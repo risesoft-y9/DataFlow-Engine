@@ -16,23 +16,23 @@
     </parent>
 
     <modules>
-        <module>../risenet-y9boot-beta-api</module>
-        <module>../risenet-y9boot-beta-client</module>
-        <module>../risenet-y9boot-data-jdbc</module>
-        <module>../risenet-y9boot-data-jdbc-commons</module>
-        <module>../risenet-y9boot-data-transfer-base</module>
-        <module>../risenet-y9boot-data-transfer-core</module>
-        <module>../risenet-y9boot-data-transfer-data</module>
-        <module>../risenet-y9boot-data-transfer-elastic</module>
-        <module>../risenet-y9boot-data-transfer-rdbms</module>
-        <module>../risenet-y9boot-data-transfer-ftp</module>
-        <module>../risenet-y9boot-data-transfer-stream</module>
-        <module>../risenet-y9boot-rpc-commons</module>
-        <module>../risenet-y9boot-rpc-consumer</module>
-        <module>../risenet-y9boot-rpc-provide</module>
-        <module>../risenet-y9boot-support-risedata-scheduler</module>
-        <module>../risenet-y9boot-webapp-risedata-executor</module>
-        <module>../risenet-y9boot-webapp-risedata-manager</module>
+        <module>risenet-y9boot-beta-api</module>
+        <module>risenet-y9boot-beta-client</module>
+        <module>risenet-y9boot-data-jdbc</module>
+        <module>risenet-y9boot-data-jdbc-commons</module>
+        <module>risenet-y9boot-data-transfer-base</module>
+        <module>risenet-y9boot-data-transfer-core</module>
+        <module>risenet-y9boot-data-transfer-data</module>
+        <module>risenet-y9boot-data-transfer-elastic</module>
+        <module>risenet-y9boot-data-transfer-rdbms</module>
+        <module>risenet-y9boot-data-transfer-ftp</module>
+        <module>risenet-y9boot-data-transfer-stream</module>
+        <module>risenet-y9boot-rpc-commons</module>
+        <module>risenet-y9boot-rpc-consumer</module>
+        <module>risenet-y9boot-rpc-provide</module>
+        <module>risenet-y9boot-support-risedata-scheduler</module>
+        <module>risenet-y9boot-webapp-risedata-executor</module>
+        <module>risenet-y9boot-webapp-risedata-manager</module>
     </modules>
 
 </project>
