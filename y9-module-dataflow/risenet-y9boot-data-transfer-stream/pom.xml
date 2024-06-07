@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>risenet-y9boot-data-transfer-stream</artifactId>
+	<packaging>jar</packaging>
+	
+	<parent>
+        <groupId>net.risesoft</groupId>
+        <artifactId>y9-module-dataflow</artifactId>
+        <version>v9.6.6-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+	
+	<description>对于流的处理</description>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<version>5.3.1</version>
+			<artifactId>hutool-all</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.risesoft</groupId>
+			<artifactId>risenet-y9boot-data-transfer-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+</project>

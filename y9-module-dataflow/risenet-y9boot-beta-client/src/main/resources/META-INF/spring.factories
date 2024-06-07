@@ -1,0 +1,4 @@
+org.springframework.cloud.bootstrap.BootstrapConfiguration=net.risedata.register.config.DiscoverBootstrapAutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  net.risedata.register.config.CreateBeanConfig,\
+  net.risedata.register.config.CommonAutoConfig

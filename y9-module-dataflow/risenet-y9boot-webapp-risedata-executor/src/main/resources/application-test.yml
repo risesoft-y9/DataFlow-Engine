@@ -1,0 +1,19 @@
+server:
+  port: 8089
+spring:
+  application:
+    name: data-transfer
+beta: 
+  discovery:
+    listener: false
+    logPath: /dataxapp/nohup.out
+    version: 1.0.1
+    ip: 10.192.198.82
+    description: 数据同步程序
+    environment: dev
+    watch:
+      watch: true
+      time: 5000 #配置多少秒监控一次
+    serverAddr: http://10.192.198.82:7055/
+  #servers: rpc:10.192.198.82:81
+  servers: rpc:10.192.198.82:7066

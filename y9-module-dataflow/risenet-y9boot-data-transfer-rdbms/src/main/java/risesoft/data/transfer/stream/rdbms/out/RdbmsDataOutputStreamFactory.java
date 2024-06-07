@@ -1,0 +1,314 @@
+package risesoft.data.transfer.stream.rdbms.out;
+
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Triple;
+
+import risesoft.data.transfer.core.context.JobContext;
+import risesoft.data.transfer.core.exception.CommonErrorCode;
+import risesoft.data.transfer.core.exception.FrameworkErrorCode;
+import risesoft.data.transfer.core.exception.TransferException;
+import risesoft.data.transfer.core.log.Logger;
+import risesoft.data.transfer.core.stream.out.DataOutputStream;
+import risesoft.data.transfer.core.stream.out.DataOutputStreamFactory;
+import risesoft.data.transfer.core.util.ClassTools;
+import risesoft.data.transfer.core.util.Configuration;
+import risesoft.data.transfer.core.util.ValueUtils;
+import risesoft.data.transfer.stream.rdbms.out.columns.PreparedStatementHandle;
+import risesoft.data.transfer.stream.rdbms.utils.DBUtil;
+import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
+
+/**
+ * 通用型数据库输出流工厂
+ * 
+ * @typeName RdbmsDataOutputStreamFactory
+ * @date 2023年12月14日
+ * @author lb
+ */
+public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
+
+	private static final List<PreparedStatementHandle> COLUMN_HANDLES;
+
+	public static final byte[] EMPTY_CHAR_ARRAY = new byte[0];
+
+	static {
+		try {
+			COLUMN_HANDLES = ClassTools.getInstancesOfPack("risesoft.data.transfer.stream.rdbms.out.columns.impl",
+					PreparedStatementHandle.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Error("加载数据库处理工厂失败程序错误!");
+		}
+
+	}
+
+	protected String jdbcUrl;
+	protected String password;
+	protected String userName;
+	protected DataBaseType dataBaseType;
+	protected String tableName;
+	protected String writerType;
+	protected Map<String, PreparedStatementHandle> createCloumnHandles;
+	protected Triple<List<String>, List<Integer>, List<String>> resultSetMetaData;
+	protected List<String> columns;
+	protected String workSql;
+	protected Logger logger;
+
+	public RdbmsDataOutputStreamFactory(Configuration configuration, JobContext jobContext) {
+		this.jdbcUrl = ValueUtils.getRequired(configuration.getString("jdbcUrl"), "缺失jdbcUrl");
+		this.password = ValueUtils.getRequired(configuration.getString("password"), "缺失password");
+		this.userName = ValueUtils.getRequired(configuration.getString("userName"), "缺失userName");
+		dataBaseType = DataBaseType.RDBMS;
+		this.tableName = ValueUtils.getRequired(configuration.getString("tableName"), "缺失tableName");
+		this.writerType = configuration.getString("writerType", "insert");
+		this.columns = ValueUtils.getRequired(configuration.getList("column", String.class), "缺失列配置");
+		this.logger = jobContext.getLoggerFactory().getLogger(RdbmsDataOutputStreamFactory.class);
+		if (logger.isInfo()) {
+			logger.info(this, "create RdbmsDataOutputStreamFactory \njdbcUrl:" + jdbcUrl + " \ntableName:" + tableName
+					+ "\ncolumns:" + this.columns + "\nwriterType:" + writerType);
+		}
+
+	}
+
+	protected List<String> idField;
+	protected List<String> updateField;
+
+	/**
+	 * 创建insertSql
+	 * 
+	 * @param size
+	 */
+	protected void createInsertSql(int size) {
+		StringBuilder sb = new StringBuilder("insert into ").append(tableName).append(" (")
+				.append(StringUtils.join(this.resultSetMetaData.getLeft(), ",")).append(") values (");
+		for (int i = 0; i < size; i++) {
+			sb.append("?");
+			if (i != size - 1) {
+				sb.append(",");
+			}
+		}
+		sb.append(")");
+
+		this.workSql = sb.toString();
+		if (logger.isInfo()) {
+			logger.info(this, "worksql:" + this.workSql);
+		}
+	}
+
+	/**
+	 * 创建replace
+	 * 
+	 * @param size
+	 */
+	protected void createReplace(int size) {
+		idField = Arrays.asList(getStrings(writerType, "replace"));
+		updateField = new ArrayList<String>();
+		for (String columnHolder : resultSetMetaData.getLeft()) {
+			if (!idField.contains(columnHolder)) {
+				updateField.add(columnHolder);
+			}
+		}
+		StringBuilder sb = new StringBuilder();
+		sb.append("update " + tableName).append(" set ");
+		for (int i = 0; i < updateField.size(); i++) {
+			if (i != 0) {
+				sb.append(",");
+			}
+			sb.append(updateField.get(i) + " = ? ");
+		}
+		sb.append("where");
+		for (int i = 0; i < idField.size(); i++) {
+			if (i != 0) {
+				sb.append(" and ");
+			}
+			sb.append(updateField.get(i) + " = ? ");
+		}
+		this.workSql = sb.toString();
+		if (logger.isInfo()) {
+			logger.info(this, "worksql:" + this.workSql);
+		}
+	}
+
+	/**
+	 * 创建updateWorkSql
+	 * 
+	 * @param size
+	 */
+	protected void createUpdate(int size) {
+		idField = Arrays.asList(getStrings(writerType, "update"));
+		updateField = new ArrayList<String>();
+		for (String columnHolder : resultSetMetaData.getLeft()) {
+			if (!idField.contains(columnHolder)) {
+				updateField.add(columnHolder);
+			}
+		}
+		StringBuilder sb = new StringBuilder();
+		sb.append("MERGE INTO " + tableName + " A USING ( SELECT ");
+		boolean first = true;
+		boolean first1 = true;
+		StringBuilder str = new StringBuilder();
+		StringBuilder update = new StringBuilder();
+		for (String columnHolder : idField) {
+			if (!first) {
+				sb.append(",");
+				str.append(" AND ");
+			} else {
+				first = false;
+			}
+			str.append("TMP.").append(columnHolder);
+			sb.append("?");
+			str.append(" = ");
+			sb.append(" AS ");
+			str.append("A.").append(columnHolder);
+			sb.append(columnHolder);
+
+		}
+
+		for (String columnHolder : updateField) {
+			if (!first1) {
+				update.append(",");
+			} else {
+				first1 = false;
+			}
+			update.append(columnHolder);
+			update.append(" = ");
+			update.append("?");
+
+		}
+
+		sb.append(" FROM DUAL ) TMP ON (");
+		sb.append(str);
+		sb.append(" ) WHEN MATCHED THEN UPDATE SET ");
+		sb.append(update);
+		sb.append(" where ");
+		first = true;
+		// 拼接or 有一个改变都得update
+		PreparedStatementHandle preparedStatementHandle;
+		for (String columnHolder : updateField) {
+			if (!first) {
+				sb.append(" or ");
+			} else {
+				first = false;
+			}
+			// 如果是大文本则需要为length
+			preparedStatementHandle = createCloumnHandles.get(columnHolder);
+			if (preparedStatementHandle.isBigType()) {
+				sb.append("length(" + columnHolder + ") != length(?)");
+			} else {
+				sb.append(columnHolder + " != ?");
+			}
+		}
+		sb.append(" WHEN NOT MATCHED THEN ").append("INSERT (")
+				.append(StringUtils.join(resultSetMetaData.getLeft(), ",")).append(") VALUES(");
+		for (int i = 0; i < size; i++) {
+			sb.append("?");
+			if (i != size - 1) {
+				sb.append(",");
+			}
+		}
+		sb.append(")");
+		this.workSql = sb.toString();
+		if (logger.isInfo()) {
+			logger.info(this, "worksql:" + this.workSql);
+		}
+	}
+
+	@Override
+	public void init() {
+		// 加载字段类型
+		createCloumnHandles = new HashMap<String, PreparedStatementHandle>();
+		try {
+			logger.debug(this, "getMetaData");
+			this.resultSetMetaData = DBUtil.getColumnMetaData(dataBaseType, jdbcUrl, userName, password, tableName,
+					StringUtils.join(this.columns, ","));
+			// 构建一个map
+			int size = this.resultSetMetaData.getRight().size();
+			for (int i = 0; i < size; i++) {
+				createCloumnHandles.put(this.resultSetMetaData.getLeft().get(i),
+						getHandle(this.resultSetMetaData.getMiddle().get(i)));
+			}
+			// 构建sql
+			logger.debug(this, "create writer sql");
+			if (writerType.equals("insert")) {
+				createInsertSql(size);
+			} else if (writerType.startsWith("update")) {
+				createUpdate(size);
+			} else if (writerType.startsWith("replace")) {
+				createUpdate(size);
+			} else {
+				logger.error(this, "未识别的输出类型" + writerType);
+				throw new RuntimeException("未识别的输出类型" + writerType);
+			}
+		} catch (Exception e) {
+			throw TransferException.as(FrameworkErrorCode.RUNTIME_ERROR, "初始化数据库输入流工厂失败异常信息" + e.getMessage(), e);
+		}
+
+	}
+
+	public static String[] getStrings(String merge, String pre) {
+		merge = merge.replace(pre, "");
+		merge = merge.replace("(", "");
+		merge = merge.replace(")", "");
+		merge = merge.replace(" ", "");
+		return merge.split(",");
+	}
+
+	/**
+	 * 获取对应类型的处理器
+	 * 
+	 * @param type
+	 * @return
+	 */
+	private PreparedStatementHandle getHandle(int type) {
+		for (PreparedStatementHandle preparedStatementHandle : COLUMN_HANDLES) {
+			if (preparedStatementHandle.isHandle(type)) {
+				return preparedStatementHandle;
+			}
+		}
+		throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "无法处理的类型:" + type);
+	}
+
+	/**
+	 * 关闭使用的链接
+	 */
+	@Override
+	public void close() throws Exception {
+		logger.info(this, "close");
+	}
+
+	protected DataOutputStream getInsertStream() {
+		return new InsertRdbmsDataOutputStream(DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password), workSql,
+				resultSetMetaData, createCloumnHandles, dataBaseType, logger);
+	}
+
+	protected DataOutputStream getUpdateStream() {
+		return new UpdateRdbmsDataOutputStream(DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password), workSql,
+				resultSetMetaData, createCloumnHandles, dataBaseType, idField, updateField, logger);
+	}
+
+	protected DataOutputStream getReplaceStream() {
+		return new ReplaceRdbmsDataOutputStream(DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password),
+				workSql, resultSetMetaData, createCloumnHandles, dataBaseType, idField, updateField, logger);
+	}
+
+	@Override
+	public DataOutputStream getStream() {
+		logger.debug(this, "getstream");
+		if (writerType.equals("insert")) {
+			return getInsertStream();
+		}
+		if (writerType.startsWith("update")) {
+			return getUpdateStream();
+		}
+		if (writerType.startsWith("replace")) {
+			return getReplaceStream();
+		}
+		throw TransferException.as(CommonErrorCode.CONFIG_ERROR, "无效的输出类型" + writerType);
+	}
+}

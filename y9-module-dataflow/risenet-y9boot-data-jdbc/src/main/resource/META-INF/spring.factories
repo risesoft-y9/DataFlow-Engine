@@ -1,0 +1,1 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=net.risedata.jdbc.config.JdbcConfig,\net.risedata.jdbc.repository.RepositoryManager

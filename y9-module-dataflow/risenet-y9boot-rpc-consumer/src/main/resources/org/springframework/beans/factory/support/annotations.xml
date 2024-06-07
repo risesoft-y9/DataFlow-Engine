@@ -1,0 +1,5 @@
+<root>
+    <item name='org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor'>
+        <annotation name='java.lang.Deprecated'/>
+    </item>
+</root>
