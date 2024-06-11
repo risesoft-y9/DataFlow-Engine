@@ -55,9 +55,9 @@ spring:
                 #username: Y9_PUBLIC
                 #password: '111111'
                 driver-class-name: com.mysql.cj.jdbc.Driver
-                url: jdbc:mysql://test.youshengyun.com:33306/y9_data?serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true&useUnicode=true&characterEncoding=utf-8&rewriteBatchedStatements=true&useCompression=true&useSSL=false
+                url: jdbc:mysql://localhost:3306/y9_data?serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true&useUnicode=true&characterEncoding=utf-8&rewriteBatchedStatements=true&useCompression=true&useSSL=false
                 username: root
-                password: 'Y9i-83204585'
+                password: '111111'
                 initialSize: 1
                 maxActive: 20
                 maxPoolPreparedStatementPerConnectionSize: 100
@@ -135,9 +135,7 @@ y9:
         convertEnabled: true
         kafkaEnabled: false
         logBaseUrl: http://127.0.0.1:7055/log
-        orgBaseUrl: https://test.youshengyun.com/platform
-        homeBaseUrl: http://127.0.0.1:7055/y9home
-        datacenterBaseUrl: http://127.0.0.1:7055/datacenter
+        orgBaseUrl: http://127.0.0.1:7055/platform
         userOnlineBaseUrl: http://127.0.0.1:7055/userOnline
     feature:
         file:
@@ -146,7 +144,7 @@ y9:
             #privateKey: 
             #publicKey: 
             rest:
-                fileManagerUrl: https://test.youshengyun.com/fileManager
+                fileManagerUrl: http://127.0.0.1:7055/fileManager
             ftp:
                 host: localhost
                 port: 21
@@ -218,8 +216,6 @@ y9:
                 acceptedReferer:
                     - 127.0.0.1
                     - localhost
-                    - vue.youshengyun.com
-                    - test.youshengyun.com
         oauth2:
             resource:
                 enabled: false
@@ -232,8 +228,8 @@ y9:
                 opaque:
                     client-id: clientid
                     client-secret: secret
-                    introspection-uri: https://test.youshengyun.com/sso/oauth2.0/introspect
-                    profile-uri: https://test.youshengyun.com/sso/oauth2.0/profile
+                    introspection-uri: http://127.0.0.1:7055/sso/oauth2.0/introspect
+                    profile-uri: http://127.0.0.1:7055/sso/oauth2.0/profile
 rpc.port: 7066
 #单机登录开关   
 risedata.security: true          
