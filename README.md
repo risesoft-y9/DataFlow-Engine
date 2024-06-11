@@ -13,124 +13,36 @@
 
 ## 简介
 
-数字底座是一款面向大型政府、企业数字化转型，基于身份认证、组织架构、岗位职务、应用系统、资源角色等功能构建的统一且安全的管理支撑平台。数字底座基于三员管理模式，具备微服务、多租户、容器化和国产化，支持用户利用代码生成器快速构建自己的业务应用，同时可关联诸多成熟且好用的内部生态应用。
+数据流引擎是一款面向数据集成、数据同步、数据交换、数据共享、任务配置、任务调度的底层数据驱动引擎。数据流引擎采用管执分离、多流层、插件库等体系应对大规模数据任务、数据高频上报、数据高频采集、异构数据兼容的实际数据问题。
 
 ## 源码目录
 
 ```
-common -- 系统公共模块
- ├── risenet-y9boot-3rd-jpa -- SpringDataJPA相关配置
- ├── risenet-y9boot-common-model -- 公共对象模型
- ├── risenet-y9boot-common-nacos -- nacos加解密包
- ├── risenet-y9boot-common-tenant-datasource -- 租户动态数据源包
- ├── risenet-y9boot-common-util -- 公共工具包
- ├── risenet-y9boot-properties -- 公共配置文件包
-example -- 基于数字底座的示例工程
- ├── risenet-y9demo-file -- 文件服务使用示例
- ├── risenet-y9demo-kernel-api -- 数字底座接口调用示例
- ├── risenet-y9demo-sso-oauth2 -- 数字底座OAuth2认证示例
- ├── risenet-y9demo-sync-kafka -- 数字底座组织信息同步(kafka消息机制)示例
-starter -- 初始化模块
- ├── risenet-y9boot-starter-apisix -- 微服务api网关组件
- ├── risenet-y9boot-starter-cache-redis -- 缓存组件
- ├── risenet-y9boot-starter-elasticsearch -- 全文检索基本依赖封装
- ├── risenet-y9boot-starter-idgenerator -- 唯一标示生成组件
- ├── risenet-y9boot-starter-jpa-public -- 公共库组件
- ├── risenet-y9boot-starter-jpa-tenant -- 多租户相关组件
- ├── risenet-y9boot-starter-kafka -- kafka通用消息监听组件(y9_common_event队列)
- ├── risenet-y9boot-starter-liquibase -- 监听数据库结构变化组件
- ├── risenet-y9boot-starter-listener-kafka -- kafka组织信息消息监听组件(y9_org_event队列)
- ├── risenet-y9boot-starter-log -- 日志组件
- ├── risenet-y9boot-starter-multi-tenant -- 多租户相关组件
- ├── risenet-y9boot-starter-openfeign -- 远程调用组件
- ├── risenet-y9boot-starter-permission -- 权限组件
- ├── risenet-y9boot-starter-publish-kafka -- kafka发布消息组件
- ├── risenet-y9boot-starter-security -- 安全模块组件
- ├── risenet-y9boot-starter-sso-oauth2-resource -- OAuth2.0认证组件
- ├── risenet-y9boot-starter-web -- 全局的异常处理器
+common -- 公共模块
+ ├── risenet-y9boot-beta-api
+ ├── risenet-y9boot-beta-client
+ ├── risenet-y9boot-data-jdbc
+ ├── risenet-y9boot-data-jdbc-commons
+transfer -- 处理模块
+ ├── risenet-y9boot-data-transfer-base
+ ├── risenet-y9boot-data-transfer-core
+ ├── risenet-y9boot-data-transfer-data
+ ├── risenet-y9boot-data-transfer-elastic
+ ├── risenet-y9boot-data-transfer-rdbms
+ ├── risenet-y9boot-data-transfer-ftp
+ ├── risenet-y9boot-data-transfer-stream
+rpc 
+ ├── risenet-y9boot-rpc-commons
+ ├── risenet-y9boot-rpc-consumer
+ ├── risenet-y9boot-rpc-provide
 support -- 业务支撑模块
- ├── risenet-y9boot-support-file-jpa-repository -- 文件信息存储模块
- ├── risenet-y9boot-support-file-service-ftp -- 文件服务器支持
- ├── risenet-y9boot-support-history -- 实体审计日志组件
+ ├── risenet-y9boot-support-risedata-scheduler
 vue -- 前端工程
- ├── y9vue-kernel-standard -- 数字底座前端工程
-webapp -- 系统公共模块
- ├── y9-module-log -- 日志后端工程
- ├── y9-module-platform -- 数字底座后端工程
- ├── y9-module-sso -- OAuth2.0认证服务端
+ ├── y9vue-dataFlowEngine -- 数据流引擎前端工程
+webapp -- 后端工程
+ ├── risenet-y9boot-webapp-risedata-executor -- 执行端
+ ├── risenet-y9boot-webapp-risedata-manager -- 管理端
 ```
-
-## 内置功能
-
-系统三员是系统默认生成的三个账号，包含系统管理员、安全保密员、安全审计员。
-
-系统管理员：主要负责系统的配置和组织人员的管理
-
-安全保密员：主要负责权限管理和子域三员管理（部门三员管理）以及查看安全审计员的日志和普通用户的日志
-
-安全审计员：主要负责审查系统管理员的日志和安全保密员的日志
-
-#### 系统管理员
-
-- 控制台
-
-  显示系统总体信息，目前是一个模板页面，可以根据自己的实际需要进行改造。
-
-- 组织架构
-
-  包括组织机构、部门、人员、部门领导的管理，其中组织、部门、人员树结构展现。
-
-- 组织岗位
-
-  包括组织机构、部门、岗位、部门领导的管理，其中组织、部门、岗位树结构展现。
-
-- 应用系统管理
-
-  需要授权的系统的管理，可以添加系统并在系统下面添加应用。
-
-- 应用角色管理
-
-  对系统下面的应用的角色进行管理。
-
-- 应用资源管理
-
-  对系统下面的应用的资源进行管理。
-
-- 字典表管理
-
-  对系统中经常使用的一些较为固定的数据进行维护。
-
-- 图标管理
-
-  对系统中的图标进行管理，系统创建应用的时候可以从该图标库中选择。
-
-#### 安全保密员
-
-- 授权管理
-
-  针对应用中的菜单，授权给拥有某些角色的用户。
-
-- 子域三员管理
-
-  对部门的三员进行管理。
-
-- 用户日志
-
-  可以审查普通用户的登录日志以及操作日志。
-
-- 安全审计员日志
-
-  可以审查安全审计员的登录日志以及操作日志。
-
-#### 安全审计员
-
-- 系统管理员日志
-
-  可以审查系统管理员的登录日志以及操作日志。
-
-- 安全保密员日志
-
-  可以审查安全保密员的登录日志以及操作日志。
 
 ## 逻辑架构图
 
@@ -179,25 +91,19 @@ webapp -- 系统公共模块
 | 3    | Kafka            | 2.6+ | <a href="https://kafka.apache.org/" target="_blank">官网</a> |
 | 4    | filezilla server | 1.7+ | <a href="https://www.filezilla.cn/download/server" target="_blank">官网</a> |
 
-## 数据库选型
+## 数据源支持与兼容
 
-| 序号 | 工具          | 版本       | 官网                                                         |
-| ---- | ------------- | ---------- | ------------------------------------------------------------ |
-| 1    | Mysql         | 5.7 / 8.0+ | <a href="https://www.mysql.com/cn/" target="_blank">官网</a> |
-| 2    | Redis         | 6.2+       | <a href="https://redis.io/" target="_blank">官网</a>         |
-| 3    | elasticsearch | 7.9+       | <a href="https://www.elastic.co/cn/elasticsearch/" target="_blank">官网</a> |
+| 序号 | 源库           | 目标库 | 源库版本                                                         |
+| ----- | ----------- | ------------------------- | ----------- |
+| 1    | Mysql | Mysql、Oracle、PostgresQL、人大金仓、达梦       | 5.7.19以上 |
+| 2    | Oracle | Mysql、Oracle、PostgresQL、人大金仓、达梦             | 11g-19c |
+| 3    | PostgresQL | Mysql、Oracle、PostgresQL、人大金仓、达梦       | 9.5.25以上 |
+| 4    | 人大金仓 | Mysql、Oracle、PostgresQL、人大金仓、达梦 | KingbaseES V8 |
+| 5    | 达梦 | Mysql、Oracle、PostgresQL、人大金仓、达梦 | DM8 |
+| 6    | ElasticSearch | ElasticSearch | 6.x以上 |
+| 7    | FTP | FTP |  |
 
-## 数字底座专利
-
-| 序号 | 专利号           | 专利名称 |
-| ----- | ---------------- | ----------------------- |
-| 1    | ZL202111207338.0 | 《基于集合运算的资源授权方法及资源授权系统》       |
-| 2    | ZL202210702228.X | 《一种静默化数据处理方法及处理系统》             |
-| 3    | ZL202310030893.3 | 《基于多租户模式下的权限调度方法及调度系统》       |
-| 4    | ZL202310238451.8 | 《一种基于前后端分离架构的前端双随机多态混淆方法》 |
-| 5    | ZL202310238534.7 | 《多租户模式下数字底座子域三员架构模型的实现方法》 |
-
-## 数字底座信创
+## 信创
 
 | **序号** | 类型     | 对象                       |
 | :------- | -------- | -------------------------- |
@@ -210,51 +116,22 @@ webapp -- 系统公共模块
 
 ## 在线体验
 
-演示地址：<a href="https://test.youshengyun.com/kernel-standard/" target="_blank">https://test.youshengyun.com/kernel-standard/</a>
+演示地址：<a href="https://test.youshengyun.com/y9vue-dataFlowEngine/" target="_blank">https://test.youshengyun.com/y9vue-dataFlowEngine/</a>
 
 > 演示账号：
 >
-> 系统管理员：systemManager  密码：Risesoft@2022
->
-> 安全保密员：securityManager  密码：Risesoft@2022
->
-> 安全审计员：auditManager   密码：Risesoft@2022
->
-> 说明：输入登录名后，请选择"北京有生博大软件股份有限公司"租户，再输入密码进行登录
-
-## 私有化部署
-
-地址：<a href="https://test.youshengyun.com/y9vue-code/" target="_blank">https://test.youshengyun.com/y9vue-code/</a>
-
-> 包含数字底座使用中间件的安装教程、数字底座重要配置讲解，进行本地化部署务必要浏览该网站，会少走弯路。
+> 账号：admin  密码：admin
 
 ## 文档专区
 
 | 序号 | 名称                                                                                              |
 |:---|-------------------------------------------------------------------------------------------------|
-| 1  | <a href="https://vue.youshengyun.com/files/单点登录对接文档.pdf" target="_blank">单点登录对接文档</a>           |
-| 2  | <a href="https://vue.youshengyun.com/files/数字底座接口文档.pdf" target="_blank">数字底座接口文档</a>           |
-| 3  | <a href="https://test.youshengyun.com/y9vue-code/digitalBase" target="_blank">安装部署文档</a>        |
-| 4  | <a href="https://vue.youshengyun.com/files/操作使用文档（技术白皮书）.pdf" target="_blank">操作使用文档（技术白皮书）</a> |
-| 5  | <a href="https://vue.youshengyun.com/files/数字底座数据库设计文档.pdf" target="_blank">数字底座数据库设计文档</a>     |
-| 6  | <a href="https://vue.youshengyun.com/files/内部Java开发规范手册.pdf" target="_blank">内部Java开发规范手册</a>   |
-| 7  | <a href="https://vue.youshengyun.com/files/日志组件使用文档.pdf" target="_blank">日志组件使用文档</a>           |
-| 8  | <a href="https://vue.youshengyun.com/files/文件组件使用文档.pdf" target="_blank">文件组件使用文档</a>           |
-| 9  | <a href="https://vue.youshengyun.com/files/代码生成器使用文档.pdf" target="_blank">代码生成器使用文档</a>         |
-| 10 | <a href="https://vue.youshengyun.com/files/配置文件说明文档.pdf" target="_blank">配置文件说明文档</a>           |
-| 11 | <a href="https://vue.youshengyun.com/files/常用工具类使用示例文档.pdf" target="_blank">常用工具类使用示例文档</a>     |
-| 12 | <a href="https://vue.youshengyun.com/files/有生博大Vue开发手册v1.0.pdf" target="_blank">前端开发手册</a>      |
-| 13 | <a href="https://vue.youshengyun.com/files/开发规范.pdf" target="_blank">前端开发规范</a>                 |
-| 14 | <a href="https://vue.youshengyun.com/files/代码格式化.pdf" target="_blank">前端代码格式化</a>               |
-| 15 | <a href="https://vue.youshengyun.com/files/系统组件.pdf" target="_blank">前端系统组件</a>                 |
-| 16 | <a href="https://vue.youshengyun.com/files/通用方法.pdf" target="_blank">前端通用方法</a>                 |
-| 17 | <a href="https://vue.youshengyun.com/files/国际化.pdf" target="_blank">前端国际化</a>                   |
-| 18 | <a href="https://vue.youshengyun.com/files/Icon图标.pdf" target="_blank">前端Icon图标</a>             |
-| 19 | <a href="https://vue.youshengyun.com/files/Oracle数据库适配文档.pdf" target="_blank">Oracle数据库适配文档</a>          |
+| 1  | <a href="https://vue.youshengyun.com/files/单点登录对接文档.pdf" target="_blank">安装部署文档</a>           |
+| 2  | <a href="https://vue.youshengyun.com/files/数字底座接口文档.pdf" target="_blank">操作使用文档</a>           |
 
-## 数字底座截图
+## 系统截图
 
-#### 系统管理员界面截图
+#### 界面截图
 
 <table>
     <tr>
@@ -275,107 +152,20 @@ webapp -- 系统公共模块
     </tr>
     <tr>
         <td><img src="https://vue.youshengyun.com/files/img/9.png"></td>
+        <td><img src="https://vue.youshengyun.com/files/img/10.png"></td>
+    </tr>
+    <tr>
+        <td><img src="https://vue.youshengyun.com/files/img/11.png"></td>
+        <td><img src="https://vue.youshengyun.com/files/img/12.png"></td>
     </tr>
 </table>
 
-#### 安全保密员界面截图
+## 同构开源项目
 
-<table>
-    <tr>
-        <td><img src="https://vue.youshengyun.com/files/img/21.png"></td>
-        <td><img src="https://vue.youshengyun.com/files/img/22.png"></td>
-    </tr>
-    <tr>
-        <td><img src="https://vue.youshengyun.com/files/img/23.png"></td>
-        <td><img src="https://vue.youshengyun.com/files/img/24.png"></td>
-    </tr>
-</table>
-
-#### 安全审计员界面截图
-
-<table>
-    <tr>
-        <td><img src="https://vue.youshengyun.com/files/img/31.png"></td>
-        <td><img src="https://vue.youshengyun.com/files/img/32.png"></td>
-    </tr>
-    <tr>
-        <td><img src="https://vue.youshengyun.com/files/img/33.png"></td>
-        <td><img src="https://vue.youshengyun.com/files/img/34.png"></td>
-    </tr>
-</table>
-
-## 数字底座生态
-
-<div><img src="https://vue.youshengyun.com/files/img/shengtai.png"><div/>
-
-#### 工作桌面
-
-##### 简介
-
-工作桌面内置首页、内容管理、日程管理、统一待办、通讯录五大模块，支持拖拉拽和点选配置定制个性化的界面，方便集成各个应用、消息。
-
-##### 截图
-
-<div><img src="https://vue.youshengyun.com/files/img/gongzuozhuomian.png"><div/>
-<div><img src="https://vue.youshengyun.com/files/img/neirongguanli.png"><div/>
-<div><img src="https://vue.youshengyun.com/files/img/bianjiwendang.png"><div/>
-
-#### 工作流程
-
-##### 简介
-
-工作流程内置流程设计器、表单设计器、事项管理器三大工具，支持中国式流程的自由定义，具备细颗粒度的事项分类。
-
-##### 截图
-
-<div><img src="https://vue.youshengyun.com/files/img/gongzuoliucheng.png"><div/>
-<div><img src="https://vue.youshengyun.com/files/img/liuchengsheji.png"><div/>
-<div><img src="https://vue.youshengyun.com/files/img/biaodansheji.png"><div/>
-
-#### 即时通讯
-
-##### 简介
-
-即时通讯仿照微信的体验和界面，支持私有化部署，支持多端同步，支持组织架构，易于接入或者关联各类应用消息。
-
-##### 截图
-
-<div><img src="https://vue.youshengyun.com/files/img/jishitongxun.png"><div/>
-<div><img src="https://vue.youshengyun.com/files/img/qunliao.png"><div/>
-
-#### 网络硬盘
-
-##### 简介
-
-网络硬盘是一个私密安全的机关单位内部的知识共享和任务收发工具，支持分级权限管控和文件加密分享。
-
-##### 截图
-
-<div><img src="https://vue.youshengyun.com/files/img/wangluoyingpan.png"><div/>
-<div><img src="https://vue.youshengyun.com/files/img/wenjianyidong.png"><div/>
-<div><img src="https://vue.youshengyun.com/files/img/wenjiangongxiang.png"><div/>
-
-#### 电子邮件
-
-##### 简介
-
-电子邮件支持内网高效模式和互联网协议模式，具备精简、安全和高效的功能模块。
-
-##### 截图
-
-<div><img src="https://vue.youshengyun.com/files/img/dianziyoujian.png"><div/>
-<div><img src="https://vue.youshengyun.com/files/img/youjianxiangqing.png"><div/>
-<div><img src="https://vue.youshengyun.com/files/img/tongxunlu.png"><div/>
-
-## 助力政企数字化转型
-
-#### 三座大山
-
-<div><img src="https://vue.youshengyun.com/files/img/sanzuodashan.png"><div/>
-
-#### 七步走
-
-<div><img src="https://vue.youshengyun.com/files/img/qibuzou.png"><div/>
+| 序号 | 项目名称          | 项目介绍           | 地址                                                         |
+| ----- | ----------- | ----------------------------------------- | ----------- |
+| 1    | 数字底座 | 数字底座是一款面向大型政府、企业数字化转型，基于身份认证、组织架构、岗位职务、应用系统、资源角色等功能构建的统一且安全的管理支撑平台。数字底座基于三员管理模式，具备微服务、多租户、容器化和国产化，支持用户利用代码生成器快速构建自己的业务应用，同时可关联诸多成熟且好用的内部生态应用。      | 码云 |
+| 2    | 工作流引擎 | 工作流引擎对内提供单位/机关流程管理规则和内部业务流程的数字化落地实践；对外提供自动化地第三方业务驱动、接口接入和算法单元驱动能力；工作流引擎在提供底层驱动引擎的同时对全局透明监控、安全防御和国产化特色功能进行充分考虑，是内部流程管理和业务算法驱动的不二之选。        | 码云 |
 
 ## 赞助与支持
 
@@ -387,20 +177,13 @@ webapp -- 系统公共模块
 
 官网：<a href="https://www.risesoft.net/" target="_blank">https://www.risesoft.net/</a>
 
-### 统一标识代码注册管理中心
-
-官网：<a href="https://www.idcode.org.cn/" target="_blank">https://www.idcode.org.cn/</a>
-
-> 数字底座已经全面接入统一标识码（MA码），具体使用说明请查看：<a href="https://gitee.com/risesoft-y9/y9-core/tree/main/y9-digitalbase-idcode" target="_blank">https://gitee.com/risesoft-y9/y9-core/tree/main/y9-digitalbase-idcode</a>
->
-
 ## 咨询与合作
 
 联系人：曲经理
 
 微信号：qq349416828
 
-备注：开源数字底座咨询-姓名
+备注：开源数据流引擎咨询-姓名
 <div><img style="width: 40%" src="https://vue.youshengyun.com/files/img/曲经理-二维码.png"><div/>
 联系人：有生博大-咨询热线
 
