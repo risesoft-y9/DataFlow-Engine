@@ -38,7 +38,7 @@ rpc
 support -- 业务支撑模块
  ├── risenet-y9boot-support-risedata-scheduler
 vue -- 前端工程
- ├── y9vue-dataFlowEngine -- 数据流引擎前端工程
+ ├── y9vue-dataFlowEngine
 webapp -- 后端工程
  ├── risenet-y9boot-webapp-risedata-executor -- 执行端
  ├── risenet-y9boot-webapp-risedata-manager -- 管理端
@@ -46,7 +46,7 @@ webapp -- 后端工程
 
 ## 逻辑架构图
 
-<div><img src="https://vue.youshengyun.com/files/img/ljjgt.png"><div/>
+<div><img src="https://vue.youshengyun.com/files/dataflow/img/ljjgt.png"><div/>
 
 ## 后端技术选型
 
@@ -118,8 +118,8 @@ webapp -- 后端工程
 
 | 序号 | 功能名称     | 功能解释                       |
 | ------- | ----------- | -------------------------- |
-| 1       | 输入   | 指的是源头表数据（数据生产者）  |
-| 2       | 输出   | 指的是要存入的目的表（数据消费者）  |
+| 1       | 输入流   | 指的是源头表数据（数据生产者）  |
+| 2       | 输出流   | 指的是要存入的目的表（数据消费者）  |
 | 3       | 输入/输出线程池   | 线程池处理器  |
 | 4       | 输入/输出通道  | 数据处理推送通道  |
 | 5       | 数据闸口   | 将接收到的数据通过批处理、直流推送或者限流推送到输出通道  |
