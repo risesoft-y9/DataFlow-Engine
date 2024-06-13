@@ -3,8 +3,8 @@
 </p>
 <p align="center">基于SpringBoot+Vue前后端分离的Java快速开发框架</p>
 <p align="center">
- <a href='https://gitee.com/risesoft-y9/y9-core/stargazers'><img src='https://gitee.com/risesoft-y9/y9-core/badge/star.svg?theme=dark' alt='star'></img></a>
-    <img src="https://img.shields.io/badge/version-v9.6.3-yellow.svg">
+ <a href='https://gitee.com/risesoft-y9/y9-dataflow/stargazers'><img src='https://gitee.com/risesoft-y9/y9-dataflow/badge/star.svg?theme=dark' alt='star'></img></a>
+    <img src="https://img.shields.io/badge/version-v9.6.6-yellow.svg">
     <img src="https://img.shields.io/badge/Spring%20Boot-2.7-blue.svg">
     <img alt="logo" src="https://img.shields.io/badge/Vue-3.3-red.svg">
     <img alt="" src="https://img.shields.io/badge/JDK-11-green.svg">
@@ -38,7 +38,7 @@ rpc
 support -- 业务支撑模块
  ├── risenet-y9boot-support-risedata-scheduler
 vue -- 前端工程
- ├── y9vue-dataFlowEngine
+ ├── y9vue-dataFlowEngine -- 前端
 webapp -- 后端工程
  ├── risenet-y9boot-webapp-risedata-executor -- 执行端
  ├── risenet-y9boot-webapp-risedata-manager -- 管理端
