@@ -558,7 +558,7 @@
             } else {
                 item.type = item.type2;
                 item.props.render = () => {
-                    return h('span', props.currNode[item.prop] || '');
+                  return h('span', baseFormConfig.value.model[item.prop] || '');
                 };
             }
         });
@@ -569,7 +569,7 @@
             } else {
                 item.type = item.type2;
                 item.props.render = () => {
-                    return h('span', props.currNode[item.prop] || '');
+                  return h('span', constraintFormConfig.value.model[item.prop] || '');
                 };
             }
         });
@@ -578,10 +578,22 @@
                 item.type = item.type1;
                 item.render = null;
             } else {
-                item.type = item.type2;
+              item.type = item.type2;
+              if(item.prop=='isLook'){
+                if(assistFormConfig.value.model.isLook==0){
+                  item.props.render = () => {
+                    return h('span',  '关闭');
+                  };
+                }else{
+                  item.props.render = () => {
+                    return h('span',  '开启');
+                  };
+                }
+              }else{
                 item.props.render = () => {
-                    return h('span', props.currNode[item.prop] || '');
+                  return h('span',  assistFormConfig.value.model[item.prop] || '');
                 };
+              }
             }
         });
     };
@@ -623,9 +635,12 @@
                 duration: 2000,
                 offset: 80
             });
-            onShow();
+            // onShow();
+          await initDataSourceDetail(props.currNode.id)
+          await saveFormList()
+          await onShow();
             // 刷新树
-            props.flxedTree?.onRefreshTree();
+            // props.flxedTree?.onRefreshTree();
         } else {
             ElMessage({
                 type: 'error',
@@ -634,6 +649,21 @@
             });
         }
     };
+    const saveFormList=async ()=>{
+      const models = Object.assign(
+          {
+            ...initFormModels.baseFormModel,
+            ...initFormModels.constraintFormModel,
+            ...initFormModels.assistFormModel,
+            baseType: props.currNode.baseType
+          },
+          dataSourceInfo.value
+      );
+      //初始化表单数据——基本信息表单
+      baseFormConfig.value.model = pick(models, Object.keys(initFormModels.baseFormModel));
+      //初始化表单数据——辅助信息表单
+      assistFormConfig.value.model = pick(models, Object.keys(initFormModels.assistFormModel));
+    }
     //编辑按钮触发
     const onEdit = () => {
         isEditStatus.value = true;
@@ -641,7 +671,7 @@
         changeFormStatus(true);
     };
     //恢复展示状态
-    const onShow = () => {
+    const onShow =async () => {
         isEditStatus.value = false;
         //改变表单状态
         changeFormStatus(false);
@@ -661,10 +691,11 @@
 
     watch(
         () => props.currNode.id,
-        (newId) => {
-            //恢复状态
-            initDataSourceDetail(newId);
-            onShow();
+        async (newId) => {
+          //恢复状态
+          //恢复状态
+          await initDataSourceDetail(newId);
+          await onShow();
         },
         {
             immediate: true,
