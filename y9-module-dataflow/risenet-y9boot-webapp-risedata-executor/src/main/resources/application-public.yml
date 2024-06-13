@@ -5,12 +5,18 @@ spring:
     name: data-transfer
 beta: 
   discovery:
+    #监听文件
     listener: true
+    #日志文件位置
     logPath: /dataxapp/nohup.out
+    #版本号
     version: 1.0.1
+    #描述
     description: 数据同步程序
+    #环境
     environment: Public
     watch:
+    #是否监控
       watch: true
       time: 5000 #配置多少秒监控一次
     serverAddr: http://localhost:7055/risedata

@@ -3,8 +3,8 @@
 </p>
 <p align="center">基于SpringBoot+Vue前后端分离的Java快速开发框架</p>
 <p align="center">
- <a href='https://gitee.com/risesoft-y9/y9-core/stargazers'><img src='https://gitee.com/risesoft-y9/y9-core/badge/star.svg?theme=dark' alt='star'></img></a>
-    <img src="https://img.shields.io/badge/version-v9.6.3-yellow.svg">
+ <a href='https://gitee.com/risesoft-y9/y9-dataflow/stargazers'><img src='https://gitee.com/risesoft-y9/y9-dataflow/badge/star.svg?theme=dark' alt='star'></img></a>
+    <img src="https://img.shields.io/badge/version-v9.6.6-yellow.svg">
     <img src="https://img.shields.io/badge/Spring%20Boot-2.7-blue.svg">
     <img alt="logo" src="https://img.shields.io/badge/Vue-3.3-red.svg">
     <img alt="" src="https://img.shields.io/badge/JDK-11-green.svg">
@@ -38,7 +38,7 @@ rpc
 support -- 业务支撑模块
  ├── risenet-y9boot-support-risedata-scheduler
 vue -- 前端工程
- ├── y9vue-dataFlowEngine
+ ├── y9vue-dataFlowEngine -- 前端
 webapp -- 后端工程
  ├── risenet-y9boot-webapp-risedata-executor -- 执行端
  ├── risenet-y9boot-webapp-risedata-manager -- 管理端
@@ -118,8 +118,8 @@ webapp -- 后端工程
 
 | 序号 | 功能名称     | 功能解释                       |
 | ------- | ----------- | -------------------------- |
-| 1       | 输入流   | 指的是源头表数据（数据生产者）  |
-| 2       | 输出流   | 指的是要存入的目的表（数据消费者）  |
+| 1       | 输入   | 指的是源头表数据（数据生产者）  |
+| 2       | 输出   | 指的是要存入的目的表（数据消费者）  |
 | 3       | 输入/输出线程池   | 线程池处理器  |
 | 4       | 输入/输出通道  | 数据处理推送通道  |
 | 5       | 数据闸口   | 将接收到的数据通过批处理、直流推送或者限流推送到输出通道  |
@@ -183,8 +183,8 @@ webapp -- 后端工程
 
 | 序号 | 项目名称          | 项目介绍           | 地址                                                         |
 | ----- | ----------- | ----------------------------------------- | ----------- |
-| 1    | 数字底座 | 数字底座是一款面向大型政府、企业数字化转型，基于身份认证、组织架构、岗位职务、应用系统、资源角色等功能构建的统一且安全的管理支撑平台。数字底座基于三员管理模式，具备微服务、多租户、容器化和国产化，支持用户利用代码生成器快速构建自己的业务应用，同时可关联诸多成熟且好用的内部生态应用。      | 码云 |
-| 2    | 工作流引擎 | 工作流引擎对内提供单位/机关流程管理规则和内部业务流程的数字化落地实践；对外提供自动化地第三方业务驱动、接口接入和算法单元驱动能力；工作流引擎在提供底层驱动引擎的同时对全局透明监控、安全防御和国产化特色功能进行充分考虑，是内部流程管理和业务算法驱动的不二之选。        | 码云 |
+| 1    | 数字底座 | 数字底座是一款面向大型政府、企业数字化转型，基于身份认证、组织架构、岗位职务、应用系统、资源角色等功能构建的统一且安全的管理支撑平台。数字底座基于三员管理模式，具备微服务、多租户、容器化和国产化，支持用户利用代码生成器快速构建自己的业务应用，同时可关联诸多成熟且好用的内部生态应用。      | <a href="https://gitee.com/risesoft-y9/y9-core" target="_blank">码云地址</a> |
+| 2    | 工作流引擎 | 工作流引擎对内提供单位/机关流程管理规则和内部业务流程的数字化落地实践；对外提供自动化地第三方业务驱动、接口接入和算法单元驱动能力；工作流引擎在提供底层驱动引擎的同时对全局透明监控、安全防御和国产化特色功能进行充分考虑，是内部流程管理和业务算法驱动的不二之选。        | <a href="https://gitee.com/risesoft-y9/y9-flowable" target="_blank">码云地址</a> |
 
 ## 赞助与支持
 
