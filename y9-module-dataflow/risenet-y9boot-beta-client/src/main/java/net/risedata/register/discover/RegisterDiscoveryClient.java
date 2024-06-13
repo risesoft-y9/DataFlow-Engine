@@ -1,7 +1,9 @@
 package net.risedata.register.discover;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
+import cn.hutool.http.HttpUtil;
 import net.risedata.register.exceptions.RegisterException;
 import net.risedata.register.model.RegisterServerAPI;
 import net.risedata.register.rpc.RegisterAPI;
@@ -10,7 +12,6 @@ import net.risedata.rpc.consumer.core.Connection;
 import net.risedata.rpc.consumer.core.ConnectionManager;
 import net.risedata.rpc.consumer.factory.ConnectionManagerFactory;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,18 +32,14 @@ public class RegisterDiscoveryClient implements DiscoveryClient {
     @Value("${beta.discovery.environment:Public}")
     private String environment;
 
-    private  String[] serversUrl ;
+    @Value("${beta.discovery.serverAddr}")
+    private String serversUrl ;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegisterDiscoveryClient.class);
 
     public static final List<ServiceInstance> EMPTY = new ArrayList<>();
 
-
     private RegisterAPI registerAPI;
-
-//    public RegisterDiscoveryClient() {
-//
-//    }
 
     public RegisterAPI getRegisterAPI() {
         return registerAPI;
@@ -50,13 +47,6 @@ public class RegisterDiscoveryClient implements DiscoveryClient {
 
     public void setRegisterAPI(RegisterAPI registerAPI) {
         this.registerAPI = registerAPI;
-    }
-
-    public RegisterDiscoveryClient(String serversUrl, String environment) {
-        if (!StringUtils.isEmpty(serversUrl)) {
-            this.serversUrl = serversUrl.split(",");
-            this.environment = environment;
-        }
     }
 
     @Override
@@ -81,22 +71,20 @@ public class RegisterDiscoveryClient implements DiscoveryClient {
         if (serversUrl == null) {
             throw new RegisterException("serversUrl is null");
         }
-        //JSONObject jsonObject = null;
-        //Set<String> keys;
-        for (int i = 0; i < serversUrl.length; i++) {
+        JSONObject jsonObject = null;
+        Set<String> keys;
+        String[] servers = serversUrl.split(",");
+        for (int i = 0; i < servers.length; i++) {
             try {
                 Map<String, Object> map = new HashMap<>();
                 map.put("environment", environment);
-                //jsonObject = JSON.parseObject(HttpUtil.get(serversUrl[i] + RegisterServerAPI.GET_ALL, map, 60000));
+                jsonObject = JSON.parseObject(HttpUtil.get(servers[i] + RegisterServerAPI.GET_ALL, map, 60000));
 
-                //keys = jsonObject.keySet();
-                //doUpdate(keys,jsonObject);
+                keys = jsonObject.keySet();
+                doUpdate(keys,jsonObject);
                 return;
             } catch (Exception e) {
                 e.printStackTrace();
-                if (i == serversUrl.length - 1) {
-//                    throw e;
-                }
             }
         }
     }
@@ -124,7 +112,7 @@ public class RegisterDiscoveryClient implements DiscoveryClient {
 
     public void refreshAll() {
 
-        if (registerAPI == null && serversUrl != null && serversUrl.length > 0) {
+        if (registerAPI == null && serversUrl != null) {
             refreshToHttp();
         }
         if (registerAPI != null) {
