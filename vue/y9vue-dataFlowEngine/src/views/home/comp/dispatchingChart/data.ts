@@ -131,7 +131,7 @@ export let currentTaskInfoQueryAllSelect = ref();
 
 export let log_totalSuccess = ref(0);
 export let log_totalFailure = ref(0);
-export let logInfoSelectName = ref('最近一个月');
+export let logInfoSelectName = ref('最近一周');
 export let logInfoQueryAllSelect = ref();
 
 export let showEnvironmentAll = ref(false);
