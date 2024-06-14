@@ -37,6 +37,9 @@
         isNot: false
     });
 
+    // 存放解除授权或授权的 判断
+    let isNotFlag = ref(false);
+
     // 表格列表配置
     let tableConfig = ref({
         loading: false,
@@ -62,7 +65,7 @@
                 title: computed(() => t('操作')),
                 fixed: 'right',
                 render: (row) => {
-                    return [
+                    let auth = [
                         h(
                             'span',
                             {
@@ -105,7 +108,9 @@
                                 }
                             },
                             t('授权')
-                        ),
+                        )
+                    ];
+                    let revokeAuth = [
                         h(
                             'span',
                             {
@@ -134,7 +139,7 @@
                                                 });
                                             } catch (err) {}
 
-                                            console.log('0000');
+                                            // console.log('0000');
 
                                             loading.value = false;
                                         })
@@ -153,6 +158,7 @@
                             t('取消授权')
                         )
                     ];
+                    return isNotFlag.value ? auth : revokeAuth;
                 }
             }
         ],
@@ -177,7 +183,8 @@
                     options: [
                         { label: '是', value: false },
                         { label: '否', value: true }
-                    ]
+                    ],
+                    clearable: false
                 }
             },
             {
@@ -196,7 +203,7 @@
             }
         ],
         filtersValueCallBack: (filters) => {
-            console.log('过滤值', filters);
+            // console.log('过滤值', filters);
             filterData.value = filters;
         }
     });
@@ -222,7 +229,9 @@
             roleId: id
         };
 
-        console.log(params, '9999');
+        // console.log(params, '9999');
+
+        isNotFlag.value = params.isNot;
 
         // 请求接口
         let result = await searchUsersList(params);
