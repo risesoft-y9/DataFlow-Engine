@@ -19,7 +19,7 @@ public interface HomeDataService {
 
 	/**
 	 * 获取首页全部数据
-	 * 
+	 *
 	 * @MethodName: getHomeData
 	 * @Description: TODO
 	 * @author
@@ -32,22 +32,22 @@ public interface HomeDataService {
 
 	/**
 	 * 获取当前任务执行情况
-	 * 
+	 *
 	 * @MethodName: getCurrentTaskInfo
 	 * @Description: TODO
 	 * @author
-	 * @param homeQueryModel
+	 * @param currentTaskQueryInfo
 	 * @return CurrentTaskInfo
 	 *
 	 */
 	CurrentTaskInfo getCurrentTaskInfo(CurrentTaskQueryInfo currentTaskQueryInfo);
 
 	/**
-	 * 
+	 *
 	 * @MethodName: getDailySchedulingFrequencyInfo
 	 * @Description: TODO 获取每日调度频率
 	 * @author
-	 * @param homeQueryModel
+	 * @param dailySchedulingFrequencyQueryInfo
 	 * @return DailySchedulingFrequencyInfo
 	 *
 	 */
@@ -56,11 +56,11 @@ public interface HomeDataService {
 
 	/**
 	 * 获取正常任务状态比例
-	 * 
+	 *
 	 * @MethodName: getTaskStateInfo
 	 * @Description: TODO
 	 * @author
-	 * @param homeQueryModel
+	 * @param taskStateQueryInfo
 	 * @return TaskStateInfo
 	 *
 	 */
@@ -68,11 +68,11 @@ public interface HomeDataService {
 
 	/**
 	 * 获取调度情况
-	 * 
+	 *
 	 * @MethodName: getTaskStateInfo
 	 * @Description: TODO
 	 * @author
-	 * @param homeQueryModel
+	 * @param schedulingQueryInfo
 	 * @return TaskStateInfo
 	 *
 	 */
@@ -80,9 +80,10 @@ public interface HomeDataService {
 
 	/**
 	 * 获取日志信息成功失败
+	 *
 	 * @MethodName: getJobLogInfo
 	 * @Description: TODO
-	 * @author 
+	 * @author
 	 * @param jobLogQueryInfo
 	 * @return List<JobLogInfo>
 	 *

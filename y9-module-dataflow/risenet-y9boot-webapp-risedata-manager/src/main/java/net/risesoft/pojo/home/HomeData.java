@@ -14,197 +14,204 @@ import net.risesoft.api.persistence.model.security.Environment;
 
 public class HomeData {
 
-	public CurrentTaskInfo getCurrentTaskInfo() {
-		return currentTaskInfo;
-	}
+    public CurrentTaskInfo getCurrentTaskInfo() {
+        return currentTaskInfo;
+    }
 
-	public List<QueryTimeRange> getTimeRanges() {
-		return timeRanges;
-	}
+    public List<QueryTimeRange> getTimeRanges() {
+        return timeRanges;
+    }
 
-	public void setTimeRanges(List<QueryTimeRange> timeRanges) {
-		this.timeRanges = timeRanges;
-	}
+    public void setTimeRanges(List<QueryTimeRange> timeRanges) {
+        this.timeRanges = timeRanges;
+    }
 
-	public DailySchedulingFrequencyInfo getDailySchedulingFrequencyInfo() {
-		return dailySchedulingFrequencyInfo;
-	}
+    public DailySchedulingFrequencyInfo getDailySchedulingFrequencyInfo() {
+        return dailySchedulingFrequencyInfo;
+    }
 
-	public void setDailySchedulingFrequencyInfo(DailySchedulingFrequencyInfo dailySchedulingFrequencyInfo) {
-		this.dailySchedulingFrequencyInfo = dailySchedulingFrequencyInfo;
-	}
+    public void setDailySchedulingFrequencyInfo(DailySchedulingFrequencyInfo dailySchedulingFrequencyInfo) {
+        this.dailySchedulingFrequencyInfo = dailySchedulingFrequencyInfo;
+    }
 
-	public SchedulingInfo getSchedulingInfo() {
-		return schedulingInfo;
-	}
+    public SchedulingInfo getSchedulingInfo() {
+        return schedulingInfo;
+    }
 
-	public void setSchedulingInfo(SchedulingInfo schedulingInfo) {
-		this.schedulingInfo = schedulingInfo;
-	}
+    public void setSchedulingInfo(SchedulingInfo schedulingInfo) {
+        this.schedulingInfo = schedulingInfo;
+    }
 
-	private List<QueryTimeRange> timeRanges;
+    private List<QueryTimeRange> timeRanges;
 
-	public JobLogInfo getJobLogInfo() {
-		return jobLogInfo;
-	}
+    public JobLogInfo getJobLogInfo() {
+        return jobLogInfo;
+    }
 
-	public void setJobLogInfo(JobLogInfo jobLogInfo) {
-		this.jobLogInfo = jobLogInfo;
-	}
+    public void setJobLogInfo(JobLogInfo jobLogInfo) {
+        this.jobLogInfo = jobLogInfo;
+    }
 
-	public HomeData() {
-		super();
-		this.timeRanges = createQueryTimeRange();
+    public HomeData() {
+        super();
+        this.timeRanges = createQueryTimeRange();
 
-	}
+    }
 
-	private List<QueryTimeRange> createQueryTimeRange() {
-		ArrayList<QueryTimeRange> queryTimeRangeList = new ArrayList<QueryTimeRange>();
-		LocalDate today = LocalDate.now();
-		queryTimeRangeList.add(new QueryTimeRange("今日", today.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
-				today.atTime(23, 59, 59).toInstant(ZoneOffset.UTC).toEpochMilli()));
-		queryTimeRangeList.add(new QueryTimeRange("最近一周",
-				today.minusDays(today.getDayOfWeek().getValue() - 1).atStartOfDay().toInstant(ZoneOffset.UTC)
-						.toEpochMilli(),
-				today.plusDays(7 - today.getDayOfWeek().getValue()).atTime(23, 59, 59).toInstant(ZoneOffset.UTC)
-						.toEpochMilli()));
-		queryTimeRangeList.add(
-				new QueryTimeRange("最近二周", today.minusWeeks(2).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
-						today.atTime(23, 59, 59).toInstant(ZoneOffset.UTC).toEpochMilli()));
-		queryTimeRangeList.add(
-				new QueryTimeRange("最近三周", today.minusWeeks(3).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
-						today.atTime(23, 59, 59).toInstant(ZoneOffset.UTC).toEpochMilli()));
-//		queryTimeRangeList.add(new QueryTimeRange("最近一个月",
-//				today.withDayOfMonth(1).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
-//				today.withDayOfMonth(today.lengthOfMonth()).atTime(23, 59, 59).toInstant(ZoneOffset.UTC)
-//						.toEpochMilli()));
-		queryTimeRangeList.add(
-				new QueryTimeRange("最近一个月", today.minusWeeks(4).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
-						today.atTime(23, 59, 59).toInstant(ZoneOffset.UTC).toEpochMilli()));
+    private List<QueryTimeRange> createQueryTimeRange() {
+        ArrayList<QueryTimeRange> queryTimeRangeList = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        queryTimeRangeList.add(new QueryTimeRange("今日", today.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
+                today.atTime(23, 59, 59).toInstant(ZoneOffset.UTC).toEpochMilli()));
+        queryTimeRangeList.add(new QueryTimeRange("最近一周",
+                today.minusDays(today.getDayOfWeek().getValue() - 1).atStartOfDay().toInstant(ZoneOffset.UTC)
+                        .toEpochMilli(),
+                today.plusDays(7 - today.getDayOfWeek().getValue()).atTime(23, 59, 59).toInstant(ZoneOffset.UTC)
+                        .toEpochMilli()));
+        queryTimeRangeList.add(
+                new QueryTimeRange("最近二周", today.minusWeeks(2).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
+                        today.atTime(23, 59, 59).toInstant(ZoneOffset.UTC).toEpochMilli()));
+        queryTimeRangeList.add(
+                new QueryTimeRange("最近三周", today.minusWeeks(3).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
+                        today.atTime(23, 59, 59).toInstant(ZoneOffset.UTC).toEpochMilli()));
+        queryTimeRangeList.add(
+                new QueryTimeRange("最近一个月", today.minusWeeks(4).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
+                        today.atTime(23, 59, 59).toInstant(ZoneOffset.UTC).toEpochMilli()));
 
-		return queryTimeRangeList;
-	}
+        return queryTimeRangeList;
+    }
 
-	public HomeData setCurrentTaskInfo(CurrentTaskInfo currentTaskInfo) {
-		this.currentTaskInfo = currentTaskInfo;
-		return this;
-	}
+    public HomeData setCurrentTaskInfo(CurrentTaskInfo currentTaskInfo) {
+        this.currentTaskInfo = currentTaskInfo;
+        return this;
+    }
 
-	private CurrentTaskInfo currentTaskInfo;
+    private CurrentTaskInfo currentTaskInfo;
 
-	// 当前运行任务情况
-	@Getter
-	@Setter
-	public static class CurrentTaskInfo {
-		Integer executing;// 正在执行
-		Integer allTasks;// 全部任务
-		Integer executedToday;// 今日已经执行
-	}
+    // 当前运行任务情况
+    @Getter
+    @Setter
+    public static class CurrentTaskInfo {
+        Integer executing;// 正在执行
+        Integer allTasks;// 全部任务
+        Integer executedToday;// 今日已经执行
 
-	private DailySchedulingFrequencyInfo dailySchedulingFrequencyInfo;
+        public CurrentTaskInfo() {
+            super();
+        }
 
-	// 每日调度次数情况
-	@Getter
-	@Setter
-	public static class DailySchedulingFrequencyInfo {
-		List<String> dateList = null;
-		List<String> frequencyList = null;
-	}
+        public CurrentTaskInfo(Integer executing, Integer allTasks, Integer executedToday) {
+            super();
+            this.executing = executing;
+            this.allTasks = allTasks;
+            this.executedToday = executedToday;
+        }
+    }
 
-	// 任务状态信息
-	@Getter
-	@Setter
-	private List<Map<String, Object>> TaskStateInfo;
+    private DailySchedulingFrequencyInfo dailySchedulingFrequencyInfo;
 
-	// 调度情况
-	private SchedulingInfo schedulingInfo;
+    // 每日调度次数情况
+    @Getter
+    @Setter
+    public static class DailySchedulingFrequencyInfo {
+        List<String> dateList = null;
+        List<String> frequencyList = null;
+    }
 
-	@Getter
-	@Setter
-	public static class SchedulingInfo {
-		private List<String> typeList;
-		private List<String> dateList;
-		List<Map<String, Object>> taskScheduLingInfo;
-	}
+    // 任务状态信息
+    @Getter
+    @Setter
+    private List<Map<String, Object>> TaskStateInfo;
 
-	public static class StatusInfo {
-		private String name;
-		private List<String> data;
+    // 调度情况
+    private SchedulingInfo schedulingInfo;
 
-		public StatusInfo(String name, List<String> data) {
-			this.name = name;
-			this.data = data;
-		}
+    @Getter
+    @Setter
+    public static class SchedulingInfo {
+        private List<String> typeList;
+        private List<String> dateList;
+        List<Map<String, Object>> taskScheduLingInfo;
+    }
 
-		public String getName() {
-			return name;
-		}
+    public static class StatusInfo {
+        private String name;
+        private List<String> data;
 
-		public List<String> getData() {
-			return data;
-		}
-	}
+        public StatusInfo(String name, List<String> data) {
+            this.name = name;
+            this.data = data;
+        }
 
-	// 环境
-	@Getter
-	@Setter
-	private List<Environment> allEnvironments;
+        public String getName() {
+            return name;
+        }
 
-	// 查询时间范围
-	@Getter
-	@Setter
-	public class QueryTimeRange {
-		private String name;
-		@JsonFormat(shape = JsonFormat.Shape.STRING)
-		private Long startTime;
-		@JsonFormat(shape = JsonFormat.Shape.STRING)
-		private Long endTime;
+        public List<String> getData() {
+            return data;
+        }
+    }
 
-		public QueryTimeRange(String name, Long startTime, Long endTime) {
-			this.name = name;
-			this.startTime = startTime;
-			this.endTime = endTime;
-		}
+    // 环境
+    @Getter
+    @Setter
+    private List<Environment> allEnvironments;
 
-	}
+    // 查询时间范围
+    @Getter
+    @Setter
+    public class QueryTimeRange {
+        private String name;
+        @JsonFormat(shape = JsonFormat.Shape.STRING)
+        private Long startTime;
+        @JsonFormat(shape = JsonFormat.Shape.STRING)
+        private Long endTime;
 
-	// 日志
-	@Getter
-	@Setter
-	public static class JobLogInfo {
-		private long successCount;
-		private long failureCount;
-		private List<LogGroupInfo> logGroupInfo;
+        public QueryTimeRange(String name, Long startTime, Long endTime) {
+            this.name = name;
+            this.startTime = startTime;
+            this.endTime = endTime;
+        }
 
-		public JobLogInfo() {
-			super();
-		}
+    }
 
-		public JobLogInfo(long successCount, long failureCount, List<LogGroupInfo> logGroupInfo) {
-			super();
-			this.successCount = successCount;
-			this.failureCount = failureCount;
-			this.logGroupInfo = logGroupInfo;
-		}
+    // 日志
+    @Getter
+    @Setter
+    public static class JobLogInfo {
+        private long successCount;
+        private long failureCount;
+        private List<LogGroupInfo> logGroupInfo;
 
-	}
+        public JobLogInfo() {
+            super();
+        }
 
-	@Getter
-	@Setter
-	public static class LogGroupInfo {
-		private Long success;
-		private Long failure;
-		private String executeStartTime;
+        public JobLogInfo(long successCount, long failureCount, List<LogGroupInfo> logGroupInfo) {
+            super();
+            this.successCount = successCount;
+            this.failureCount = failureCount;
+            this.logGroupInfo = logGroupInfo;
+        }
 
-		public LogGroupInfo(Long success, Long failure, String executeStartTime) {
-			super();
-			this.success = success;
-			this.failure = failure;
-			this.executeStartTime = executeStartTime;
-		}
+    }
 
-	}
+    @Getter
+    @Setter
+    public static class LogGroupInfo {
+        private Long success;
+        private Long failure;
+        private String executeStartTime;
 
-	private JobLogInfo jobLogInfo;
+        public LogGroupInfo(Long success, Long failure, String executeStartTime) {
+            super();
+            this.success = success;
+            this.failure = failure;
+            this.executeStartTime = executeStartTime;
+        }
+
+    }
+
+    private JobLogInfo jobLogInfo;
 
 }
