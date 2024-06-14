@@ -5,29 +5,23 @@ import net.risedata.jdbc.annotations.repository.Search;
 import net.risedata.jdbc.repository.Repository;
 import net.risesoft.api.persistence.model.security.Environment;
 
-import java.util.List;
-
-/**
- * @Description :
- * @ClassName UserDao
- * @Author lb
- * @Date 2022/8/3 16:04
- * @Version 1.0
- */
-public interface EnvironmentDao extends Repository {
+public interface EnvironmentDao extends Repository<Environment> {
 
 	@Search("select count(*) from Y9_DATASERVICE_ENVIRONMENT where name='Public'")
-	Integer hasPulibc();
+	Integer hasPublic();
 
 	@Search("select count(*) from Y9_DATASERVICE_ENVIRONMENT where  name = ? and id != ?")
 	Integer hasByName(String name, String id);
 
 	@Search("select name from Y9_DATASERVICE_ENVIRONMENT where name = ?")
-	String findByID(String environment);
+	String findById(String environment);
 
 	@Search("select id from Y9_DATASERVICE_ENVIRONMENT where name = ?")
-	String findByNAME(String name);
+	String findByName(String name);
 
 	@Modify("update Y9_DATASERVICE_ENVIRONMENT set name=?1,description=?2 where id = ?3")
 	Integer updateEnvironment(String name, String description, String id);
+	
+	@Modify("insert into Y9_DATASERVICE_ENVIRONMENT (ID,NAME,DESCRIPTION) values(?,?,?)")
+    Integer create(String id, String name, String description);
 }
