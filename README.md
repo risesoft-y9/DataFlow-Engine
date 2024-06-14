@@ -48,6 +48,14 @@ webapp -- 后端工程
 
 <div><img src="https://vue.youshengyun.com/files/dataflow/img/ljjgt.png"><div/>
 
+## 功能架构图
+
+<div><img src="https://vue.youshengyun.com/files/dataflow/img/gnjgt.png"><div/>
+
+## 部署架构图
+
+<div><img src="https://vue.youshengyun.com/files/dataflow/img/bsjgt.png"><div/>
+
 ## 后端技术选型
 
 | 序号 | 依赖            | 版本    | 官网                                                         |
