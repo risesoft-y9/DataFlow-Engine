@@ -4,7 +4,6 @@ import net.risedata.jdbc.annotations.repository.Search;
 import net.risedata.jdbc.repository.Repository;
 import net.risesoft.api.persistence.model.security.Role;
 import net.risesoft.api.persistence.security.impl.RoleServiceImpl;
-import net.risesoft.api.persistence.security.impl.UserServiceImpl;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ import java.util.List;
  * @Date 2022/8/3 16:04
  * @Version 1.0
  */
-public interface RoleDao extends Repository {
+public interface RoleDao extends Repository<Role> {
 
 	@Search("select count(*) from Y9_DATASERVICE_ROLE where NAME='" + RoleServiceImpl.ROLE_ADMIN + "'")
 	Integer hasAdminRole();

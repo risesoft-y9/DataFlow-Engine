@@ -1,27 +1,19 @@
 package net.risesoft.api.persistence.security.impl;
 
 import net.risedata.jdbc.commons.LPage;
-import net.risedata.jdbc.factory.ObjectBuilderFactory;
 import net.risedata.jdbc.factory.OperationBuilderFactory;
 import net.risedata.jdbc.operation.impl.CustomOperation;
-import net.risedata.jdbc.operation.impl.InOperation;
 import net.risedata.jdbc.search.LPageable;
 import net.risedata.jdbc.service.impl.AutomaticCrudService;
 import net.risesoft.api.exceptions.ServiceOperationException;
 import net.risesoft.api.persistence.dao.UserDao;
 import net.risesoft.api.persistence.model.security.DataUser;
-import net.risesoft.api.persistence.model.security.RoleUserLink;
-import net.risesoft.api.persistence.security.RoleLinkService;
-import net.risesoft.api.persistence.security.TokenService;
 import net.risesoft.api.persistence.security.UserService;
 import net.risesoft.api.utils.AutoIdUtil;
 import net.risesoft.api.utils.MD5Util;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -34,8 +26,8 @@ import java.util.List;
  * @Version 1.0
  */
 @Service
-public class UserServiceImpl extends AutomaticCrudService<DataUser, String>
-		implements UserService, ApplicationListener<ApplicationStartedEvent> {
+public class UserServiceImpl extends AutomaticCrudService<DataUser, String> implements UserService {
+	
 	@Autowired
 	UserDao userDao;
 
@@ -76,7 +68,8 @@ public class UserServiceImpl extends AutomaticCrudService<DataUser, String>
 
 	@Override
 	public Integer deleteUser(String userId) {
-		if (UserServiceImpl.DEFAULT_USER_ACCOUNT.equals(userId)) {
+		DataUser dataUser = findOne(userId);
+		if(dataUser != null && dataUser.getUserName().equals("admin")) {
 			throw new ServiceOperationException("系统管理员无法删除");
 		}
 		return userDao.deleteUser(userId);
@@ -90,26 +83,6 @@ public class UserServiceImpl extends AutomaticCrudService<DataUser, String>
 	@Override
 	public DataUser findOne(String id) {
 		return getOne(id);
-	}
-
-	public static final String DEFAULT_USER = "admin";
-	public static final String DEFAULT_USER_PASSWORD = "admin";
-	public static final String DEFAULT_USER_ACCOUNT = "admin";
-
-	@Autowired
-	RoleLinkService roleLinkService;
-
-	@Transactional
-	@Override
-	public void onApplicationEvent(ApplicationStartedEvent event) {
-		if (userDao.hasName(DEFAULT_USER) == 0) {
-			DataUser user = new DataUser();
-			user.setAccount(DEFAULT_USER_ACCOUNT);
-			user.setPassword(DEFAULT_USER_PASSWORD);
-			user.setUserName(DEFAULT_USER);
-			roleLinkService.save(ObjectBuilderFactory.builder(RoleUserLink.class, "roleId", RoleServiceImpl.ADMIN_ID)
-					.builder("userId", createUser(user)));
-		}
 	}
 
 	@Override
@@ -132,5 +105,10 @@ public class UserServiceImpl extends AutomaticCrudService<DataUser, String>
 					where.add(roleId);
 					return true;
 				})));
+	}
+
+	@Override
+	public Integer hasName(String name) {
+		return userDao.hasName(name);
 	}
 }

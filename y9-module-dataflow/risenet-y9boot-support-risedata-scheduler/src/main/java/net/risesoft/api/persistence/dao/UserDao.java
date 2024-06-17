@@ -7,17 +7,11 @@ import net.risesoft.api.persistence.model.security.DataUser;
 
 import java.util.List;
 
-/**
- * @Description :
- * @ClassName UserDao
- * @Author lb
- * @Date 2022/8/3 16:04
- * @Version 1.0
- */
-public interface UserDao extends Repository {
+public interface UserDao extends Repository<DataUser> {
 
     @Search("select * from Y9_DATASERVICE_USER where ACCOUNT = ? and PASSWORD=?")
     DataUser getUser(String account, String password);
+    
     @Search("select USER_NAME from Y9_DATASERVICE_USER")
     List<String> findAll();
 
@@ -27,7 +21,7 @@ public interface UserDao extends Repository {
     @Modify("update Y9_DATASERVICE_USER set PASSWORD=? where id=?")
     Integer updatePassword(String password, String id);
 
-    @Modify("delete  from  Y9_DATASERVICE_USER  where ID=?")
+    @Modify("delete from Y9_DATASERVICE_USER where ID=?")
     Integer deleteUser( String id);
 
 }

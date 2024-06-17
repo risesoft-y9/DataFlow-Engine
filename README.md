@@ -48,6 +48,14 @@ webapp -- 后端工程
 
 <div><img src="https://vue.youshengyun.com/files/dataflow/img/ljjgt.png"><div/>
 
+## 功能架构图
+
+<div><img src="https://vue.youshengyun.com/files/dataflow/img/gnjgt.png"><div/>
+
+## 部署架构图
+
+<div><img src="https://vue.youshengyun.com/files/dataflow/img/bsjgt.png"><div/>
+
 ## 后端技术选型
 
 | 序号 | 依赖            | 版本    | 官网                                                         |
@@ -203,7 +211,7 @@ webapp -- 后端工程
 微信号：qq349416828
 
 备注：开源数据流引擎咨询-姓名
-<div><img style="width: 40%" src="https://vue.youshengyun.com/files/img/曲经理-二维码.png"><div/>
+<div><img style="width: 40%" src="https://vue.youshengyun.com/files/dataflow/img/qjfewm.png"><div/>
 联系人：有生博大-咨询热线
 
 座机号：010-86393151

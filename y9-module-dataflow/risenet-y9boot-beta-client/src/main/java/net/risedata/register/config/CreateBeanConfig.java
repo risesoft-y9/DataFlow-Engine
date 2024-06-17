@@ -18,7 +18,6 @@ import net.risedata.register.watch.impl.MEMServiceAvailability;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -56,7 +55,7 @@ public class CreateBeanConfig {
 	@Bean
 	@ConditionalOnMissingBean(RegisterDiscoveryClient.class)
 	public DiscoveryClient discoveryClient() {
-		return new RegisterDiscoveryClient(serverAddr, environment);
+		return new RegisterDiscoveryClient();
 	}
 
 	@Bean
@@ -65,6 +64,7 @@ public class CreateBeanConfig {
 		return new FileOperation();
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Bean
 	@ConditionalOnProperty(name = "beta.discovery.listener", matchIfMissing = false)
 	public FilterRegistrationBean filterRegistration(ListenerFilter listenerFilter) {
@@ -113,11 +113,6 @@ public class CreateBeanConfig {
 	public WatchProperties WatchProperties() {
 		return new WatchProperties();
 	}
-
-	@Value("${beta.discovery.serverAddr:}")
-	private String serverAddr;
-	@Value("${beta.discovery.environment:Public}")
-	String environment;
 
 	@Bean
 	@ConditionalOnMissingBean(ServiceWatchController.class)

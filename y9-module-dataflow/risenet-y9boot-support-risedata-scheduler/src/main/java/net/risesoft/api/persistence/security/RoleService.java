@@ -50,5 +50,11 @@ public interface RoleService {
 	 * @return
 	 */
 	Role findById(String id);
+	
+	/**
+	 * 判断管理员角色是否存在
+	 * @return
+	 */
+	Integer hasAdminRole();
 
 }
