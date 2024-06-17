@@ -53,6 +53,21 @@ export const ChartManager = (function () {
             this.forEachChartInstance((chart) => {
                 chart.resize();
             });
+        },
+        //销毁
+        disposeAllChartInstance: function () {
+            this.forEachChartInstance((chart) => {
+                chart.dispose();
+            });
+            chartInstances = {};
+        },
+        //刷新颜色
+        refreshAllChartColor: function (color) {
+            this.forEachChartInstance((chartObj) => {
+                chartObj.setOption({
+                    color: color
+                });
+            });
         }
     };
 })();
@@ -671,6 +686,8 @@ const schedulingOpinion = ref({
             }
         }
     },
+    color: [echartsColor.value, '#dceae4'],
+
     legend: {
         show: true,
         top: 17,
@@ -781,6 +798,8 @@ function initDailySchedulingFrequencyInfo() {
 }
 //每日调度echarts;
 export const dailySchedulingFrequencyOpinion = ref({
+    color: [echartsColor.value, '#dceae4'],
+
     xAxis: {
         show: true,
         type: 'category',
