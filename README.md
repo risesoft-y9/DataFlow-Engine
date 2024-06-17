@@ -211,7 +211,7 @@ webapp -- 后端工程
 微信号：qq349416828
 
 备注：开源数据流引擎咨询-姓名
-<div><img style="width: 40%" src="https://vue.youshengyun.com/files/img/曲经理-二维码.png"><div/>
+<div><img style="width: 40%" src="https://vue.youshengyun.com/files/dataflow/img/qjfewm.png"><div/>
 联系人：有生博大-咨询热线
 
 座机号：010-86393151
