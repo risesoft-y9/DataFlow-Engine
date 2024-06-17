@@ -1,11 +1,22 @@
 package net.risesoft;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.support.EncodedResource;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.stereotype.Component;
+
+import com.alibaba.druid.pool.DruidDataSource;
 
 import net.risedata.jdbc.factory.ObjectBuilderFactory;
 import net.risesoft.api.persistence.dao.EnvironmentDao;
@@ -16,6 +27,7 @@ import net.risesoft.api.persistence.security.RoleLinkService;
 import net.risesoft.api.persistence.security.RoleService;
 import net.risesoft.api.persistence.security.UserService;
 import net.risesoft.api.persistence.security.impl.RoleServiceImpl;
+import net.risesoft.y9public.repository.DataMappingRepository;
 
 @Component
 public class OnApplicationReady implements ApplicationListener<ApplicationReadyEvent> {
@@ -36,6 +48,12 @@ public class OnApplicationReady implements ApplicationListener<ApplicationReadyE
 	
 	@Autowired
 	private RoleLinkService roleLinkService;
+	
+	@Autowired
+	private DataMappingRepository dataMappingRepository;
+	
+	@Resource(name = "jdbcTemplate4Public")
+	private JdbcTemplate jdbcTemplate4Public;
   
 	@Override
 	public void onApplicationEvent(ApplicationReadyEvent event) {
@@ -61,7 +79,32 @@ public class OnApplicationReady implements ApplicationListener<ApplicationReadyE
 			role.setJobTypes("");
 			roleService.saveRole(role);
 		}
+		if(dataMappingRepository.count() == 0) {
+			initSql();
+		}
 		log.info("init data finish");
-	}  
+	}
+	
+	public void initSql() {
+		Connection conn = null;
+    	try {
+        	DruidDataSource dds = (DruidDataSource) jdbcTemplate4Public.getDataSource();
+            conn = dds.getConnection();
+            String path = this.getClass().getClassLoader().getResource("/sql/data-mysql.sql").getPath();
+            FileSystemResource rc = new FileSystemResource(path);
+            EncodedResource er = new EncodedResource(rc, "UTF-8");
+            ScriptUtils.executeSqlScript(conn, er);
+        } catch (Exception e) {
+            log.error("sql脚本执行发生异常-" + e.getMessage());
+        } finally {
+        	if(conn != null) {
+        		try {
+					conn.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+        	}
+        }
+    }
 
 }
