@@ -29,8 +29,9 @@ public class SecurityConfiguration {
 	public SecurityConfig hasSecurityManagerConfig() {
 		SecurityConfig securityConfig = new SecurityConfig();
 		securityConfig.setSecurityCheck(new HasSecurityManager());
-		securityConfig.setCheckUrl(Arrays.asList("/api/rest/system/**"));
-		securityConfig.setWhiteList(Arrays.asList("/api/rest/system/Environment/getEnvironment"));
+		securityConfig.setCheckUrl(Arrays.asList("**/api/rest/system/**"));// 白名单、环境
+		securityConfig.setWhiteList(Arrays.asList("**/api/rest/system/Environment/getEnvironment", "**/api/rest/system/Environment/getAll",
+				"**/api/rest/system/networkWhiteList/searchForPage", "**/api/rest/system/service/getServicesAll"));
 		return securityConfig;
 	}
 
@@ -44,7 +45,9 @@ public class SecurityConfiguration {
 	public SecurityConfig hasUserManager() {
 		SecurityConfig securityConfig = new SecurityConfig();
 		securityConfig.setSecurityCheck(new HasUserManager());
-		securityConfig.setCheckUrl(Arrays.asList("/api/rest/role/**", "/api/rest/user/**"));
+		securityConfig.setCheckUrl(Arrays.asList("**/api/rest/role/**", "**/api/rest/user/**"));// 用户、角色
+		securityConfig.setWhiteList(Arrays.asList("**/api/rest/role/search", "**/api/rest/role/link/searchUsers",
+				"**/api/rest/user/searchForPage"));
 		return securityConfig;
 	}
 

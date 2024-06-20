@@ -47,7 +47,7 @@ public class NetworkWhiteList implements GetEnvironment {
     @Column(name = "DESCRIPTION", length = 100)
     private String description;
     /**
-     * ip 匹配 多个使用, 分隔 可以使用** 匹配
+     * ip匹配, 可以使用** 匹配
      */
     @Comment(value = "ip匹配")
     @NotBlank(message = "ip不能为空")
@@ -113,8 +113,6 @@ public class NetworkWhiteList implements GetEnvironment {
         this.ipMatch = ipMatch;
     }
 
-
-
     public String getService() {
         return service;
     }
@@ -130,7 +128,5 @@ public class NetworkWhiteList implements GetEnvironment {
     public void setEnvironment(String environment) {
         this.environment = environment;
     }
-
-
 
 }

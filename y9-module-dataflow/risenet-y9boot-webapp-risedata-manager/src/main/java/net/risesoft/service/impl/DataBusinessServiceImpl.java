@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import net.risesoft.api.security.ConcurrentSecurity;
+import net.risesoft.api.security.SecurityManager;
 import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.service.DataBusinessService;
@@ -26,6 +28,8 @@ import net.risesoft.y9public.repository.spec.DataBusinessSpecification;
 public class DataBusinessServiceImpl implements DataBusinessService {
 	
 	private final DataBusinessRepository dataBusinessRepository;
+	
+	private final SecurityManager securityManager;
 	
 	@Override
 	public Page<DataBusinessEntity> findByNamePage(String name, String parentId, int page, int rows) {
@@ -101,6 +105,11 @@ public class DataBusinessServiceImpl implements DataBusinessService {
 
 	@Override
 	public List<DataBusinessEntity> findAll() {
+		ConcurrentSecurity security = securityManager.getConcurrentSecurity();
+		List<String> ids = security.getJobTypes();
+		if(ids.size() > 0) {
+			return dataBusinessRepository.findByIdIn(ids);
+		}
 		return dataBusinessRepository.findAll();
 	}
 

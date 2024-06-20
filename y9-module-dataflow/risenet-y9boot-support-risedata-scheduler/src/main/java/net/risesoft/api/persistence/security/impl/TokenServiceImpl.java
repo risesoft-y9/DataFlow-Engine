@@ -1,6 +1,5 @@
 package net.risesoft.api.persistence.security.impl;
 
-import cn.hutool.core.date.DateUtil;
 import net.risedata.jdbc.service.impl.AutomaticCrudService;
 import net.risesoft.api.exceptions.TokenException;
 import net.risesoft.api.persistence.dao.TokenDao;
@@ -8,16 +7,12 @@ import net.risesoft.api.persistence.model.security.DataUser;
 import net.risesoft.api.persistence.model.security.Token;
 import net.risesoft.api.persistence.security.TokenService;
 import net.risesoft.api.persistence.security.UserService;
-import net.risesoft.api.security.SecurityManager;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,7 +27,7 @@ import java.util.UUID;
 public class TokenServiceImpl extends AutomaticCrudService<Token, String> implements TokenService {
 
 	@Autowired
-	TokenDao tokenDao;
+	private TokenDao tokenDao;
 
 	@Override
 	public String createToken(DataUser userModel) {
@@ -45,7 +40,7 @@ public class TokenServiceImpl extends AutomaticCrudService<Token, String> implem
 	}
 
 	@Autowired
-	UserService userService;
+	private UserService userService;
 
 	@Override
 	public DataUser getUserByToken(String token) {
@@ -86,8 +81,6 @@ public class TokenServiceImpl extends AutomaticCrudService<Token, String> implem
 	 */
 	@Value("${beta.token.time:480}")
 	public Long FAILURE_TIME;
-
-
 
 	@Override
 	public List<String> getFailureToken() {

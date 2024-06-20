@@ -1,23 +1,19 @@
 package net.risesoft.api.security;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.PatternMatchUtils;
 
 import net.risesoft.api.persistence.model.security.DataUser;
-import net.risesoft.api.persistence.model.security.Environment;
 import net.risesoft.api.persistence.model.security.Role;
-import net.risesoft.api.persistence.security.EnvironmentService;
+import net.risesoft.y9.Y9Context;
+import net.risesoft.y9public.repository.DataBusinessRepository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * @Description : 安全
- * @ClassName Security
- * @Author lb
- * @Date 2022/8/5 10:49
- * @Version 1.0
+ * 缓存信息
+ *
  */
 public class ConcurrentSecurity {
 	/**
@@ -43,26 +39,34 @@ public class ConcurrentSecurity {
 	private boolean systemManager;
 
 	public ConcurrentSecurity(DataUser user, List<Role> roles) {
-		this.user = user;
-		List<String> environments = new ArrayList<String>();
-		List<String> jobTypes = new ArrayList<String>();
-		for (Role role : roles) {
-			if (StringUtils.isNoneBlank(role.getEnvironments())) {
-				environments.addAll(Arrays.asList(role.getEnvironments().split(",")));
+		try {
+			this.user = user;
+			List<String> environments = new ArrayList<String>();
+			List<String> jobTypes = new ArrayList<String>();
+			for (Role role : roles) {
+				if (StringUtils.isNotBlank(role.getEnvironments())) {
+					environments.addAll(Arrays.asList(role.getEnvironments().split(",")));
+				}
+				if (StringUtils.isNotBlank(role.getJobTypes())) {
+					DataBusinessRepository dataBusinessRepository = Y9Context.getBean("dataBusinessRepository");
+					String[] ids = role.getJobTypes().split(",");
+					jobTypes.addAll(Arrays.asList(ids));
+					for(String id : ids) {
+						jobTypes.addAll(dataBusinessRepository.findByParentId(id));
+					}
+				}
+				if (role.getSystemManager() == 1) {
+					systemManager = true;
+				}
+				if (role.getUserManager() == 1) {
+					userManager = true;
+				}
 			}
-			if (StringUtils.isNoneBlank(role.getJobTypes())) {
-				jobTypes.addAll(Arrays.asList(role.getJobTypes().split(",")));
-			}
-			if (role.getSystemManager() == 1) {
-				systemManager = true;
-			}
-			if (role.getUserManager() == 1) {
-				userManager = true;
-			}
+			this.environments = environments;
+			this.jobTypes = jobTypes;
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		this.environments = environments;
-		this.jobTypes = jobTypes;
-
 	}
 
 	public DataUser getUser() {

@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import net.risesoft.api.persistence.job.JobService;
-import net.risesoft.elastic.ElasticsearchRestClient;
+import net.risesoft.api.security.ConcurrentSecurity;
+import net.risesoft.api.security.SecurityManager;
 import net.risesoft.log.LogLevelEnum;
 import net.risesoft.log.OperationTypeEnum;
 import net.risesoft.log.annotation.RiseLog;
-import net.risesoft.pojo.QueryModel;
 import net.risesoft.pojo.TaskModel;
 import net.risesoft.pojo.Y9Page;
 import net.risesoft.pojo.Y9Result;
@@ -39,31 +39,7 @@ public class TaskController {
 	private final DataTaskService dataTaskService;
 	private final DataBusinessService dataBusinessService;
 	private final JobService jobService;
-	
-	@RequestMapping(value = "/test")
-	public void test() {
-		try {
-			ElasticsearchRestClient client = new ElasticsearchRestClient("http://127.0.0.1:9200", "", "");
-			//String msg = ElasticsearchRestClient.getDocument("3", "my_index", "http://218.60.95.59:9200", "elastic", "risesoft");
-			//String msg = ElasticsearchRestClient.copyIndexData("y9_subscription", "my_index", "http://127.0.0.1:9200", "", "").getMsg();
-			//System.out.println(msg);
-			QueryModel queryModel = new QueryModel();
-			queryModel.setAggs("{\"aggs_name\":{\"terms\":{\"field\":\"from\"}}}");
-			String query = "{\"bool\":{\"must\":[{\"match\":{\"appCnName\":\"部门号\"}}],\"filter\":{\"range\":{\"createTime\":{\"gt\":\"2020-11-09 11:50:14\"}}}}}";
-			queryModel.setQuery(query);
-			//queryModel.set_source("{\"includes\":[\"id\",\"name\",\"guideType\",\"createTime\"]}");
-			//String sort = "[{\"createTime\":{\"order\":\"desc\"}}]";
-			//queryModel.setSort(sort);
-			//queryModel.setFrom(0);
-			queryModel.setSize(0);
-			//Map<String, Object> map1 = ElasticsearchRestClient.search(queryModel, "my_index", "http://218.60.95.59:9200", "elastic", "risesoft");
-			//System.out.println(map1);
-			Map<String, Object> map2 = client.search(queryModel, "my_index");
-			System.out.println(map2);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	private final SecurityManager securityManager;
 	
 	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "分页获取任务列表", logLevel = LogLevelEnum.RSLOG, enable = false)
 	@GetMapping("/findPage")
@@ -73,7 +49,16 @@ public class TaskController {
 		if(StringUtils.isNotBlank(jobId)) {
 			ids = jobService.findArgsById(jobId);
 		}
-		Page<DataTaskEntity> pageList = dataTaskService.findPage(ids, name, businessId, page, size);
+		// 获取权限
+		ConcurrentSecurity security = securityManager.getConcurrentSecurity();
+		List<String> bIds = security.getJobTypes();
+		if(StringUtils.isNotBlank(businessId)) {
+			if(bIds.size() == 0 || bIds.contains(businessId)) {
+				bIds = new ArrayList<String>();
+				bIds.add(businessId);
+			}
+		}
+		Page<DataTaskEntity> pageList = dataTaskService.findPage(ids, name, bIds, page, size);
 		for(DataTaskEntity task : pageList) {
 			Map<String, Object> row = new HashMap<String, Object>();
 			row.put("id", task.getId());

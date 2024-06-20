@@ -1,20 +1,20 @@
 package net.risesoft.api.persistence.security;
 
 import net.risedata.rpc.provide.context.RPCRequestContext;
-import net.risesoft.api.aop.SecurityAspect;
 import net.risesoft.api.exceptions.TokenException;
 import net.risesoft.api.persistence.model.security.DataUser;
+import net.risesoft.api.persistence.model.security.NetworkWhiteList;
 import net.risesoft.api.persistence.model.security.Role;
 import net.risesoft.api.persistence.security.NetworkWhiteListService;
 import net.risesoft.api.persistence.security.RoleService;
 import net.risesoft.api.persistence.security.TokenService;
-import net.risesoft.api.persistence.security.impl.UserServiceImpl;
 import net.risesoft.api.security.ConcurrentSecurity;
 import net.risesoft.api.security.RPCRequestFilter;
 import net.risesoft.api.security.SecurityConfig;
 import net.risesoft.api.utils.IpUtils;
 import net.risesoft.api.utils.PattenUtil;
 import net.risesoft.pojo.Y9Result;
+import net.risesoft.y9.Y9LoginUserHolder;
 
 import com.alibaba.fastjson.JSON;
 
@@ -149,17 +149,17 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 	}
 
 	@Autowired
-	TokenService tokenService;
+	private TokenService tokenService;
 
 	@Autowired
-	RoleService roleService;
+	private RoleService roleService;
 
 	@Autowired
-	NetworkWhiteListService networkWhiteListService;
+	private NetworkWhiteListService networkWhiteListService;
 
 	public static Y9Result<Object> noToken = Y9Result.failure(401, "no token or Token expired");
 	public static Y9Result<Object> tokenError = Y9Result.failure(401, "no token or Token expired");
-
+	public static Y9Result<Object> noPermission = Y9Result.failure(403, "no permission");
 
 	/**
 	 * 每1小时判断一次 检查token 状态
@@ -174,7 +174,6 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 			if (newTime != null && failureTime > newTime) {
 				TOKEN_TIME_MAP.remove(key);
 				TOKEN_SECURITY_MAP.remove(key);
-
 			}
 		}
 		List<String> failureTokens = tokenService.getFailureToken();
@@ -197,7 +196,6 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
  
 	@Value("${risedata.security:true}")
 	private Boolean enable;
-	
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -210,26 +208,25 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 				return;
 			}
 			HttpServletRequest request1 = ((HttpServletRequest) request);
+			// 检查白名单
+//			String ip = getConcurrentIp();
+//			System.out.println("========================="+ip);
+//			List<NetworkWhiteList> networkWhiteList = networkWhiteListService.findAll();
+//			boolean flag = false;
+//			for (int i = 0; i < networkWhiteList.size(); i++) {
+//				if (hasMatch(networkWhiteList.get(i).getIpMatch(), ip)) {
+//					flag = true;
+//					break;
+//				}
+//			}
+//			if (!flag) {
+//				throwError(noPermission, request, response);
+//				return;
+//			}
+			//检查token
 			String token = request1.getHeader(TOKEN_KEY);
 			String url = request1.getRequestURI();
-			//这条线为 rpc 在发起请求
 			if (StringUtils.isEmpty(token)) {
-//				String environment = request.getParameter("environment");
-//				if (!StringUtils.isEmpty(environment)) {
-//					String ip = getConcurrentIp();
-//					List<NetworkWhiteList> networkWhiteList = networkWhiteListService.getNetworkWhiteList(environment);
-//					boolean flag = false;
-//					for (int i = 0; i < networkWhiteList.size(); i++) {
-//						if (hasMatch(networkWhiteList.get(i).getIpMatch(), ip)) {
-//							flag = true;
-//							break;
-//						}
-//					}
-//					if (!flag) {
-//						throwError(SecurityAspect.NO_SECURITY, request, response);
-//						return;
-//					}
-//				}
 				for (String excludeStartUrl : excludeEndUrls) {
 					if (url.endsWith(excludeStartUrl)) {
 						chain.doFilter(request, response);
@@ -245,15 +242,16 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 				throwError(noToken, request, response);
 				return;
 			}
+			// 保存登录信息
 			saveSecurity(token);
+			// 检查访问的url用户有没有权限
 			for (SecurityConfig securityConfig : securityConfigs) {
 				if (PattenUtil.hasMatch(securityConfig.getCheckUrl(), url)) {
 					if (PattenUtil.hasMatch(securityConfig.getWhiteList(), url)) {
 						continue;
 					}
-					if (!securityConfig.getSecurityCheck().check(securityConfig, getConcurrentSecurity(), url,
-							request1)) {
-						throwError(SecurityAspect.NO_SECURITY, request, response);
+					if (!securityConfig.getSecurityCheck().check(securityConfig, getConcurrentSecurity(), url, request1)) {
+						throwError(noPermission, request, response);
 						return;
 					}
 				}
@@ -263,23 +261,23 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 			throwError(tokenError, request, response);
 			return;
 		} catch (Exception e) {
+			//e.printStackTrace();
 			throwError(Y9Result.failure(500, e.getMessage()), request, response);
 		} finally {
 			threadLocal.remove();
 		}
 	}
 
-
-	@Autowired
-	EnvironmentService environmentService;
-
 	private void saveSecurity(String token) {
+		// 获取用户信息
 		DataUser userToken = tokenService.getUserByToken(token);
+		// 获取用户的权限
 		List<Role> roles = roleService.getRolesByUser(userToken.getId());
 		ConcurrentSecurity concurrentSecurity = new ConcurrentSecurity(userToken, roles);
 		threadLocal.set(token);
 		TOKEN_SECURITY_MAP.put(token, concurrentSecurity);
 		TOKEN_TIME_MAP.put(token, System.currentTimeMillis());
+		Y9LoginUserHolder.setPersonId(userToken.getId());
 	}
 
 	private void throwError(Y9Result<?> result, ServletRequest request, ServletResponse response) throws IOException {
@@ -295,9 +293,8 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 
 	@Override
 	public String getToken() {
-		HttpServletRequest request1 = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-				.getRequest();
-		return request1.getHeader(TOKEN_KEY);
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		return request.getHeader(TOKEN_KEY);
 	}
 
 }

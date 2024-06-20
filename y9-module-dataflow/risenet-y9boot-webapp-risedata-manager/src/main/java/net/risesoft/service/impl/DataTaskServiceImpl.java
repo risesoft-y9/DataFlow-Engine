@@ -62,12 +62,12 @@ public class DataTaskServiceImpl implements DataTaskService {
 	private final TaskMakeUpListener taskMakeUpListener;
 	
 	@Override
-	public Page<DataTaskEntity> findPage(List<String> ids, String name, String businessId, int page, int rows) {
+	public Page<DataTaskEntity> findPage(List<String> ids, String name, List<String> businessIds, int page, int rows) {
 		if (page < 0) {
             page = 1;
         }
         Pageable pageable = PageRequest.of(page - 1, rows, Sort.by(Sort.Direction.DESC, "createTime"));
-        DataTaskSpecification spec = new DataTaskSpecification(ids, businessId, name);
+        DataTaskSpecification spec = new DataTaskSpecification(ids, businessIds, name);
 		return dataTaskRepository.findAll(spec, pageable);
 	}
 

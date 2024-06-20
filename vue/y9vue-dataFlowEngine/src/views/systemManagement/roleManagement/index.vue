@@ -22,13 +22,8 @@
         <y9Form :config="formConfig" ref="y9TreeFormRef">
             <template #JOBTYPES>
                 <div class="job-types">
-                    <el-tag
-                        v-for="(item, index) in formConfig.model.jobTypes"
-                        :key="index"
-                        closable
-                        @close="handleClose(item)"
-                    >
-                        {{ item }}
+                    <el-tag v-for="(item, index) in jobTypesList" :key="index" closable @close="handleClose(item)">
+                        {{ item.name }}
                     </el-tag>
                     <el-tag @click="dialogJOBTYPESConfig.show = true" class="button-new-tag" type="info">
                         +添加
@@ -57,6 +52,8 @@
     let filterData = ref({});
 
     let loading = ref(false);
+
+    let jobTypesList = ref([]);
 
     // 表格返回数据的回显
     let environmentName = {
@@ -93,10 +90,10 @@
             },
             {
                 title: computed(() => t('任务类型')),
-                key: 'jobTypes',
+                key: 'typeNames',
                 showOverflowTooltip: false,
                 render: (row) => {
-                    return row.jobTypes.replace(/,/g, '，');
+                    return row.typeNames.replace(/,/g, '，');
                 }
             },
             {
@@ -126,7 +123,11 @@
                                         environments: row.environments ? row.environments.split(',') : [],
                                         jobTypes: row.jobTypes ? row.jobTypes.split(',') : []
                                     });
-                                    formConfig.value.model = rowParams;
+                                    jobTypesList.value = row.jobTypes.split(',')?.map((item, index) => {
+                                        return { id: item, name: row.typeNames.split(',')[index] };
+                                    });
+                                    let { typeNames, ...newParams } = rowParams;
+                                    formConfig.value.model = newParams;
                                     Object.assign(dialogConfig.value, {
                                         show: true,
                                         title: computed(() => t('修改角色信息'))
@@ -284,12 +285,14 @@
     // 拿到表格返回的数据
     function handleGetData(data) {
         dialogJOBTYPESConfig.value.show = false;
-        formConfig.value.model.jobTypes = data?.map((item) => item.name);
+        formConfig.value.model.jobTypes = data?.map((item) => item.id);
+        jobTypesList.value = data;
     }
 
     // 删除tag标签
     function handleClose(value) {
-        formConfig.value.model.jobTypes = formConfig.value.model.jobTypes.filter((item) => item !== value);
+        formConfig.value.model.jobTypes = formConfig.value.model.jobTypes.filter((item) => item !== value.id);
+        jobTypesList.value = jobTypesList.value.filter((item) => item.id !== value.id);
     }
 
     const formConfig = ref({
@@ -310,9 +313,9 @@
         },
         rules: {
             //表单验证规则
-            name: { required: true, message: computed(() => t('请输入角色名称')), trigger: 'blur' },
-            userManager: { required: true, message: computed(() => t('请选择')), trigger: 'blur' },
-            systemManager: { required: true, message: computed(() => t('请选择')), trigger: 'blur' }
+            name: { required: true, message: computed(() => t('请输入用户名')), trigger: 'blur' },
+            userManager: { required: true, message: computed(() => t('请输入账号')), trigger: 'blur' },
+            systemManager: { required: true, message: computed(() => t('请输入密码')), trigger: 'blur' }
         },
         itemList: [
             //表单显示列表

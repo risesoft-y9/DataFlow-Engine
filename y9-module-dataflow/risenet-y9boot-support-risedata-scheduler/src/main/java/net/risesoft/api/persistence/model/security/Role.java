@@ -3,7 +3,6 @@ package net.risesoft.api.persistence.model.security;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import net.risedata.jdbc.annotations.operation.Operate;
-import net.risedata.jdbc.annotations.update.UpdateId;
 import net.risedata.jdbc.operation.Operates;
 
 import javax.persistence.*;
@@ -15,7 +14,7 @@ import org.hibernate.annotations.Comment;
 import java.io.Serializable;
 
 /**
- * @Description : 角色 与用户绑定表
+ * @Description : 角色表
  * @ClassName Role
  * @Author lb
  * @Date 2022/8/3 15:30
@@ -71,6 +70,9 @@ public class Role implements Serializable {
 	@NotNull(message = "系统管理权限不能为空")
 	@Column(name = "SYSTEM_MANAGER", length = 1)
 	private Integer systemManager;
+    
+    @Transient
+	private String typeNames;// 存任务类型名称
 
 	public String getName() {
 		return name;
@@ -87,8 +89,6 @@ public class Role implements Serializable {
 	public void setId(String id) {
 		this.id = id;
 	}
-
-
 
 	public String getEnvironments() {
 		return environments;
@@ -120,6 +120,14 @@ public class Role implements Serializable {
 
 	public void setSystemManager(Integer systemManager) {
 		this.systemManager = systemManager;
+	}
+
+	public String getTypeNames() {
+		return typeNames;
+	}
+
+	public void setTypeNames(String typeNames) {
+		this.typeNames = typeNames;
 	}
 
 }

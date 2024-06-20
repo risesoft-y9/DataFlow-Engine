@@ -5,10 +5,8 @@ import org.springframework.stereotype.Component;
 import net.risesoft.api.security.ConcurrentSecurity;
 import net.risesoft.api.security.SecurityCheck;
 import net.risesoft.api.security.SecurityConfig;
-import net.risesoft.api.utils.PattenUtil;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * @Description : 检查是否有安全操作权限 安全管理包含,白名单,服务器,环境
@@ -19,7 +17,6 @@ import java.util.List;
  */
 @Component
 public class HasSecurityManager implements SecurityCheck {
-
 
     @Override
     public boolean check(SecurityConfig config, ConcurrentSecurity security, String url, HttpServletRequest request) {

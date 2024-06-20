@@ -74,6 +74,9 @@ public class EnvironmentServiceImpl extends AutomaticCrudService<Environment, St
 
 	@Override
 	public List<Environment> findForEnvironment(List<String> environments) {
+		if(environments.size() == 0) {
+			return null;
+		}
 		return search("*", null, OperationBuilderFactory.builder("id", new InOperation(true, environments)));
 	}
 

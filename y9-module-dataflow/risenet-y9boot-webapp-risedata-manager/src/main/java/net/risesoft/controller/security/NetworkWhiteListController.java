@@ -70,8 +70,7 @@ public class NetworkWhiteListController {
 	}
 	
 	/**
-	 * 根据id 删除
-	 *
+	 * 根据id获取对象
 	 * @param id
 	 * @return
 	 */

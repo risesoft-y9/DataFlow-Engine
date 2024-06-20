@@ -8,9 +8,9 @@ import net.risesoft.api.persistence.security.NetworkWhiteListService;
 import net.risesoft.api.utils.AutoIdUtil;
 import net.risesoft.api.utils.PattenUtil;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -23,6 +23,7 @@ import java.util.*;
  */
 @Service
 public class NetworkWhiteListServiceImpl extends AutomaticCrudService<NetworkWhiteList, String> implements NetworkWhiteListService {
+	
     @Override
     public void saveNetworkWhiteList(NetworkWhiteList network) {
         if (StringUtils.isEmpty(network.getId())) {
@@ -120,5 +121,9 @@ public class NetworkWhiteListServiceImpl extends AutomaticCrudService<NetworkWhi
 		return getOne(id);
 	}
 
+	@Override
+	public List<NetworkWhiteList> findAll() {
+		return searchAll();
+	}
 
 }
