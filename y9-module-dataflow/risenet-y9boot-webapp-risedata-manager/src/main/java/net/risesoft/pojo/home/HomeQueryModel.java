@@ -1,7 +1,8 @@
 package net.risesoft.pojo.home;
 
+import net.risesoft.util.home.QueryTimeRangeCacheUtil;
+
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 
 public class HomeQueryModel {
 
@@ -17,27 +18,26 @@ public class HomeQueryModel {
 
     public HomeQueryModel() {
         super();
-        LocalDate today = LocalDate.now();
+        HomeData.QueryTimeRange lastWeek = QueryTimeRangeCacheUtil.getQueryTimeRangeByName(QueryTimeRangeCacheUtil.LAST_WEEK);
+        HomeData.QueryTimeRange lastMonth = QueryTimeRangeCacheUtil.getQueryTimeRangeByName(QueryTimeRangeCacheUtil.LAST_MONTH);
+        Long lastMonthStartTime = lastMonth.getStartTime();
+        Long lastMonthEndTime = lastMonth.getEndTime();
 
-        long dayOfMonthTimeStampStart = today.minusWeeks(4).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli();
-        long dayOfMonthTimeStampEnd = today.atTime(23, 59, 59).toInstant(ZoneOffset.UTC).toEpochMilli();
-
-        long dayOfWeekTimeStampStart = today.minusDays(today.getDayOfWeek().getValue() - 1).atStartOfDay()
-                .toInstant(ZoneOffset.UTC).toEpochMilli();
-        long dayOfWeekTimeStampEnd = today.plusDays(7 - today.getDayOfWeek().getValue()).atTime(23, 59, 59)
-                .toInstant(ZoneOffset.UTC).toEpochMilli();
-        currentTaskQueryInfo = new CurrentTaskQueryInfo(dayOfMonthTimeStampStart, dayOfMonthTimeStampEnd);
+        Long lastWeekStartTime = lastWeek.getStartTime();
+        long lastWeekEndTime = lastWeek.getEndTime();
 
         // 默认周
-        dailySchedulingFrequencyQueryInfo = new DailySchedulingFrequencyQueryInfo(dayOfWeekTimeStampStart,
-                dayOfWeekTimeStampEnd);
-        taskStateQueryInfo = new TaskStateQueryInfo(dayOfMonthTimeStampStart, dayOfMonthTimeStampEnd);
+        jobLogQueryInfo = new JobLogQueryInfo(lastWeekStartTime, lastWeekEndTime);
+        dailySchedulingFrequencyQueryInfo = new DailySchedulingFrequencyQueryInfo(lastWeekStartTime,
+                lastWeekEndTime);//每日调度
 
         // 默认月
-        schedulingQueryInfo = new SchedulingQueryInfo(dayOfMonthTimeStampStart, dayOfMonthTimeStampEnd);
+        currentTaskQueryInfo = new CurrentTaskQueryInfo(lastMonthStartTime, lastMonthEndTime);
+        taskStateQueryInfo = new TaskStateQueryInfo(lastMonthStartTime, lastMonthEndTime);
+        schedulingQueryInfo = new SchedulingQueryInfo(lastMonthStartTime, lastMonthEndTime);
 
-        jobLogQueryInfo = new JobLogQueryInfo(dayOfWeekTimeStampStart, dayOfWeekTimeStampStart);
     }
+
 
     public CurrentTaskQueryInfo getCurrentTaskQueryInfo() {
         return currentTaskQueryInfo;

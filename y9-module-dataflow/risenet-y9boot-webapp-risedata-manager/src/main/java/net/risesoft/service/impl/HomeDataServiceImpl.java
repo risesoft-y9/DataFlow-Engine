@@ -19,6 +19,8 @@ import java.util.stream.Stream;
 
 import javax.annotation.Resource;
 
+import net.bytebuddy.asm.Advice;
+import net.risesoft.util.home.QueryTimeRangeCacheUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
@@ -56,14 +58,18 @@ public class HomeDataServiceImpl implements HomeDataService {
 	@Resource(name = "homeDataExecutor")
 	ThreadPoolTaskExecutor homeDataExecutor;
 
-	@Autowired
 	JobLogService jobLogService;
 
-	@Autowired
 	JobService jobService;
 
-	@Autowired
 	EnvironmentService environmentService;
+
+	@Autowired
+	public HomeDataServiceImpl(JobLogService jobLogService, JobService jobService, EnvironmentService environmentService) {
+		this.jobLogService = jobLogService;
+		this.jobService = jobService;
+		this.environmentService = environmentService;
+	}
 
 	@Override
 	public Y9Result<HomeData> getHomeDataSync() {
@@ -125,12 +131,8 @@ public class HomeDataServiceImpl implements HomeDataService {
 						homeQueryModel.getSchedulingQueryInfo()
 								.setEnvironment(Optional.ofNullable(data).orElse(Collections.emptyList()).stream()
 										.findFirst().map(Environment::getName).orElse(""));
-					}).thenCompose(data -> {
-
-						return CompletableFuture.supplyAsync(
-								() -> getSchedulingInfo(homeQueryModel.getSchedulingQueryInfo()), homeDataExecutor);
-
-					})
+					}).thenCompose(data -> CompletableFuture.supplyAsync(
+							() -> getSchedulingInfo(homeQueryModel.getSchedulingQueryInfo()), homeDataExecutor))
 
 					.thenAccept(data -> homeData.setSchedulingInfo(data));
 
@@ -204,7 +206,7 @@ public class HomeDataServiceImpl implements HomeDataService {
 		} catch (Exception e) {
 			LOGGER.error("获取当前运行任务情况失败", ExceptionUtils.extractConcurrentException(e));
 		}
-		return new CompletableFuture<CurrentTaskInfo>();
+		return new CompletableFuture<>();
 	}
 
 	@Override
@@ -220,11 +222,8 @@ public class HomeDataServiceImpl implements HomeDataService {
 			Map<String, List<String>> resultMap = new HashMap<>();
 
 			for (Map<String, Object> map : dataList) {
-				map.forEach((key, value) -> {
-					resultMap.computeIfAbsent(key, k -> new ArrayList<>()).add(value.toString());
-				});
+				map.forEach((key, value) -> resultMap.computeIfAbsent(key, k -> new ArrayList<>()).add(value.toString()));
 			}
-			;
 			List<String> dateList = resultMap.get("execute_start_time");
 			List<String> frequencyList = resultMap.get("execute_count");
 			if (dateList == null || frequencyList == null) {
@@ -252,7 +251,7 @@ public class HomeDataServiceImpl implements HomeDataService {
 		}
 
 	}
-
+	@SuppressWarnings("unused")
 	public static <T, R> List<R> flatMapAndCollect(List<T> dataList, Function<T, Collection<R>> mapper) {
 		return dataList.stream().flatMap(mapper.andThen(Collection::stream)).collect(Collectors.toList());
 	}
@@ -296,9 +295,9 @@ public class HomeDataServiceImpl implements HomeDataService {
 			Long endTime = schedulingQueryInfo.getEndTime();
 
 			if (startTime == null || endTime == null) {
-				LocalDate today = LocalDate.now();
-				startTime = today.minusWeeks(4).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli();
-				endTime = today.atTime(23, 59, 59).toInstant(ZoneOffset.UTC).toEpochMilli();
+				HomeData.QueryTimeRange lastMonth = QueryTimeRangeCacheUtil.getQueryTimeRangeByName(QueryTimeRangeCacheUtil.LAST_MONTH);
+				startTime = lastMonth.getStartTime();
+				endTime = lastMonth.getEndTime();
 
 			}
 			List<Map<String, Object>> records = jobLogService.getSchedulingInfo(
@@ -380,8 +379,7 @@ public class HomeDataServiceImpl implements HomeDataService {
 		long totalSuccessCount = logGroupInfos.stream().mapToLong(LogGroupInfo::getSuccess).sum();
 		long totalFailureCount = logGroupInfos.stream().mapToLong(LogGroupInfo::getFailure).sum();
 
-		JobLogInfo jobLogInfo = new JobLogInfo(totalSuccessCount, totalFailureCount, logGroupInfos);
-		return jobLogInfo;
+		return new JobLogInfo(totalSuccessCount, totalFailureCount, logGroupInfos);
 	}
 
 }

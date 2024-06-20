@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import net.risesoft.api.persistence.model.security.Environment;
+import net.risesoft.util.home.QueryTimeRangeCacheUtil;
 
 public class HomeData {
 
@@ -54,31 +55,8 @@ public class HomeData {
 
     public HomeData() {
         super();
-        this.timeRanges = createQueryTimeRange();
+        this.timeRanges = QueryTimeRangeCacheUtil.getQueryTimeRangeList();
 
-    }
-
-    private List<QueryTimeRange> createQueryTimeRange() {
-        ArrayList<QueryTimeRange> queryTimeRangeList = new ArrayList<>();
-        LocalDate today = LocalDate.now();
-        queryTimeRangeList.add(new QueryTimeRange("今日", today.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
-                today.atTime(23, 59, 59).toInstant(ZoneOffset.UTC).toEpochMilli()));
-        queryTimeRangeList.add(new QueryTimeRange("最近一周",
-                today.minusDays(today.getDayOfWeek().getValue() - 1).atStartOfDay().toInstant(ZoneOffset.UTC)
-                        .toEpochMilli(),
-                today.plusDays(7 - today.getDayOfWeek().getValue()).atTime(23, 59, 59).toInstant(ZoneOffset.UTC)
-                        .toEpochMilli()));
-        queryTimeRangeList.add(
-                new QueryTimeRange("最近二周", today.minusWeeks(2).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
-                        today.atTime(23, 59, 59).toInstant(ZoneOffset.UTC).toEpochMilli()));
-        queryTimeRangeList.add(
-                new QueryTimeRange("最近三周", today.minusWeeks(3).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
-                        today.atTime(23, 59, 59).toInstant(ZoneOffset.UTC).toEpochMilli()));
-        queryTimeRangeList.add(
-                new QueryTimeRange("最近一个月", today.minusWeeks(4).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
-                        today.atTime(23, 59, 59).toInstant(ZoneOffset.UTC).toEpochMilli()));
-
-        return queryTimeRangeList;
     }
 
     public HomeData setCurrentTaskInfo(CurrentTaskInfo currentTaskInfo) {
@@ -160,7 +138,7 @@ public class HomeData {
     // 查询时间范围
     @Getter
     @Setter
-    public class QueryTimeRange {
+    public static class QueryTimeRange {
         private String name;
         @JsonFormat(shape = JsonFormat.Shape.STRING)
         private Long startTime;
