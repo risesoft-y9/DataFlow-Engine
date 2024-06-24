@@ -48,14 +48,33 @@ webapp -- 后端工程
 ## 逻辑架构图
 
 <div><img src="https://vue.youshengyun.com/files/dataflow/img/ljjgt.png"><div/>
+1. 数据流引擎分为管理端和执行端，管理端具备可视化界面面向用户操作，执行端无界面无状态
+
+2. 管理端主要负责对于执行端任务的配置和监控
+
+3. 执行端接收任务，数据从输入流至数据闸口，最终通过输出流推出
+
+4. 插件库是数据流引擎的重要核心，每个环节中使用哪些插件的灵活组合可以应对多种定制化复杂业务
 
 ## 功能架构图
 
 <div><img src="https://vue.youshengyun.com/files/dataflow/img/gnjgt.png"><div/>
+1. 管理端的功能主要为任务配置和、任务调度和插件库配置
+
+2. 执行端的每一个环节中均有不等的插件对数据任务进行处理
+
+3. 数据流引擎可以依赖数字底座进行使用，也可以单独进行使用
 
 ## 部署架构图
 
 <div><img src="https://vue.youshengyun.com/files/dataflow/img/bsjgt.png"><div/>
+1. 管理端可以平行部署，执行端可以根据业务分类和业务量进行大规模部署，从而提高数据流转效率
+
+2. 正式环境为保证安全，建议将数字底座与数据流引擎进行结合，用系统管理员账号进行管理端操作
+
+3. 数据流引擎支持容器化方式部署
+
+4. 数据流引擎单体在信创环境中，4核8GB的虚拟机可以轻松管理5000任务（需合理匹配多个执行端）
 
 ## 后端技术选型
 
@@ -219,6 +238,10 @@ webapp -- 后端工程
 ### 北京有生博大软件股份有限公司
 
 官网：<a href="https://www.risesoft.net/" target="_blank">https://www.risesoft.net/</a>
+
+### 中国城市发展研究会
+
+官网：<a href="https://www.china-cfh.com/" target="_blank">https://www.china-cfh.com/</a>
 
 ## 咨询与合作
 
