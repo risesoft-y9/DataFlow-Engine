@@ -63,9 +63,10 @@ export const ChartManager = (function () {
         },
         //刷新颜色
         refreshAllChartColor: function (color) {
+            let colors = [color, '#dceae4'];
             this.forEachChartInstance((chartObj) => {
                 chartObj.setOption({
-                    color: color
+                    color: colors
                 });
             });
         }
@@ -257,9 +258,7 @@ export const getHomeDataInfo = async () => {
         let queryTimes = homeData.value.timeRanges;
         //*****************处理数据start*************** */
         homeData.value.schedulingInfo.taskScheduLingInfo.forEach((task: any) => {
-            // 给每个任务对象增加 type 和 stack 属性
             task.type = 'line';
-            task.stack = 'Total';
         });
         showEnvironmentAll.value = true;
         environmentAll.value = homeData.value.allEnvironments;
@@ -989,7 +988,6 @@ export const currentTaskInfoOpinion = ref({
 });
 //日志
 function initlogInfo() {
-    debugger;
     let myChart = ChartManager.getChartInstance('logInfo');
     myChart.clear(); // 清除之前的配置
 
@@ -1090,15 +1088,12 @@ const querySchedulingInfo = async (item) => {
         endTime: null,
         environment: item
     };
-    // let data = JSON.parse(JSON.stringify(params));
 
     let res = await getSchedulingInfo(params);
     if (res.success) {
         homeData.value.schedulingInfo = res.data;
         homeData.value.schedulingInfo.taskScheduLingInfo.forEach((task: any) => {
-            // 给每个任务对象增加 type 和 stack 属性
             task.type = 'line';
-            task.stack = 'Total';
         });
         initSchedulingInfo();
     } else {
