@@ -57,7 +57,7 @@
 		</dependency>
 		<dependency>
 			<groupId>net.risesoft</groupId>
-			<artifactId>risenet-y9boot-starter-idGenerator</artifactId>
+			<artifactId>risenet-y9boot-starter-idgenerator</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
