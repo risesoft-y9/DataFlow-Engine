@@ -48,6 +48,7 @@ webapp -- 后端工程
 ## 逻辑架构图
 
 <div><img src="https://vue.youshengyun.com/files/dataflow/img/ljjgt.png"><div/>
+<div><img src="https://vue.youshengyun.com/files/dataflow/img/ljjgt2.png"><div/>
 
 1. 数据流引擎分为管理端和执行端，管理端具备可视化界面面向用户操作，执行端无界面无状态
 
