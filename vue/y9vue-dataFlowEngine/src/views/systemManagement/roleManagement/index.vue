@@ -313,9 +313,9 @@
         },
         rules: {
             //表单验证规则
-            name: { required: true, message: computed(() => t('请输入用户名')), trigger: 'blur' },
-            userManager: { required: true, message: computed(() => t('请输入账号')), trigger: 'blur' },
-            systemManager: { required: true, message: computed(() => t('请输入密码')), trigger: 'blur' }
+            name: { required: true, message: computed(() => t('请输入名称')), trigger: 'blur' },
+            userManager: { required: true, message: computed(() => t('请选择')), trigger: 'blur' },
+            systemManager: { required: true, message: computed(() => t('请选择')), trigger: 'blur' }
         },
         itemList: [
             //表单显示列表
