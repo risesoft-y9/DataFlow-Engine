@@ -35,6 +35,11 @@ public class TaskModel {
 	private String userId;
 	
 	/**
+	 * 创建者名称
+	 */
+	private String userName;
+	
+	/**
 	 * 副表
 	 */
 	private TaskConfigModel taskConfigModel;

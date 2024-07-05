@@ -67,7 +67,7 @@ public class TaskController {
 			row.put("businessId", task.getBusinessId());
 			row.put("business", dataBusinessService.getById(task.getBusinessId()).getName());
 			row.put("createTime", task.getCreateTime());
-			row.put("user", "admin");
+			row.put("user", task.getUserName());
 			int count = jobService.findCountJobByArgs(task.getId());
 			if(count == 0) {
 				row.put("status", "未设置调度");

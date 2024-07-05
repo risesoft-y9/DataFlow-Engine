@@ -13,6 +13,7 @@ import net.risesoft.api.security.RPCRequestFilter;
 import net.risesoft.api.security.SecurityConfig;
 import net.risesoft.api.utils.IpUtils;
 import net.risesoft.api.utils.PattenUtil;
+import net.risesoft.model.user.UserInfo;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.y9.Y9LoginUserHolder;
 
@@ -277,6 +278,11 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 		threadLocal.set(token);
 		TOKEN_SECURITY_MAP.put(token, concurrentSecurity);
 		TOKEN_TIME_MAP.put(token, System.currentTimeMillis());
+		
+		UserInfo userInfo = new UserInfo();
+		userInfo.setPersonId(userToken.getId());
+    	userInfo.setName(userToken.getUserName());
+		Y9LoginUserHolder.setUserInfo(userInfo);
 		Y9LoginUserHolder.setPersonId(userToken.getId());
 	}
 

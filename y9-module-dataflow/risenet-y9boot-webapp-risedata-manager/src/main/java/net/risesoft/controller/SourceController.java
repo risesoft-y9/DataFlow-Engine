@@ -29,7 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import net.risesoft.api.utils.jdbc.filedTypeMapping.TypeDefinition;
-import net.risesoft.elastic.ElasticsearchRestClient;
+import net.risesoft.elastic.client.ElasticsearchRestClient;
 import net.risesoft.log.LogLevelEnum;
 import net.risesoft.log.OperationTypeEnum;
 import net.risesoft.log.annotation.RiseLog;
