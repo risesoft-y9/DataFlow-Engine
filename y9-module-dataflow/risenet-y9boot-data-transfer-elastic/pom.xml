@@ -20,6 +20,12 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.risesoft</groupId>
+			<artifactId>risenet-y9boot-data-common-tools</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.risesoft</groupId>
 			<artifactId>risenet-y9boot-data-transfer-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
