@@ -34,19 +34,19 @@ public class RdbmsDataInputStream implements DataInputStream {
 
 	private int fetchSize;
 
-	private List<CreateColumnHandle> createCloumnHandles;
+	private List<CreateColumnHandle> createColumnHandles;
 
 	private String encoding;
 
 	private Logger logger;
 
 	public RdbmsDataInputStream(Connection connection, String selectSql, int fetchSize,
-			List<CreateColumnHandle> createCloumnHandles, String encoding, Logger logger) {
+			List<CreateColumnHandle> createColumnHandles, String encoding, Logger logger) {
 		super();
 		this.connection = connection;
 		this.selectSql = selectSql;
 		this.fetchSize = fetchSize;
-		this.createCloumnHandles = createCloumnHandles;
+		this.createColumnHandles = createColumnHandles;
 		this.encoding = encoding;
 		this.logger = logger;
 	}
@@ -81,9 +81,9 @@ public class RdbmsDataInputStream implements DataInputStream {
 				ResultSetMetaData metaData = resultSet.getMetaData();
 				Record record = new DefaultRecord();
 				try {
-					for (int i = 0; i < createCloumnHandles.size(); i++) {
-						CreateColumnHandle createCloumnHandle = createCloumnHandles.get(i);
-						record.addColumn(createCloumnHandle.getColumn(resultSet, metaData, i + 1, encoding));
+					for (int i = 0; i < createColumnHandles.size(); i++) {
+						CreateColumnHandle createColumnHandle = createColumnHandles.get(i);
+						record.addColumn(createColumnHandle.getColumn(resultSet, metaData, i + 1, encoding));
 					}
 					inChannel.writer(record);
 				} catch (Exception e) {

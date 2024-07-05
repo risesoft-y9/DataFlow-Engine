@@ -84,7 +84,7 @@ public class RegisterListener implements ConnectionListener, ListenerBack {
                     });
                 }
             }).onError((req, err) -> {
-            	LOGGER.error("reNewTime error" + err.getMessage());
+            	LOGGER.error("reNewTime error " + err.getMessage());
             });
         }
     }

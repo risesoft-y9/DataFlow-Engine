@@ -33,9 +33,9 @@ public class UpdateRdbmsDataOutputStream extends RdbmsDataOutputStream {
 
 	public UpdateRdbmsDataOutputStream(Connection connection, String workSql,
 			Triple<List<String>, List<Integer>, List<String>> resultSetMetaData,
-			Map<String, PreparedStatementHandle> createCloumnHandles, DataBaseType dataBaseType, List<String> idField,
+			Map<String, PreparedStatementHandle> createColumnHandles, DataBaseType dataBaseType, List<String> idField,
 			List<String> updateField,Logger logger) {
-		super(connection, workSql, resultSetMetaData, createCloumnHandles, dataBaseType,logger);
+		super(connection, workSql, resultSetMetaData, createColumnHandles, dataBaseType,logger);
 		this.idField = idField;
 		this.updateField = updateField;
 	}
@@ -49,14 +49,14 @@ public class UpdateRdbmsDataOutputStream extends RdbmsDataOutputStream {
 		// id
 		for (int i = 0; i < idField.size(); i++) {
 			col = ValueUtils.getRequired(colMap.get(idField.get(i)), "不存在的字段" + idField.get(i));
-			psHandle = this.createCloumnHandles.get(idField.get(i));
+			psHandle = this.createColumnHandles.get(idField.get(i));
 			psHandle.fillPreparedStatementColumnType(preparedStatement, size, col, dataBaseType, resultSetMetaData);
 			size++;
 		}
 		// 设置值
 		for (int i = 0; i < updateField.size(); i++) {
 			col = ValueUtils.getRequired(colMap.get(updateField.get(i)), "不存在的字段" + updateField.get(i));
-			psHandle = this.createCloumnHandles.get(updateField.get(i));
+			psHandle = this.createColumnHandles.get(updateField.get(i));
 			psHandle.fillPreparedStatementColumnType(preparedStatement, size, col, dataBaseType, resultSetMetaData);
 			size++;
 		}
@@ -64,7 +64,7 @@ public class UpdateRdbmsDataOutputStream extends RdbmsDataOutputStream {
 		byte[] bytes;
 		for (int i = 0; i < updateField.size(); i++) {
 			col = colMap.get(updateField.get(i));
-			psHandle = this.createCloumnHandles.get(updateField.get(i));
+			psHandle = this.createColumnHandles.get(updateField.get(i));
 			if (psHandle.isBigType()) {
 				bytes = col.asBytes();
 				preparedStatement.setLong(size, bytes == null ? 0L : bytes.length);
@@ -77,7 +77,7 @@ public class UpdateRdbmsDataOutputStream extends RdbmsDataOutputStream {
 		List<String> lefts = resultSetMetaData.getLeft();
 		for (int i = 0; i < lefts.size(); i++) {
 			col = colMap.get(lefts.get(i));
-			psHandle = this.createCloumnHandles.get(lefts.get(i));
+			psHandle = this.createColumnHandles.get(lefts.get(i));
 			psHandle.fillPreparedStatementColumnType(preparedStatement, size, col, dataBaseType, resultSetMetaData);
 			size++;
 		}

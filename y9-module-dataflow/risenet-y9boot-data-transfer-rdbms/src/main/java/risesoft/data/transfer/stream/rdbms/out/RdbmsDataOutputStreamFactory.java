@@ -1,6 +1,5 @@
 package risesoft.data.transfer.stream.rdbms.out;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -54,7 +53,7 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 	protected DataBaseType dataBaseType;
 	protected String tableName;
 	protected String writerType;
-	protected Map<String, PreparedStatementHandle> createCloumnHandles;
+	protected Map<String, PreparedStatementHandle> createColumnHandles;
 	protected Triple<List<String>, List<Integer>, List<String>> resultSetMetaData;
 	protected List<String> columns;
 	protected String workSql;
@@ -73,7 +72,6 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 			logger.info(this, "create RdbmsDataOutputStreamFactory \njdbcUrl:" + jdbcUrl + " \ntableName:" + tableName
 					+ "\ncolumns:" + this.columns + "\nwriterType:" + writerType);
 		}
-
 	}
 
 	protected List<String> idField;
@@ -197,7 +195,7 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 				first = false;
 			}
 			// 如果是大文本则需要为length
-			preparedStatementHandle = createCloumnHandles.get(columnHolder);
+			preparedStatementHandle = createColumnHandles.get(columnHolder);
 			if (preparedStatementHandle.isBigType()) {
 				sb.append("length(" + columnHolder + ") != length(?)");
 			} else {
@@ -222,7 +220,7 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 	@Override
 	public void init() {
 		// 加载字段类型
-		createCloumnHandles = new HashMap<String, PreparedStatementHandle>();
+		createColumnHandles = new HashMap<String, PreparedStatementHandle>();
 		try {
 			logger.debug(this, "getMetaData");
 			this.resultSetMetaData = DBUtil.getColumnMetaData(dataBaseType, jdbcUrl, userName, password, tableName,
@@ -230,7 +228,7 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 			// 构建一个map
 			int size = this.resultSetMetaData.getRight().size();
 			for (int i = 0; i < size; i++) {
-				createCloumnHandles.put(this.resultSetMetaData.getLeft().get(i),
+				createColumnHandles.put(this.resultSetMetaData.getLeft().get(i),
 						getHandle(this.resultSetMetaData.getMiddle().get(i)));
 			}
 			// 构建sql
@@ -284,17 +282,17 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 
 	protected DataOutputStream getInsertStream() {
 		return new InsertRdbmsDataOutputStream(DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password), workSql,
-				resultSetMetaData, createCloumnHandles, dataBaseType, logger);
+				resultSetMetaData, createColumnHandles, dataBaseType, logger);
 	}
 
 	protected DataOutputStream getUpdateStream() {
 		return new UpdateRdbmsDataOutputStream(DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password), workSql,
-				resultSetMetaData, createCloumnHandles, dataBaseType, idField, updateField, logger);
+				resultSetMetaData, createColumnHandles, dataBaseType, idField, updateField, logger);
 	}
 
 	protected DataOutputStream getReplaceStream() {
 		return new ReplaceRdbmsDataOutputStream(DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password),
-				workSql, resultSetMetaData, createCloumnHandles, dataBaseType, idField, updateField, logger);
+				workSql, resultSetMetaData, createColumnHandles, dataBaseType, idField, updateField, logger);
 	}
 
 	@Override

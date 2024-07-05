@@ -40,17 +40,17 @@ import risesoft.data.transfer.stream.rdbms.utils.RdbmsRangeSplitWrap;
  */
 public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 
-	private static final List<CreateColumnHandle> CLOUMN_HANDLES;
+	private static final List<CreateColumnHandle> COLUMN_HANDLES;
 
 	public static final byte[] EMPTY_CHAR_ARRAY = new byte[0];
 
 	static {
 		try {
-			CLOUMN_HANDLES = ClassTools.getInstancesOfPack("risesoft.data.transfer.stream.rdbms.in.columns.impl",
+			COLUMN_HANDLES = ClassTools.getInstancesOfPack("risesoft.data.transfer.stream.rdbms.in.columns.impl",
 					CreateColumnHandle.class);
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new Error("加载数据库处理工厂失败程序错误!");
+			throw new Error("加载数据库处理工厂失败，程序错误!");
 		}
 
 	}
@@ -66,7 +66,7 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 	private int splitFactor;
 	private String tableName;
 	private Connection connection;
-	private List<CreateColumnHandle> createCloumnHandles;
+	private List<CreateColumnHandle> createColumnHandles;
 	private int tableNumber;
 	private int fetchSize;
 	private double samplePercentage;
@@ -106,7 +106,7 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 	@Override
 	public void init() {
 		// 加载字段类型
-		createCloumnHandles = new ArrayList<CreateColumnHandle>();
+		createColumnHandles = new ArrayList<CreateColumnHandle>();
 		try {
 			logger.debug(this, "getConnection");
 			this.connection = DBUtil.getConnection(DataBaseType.RDBMS, jdbcUrl, userName, password);
@@ -118,13 +118,13 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 			int tmpType;
 			for (int i = 1; i <= metaData.getColumnCount(); i++) {
 				tmpType = metaData.getColumnType(i);
-				for (CreateColumnHandle createCloumnHandle : CLOUMN_HANDLES) {
-					if (createCloumnHandle.isHandle(tmpType)) {
-						createCloumnHandles.add(createCloumnHandle);
+				for (CreateColumnHandle createColumnHandle : COLUMN_HANDLES) {
+					if (createColumnHandle.isHandle(tmpType)) {
+						createColumnHandles.add(createColumnHandle);
 						break;
 					}
 				}
-				if (createCloumnHandles.size() != i) {
+				if (createColumnHandles.size() != i) {
 					throw TransferException.as(DBUtilErrorCode.UNSUPPORTED_TYPE, String.format(
 							"您的配置文件中的列配置信息有误.  不支持数据库读取这种字段类型. 字段名:[%s], 字段名称:[%s], 字段Java类型:[%s]. 请尝试使用数据库函数将其转换支持的类型 或者不同步该字段 .",
 							metaData.getColumnLabel(i), metaData.getColumnType(i), metaData.getColumnClassName(i)));
@@ -132,7 +132,7 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 			}
 			logger.info(this, "初始化完成");
 		} catch (Exception e) {
-			throw TransferException.as(FrameworkErrorCode.RUNTIME_ERROR, "初始化数据库输入流工厂失败异常信息" + e.getMessage(), e);
+			throw TransferException.as(FrameworkErrorCode.RUNTIME_ERROR, "初始化数据库输入流工厂失败，异常信息：" + e.getMessage(), e);
 		}
 
 	}
@@ -140,7 +140,7 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 	@Override
 	public DataInputStream getStream() {
 		return new RdbmsDataInputStream(DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password), selectSql,
-				fetchSize, createCloumnHandles, mandatoryEncoding, logger);
+				fetchSize, createColumnHandles, mandatoryEncoding, logger);
 	}
 
 	@Override
@@ -158,7 +158,7 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 		boolean isSub = numberSize >= 1 && StringUtils.isNotEmpty(this.splitPk);
 		if (isSub) {
 			if (logger.isInfo()) {
-				logger.info(this, "sub data to" + numberSize);
+				logger.info(this, "sub data to " + numberSize);
 			}
 			List<Data> querys = null;
 			String pk = genPKSql(splitPk, tableName, where);

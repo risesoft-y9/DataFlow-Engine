@@ -29,9 +29,9 @@ public class PGUpadateDataOutputStream extends RdbmsDataOutputStream {
 
 	public PGUpadateDataOutputStream(Connection connection, String workSql,
 			Triple<List<String>, List<Integer>, List<String>> resultSetMetaData,
-			Map<String, PreparedStatementHandle> createCloumnHandles, DataBaseType dataBaseType, Logger logger,
+			Map<String, PreparedStatementHandle> createColumnHandles, DataBaseType dataBaseType, Logger logger,
 			List<String> updateField) {
-		super(connection, workSql, resultSetMetaData, createCloumnHandles, dataBaseType, logger);
+		super(connection, workSql, resultSetMetaData, createColumnHandles, dataBaseType, logger);
 		this.updateField = updateField;
 	}
 
@@ -42,7 +42,7 @@ public class PGUpadateDataOutputStream extends RdbmsDataOutputStream {
 		Column column;
 		PreparedStatementHandle psHandle;
 		for (int i = 0; i < size; i++) {
-			psHandle = this.createCloumnHandles.get(this.resultSetMetaData.getLeft().get(i));
+			psHandle = this.createColumnHandles.get(this.resultSetMetaData.getLeft().get(i));
 			column = recordMap.get(this.resultSetMetaData.getLeft().get(i));
 			if (column == null) {
 				throw TransferException.as(CommonErrorCode.RUNTIME_ERROR,
@@ -51,7 +51,7 @@ public class PGUpadateDataOutputStream extends RdbmsDataOutputStream {
 			psHandle.fillPreparedStatementColumnType(preparedStatement, i + 1, column, dataBaseType, resultSetMetaData);
 		}
 		for (int i = 0; i < updateField.size(); i++) {
-			psHandle = this.createCloumnHandles.get(updateField.get(i));
+			psHandle = this.createColumnHandles.get(updateField.get(i));
 			column = recordMap.get(updateField.get(i));
 			if (column == null) {
 				throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "没找到字段通常是配置少了字段导致的:" + updateField.get(i));
