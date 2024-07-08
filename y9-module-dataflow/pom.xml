@@ -18,6 +18,7 @@
     <modules>
         <module>risenet-y9boot-beta-api</module>
         <module>risenet-y9boot-beta-client</module>
+        <module>risenet-y9boot-data-common-tools</module>
         <module>risenet-y9boot-data-jdbc</module>
         <module>risenet-y9boot-data-jdbc-commons</module>
         <module>risenet-y9boot-data-transfer-base</module>
