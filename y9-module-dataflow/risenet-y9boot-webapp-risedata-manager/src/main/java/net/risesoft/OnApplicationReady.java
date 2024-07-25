@@ -5,9 +5,6 @@ import java.sql.SQLException;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.io.FileSystemResource;
@@ -18,6 +15,8 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.druid.pool.DruidDataSource;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.risedata.jdbc.factory.ObjectBuilderFactory;
 import net.risesoft.api.persistence.dao.EnvironmentDao;
 import net.risesoft.api.persistence.model.security.DataUser;
@@ -30,27 +29,22 @@ import net.risesoft.api.persistence.security.impl.RoleServiceImpl;
 import net.risesoft.y9public.repository.DataMappingRepository;
 
 @Component
+@Slf4j
+@RequiredArgsConstructor
 public class OnApplicationReady implements ApplicationListener<ApplicationReadyEvent> {
-	
-	private static final Logger log = LoggerFactory.getLogger(OnApplicationReady.class);
 	
 	private final String DEFAULT_USER = "admin";
 	private final String DEFAULT_PWD = "admin";
 	
-	@Autowired
-	private EnvironmentDao environmentDao;
+	private final EnvironmentDao environmentDao;
 	
-	@Autowired
-	private UserService userService;
+	private final UserService userService;
 	
-	@Autowired
-	private RoleService roleService;
+	private final RoleService roleService;
 	
-	@Autowired
-	private RoleLinkService roleLinkService;
+	private final RoleLinkService roleLinkService;
 	
-	@Autowired
-	private DataMappingRepository dataMappingRepository;
+	private final DataMappingRepository dataMappingRepository;
 	
 	@Resource(name = "jdbcTemplate4Public")
 	private JdbcTemplate jdbcTemplate4Public;
@@ -82,7 +76,7 @@ public class OnApplicationReady implements ApplicationListener<ApplicationReadyE
 		if(dataMappingRepository.count() == 0) {
 			initSql();
 		}
-		log.info("init data finish");
+		LOGGER.info("init data finish");
 	}
 	
 	public void initSql() {
@@ -95,7 +89,7 @@ public class OnApplicationReady implements ApplicationListener<ApplicationReadyE
             EncodedResource er = new EncodedResource(rc, "UTF-8");
             ScriptUtils.executeSqlScript(conn, er);
         } catch (Exception e) {
-            log.error("sql脚本执行发生异常-" + e.getMessage());
+        	LOGGER.error("sql脚本执行发生异常-" + e.getMessage());
         } finally {
         	if(conn != null) {
         		try {

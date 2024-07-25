@@ -2,7 +2,6 @@ package net.risesoft.util.sqlddl;
 
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
-import net.risesoft.id.IdType;
 import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.y9.json.Y9JsonUtil;
 
@@ -93,7 +92,7 @@ public class DDLpg {
 				}
 				
 				if (dbc.getIsCreateIndex() && !dbc.getIsState()) {
-					DbMetaDataUtil.executeDDL(dataSource, "ALTER TABLE " + tableName + " ADD INDEX " + Y9IdGenerator.genId(IdType.UUID) +
+					DbMetaDataUtil.executeDDL(dataSource, "ALTER TABLE " + tableName + " ADD INDEX " + Y9IdGenerator.genId() +
 							" (" + dbc.getColumn_name() + ")");
 				}
 			}
@@ -103,7 +102,7 @@ public class DDLpg {
 			sb.append("CREATE TABLE " + tableName + " (\r\n");
 			String isPK = "";
 			for (DbColumn dbc : dbcs) {
-				String key = Y9IdGenerator.genId(IdType.UUID);
+				String key = Y9IdGenerator.genId();
 				String columnName = dbc.getColumn_name();
 				if (dbc.getPrimaryKey()){
 					isPK += "PRIMARY KEY ("+dbc.getColumn_name()+") \r\n";
