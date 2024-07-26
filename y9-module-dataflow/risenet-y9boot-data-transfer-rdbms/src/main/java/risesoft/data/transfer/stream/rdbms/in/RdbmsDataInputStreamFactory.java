@@ -177,14 +177,14 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 			} else {
 				String pk = genPKSql(splitPk, tableName, where);
 				if (dataBaseType == DataBaseType.Oracle) {
+					//oracle 
 					querys = StringData.as(genSplitSqlForOracle(splitPk, tableName, where, numberSize));
 					return querys;
 				}
 				resultSet = DBUtil.query(connection, pk);
 				rsMetaData = resultSet.getMetaData();
 				Pair<Object, Object> minMaxPK = null;
-				boolean isStringType = false;
-				boolean isLongType = false;
+		
 				if (!isPKTypeValid(rsMetaData)) {
 					throw new TransferException(CommonErrorCode.CONFIG_ERROR, "配置的splitPk不支持此类型");
 				}
@@ -192,9 +192,10 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 					while (DBUtil.asyncResultSetNext(resultSet)) {
 						minMaxPK = new ImmutablePair<Object, Object>(resultSet.getString(1), resultSet.getString(2));
 					}
-					isStringType = true;
+					querys = StringData.as(RdbmsRangeSplitWrap.splitAndWrap(String.valueOf(minMaxPK.getLeft()),
+							String.valueOf(minMaxPK.getRight()), numberSize, splitPk, "'", dataBaseType));
 				} else if (isLongType(rsMetaData.getColumnType(1))) {
-					isLongType = true;
+				
 					while (DBUtil.asyncResultSetNext(resultSet)) {
 						minMaxPK = new ImmutablePair<Object, Object>(resultSet.getString(1), resultSet.getString(2));
 
@@ -205,19 +206,15 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 											+ pk + " type:" + rsMetaData.getColumnType(1));
 						}
 					}
-				}
-				resultSet.close();
-				if (isStringType) {
-					querys = StringData.as(RdbmsRangeSplitWrap.splitAndWrap(String.valueOf(minMaxPK.getLeft()),
-							String.valueOf(minMaxPK.getRight()), numberSize, splitPk, "'", dataBaseType));
-				} else if (isLongType) {
 					querys = StringData
 							.as(RdbmsRangeSplitWrap.splitAndWrap(new BigInteger(minMaxPK.getLeft().toString()),
 									new BigInteger(minMaxPK.getRight().toString()), numberSize, splitPk));
-				} else {
+				}else {
 					throw TransferException.as(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
 							"您配置的切分主键(splitPk) 类型  不支持 仅支持切分主键为一个,并且类型为整数或者字符串类型. 请尝试使用其他的切分主键或者联系 DBA 进行处理.");
 				}
+				resultSet.close();
+				
 			}
 			// 需要加工where
 			String whereStr = " where ";
