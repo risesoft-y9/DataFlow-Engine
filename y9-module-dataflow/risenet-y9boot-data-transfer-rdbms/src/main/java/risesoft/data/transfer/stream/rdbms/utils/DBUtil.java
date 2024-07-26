@@ -377,7 +377,7 @@ public final class DBUtil {
 	 * @throws SQLException if occurs SQLException.
 	 */
 	public static ResultSet query(Connection conn, String sql, int fetchSize) throws SQLException {
-		// 默认3600 s 的query Timeout
+		// 默认3600 s 的query Timeout 1小时
 		return query(conn, sql, fetchSize, Constant.SOCKET_TIMEOUT_INSECOND);
 	}
 

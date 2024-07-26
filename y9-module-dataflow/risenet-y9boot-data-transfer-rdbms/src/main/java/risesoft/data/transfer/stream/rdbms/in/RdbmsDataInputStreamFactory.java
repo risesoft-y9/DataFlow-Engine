@@ -85,7 +85,8 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 				.join(ValueUtils.getRequired(configuration.getList("column", String.class), "缺失column"), ",") + " from "
 				+ this.tableName;
 		this.where = configuration.getString("where", "").trim();
-		//其他地方有用到这个原始的where genPKSql 	pkRangeSQL = String.format("%s WHERE (%s AND %s IS NOT NULL)", pkRangeSQL, where, splitPK);
+		// 其他地方有用到这个原始的where genPKSql pkRangeSQL = String.format("%s WHERE (%s AND %s IS
+		// NOT NULL)", pkRangeSQL, where, splitPK);
 //		if(StringUtils.isNotBlank(where) && !where.startsWith("where")) {
 //			where = " where " + where;
 //		}
@@ -161,73 +162,81 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 				logger.info(this, "sub data to " + numberSize);
 			}
 			List<Data> querys = null;
-			String pk = genPKSql(splitPk, tableName, where);
-			if (dataBaseType == DataBaseType.Oracle) {
-				querys = StringData.as(genSplitSqlForOracle(splitPk, tableName, where, numberSize));
-				return querys;
-			}
-			ResultSet resultSet = DBUtil.query(connection, pk);
-			ResultSetMetaData rsMetaData = resultSet.getMetaData();
-			Pair<Object, Object> minMaxPK = null;
-			boolean isStringType = false;
-			boolean isLongType = false;
-			if (!isPKTypeValid(rsMetaData)) {
-				throw new TransferException(CommonErrorCode.CONFIG_ERROR, "配置的splitPk不支持此类型");
-			}
-			if (isStringType(rsMetaData.getColumnType(1))) {
-				while (DBUtil.asyncResultSetNext(resultSet)) {
-					minMaxPK = new ImmutablePair<Object, Object>(resultSet.getString(1), resultSet.getString(2));
-				}
-				isStringType = true;
-			} else if (isLongType(rsMetaData.getColumnType(1))) {
-				isLongType = true;
-				while (DBUtil.asyncResultSetNext(resultSet)) {
-					minMaxPK = new ImmutablePair<Object, Object>(resultSet.getString(1), resultSet.getString(2));
-
-					String minMax = resultSet.getString(1) + resultSet.getString(2);
-					if (StringUtils.contains(minMax, '.')) {
-						throw TransferException.as(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
-								"您配置的切分主键(splitPk)有误. 因为您配置的切分主键(splitPk) 类型不支持. 仅支持切分主键为一个,并且类型为整数或者字符串类型. 请尝试使用其他的切分主键或者联系 DBA 进行处理..pkSql:"
-										+ pk + " type:" + rsMetaData.getColumnType(1));
-					}
-				}
-			}
-			resultSet.close();
+			ResultSet resultSet;
+			ResultSetMetaData rsMetaData;
 			if (precise) {
 				resultSet = DBUtil.query(connection, "SELECT distinct " + splitPk + " from " + tableName);
 				querys = new ArrayList<Data>();
-				String fu = isStringType ? "'%S'" : "%S";
+				
+				rsMetaData = resultSet.getMetaData();
+				String fu = isStringType(rsMetaData.getColumnType(1)) ? "'%S'" : "%S";
 				while (resultSet.next()) {
 					querys.add(new StringData(String.format(" %S = " + fu, splitPk, resultSet.getObject(splitPk))));
 				}
 				resultSet.close();
-			} else if (isStringType) {
-				querys = StringData.as(RdbmsRangeSplitWrap.splitAndWrap(String.valueOf(minMaxPK.getLeft()),
-						String.valueOf(minMaxPK.getRight()), numberSize, splitPk, "'", dataBaseType));
-			} else if (isLongType) {
-				querys = StringData.as(RdbmsRangeSplitWrap.splitAndWrap(new BigInteger(minMaxPK.getLeft().toString()),
-						new BigInteger(minMaxPK.getRight().toString()), numberSize, splitPk));
 			} else {
-				throw TransferException.as(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
-						"您配置的切分主键(splitPk) 类型  不支持 仅支持切分主键为一个,并且类型为整数或者字符串类型. 请尝试使用其他的切分主键或者联系 DBA 进行处理.");
+				String pk = genPKSql(splitPk, tableName, where);
+				if (dataBaseType == DataBaseType.Oracle) {
+					querys = StringData.as(genSplitSqlForOracle(splitPk, tableName, where, numberSize));
+					return querys;
+				}
+				resultSet = DBUtil.query(connection, pk);
+				rsMetaData = resultSet.getMetaData();
+				Pair<Object, Object> minMaxPK = null;
+				boolean isStringType = false;
+				boolean isLongType = false;
+				if (!isPKTypeValid(rsMetaData)) {
+					throw new TransferException(CommonErrorCode.CONFIG_ERROR, "配置的splitPk不支持此类型");
+				}
+				if (isStringType(rsMetaData.getColumnType(1))) {
+					while (DBUtil.asyncResultSetNext(resultSet)) {
+						minMaxPK = new ImmutablePair<Object, Object>(resultSet.getString(1), resultSet.getString(2));
+					}
+					isStringType = true;
+				} else if (isLongType(rsMetaData.getColumnType(1))) {
+					isLongType = true;
+					while (DBUtil.asyncResultSetNext(resultSet)) {
+						minMaxPK = new ImmutablePair<Object, Object>(resultSet.getString(1), resultSet.getString(2));
+
+						String minMax = resultSet.getString(1) + resultSet.getString(2);
+						if (StringUtils.contains(minMax, '.')) {
+							throw TransferException.as(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
+									"您配置的切分主键(splitPk)有误. 因为您配置的切分主键(splitPk) 类型不支持. 仅支持切分主键为一个,并且类型为整数或者字符串类型. 请尝试使用其他的切分主键或者联系 DBA 进行处理..pkSql:"
+											+ pk + " type:" + rsMetaData.getColumnType(1));
+						}
+					}
+				}
+				resultSet.close();
+				if (isStringType) {
+					querys = StringData.as(RdbmsRangeSplitWrap.splitAndWrap(String.valueOf(minMaxPK.getLeft()),
+							String.valueOf(minMaxPK.getRight()), numberSize, splitPk, "'", dataBaseType));
+				} else if (isLongType) {
+					querys = StringData
+							.as(RdbmsRangeSplitWrap.splitAndWrap(new BigInteger(minMaxPK.getLeft().toString()),
+									new BigInteger(minMaxPK.getRight().toString()), numberSize, splitPk));
+				} else {
+					throw TransferException.as(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
+							"您配置的切分主键(splitPk) 类型  不支持 仅支持切分主键为一个,并且类型为整数或者字符串类型. 请尝试使用其他的切分主键或者联系 DBA 进行处理.");
+				}
 			}
 			// 需要加工where
-			String whereStr = " where " ;
-			StringBuilder tmpWhereSB= new StringBuilder();
-			if(StringUtils.isNotBlank(where)) {
+			String whereStr = " where ";
+			StringBuilder tmpWhereSB = new StringBuilder();
+			if (StringUtils.isNotBlank(where)) {
 				if (!where.toLowerCase().startsWith("where")) {
 					tmpWhereSB.append(" where ").append(where);
 				} else {
 					tmpWhereSB.append(where);
 				}
-				whereStr= " and ";
+				whereStr = " and ";
 			}
 			String tmpWhere = tmpWhereSB.toString();
 			StringData stringData;
 			for (Data data : querys) {
-					// where name='1'   where name like 'aa' and name='1';
-					stringData = (StringData) data;
-					stringData.setValue(StringUtils.isEmpty(tmpWhere)?(whereStr+stringData.getValue()) : tmpWhere+  whereStr + stringData.getValue());
+				// where name='1' where name like 'aa' and name='1';
+				stringData = (StringData) data;
+				stringData.setValue(StringUtils.isEmpty(tmpWhere) ? (whereStr + stringData.getValue())
+						: tmpWhere + whereStr + stringData.getValue());
 //					stringData.setValue(whereStr + stringData.getValue());
 			}
 			if (logger.isInfo()) {
