@@ -14,6 +14,52 @@
         <version>v9.6.7-SNAPSHOT</version>
         <relativePath>../y9-digitalbase/pom.xml</relativePath>
     </parent>
+    
+    <repositories>
+        <repository>
+            <id>aliyun-repo</id>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>y9-internet-repo</id>
+            <url>https://svn.youshengyun.com:9900/nexus/repository/maven-public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <!-- <updatePolicy>always</updatePolicy> -->
+                <!-- always,daily(default),interval:XXX,never -->
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>aliyun-repo-plugin</id>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>y9-internet-repo-plugin</id>
+            <url>https://svn.youshengyun.com:9900/nexus/repository/maven-public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <url>https://svn.youshengyun.com:9900/nexus/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>https://svn.youshengyun.com:9900/nexus/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <modules>
         <module>y9-module-dataflow</module>
