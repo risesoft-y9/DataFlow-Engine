@@ -90,13 +90,13 @@
 
 <template>
     <div class="login-page">
-        <div class="left">
+        <!-- <div class="left">
             <div class="company-logo"></div>
             <div class="ui">
                 <div class="data-line-img"></div>
                 <div class="system-name"></div>
             </div>
-        </div>
+        </div> -->
         <div class="right login-wrapper-bg">
             <div class="wrapper">
                 <div class="login-form-title">用户登录</div>
@@ -132,7 +132,7 @@
     .login-page {
         min-width: 100vw;
         height: 100vh;
-        background-image: url('./static/images/数据流引擎单点登录-大背景图.png');
+        background-image: url('./static/images/bg.png');
         background-size: cover;
         display: flex;
         align-items: center;
@@ -174,11 +174,12 @@
         .right {
             width: 45vw;
             height: 100vh;
+            margin-left: 34%;
 
             &.login-wrapper-bg {
                 width: 601px;
                 height: 575px;
-                background-image: url('./static/images/单点登录-背景色.png');
+                background-image: url('./static/images/bjb.png');
                 background-size: contain;
                 background-repeat: no-repeat;
             }
