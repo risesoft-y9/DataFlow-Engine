@@ -1,8 +1,6 @@
 package net.risesoft.controller;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
@@ -42,17 +40,6 @@ public class BusinessController {
         return Y9Result.success(dataBusinessService.findAll(), "获取数据成功");
     }
 	
-	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "分页获取业务分类", logLevel = LogLevelEnum.RSLOG, enable = false)
-	@RequestMapping("/findByNamePage")
-    public Map<String, Object> findByNamePage(String name, String parentId, int page, int limit) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		Page<DataBusinessEntity> records = dataBusinessService.findByNamePage(name, parentId, page, limit);
-		map.put("data", records.getContent());
-        map.put("count", records.getTotalElements());
-        map.put("code", 0);
-		return map;
-	}
-	
 	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "保存业务分类信息", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/saveData")
 	public Y9Result<DataBusinessEntity> saveData(DataBusinessEntity entity) {
@@ -68,8 +55,7 @@ public class BusinessController {
 	@RiseLog(operationType = OperationTypeEnum.DELETE, operationName = "删除业务分类数据", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/deleteData")
 	public Y9Result<String> deleteData(@RequestParam String id) {
-		dataBusinessService.deleteData(id);
-		return Y9Result.successMsg("删除成功");
+		return dataBusinessService.deleteData(id);
 	}
 	
 }

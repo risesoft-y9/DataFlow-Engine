@@ -55,7 +55,7 @@ public class QueryTimeRangeCacheUtil {
      * @param today
      */
     private static void createQueryTimeRange(LocalDate today) {
-        System.out.println("**************************start*********************************");
+        //System.out.println("**************************start*********************************");
         // 获取今日的结束时间
         LocalTime endTime = LocalTime.of(23, 59, 59);
         LocalDateTime todayEnd = LocalDateTime.of(today, endTime);

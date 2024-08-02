@@ -79,7 +79,7 @@ public class RegisterListener implements ConnectionListener, ListenerBack {
                     }
                     registerAPI.register(instance).as(Boolean.class).onSuccess((res2) -> {
                         if (LOGGER.isDebugEnabled()) {
-                        	LOGGER.debug("register result" + res2);
+                        	LOGGER.debug("register result " + res2);
                         }
                     });
                 }
@@ -97,7 +97,7 @@ public class RegisterListener implements ConnectionListener, ListenerBack {
         }
         ((ChannelConnection) connection).executionSync("register/register", 5000, instance).as(Boolean.class).onSuccess((res) -> {
             if (LOGGER.isDebugEnabled()) {
-            	LOGGER.debug("register result" + res);
+            	LOGGER.debug("register result " + res);
             }
             if (registerDiscoveryClient.getRegisterAPI() == null) {
             	registerDiscoveryClient.setRegisterAPI(registerAPI);
@@ -170,7 +170,7 @@ public class RegisterListener implements ConnectionListener, ListenerBack {
                             LOGGER.error("任务确认失败");
                         }
                     }).onError((req,e)->{
-                        LOGGER.error("任务确认失败"+e.getMessage());
+                        LOGGER.error("任务确认失败："+e.getMessage());
                         e.printStackTrace();
                     });
                     return;

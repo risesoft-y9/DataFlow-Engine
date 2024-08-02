@@ -24,7 +24,7 @@ public interface DataBusinessService {
 	/**
 	 * 根据id删除数据
 	 */
-	void deleteData(String id);
+	Y9Result<String> deleteData(String id);
 
 	/**
 	 * 根据父节点获取子项列表
