@@ -174,7 +174,7 @@
         .right {
             width: 45vw;
             height: 100vh;
-            margin-left: 34%;
+            margin-left: 35%;
 
             &.login-wrapper-bg {
                 width: 601px;

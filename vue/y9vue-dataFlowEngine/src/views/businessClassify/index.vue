@@ -82,8 +82,12 @@
                 align: 'left'
             },
             {
-                title: computed(() => t('时间')),
+                title: computed(() => t('创建时间')),
                 key: 'createTime'
+            },
+            {
+                title: computed(() => t('更新时间')),
+                key: 'updateTime'
             },
             {
                 title: computed(() => t('操作')),
@@ -426,8 +430,12 @@
                     key: 'name'
                 },
                 {
-                    title: computed(() => t('时间')),
+                    title: computed(() => t('创建时间')),
                     key: 'createTime'
+                },
+                {
+                    title: computed(() => t('更新时间')),
+                    key: 'updateTime'
                 },
                 {
                     title: computed(() => t('操作')),

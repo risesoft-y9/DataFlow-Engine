@@ -17,6 +17,7 @@ public class DataBusinessSpecification implements Specification<DataBusinessEnti
 
 	private static final long serialVersionUID = -8033435846816389785L;
 	
+	private List<String> ids;
 	private String parentId;
 	private String name;
 	
@@ -24,10 +25,11 @@ public class DataBusinessSpecification implements Specification<DataBusinessEnti
 		super();
 	}
 
-	public DataBusinessSpecification(String parentId, String name) {
+	public DataBusinessSpecification(String parentId, String name, List<String> ids) {
 		super();
 		this.parentId = parentId;
 		this.name = name;
+		this.ids = ids;
 	}
 
 	@Override
@@ -41,6 +43,9 @@ public class DataBusinessSpecification implements Specification<DataBusinessEnti
 		if (StringUtils.isNotBlank(name)) {
 			expressions.add(cb.like(root.get("name").as(String.class), "%" + name + "%"));
 		}
+		if (ids != null && ids.size() > 0) {
+            expressions.add(root.get("id").in(ids));
+        }
 		return predicate;
 	}
 

@@ -11,4 +11,8 @@ public interface DataTaskRepository extends JpaRepository<DataTaskEntity, String
 	
 	List<DataTaskEntity> findByBusinessId(String businessId);
 	
+	long countByBusinessId(String businessId);
+	
+	long countByBusinessIdIn(List<String> businessId);
+	
 }
