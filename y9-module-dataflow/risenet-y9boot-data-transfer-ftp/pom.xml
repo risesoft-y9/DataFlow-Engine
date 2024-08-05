@@ -45,15 +45,16 @@
         </developer>
     </developers>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <scm>
         <url>https://gitee.com/risesoft-y9/y9-dataflow</url>
         <connection>https://gitee.com/risesoft-y9/y9-dataflow</connection>
         <developerConnection>https://gitee.com/risesoft-y9/y9-dataflow</developerConnection>
     </scm>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>net.risesoft</groupId>
@@ -70,5 +71,5 @@
             <artifactId>commons-net</artifactId>
         </dependency>
     </dependencies>
- 
+
 </project>

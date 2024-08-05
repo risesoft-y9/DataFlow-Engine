@@ -51,7 +51,12 @@
         <connection>https://gitee.com/risesoft-y9/y9-dataflow</connection>
         <developerConnection>https://gitee.com/risesoft-y9/y9-dataflow</developerConnection>
     </scm>
- 
+
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+    </properties>
+
     <distributionManagement>
         <repository>
             <id>releases</id>
@@ -62,11 +67,6 @@
             <url>https://svn.youshengyun.com:9900/nexus/repository/maven-snapshots</url>
         </snapshotRepository>
     </distributionManagement>
-
-    <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-    </properties>
 
     <dependencies>
         <dependency>

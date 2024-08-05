@@ -84,4 +84,24 @@
         <module>risenet-y9boot-webapp-risedata-manager</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <configuration>
+                            <excludeArtifacts>
+                                <artifact>risenet-y9boot-webapp-risedata-executor</artifact>
+                                <artifact>risenet-y9boot-webapp-risedata-manager</artifact>
+                            </excludeArtifacts>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
