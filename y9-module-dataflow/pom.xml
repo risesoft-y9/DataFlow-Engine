@@ -52,17 +52,6 @@
         <developerConnection>https://gitee.com/risesoft-y9/y9-dataflow</developerConnection>
     </scm>
 
-    <distributionManagement>
-        <repository>
-            <id>releases</id>
-            <url>https://svn.youshengyun.com:9900/nexus/repository/maven-releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <url>https://svn.youshengyun.com:9900/nexus/repository/maven-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <modules>
         <module>risenet-y9boot-beta-api</module>
         <module>risenet-y9boot-beta-client</module>
@@ -86,7 +75,7 @@
 
     <profiles>
         <profile>
-            <id>release</id>
+            <id>deploy-maven-central</id>
             <build>
                 <plugins>
                     <plugin>
