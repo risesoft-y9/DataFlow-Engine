@@ -15,44 +15,13 @@
     <description>DataFlow Engine transfer core</description>
     <url>https://gitee.com/risesoft-y9/y9-dataflow</url>
 
-    <licenses>
-        <license>
-            <name>GNU General Public License (GPL) version 3.0</name>
-            <url>https://www.gnu.org/licenses/gpl-3.0.en.html</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <name>wanghongzhe</name>
-            <email>wanghongzhe@risesoft.net</email>
-            <organization>risesoft</organization>
-            <organizationUrl>https://www.risesoft.net</organizationUrl>
-        </developer>
-
-        <developer>
-            <name>panzhaoxiong</name>
-            <email>panzhaoxiong@risesoft.net</email>
-            <organization>risesoft</organization>
-            <organizationUrl>https://www.risesoft.net</organizationUrl>
-        </developer>
-
-        <developer>
-            <name>libo</name>
-            <email>libo@risesoft.net</email>
-            <organization>risesoft</organization>
-            <organizationUrl>https://www.risesoft.net</organizationUrl>
-        </developer>
-    </developers>
-
     <properties>
     </properties>
 
     <scm>
-        <url>https://gitee.com/risesoft-y9/y9-dataflow</url>
-        <connection>https://gitee.com/risesoft-y9/y9-dataflow</connection>
-        <developerConnection>https://gitee.com/risesoft-y9/y9-dataflow</developerConnection>
+        <url>${gitee.url}</url>
+        <connection>${gitee.connection}</connection>
+        <developerConnection>${gitee.developerConnection}</developerConnection>
     </scm>
 
     <dependencies>

@@ -14,7 +14,7 @@
     <version>v9.6.7-SNAPSHOT</version>
     <name>y9-dataflow</name>
     <description>DataFlow Engine project parent pom.xml file</description>
-    <url>https://gitee.com/risesoft-y9/y9-dataflow</url>
+    <url>https://gitee.com/risesoft-y9/y9-dataflow/</url>
 
     <licenses>
         <license>
@@ -24,6 +24,12 @@
         </license>
     </licenses>
 
+    <scm>
+        <url>${gitee.url}</url>
+        <connection>${gitee.connection}</connection>
+        <developerConnection>${gitee.developerConnection}</developerConnection>
+    </scm>
+    
     <developers>
         <developer>
             <name>wanghongzhe</name>
@@ -46,12 +52,12 @@
             <organizationUrl>https://www.risesoft.net</organizationUrl>
         </developer>
     </developers>
-
-    <scm>
-        <url>https://gitee.com/risesoft-y9/y9-dataflow</url>
-        <connection>https://gitee.com/risesoft-y9/y9-dataflow</connection>
-        <developerConnection>https://gitee.com/risesoft-y9/y9-dataflow</developerConnection>
-    </scm>
+    
+    <properties>
+        <gitee.url>https://gitee.com/risesoft-y9/y9-dataflow</gitee.url>
+        <gitee.connection>scm:git:https://gitee.com/risesoft-y9/y9-dataflow.git</gitee.connection>
+        <gitee.developerConnection>scm:git:https://gitee.com/risesoft-y9/y9-dataflow.git</gitee.developerConnection>
+    </properties>
 
     <modules>
         <module>y9-module-dataflow</module>
