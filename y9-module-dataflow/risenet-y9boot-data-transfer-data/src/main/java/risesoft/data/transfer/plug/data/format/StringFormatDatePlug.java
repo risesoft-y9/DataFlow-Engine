@@ -13,6 +13,7 @@ import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.exception.CommonErrorCode;
 import risesoft.data.transfer.core.exception.TransferException;
 import risesoft.data.transfer.core.factory.annotations.ConfigParameter;
+import risesoft.data.transfer.core.plug.Plug;
 import risesoft.data.transfer.core.record.ColumnDisposeHandlePlug;
 import risesoft.data.transfer.plug.data.utils.DateUtils;
 
@@ -24,7 +25,7 @@ import risesoft.data.transfer.plug.data.utils.DateUtils;
  * @date 2024年8月7日
  * @author lb
  */
-public class StringFormatDatePlug {
+public class StringFormatDatePlug implements Plug {
 	/**
 	 * 
 	 * @param format     当不传的时候采用pattern 匹配常见格式
@@ -41,15 +42,14 @@ public class StringFormatDatePlug {
 					if (!StringUtils.isEmpty(dateStr)) {
 						column = new DateColumn(DateUtils.parse(dateStr), c.getName());
 						r.setColumn(i, column);
-					} else {
-						column = c;
+						return column;
 					}
-
-					return column;
+					return c;
 				} catch (Exception e) {
 					throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "时间格式化失败!:" + e.getMessage());
 				}
 			}, jobContext);
+			return;
 		}
 		ColumnDisposeHandlePlug.registerListener(field, (c, r, i) -> {
 			Column column;
@@ -58,15 +58,18 @@ public class StringFormatDatePlug {
 				if (!StringUtils.isEmpty(dateStr)) {
 					column = new DateColumn(DateUtils.parse(dateStr, format), c.getName());
 					r.setColumn(i, column);
-				} else {
-					column = c;
+					return column;
 				}
-
-				return column;
+				return c;
 			} catch (Exception e) {
 				throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "时间格式化失败!:" + e.getMessage());
 			}
 		}, jobContext);
+	}
+
+	@Override
+	public boolean register(JobContext jobContext) {
+		return true;
 	}
 
 }
