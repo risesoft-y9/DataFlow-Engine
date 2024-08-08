@@ -19,7 +19,7 @@ public interface DataTaskService {
 	 * @param rows
 	 * @return
 	 */
-	Page<DataTaskEntity> findPage(List<String> ids, String name, String businessId, int page, int rows);
+	Page<DataTaskEntity> findPage(List<String> ids, String name, List<String> businessIds, int page, int rows);
 
 	/**
 	 * 根据ID获取数据

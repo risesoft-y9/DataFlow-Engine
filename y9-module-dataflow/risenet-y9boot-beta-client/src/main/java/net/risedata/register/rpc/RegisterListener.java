@@ -43,9 +43,6 @@ public class RegisterListener implements ConnectionListener, ListenerBack {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegisterListener.class);
 
     @Autowired
-    RegisterDiscoveryClient discoveryClient;
-
-    @Autowired
     RegisterDiscoveryProperties registerDiscoveryProperties;
 
     @Resource(name = RegisterAPI.MANAGER_NAME)
@@ -73,7 +70,7 @@ public class RegisterListener implements ConnectionListener, ListenerBack {
 
     @Scheduled(fixedDelayString = "${beta.discovery.heartBeat:30000}", initialDelayString = "${beta.discovery.heartBeat:30000}")
     public void reNewTime() {
-        if (discoveryClient.getRegisterAPI() != null && connectionManager.getConnectionPool().size() > 0) {
+        if (registerDiscoveryClient.getRegisterAPI() != null && connectionManager.getConnectionPool().size() > 0) {
             registerAPI.reNew().as(Boolean.class).onSuccess((res) -> {
                 if (!res) {
                     IServiceInstance instance = iServiceInstanceFactory.getIsntance();
@@ -82,12 +79,12 @@ public class RegisterListener implements ConnectionListener, ListenerBack {
                     }
                     registerAPI.register(instance).as(Boolean.class).onSuccess((res2) -> {
                         if (LOGGER.isDebugEnabled()) {
-                        	LOGGER.debug("register result" + res2);
+                        	LOGGER.debug("register result " + res2);
                         }
                     });
                 }
             }).onError((req, err) -> {
-            	LOGGER.error("reNewTime error" + err.getMessage());
+            	LOGGER.error("reNewTime error " + err.getMessage());
             });
         }
     }
@@ -100,15 +97,15 @@ public class RegisterListener implements ConnectionListener, ListenerBack {
         }
         ((ChannelConnection) connection).executionSync("register/register", 5000, instance).as(Boolean.class).onSuccess((res) -> {
             if (LOGGER.isDebugEnabled()) {
-            	LOGGER.debug("register result" + res);
+            	LOGGER.debug("register result " + res);
             }
-            if (discoveryClient.getRegisterAPI() == null) {
-                discoveryClient.setRegisterAPI(registerAPI);
+            if (registerDiscoveryClient.getRegisterAPI() == null) {
+            	registerDiscoveryClient.setRegisterAPI(registerAPI);
             }
             if (connectionManager.getConnectionPool().size() == 1) {
-                discoveryClient.refreshAll();
+            	registerDiscoveryClient.refreshAll();
             } else {
-                discoveryClient.compareAndSet((Connection) connection);
+            	registerDiscoveryClient.compareAndSet((Connection) connection);
             }
         }).onError((res, e) -> {
             LOGGER.error("register error " + e.getMessage());
@@ -173,7 +170,7 @@ public class RegisterListener implements ConnectionListener, ListenerBack {
                             LOGGER.error("任务确认失败");
                         }
                     }).onError((req,e)->{
-                        LOGGER.error("任务确认失败"+e.getMessage());
+                        LOGGER.error("任务确认失败："+e.getMessage());
                         e.printStackTrace();
                     });
                     return;

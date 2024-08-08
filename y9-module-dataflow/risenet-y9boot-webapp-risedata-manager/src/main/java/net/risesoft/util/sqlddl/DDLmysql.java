@@ -2,8 +2,6 @@ package net.risesoft.util.sqlddl;
 
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
-import net.risesoft.id.IdType;
-import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.y9.json.Y9JsonUtil;
 
 import org.apache.commons.lang3.StringUtils;
@@ -91,7 +89,7 @@ public class DDLmysql {
 				DbMetaDataUtil.executeDDL(dataSource, DDL);
 				
 				if (dbc.getIsCreateIndex() && !dbc.getIsState()) {
-					String str = "ALTER TABLE " + tableName + " ADD INDEX " + Y9IdGenerator.genId(IdType.UUID) + " (" + dbc.getColumn_name() + ")";
+					String str = "ALTER TABLE " + tableName + " ADD INDEX " + tableName + "_" + dbc.getColumn_name() + " (" + dbc.getColumn_name() + ")";
 					DbMetaDataUtil.executeDDL(dataSource, str);
 				}
 			}
@@ -100,7 +98,6 @@ public class DDLmysql {
 			sb.append("CREATE TABLE " + tableName + " (\r\n");
 			String isPK = "";
 			for (DbColumn dbc : dbcs) {
-				String key = Y9IdGenerator.genId(IdType.UUID);
 				String columnName = dbc.getColumn_name();
 				if (dbc.getPrimaryKey()){
 					isPK += "PRIMARY KEY ("+dbc.getColumn_name()+") \r\n";
@@ -122,7 +119,7 @@ public class DDLmysql {
 				}
 				sb.append(",\r\n");
 				if (dbc.getIsCreateIndex()) {
-					sb.append("KEY "+key+" ("+ columnName +") USING BTREE");
+					sb.append("KEY " + tableName + "_" + columnName + " ("+ columnName +") USING BTREE");
 					sb.append(",\r\n");
 				}
 			}

@@ -10,24 +10,15 @@ import net.risesoft.api.persistence.model.security.Environment;
 import net.risesoft.api.persistence.security.EnvironmentService;
 import net.risesoft.api.utils.AutoIdUtil;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 
-/**
- * @Description :
- * @ClassName EnvironmentServiceImpl
- * @Author lb
- * @Date 2022/8/4 16:58
- * @Version 1.0
- */
 @Service
-public class EnvironmentServiceImpl extends AutomaticCrudService<Environment, String>
-		implements EnvironmentService, ApplicationListener<ApplicationStartedEvent> {
+public class EnvironmentServiceImpl extends AutomaticCrudService<Environment, String> implements EnvironmentService {
+	
 	public static final String PUBLIC = "Public";
 
 	@Autowired
@@ -60,7 +51,7 @@ public class EnvironmentServiceImpl extends AutomaticCrudService<Environment, St
 
 	@Override
 	public String getEnvironmentById(String environment) {
-		String name = environmentDao.findByID(environment);
+		String name = environmentDao.findById(environment);
 		if (StringUtils.isEmpty(name)) {
 			throw new ServiceOperationException("没有找到该环境" + environment);
 		}
@@ -69,27 +60,11 @@ public class EnvironmentServiceImpl extends AutomaticCrudService<Environment, St
 
 	@Override
 	public String getEnvironmentByName(String environment) {
-		String id = environmentDao.findByNAME(environment);
+		String id = environmentDao.findByName(environment);
 		if (StringUtils.isEmpty(id)) {
 			throw new ServiceOperationException("没有找到该环境" + environment);
 		}
 		return id;
-	}
-
-	@Override
-	public void onApplicationEvent(ApplicationStartedEvent event) {
-		if (environmentDao.hasPulibc() < 1) {
-			Environment environment = new Environment();
-			environment.setDescription("默认环境");
-			environment.setName(PUBLIC);
-			environment.setId("Public");
-			insert(environment);
-			environment = new Environment();
-			environment.setDescription("测试环境");
-			environment.setName("dev");
-			environment.setId("dev");
-			insert(environment);
-		}
 	}
 
 	@Override
@@ -99,6 +74,9 @@ public class EnvironmentServiceImpl extends AutomaticCrudService<Environment, St
 
 	@Override
 	public List<Environment> findForEnvironment(List<String> environments) {
+		if(environments.size() == 0) {
+			return null;
+		}
 		return search("*", null, OperationBuilderFactory.builder("id", new InOperation(true, environments)));
 	}
 

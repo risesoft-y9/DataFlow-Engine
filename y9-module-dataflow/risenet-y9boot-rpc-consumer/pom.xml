@@ -1,36 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>risenet-y9boot-rpc-consumer</artifactId>
-    
     <parent>
         <groupId>net.risesoft</groupId>
         <artifactId>y9-module-dataflow</artifactId>
-        <version>v9.6.6-SNAPSHOT</version>
+        <version>v9.6.7-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-	
-	<properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+    <artifactId>risenet-y9boot-rpc-consumer</artifactId>
+    <name>risenet-y9boot-rpc-consumer</name>
+    <description>DataFlow Engine rpc consumer</description>
+    <url>https://gitee.com/risesoft-y9/y9-dataflow</url>
+
+    <licenses>
+        <license>
+            <name>GNU General Public License (GPL) version 3.0</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0.en.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>wanghongzhe</name>
+            <email>wanghongzhe@risesoft.net</email>
+            <organization>risesoft</organization>
+            <organizationUrl>https://www.risesoft.net</organizationUrl>
+        </developer>
+
+        <developer>
+            <name>panzhaoxiong</name>
+            <email>panzhaoxiong@risesoft.net</email>
+            <organization>risesoft</organization>
+            <organizationUrl>https://www.risesoft.net</organizationUrl>
+        </developer>
+
+        <developer>
+            <name>libo</name>
+            <email>libo@risesoft.net</email>
+            <organization>risesoft</organization>
+            <organizationUrl>https://www.risesoft.net</organizationUrl>
+        </developer>
+    </developers>
+
+    <properties>
     </properties>
-    
+
+    <scm>
+        <url>https://gitee.com/risesoft-y9/y9-dataflow</url>
+        <connection>https://gitee.com/risesoft-y9/y9-dataflow</connection>
+        <developerConnection>https://gitee.com/risesoft-y9/y9-dataflow</developerConnection>
+    </scm>
+
     <dependencies>
-    	<dependency>
+        <dependency>
             <groupId>net.risesoft</groupId>
             <artifactId>risenet-y9boot-rpc-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
+
         <!-- fastjson -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
@@ -45,7 +81,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        
+
     </dependencies>
-    
+
 </project>

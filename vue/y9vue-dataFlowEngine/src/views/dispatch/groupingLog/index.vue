@@ -87,7 +87,7 @@
 import {ref, onMounted, computed, inject, reactive} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {getFindAll} from "@/api/taskConfig";
-
+import {ElMessageBox, ElNotification, ElMessage} from 'element-plus';
 import {getDataSearch, getEnvironmentAll, getLogSearch, getLogSearchByGroup} from "@/api/dispatch";
 import {setTreeData} from "@/utils/object";
 import router from '@/router';
@@ -301,6 +301,16 @@ async function initTableData() {
     // 对返回的接口数据进行赋值与处理
     tableConfig.value.tableData = res.data.content
     tableConfig.value.pageConfig.total = res.data.total;
+  }else {
+    tableConfig.value.tableData = [];
+    tableConfig.value.pageConfig.total = 0;
+    ElNotification({
+      title: '提示',
+      message: res?.msg,
+      type: 'error',
+      duration: 2000,
+      offset: 80
+    });
   }
 
   tableConfig.value.loading = false;

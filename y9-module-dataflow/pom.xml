@@ -1,23 +1,61 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <!-- <groupId>net.risesoft</groupId> -->
-    <artifactId>y9-module-dataflow</artifactId>
-    <packaging>pom</packaging>
-    <!-- <version>v9.6.6-SNAPSHOT</version> -->
-
     <parent>
         <groupId>net.risesoft</groupId>
         <artifactId>y9-dataflow</artifactId>
-        <version>v9.6.6-SNAPSHOT</version>
+        <version>v9.6.7-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+    <artifactId>y9-module-dataflow</artifactId>
+    <packaging>pom</packaging>
+    <name>y9-module-dataflow</name>
+    <description>DataFlow Engine y9-module-dataflow project parent pom.xml file</description>
+    <url>https://gitee.com/risesoft-y9/y9-dataflow</url>
+
+    <licenses>
+        <license>
+            <name>GNU General Public License (GPL) version 3.0</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0.en.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>wanghongzhe</name>
+            <email>wanghongzhe@risesoft.net</email>
+            <organization>risesoft</organization>
+            <organizationUrl>https://www.risesoft.net</organizationUrl>
+        </developer>
+
+        <developer>
+            <name>panzhaoxiong</name>
+            <email>panzhaoxiong@risesoft.net</email>
+            <organization>risesoft</organization>
+            <organizationUrl>https://www.risesoft.net</organizationUrl>
+        </developer>
+
+        <developer>
+            <name>libo</name>
+            <email>libo@risesoft.net</email>
+            <organization>risesoft</organization>
+            <organizationUrl>https://www.risesoft.net</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://gitee.com/risesoft-y9/y9-dataflow</url>
+        <connection>https://gitee.com/risesoft-y9/y9-dataflow</connection>
+        <developerConnection>https://gitee.com/risesoft-y9/y9-dataflow</developerConnection>
+    </scm>
 
     <modules>
         <module>risenet-y9boot-beta-api</module>
         <module>risenet-y9boot-beta-client</module>
+        <module>risenet-y9boot-data-common-tools</module>
         <module>risenet-y9boot-data-jdbc</module>
         <module>risenet-y9boot-data-jdbc-commons</module>
         <module>risenet-y9boot-data-transfer-base</module>
@@ -34,5 +72,25 @@
         <module>risenet-y9boot-webapp-risedata-executor</module>
         <module>risenet-y9boot-webapp-risedata-manager</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>deploy-maven-central</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <configuration>
+                            <excludeArtifacts>
+                                <artifact>risenet-y9boot-webapp-risedata-executor</artifact>
+                                <artifact>risenet-y9boot-webapp-risedata-manager</artifact>
+                            </excludeArtifacts>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

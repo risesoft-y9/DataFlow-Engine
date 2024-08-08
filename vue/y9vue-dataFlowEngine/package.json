@@ -5,7 +5,8 @@
     "main": "/electron/main.js",
     "scripts": {
         "dev": "vite  --mode development",
-        "serve": "vite  --mode test",
+        "serve": "vite  --mode development",
+        "test": "vite  --mode test",
         "build": "vite build",
         "build-test": "vite build  --mode test",
         "preview": "vite preview",

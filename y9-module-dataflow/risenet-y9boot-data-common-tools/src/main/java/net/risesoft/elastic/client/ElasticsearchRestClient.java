@@ -1,8 +1,8 @@
-package net.risesoft.elastic;
+package net.risesoft.elastic.client;
 
-import net.risesoft.pojo.QueryModel;
+import net.risesoft.elastic.client.pojo.QueryModel;
+import net.risesoft.elastic.utils.HttpClientEsUtil;
 import net.risesoft.pojo.Y9Result;
-import net.risesoft.util.HttpClientEsUtil;
 import net.risesoft.y9.json.Y9JsonUtil;
 
 import java.io.IOException;
@@ -104,10 +104,11 @@ public class ElasticsearchRestClient {
      * 复制表和数据
      * @param indexName
      * @param newIndexName
+     * @param isData 是否拷贝数据
      * @return
      * @throws Exception
      */
-    public Y9Result<String> copyIndexData(String indexName, String newIndexName) throws Exception {
+    public Y9Result<String> copyIndexData(String indexName, String newIndexName, boolean isData) throws Exception {
     	// 获取原表结构
     	String json = getMapping(indexName);
     	if(json.equals("failed")) {
@@ -119,11 +120,13 @@ public class ElasticsearchRestClient {
     	if(msg.equals("failed")) {
     		return Y9Result.failure("创建索引表失败");
     	}
-    	// 迁移数据
-    	String mapping = "{\"source\": {\"index\": \""+indexName+"\"},\"dest\": {\"index\": \""+newIndexName+"\"}}";
-    	String response = HttpClientEsUtil.httpPost(mapping, url + "/_reindex", username, password);
-    	if(response.equals("failed")) {
-    		return Y9Result.failure("复制数据失败");
+    	if(isData) {
+    		// 迁移数据
+        	String mapping = "{\"source\": {\"index\": \""+indexName+"\"},\"dest\": {\"index\": \""+newIndexName+"\"}}";
+        	String response = HttpClientEsUtil.httpPost(mapping, url + "/_reindex", username, password);
+        	if(response.equals("failed")) {
+        		return Y9Result.failure("复制数据失败");
+        	}
     	}
     	return Y9Result.successMsg("操作成功");
     }
@@ -137,7 +140,12 @@ public class ElasticsearchRestClient {
      * @throws Exception
      */
     public String addDocument(String indexName, String document, String id) throws Exception {
-    	return HttpClientEsUtil.httpPost(document, url + "/" + indexName + "/_doc/" + id, username, password);
+    	String data = HttpClientEsUtil.httpPost(document, url + "/" + indexName + "/_doc/" + id, username, password);
+    	if(!data.equals("failed")) {
+    		return data;
+    	}else {
+    		throw new Exception("新增/修改文档失败");
+    	}
     }
     
     /**
@@ -150,7 +158,7 @@ public class ElasticsearchRestClient {
     public String getDocument(String id, String indexName) throws Exception {
     	String response = HttpClientEsUtil.httpGet(url + "/" + indexName + "/_doc/" + id, username, password);
     	if(response.equals("failed")) {
-    		return "";
+    		throw new Exception("根据id获取文档失败");
     	}
     	Map<String, Object> map = Y9JsonUtil.readHashMap(response);
     	String data = Y9JsonUtil.writeValueAsString(map.get("_source"));
@@ -163,13 +171,14 @@ public class ElasticsearchRestClient {
      * @return
      * @throws Exception
      */
-    public String getCount(String indexName) throws Exception {
+    public int getCount(String indexName) throws Exception {
     	String data = HttpClientEsUtil.httpGet(url + "/" + indexName + "/_count", username, password);
     	if(!data.equals("failed")) {
     		Map<String, Object> map = Y9JsonUtil.readHashMap(data);
-    		return Y9JsonUtil.writeValueAsString(map.get("count"));
+    		return (int)map.get("count");
+    	}else {
+    		throw new Exception("获取索引表数据量失败");
     	}		
-    	return "";
     }
     
     /**
@@ -204,44 +213,43 @@ public class ElasticsearchRestClient {
     	}
     	queryJson += "}";
     	String response = HttpClientEsUtil.httpPost(queryJson, url + "/" + indexName + "/_search", username, password);
-    	Map<String, Object> map = new HashMap<String, Object>();
     	if(response.equals("failed")) {
-    		map.put("success", false);
-    		return map;
-    	}
-    	map.put("success", true);
-    	Map<String, Object> data = Y9JsonUtil.readHashMap(response);
-    	if(queryType.equals("aggs")) {
-    		Map<String, Object> hits = (Map<String, Object>) data.get("aggregations");
-    		if(hits != null) {
-    			Map<String, Object> aggsMap = (Map<String, Object>) hits.get("aggs_name");
-    			// 判断是否分组查询，分组返回list
-    			List<Map<String, Object>> aggs_list = (List<Map<String, Object>>) aggsMap.get("buckets");
-    			if(aggs_list == null) {
-    				map.put("data", aggsMap.get("value"));
-    			}else {
-    				map.put("data", aggs_list);
-    			}
-    		}
+    		throw new Exception("索引表-" + indexName + "查询报错，请检查查询接口报错信息");
     	}else {
-    		Integer total = 0;
-    		List<Map<String, Object>> listMap = new ArrayList<Map<String,Object>>();
-    		Map<String, Object> hits = (Map<String, Object>) data.get("hits");
-    		if(hits != null) {
-    			try {
-					total = (Integer) hits.get("total");
-				} catch (Exception e) {
-					Map<String, Object> totalMap = (Map<String, Object>) hits.get("total");
-					total = (Integer) totalMap.get("value");
-				}
-    			List<Map<String, Object>> hits_list = (List<Map<String, Object>>) hits.get("hits");
-    			for(Map<String, Object> hit : hits_list) {
-    				listMap.add((Map<String, Object>) hit.get("_source"));
-    			}
-    		}
-    		map.put("total", total);
-    		map.put("data", listMap);
+    		Map<String, Object> map = new HashMap<String, Object>();
+    		Map<String, Object> data = Y9JsonUtil.readHashMap(response);
+        	if(queryType.equals("aggs")) {
+        		Map<String, Object> hits = (Map<String, Object>) data.get("aggregations");
+        		if(hits != null) {
+        			Map<String, Object> aggsMap = (Map<String, Object>) hits.get("aggs_name");
+        			// 判断是否分组查询，分组返回list
+        			List<Map<String, Object>> aggs_list = (List<Map<String, Object>>) aggsMap.get("buckets");
+        			if(aggs_list == null) {
+        				map.put("data", aggsMap.get("value"));
+        			}else {
+        				map.put("data", aggs_list);
+        			}
+        		}
+        	}else {
+        		Integer total = 0;
+        		List<Map<String, Object>> listMap = new ArrayList<Map<String,Object>>();
+        		Map<String, Object> hits = (Map<String, Object>) data.get("hits");
+        		if(hits != null) {
+        			try {
+    					total = (Integer) hits.get("total");
+    				} catch (Exception e) {
+    					Map<String, Object> totalMap = (Map<String, Object>) hits.get("total");
+    					total = (Integer) totalMap.get("value");
+    				}
+        			List<Map<String, Object>> hits_list = (List<Map<String, Object>>) hits.get("hits");
+        			for(Map<String, Object> hit : hits_list) {
+        				listMap.add((Map<String, Object>) hit.get("_source"));
+        			}
+        		}
+        		map.put("total", total);
+        		map.put("data", listMap);
+        	}
+        	return map;
     	}
-    	return map;
     }
 }

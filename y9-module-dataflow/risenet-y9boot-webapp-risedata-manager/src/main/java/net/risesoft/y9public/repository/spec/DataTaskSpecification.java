@@ -18,17 +18,17 @@ public class DataTaskSpecification implements Specification<DataTaskEntity>{
 	private static final long serialVersionUID = 7150744199489729818L;
 	
 	private List<String> ids;
-	private String businessId;
+	private List<String> businessIds;
 	private String name;
 	
 	public DataTaskSpecification() {
 		super();
 	}
 
-	public DataTaskSpecification(List<String> ids, String businessId, String name) {
+	public DataTaskSpecification(List<String> ids, List<String> businessIds, String name) {
 		super();
 		this.ids = ids;
-		this.businessId = businessId;
+		this.businessIds = businessIds;
 		this.name = name;
 	}
 
@@ -40,8 +40,8 @@ public class DataTaskSpecification implements Specification<DataTaskEntity>{
 		if (ids != null && ids.size() > 0) {
             expressions.add(root.get("id").in(ids));
         }
-		if (StringUtils.isNotBlank(businessId)) {
-			expressions.add(cb.equal(root.get("businessId").as(String.class), businessId));
+		if (businessIds != null && businessIds.size() > 0) {
+			expressions.add(root.get("businessId").in(businessIds));
 		}
 		if (StringUtils.isNotBlank(name)) {
 			expressions.add(cb.like(root.get("name").as(String.class), "%" + name + "%"));
@@ -57,12 +57,12 @@ public class DataTaskSpecification implements Specification<DataTaskEntity>{
 		this.ids = ids;
 	}
 
-	public String getBusinessId() {
-		return businessId;
+	public List<String> getBusinessIds() {
+		return businessIds;
 	}
 
-	public void setBusinessId(String businessId) {
-		this.businessId = businessId;
+	public void setBusinessIds(List<String> businessIds) {
+		this.businessIds = businessIds;
 	}
 
 	public String getName() {

@@ -7,6 +7,7 @@ import net.risesoft.api.job.TaskExecutorService;
 import net.risesoft.api.persistence.job.JobLogService;
 import net.risesoft.api.persistence.job.JobService;
 import net.risesoft.api.persistence.model.job.Job;
+import net.risesoft.api.security.ConcurrentSecurity;
 import net.risesoft.api.utils.Sort;
 import net.risesoft.api.utils.TaskUtils;
 import net.risesoft.controller.BaseController;
@@ -72,7 +73,13 @@ public class JobController extends BaseController {
 	@CheckHttpForArgs
 	@GetMapping("search")
 	public Y9Result<Object> search(Job job, LPageable page) {
-		return Y9Result.success(jobService.search(job, page, getSecurityJurisdiction(job.getEnvironment())));
+		ConcurrentSecurity jurisdiction = null;
+		try {
+			jurisdiction = getSecurityJurisdiction(job.getEnvironment());
+		} catch (Exception e) {
+			return Y9Result.failure(e.getMessage());
+		}
+		return Y9Result.success(jobService.search(job, page, jurisdiction));
 	}
 
 	/**

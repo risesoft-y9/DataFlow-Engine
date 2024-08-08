@@ -14,18 +14,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import net.risesoft.api.security.ConcurrentSecurity;
+import net.risesoft.api.security.SecurityManager;
 import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.service.DataBusinessService;
 import net.risesoft.y9public.entity.DataBusinessEntity;
 import net.risesoft.y9public.repository.DataBusinessRepository;
+import net.risesoft.y9public.repository.DataTaskRepository;
 import net.risesoft.y9public.repository.spec.DataBusinessSpecification;
 
 @Service(value = "dataBusinessService")
 @RequiredArgsConstructor
 public class DataBusinessServiceImpl implements DataBusinessService {
 	
+	private final DataTaskRepository dataTaskRepository;
+	
 	private final DataBusinessRepository dataBusinessRepository;
+	
+	private final SecurityManager securityManager;
 	
 	@Override
 	public Page<DataBusinessEntity> findByNamePage(String name, String parentId, int page, int rows) {
@@ -36,7 +43,8 @@ public class DataBusinessServiceImpl implements DataBusinessService {
         if(StringUtils.isBlank(parentId)) {
         	parentId = "0";
         }
-        DataBusinessSpecification spec = new DataBusinessSpecification(parentId, name);
+        ConcurrentSecurity security = securityManager.getConcurrentSecurity();
+        DataBusinessSpecification spec = new DataBusinessSpecification(parentId, name, security.getJobTypes());
 		return dataBusinessRepository.findAll(spec, pageable);
 	}
 
@@ -47,12 +55,19 @@ public class DataBusinessServiceImpl implements DataBusinessService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public void deleteData(String id) {
-		List<DataBusinessEntity> list = dataBusinessRepository.findByParentIdOrderByCreateTime(id);
+	public Y9Result<String> deleteData(String id) {
+		if(dataTaskRepository.countByBusinessId(id) > 0) {
+			return Y9Result.failure("分类下存在任务，无法删除");
+		}
+		List<String> list = dataBusinessRepository.findByParentId(id);
 		if(list != null && list.size() > 0) {
-			dataBusinessRepository.deleteAll(list);
+			if(dataTaskRepository.countByBusinessIdIn(list) > 0) {
+				return Y9Result.failure("子分类下存在任务，无法删除");
+			}
+			dataBusinessRepository.deleteAllById(list);
 		}
 		dataBusinessRepository.deleteById(id);
+		return Y9Result.successMsg("删除成功");
 	}
 
 	@Override
@@ -64,13 +79,19 @@ public class DataBusinessServiceImpl implements DataBusinessService {
 	@Transactional(readOnly = false)
 	public Y9Result<DataBusinessEntity> saveData(DataBusinessEntity entity) {
 		if (entity != null && StringUtils.isNotBlank(entity.getName())) {
+			DataBusinessEntity dataBusinessEntity = null;
 			if (StringUtils.isBlank(entity.getId())) {
-				entity.setId(Y9IdGenerator.genId());
-				if(StringUtils.isBlank(entity.getParentId())) {
-					entity.setParentId("0");
-				}
+				dataBusinessEntity = new DataBusinessEntity();
+				dataBusinessEntity.setId(Y9IdGenerator.genId());
+				dataBusinessEntity.setParentId(entity.getParentId());
+			}else {
+				dataBusinessEntity = getById(entity.getId());
 			}
-			return Y9Result.success(dataBusinessRepository.save(entity), "保存成功");
+			dataBusinessEntity.setName(entity.getName());
+			if(StringUtils.isBlank(dataBusinessEntity.getParentId())) {
+				dataBusinessEntity.setParentId("0");
+			}
+			return Y9Result.success(dataBusinessRepository.save(dataBusinessEntity), "保存成功");
 		}
 		return Y9Result.failure("数据不能为空");
 	}
@@ -101,8 +122,12 @@ public class DataBusinessServiceImpl implements DataBusinessService {
 
 	@Override
 	public List<DataBusinessEntity> findAll() {
+		ConcurrentSecurity security = securityManager.getConcurrentSecurity();
+		List<String> ids = security.getJobTypes();
+		if(ids.size() > 0) {
+			return dataBusinessRepository.findByIdIn(ids);
+		}
 		return dataBusinessRepository.findAll();
 	}
-
 
 }

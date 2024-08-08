@@ -2,7 +2,6 @@ package net.risesoft.util.sqlddl;
 
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import net.risesoft.y9.json.Y9JsonUtil;
-import net.risesoft.id.IdType;
 import net.risesoft.id.Y9IdGenerator;
 import org.apache.commons.lang3.StringUtils;
 
@@ -22,7 +21,7 @@ public class DDLkingbase {
 		DbColumn[] dbcs = Y9JsonUtil.objectMapper.readValue(jsonDbColumns, TypeFactory.defaultInstance().constructArrayType(DbColumn.class));
 		if (DbMetaDataUtil.checkTableExist(dataSource, tableName)) {
 			for (DbColumn dbc : dbcs) {
-				String key = Y9IdGenerator.genId(IdType.UUID);
+				String key = Y9IdGenerator.genId();
 				String columnName = dbc.getColumn_name();
 				String DDL = "ALTER TABLE " + tableName;
 				if (!dbc.getIsState()) {// 没有则创建
@@ -95,7 +94,7 @@ public class DDLkingbase {
 			}
 
 			for (DbColumn dbc : dbcs) {
-				String key = Y9IdGenerator.genId(IdType.UUID);
+				String key = Y9IdGenerator.genId();
 				String columnName = dbc.getColumn_name();
 				if (StringUtils.isNotBlank(dbc.getComment())) {
 					DbMetaDataUtil.executeDDL(dataSource, "COMMENT ON COLUMN " + tableName.trim().toUpperCase() + "."

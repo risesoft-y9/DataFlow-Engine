@@ -130,6 +130,7 @@ import result from '../comp/result/index.vue'
 const {t} = useI18n();
 const fontSizeObj: any = inject('sizeObjInfo');
 import {useRoute} from 'vue-router'
+import { ElNotification } from 'element-plus';
 
 const props = defineProps({
   tableRow: {
@@ -423,6 +424,16 @@ async function initTableData() {
     // 对返回的接口数据进行赋值与处理
     tableConfig.value.tableData = res.data.content
     tableConfig.value.pageConfig.total = res.data.total;
+  }else {
+    tableConfig.value.tableData = [];
+    tableConfig.value.pageConfig.total = 0;
+    ElNotification({
+      title: '提示',
+      message: res?.msg,
+      type: 'error',
+      duration: 2000,
+      offset: 80
+    });
   }
 
   tableConfig.value.loading = false;

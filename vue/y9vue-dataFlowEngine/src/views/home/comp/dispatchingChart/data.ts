@@ -53,6 +53,22 @@ export const ChartManager = (function () {
             this.forEachChartInstance((chart) => {
                 chart.resize();
             });
+        },
+        //销毁
+        disposeAllChartInstance: function () {
+            this.forEachChartInstance((chart) => {
+                chart.dispose();
+            });
+            chartInstances = {};
+        },
+        //刷新颜色
+        refreshAllChartColor: function (color) {
+            let colors = [color, '#dceae4'];
+            this.forEachChartInstance((chartObj) => {
+                chartObj.setOption({
+                    color: colors
+                });
+            });
         }
     };
 })();
@@ -131,7 +147,7 @@ export let currentTaskInfoQueryAllSelect = ref();
 
 export let log_totalSuccess = ref(0);
 export let log_totalFailure = ref(0);
-export let logInfoSelectName = ref('最近一个月');
+export let logInfoSelectName = ref('最近一周');
 export let logInfoQueryAllSelect = ref();
 
 export let showEnvironmentAll = ref(false);
@@ -242,9 +258,7 @@ export const getHomeDataInfo = async () => {
         let queryTimes = homeData.value.timeRanges;
         //*****************处理数据start*************** */
         homeData.value.schedulingInfo.taskScheduLingInfo.forEach((task: any) => {
-            // 给每个任务对象增加 type 和 stack 属性
             task.type = 'line';
-            task.stack = 'Total';
         });
         showEnvironmentAll.value = true;
         environmentAll.value = homeData.value.allEnvironments;
@@ -671,6 +685,8 @@ const schedulingOpinion = ref({
             }
         }
     },
+    color: [echartsColor.value, '#dceae4'],
+
     legend: {
         show: true,
         top: 17,
@@ -781,6 +797,8 @@ function initDailySchedulingFrequencyInfo() {
 }
 //每日调度echarts;
 export const dailySchedulingFrequencyOpinion = ref({
+    color: [echartsColor.value, '#dceae4'],
+
     xAxis: {
         show: true,
         type: 'category',
@@ -970,7 +988,6 @@ export const currentTaskInfoOpinion = ref({
 });
 //日志
 function initlogInfo() {
-    debugger;
     let myChart = ChartManager.getChartInstance('logInfo');
     myChart.clear(); // 清除之前的配置
 
@@ -1071,15 +1088,12 @@ const querySchedulingInfo = async (item) => {
         endTime: null,
         environment: item
     };
-    // let data = JSON.parse(JSON.stringify(params));
 
     let res = await getSchedulingInfo(params);
     if (res.success) {
         homeData.value.schedulingInfo = res.data;
         homeData.value.schedulingInfo.taskScheduLingInfo.forEach((task: any) => {
-            // 给每个任务对象增加 type 和 stack 属性
             task.type = 'line';
-            task.stack = 'Total';
         });
         initSchedulingInfo();
     } else {

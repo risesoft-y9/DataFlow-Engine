@@ -40,5 +40,9 @@ public class DataTaskEntity extends BaseEntity {
 	@Column(name = "USERID", length = 50)
 	@Comment(value = "创建者id")
 	private String userId;
+	
+	@Column(name = "USERNAME", length = 50)
+	@Comment(value = "创建者")
+	private String userName;
 
 }

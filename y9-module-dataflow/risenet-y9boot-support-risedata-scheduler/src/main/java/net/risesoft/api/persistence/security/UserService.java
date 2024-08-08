@@ -2,8 +2,6 @@ package net.risesoft.api.persistence.security;
 
 import java.util.List;
 
-import javax.validation.Valid;
-
 import net.risedata.jdbc.commons.LPage;
 import net.risedata.jdbc.search.LPageable;
 import net.risesoft.api.persistence.model.security.DataUser;
@@ -78,5 +76,12 @@ public interface UserService {
 	LPage<DataUser> searchForPageRole(DataUser betaUser, LPageable page, String roleId, boolean isNot);
 
 	String createUser( DataUser dataUser);
+	
+	/**
+	 * 判断人员是否存在
+	 * @param name
+	 * @return
+	 */
+	Integer hasName(String name);
 
 }

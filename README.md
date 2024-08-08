@@ -1,7 +1,7 @@
 <p align="center">
  <img alt="logo" src="https://vue.youshengyun.com/files/img/qrCodeLogo.png">
 </p>
-<p align="center">基于SpringBoot+Vue前后端分离的Java快速开发框架</p>
+<p align="center">基于SpringBoot+Vue前后端分离的Java分布式国产纯净数据集成引擎</p>
 <p align="center">
  <a href='https://gitee.com/risesoft-y9/y9-dataflow/stargazers'><img src='https://gitee.com/risesoft-y9/y9-dataflow/badge/star.svg?theme=dark' alt='star'></img></a>
     <img src="https://img.shields.io/badge/version-v9.6.6-yellow.svg">
@@ -9,6 +9,7 @@
     <img alt="logo" src="https://img.shields.io/badge/Vue-3.3-red.svg">
     <img alt="" src="https://img.shields.io/badge/JDK-11-green.svg">
     <a href="https://gitee.com/risesoft-y9/y9-core/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-GPL3-blue.svg"></a>
+    <img src="https://img.shields.io/badge/total%20lines-129.2k-blue.svg">
 </p>
 
 ## 简介
@@ -23,7 +24,8 @@ common -- 公共模块
  ├── risenet-y9boot-beta-client
  ├── risenet-y9boot-data-jdbc
  ├── risenet-y9boot-data-jdbc-commons
-transfer -- 处理模块
+ ├── risenet-y9boot-data-common-tools
+transfer -- 数据处理模块
  ├── risenet-y9boot-data-transfer-base
  ├── risenet-y9boot-data-transfer-core
  ├── risenet-y9boot-data-transfer-data
@@ -31,7 +33,7 @@ transfer -- 处理模块
  ├── risenet-y9boot-data-transfer-rdbms
  ├── risenet-y9boot-data-transfer-ftp
  ├── risenet-y9boot-data-transfer-stream
-rpc 
+rpc -- 远程过程调用模块
  ├── risenet-y9boot-rpc-commons
  ├── risenet-y9boot-rpc-consumer
  ├── risenet-y9boot-rpc-provide
@@ -47,6 +49,37 @@ webapp -- 后端工程
 ## 逻辑架构图
 
 <div><img src="https://vue.youshengyun.com/files/dataflow/img/ljjgt.png"><div/>
+<div><img src="https://vue.youshengyun.com/files/dataflow/img/ljjgt2.png"><div/>
+
+1. 数据流引擎分为管理端和执行端，管理端具备可视化界面面向用户操作，执行端无界面无状态
+
+2. 管理端主要负责对于执行端任务的配置和监控
+
+3. 执行端接收任务，数据从输入流至数据闸口，最终通过输出流推出
+
+4. 插件库是数据流引擎的重要核心，每个环节中使用哪些插件的灵活组合可以应对多种定制化复杂业务
+
+## 功能架构图
+
+<div><img src="https://vue.youshengyun.com/files/dataflow/img/gnjgt.png"><div/>
+
+1. 管理端的功能主要为任务配置和、任务调度和插件库配置
+
+2. 执行端的每一个环节中均有不等的插件对数据任务进行处理
+
+3. 数据流引擎可以依赖数字底座进行使用，也可以单独进行使用
+
+## 部署架构图
+
+<div><img src="https://vue.youshengyun.com/files/dataflow/img/bsjgt.png"><div/>
+
+1. 管理端可以平行部署，执行端可以根据业务分类和业务量进行大规模部署，从而提高数据流转效率
+
+2. 正式环境为保证安全，建议将数字底座与数据流引擎进行结合，用系统管理员账号进行管理端操作
+
+3. 数据流引擎支持容器化方式部署
+
+4. 数据流引擎单体在信创环境中，4核8GB的虚拟机可以轻松管理5000任务（需合理匹配多个执行端）
 
 ## 后端技术选型
 
@@ -93,7 +126,7 @@ webapp -- 后端工程
 
 ## 数据源支持与兼容
 
-| 序号 | 源库           | 目标库 | 源库版本                                                         |
+| 序&nbsp;号 | 源库           | 目标库 | 源库版本                                                         |
 | ----- | ----------- | ------------------------- | ----------- |
 | 1    | Mysql | Mysql、Oracle、PostgresQL、人大金仓、达梦       | 5.7.19以上 |
 | 2    | Oracle | Mysql、Oracle、PostgresQL、人大金仓、达梦             | 11g-19c |
@@ -103,7 +136,7 @@ webapp -- 后端工程
 | 6    | ElasticSearch | ElasticSearch | 6.x以上 |
 | 7    | FTP | FTP |  |
 
-## 信创
+## 信创兼容适配
 
 | 序号 | 类型     | 对象                       |
 | ------- | -------- | -------------------------- |
@@ -114,24 +147,41 @@ webapp -- 后端工程
 | 5        | 操作系统 | 统信、麒麟、中科方德等     |
 | 6        | 芯片     | ARM体系、MIPS体系、X86体系 |
 
-## 引擎高级特性
+## 引擎高级特点
 
-| 序号 | 功能名称     | 功能解释                       |
+| 序&nbsp;号       | 特&nbsp;点&nbsp;&nbsp;名&nbsp;称        | 特点描述                       |
 | ------- | ----------- | -------------------------- |
-| 1       | 输入   | 指的是源头表数据（数据生产者）  |
-| 2       | 输出   | 指的是要存入的目的表（数据消费者）  |
-| 3       | 输入/输出线程池   | 线程池处理器  |
-| 4       | 输入/输出通道  | 数据处理推送通道  |
-| 5       | 数据闸口   | 将接收到的数据通过批处理、直流推送或者限流推送到输出通道  |
-| 6       | 脏数据     | 数据同步过程中报错的数据   |
-| 7       | 异字段同步   | 将源表的字段数据插入到目的表里不同的字段里     |
-| 8       | 数据转换   | 将源表的某个字段数据转换成其它数据插入到目的表里     |
-| 9       | 切分 | 将要抽取的数据做分片处理，提高抽取的效率     |
-| 10      | 数据脱敏     | 将敏感的数据脱敏处理后插入到目的表里 |
-| 11      | 数据加密     | 将数据按加密规则加密处理后插入到目的表里 |
-| 12      | 增量同步     | 做增量数据同步操作 |
-| 13      | 提取表     | 将数据库的表结构信息提取出来做任务配置使用 |
-| 14      | 生成表     | 将在页面上添加的表在数据库里生成 |
+| 1       | 异构适配   | 支持多种结构化、半结构化、非结构化数据库或系统的插件兼容模式  |
+| 2       | 切分模式   | 支持按照多种规则对接入的数据进行切片处理，便于提高采集效率  |
+| 3       | 全量增量   | 支持全量数据同步，支持根据一定规则进行增量数据同步  |
+| 4       | 脏数据处理  | 针对报错数据，支持以多种处理模式进行自动化处理和执行  |
+| 5       | 数据筛选   | 支持用户利用灵活的查询语句在同步过程中对数据进行筛选  |
+| 6       | 数据转换   | 支持将源头表某字段数据转换成其他数据类型插入至目标表  |
+| 7       | 数据脱敏   | 支持将某字段敏感数据按照一定规则脱敏后再进行处理和执行     |
+| 8       | 数据加密   | 支持将批量数据按照选择的加密规则进行加密后再进行处理和执行     |
+| 9       | 异字段转换 | 针对源头和目标的字段名称不同（含义一致），支持配置转换后插入     |
+| 10      | 多线程    | 支持在线程池中配置多线程以增加执行端的效率 |
+| 11      | 接口适配     | 支持源头和目标以约定的接口形式和数据结构进行接入和推出 |
+| 12      | 断点续传     | 针对批处理过程中进行批次标记，从而实现断点续传，减少错误成本 |
+| 13      | 回滚补偿     | 支持将配置的已执行的日志记录在补充日志中，在异常后可在具体点位进行数据回滚恢复 |
+
+## 引擎高级功能
+
+| 序&nbsp;号 | 功&nbsp;能&nbsp;&nbsp;名&nbsp;称     | 功能描述                       |
+| ------- | ----------- | -------------------------- |
+| 1       | 输入流   | 在执行端中用于接入源头数据（生产方数据）的模块  |
+| 2       | 输出流   | 在执行端中用于推出目标数据（消费方数据）的模块  |
+| 3       | 输入线程池   | 在执行端中配置接入数据后的线程池  |
+| 4       | 输出线程池  | 在执行端中配置推出数据前的线程池  |
+| 5       | 输入通道    |	  在执行端中用于处理接入的源头数据的通道  |
+| 6       | 输出通道    | 在执行端中用于处理推出的目标数据的通道 |
+| 7       | 数据闸口     | 在执行端中利用批处理、直流推送和限流推送等方式的中间缓冲层     |
+| 8       | 插件库      |	集中存储和配置各类执行端需要部署插件的统一仓库     |
+| 9       | 任务配置   |	在管理端中配置某任务执行时所需的详细配置项     |
+| 10      | 任务调度    |	 在管理端中对已经部署的任务和执行端进行调度 |
+| 11      | 日志监控     | 在管理端中负责各个执行端的成功和失败日志的汇总查看 |
+| 12      | 白名单管理  | 针对IP地址的白名单安全管控（执行端、源头和目标） |
+| 13      | 模版导入  | 在管理端支持以Excel模板、SQL文件的方式定向进行数据采集和导入功能 |
 
 ## 在线体验
 
@@ -139,7 +189,7 @@ webapp -- 后端工程
 
 > 演示账号：
 >
-> 账号：admin  密码：admin
+> 账号：guest  密码：guest
 
 ## 文档专区
 
@@ -181,7 +231,7 @@ webapp -- 后端工程
 
 ## 同构开源项目
 
-| 序号 | 项目名称          | 项目介绍           | 地址                                                         |
+| 序&nbsp;号 | 项&nbsp;目&nbsp;&nbsp;名&nbsp;称          | 项目介绍           | 地&nbsp;址                                                         |
 | ----- | ----------- | ----------------------------------------- | ----------- |
 | 1    | 数字底座 | 数字底座是一款面向大型政府、企业数字化转型，基于身份认证、组织架构、岗位职务、应用系统、资源角色等功能构建的统一且安全的管理支撑平台。数字底座基于三员管理模式，具备微服务、多租户、容器化和国产化，支持用户利用代码生成器快速构建自己的业务应用，同时可关联诸多成熟且好用的内部生态应用。      | <a href="https://gitee.com/risesoft-y9/y9-core" target="_blank">码云地址</a> |
 | 2    | 工作流引擎 | 工作流引擎对内提供单位/机关流程管理规则和内部业务流程的数字化落地实践；对外提供自动化地第三方业务驱动、接口接入和算法单元驱动能力；工作流引擎在提供底层驱动引擎的同时对全局透明监控、安全防御和国产化特色功能进行充分考虑，是内部流程管理和业务算法驱动的不二之选。        | <a href="https://gitee.com/risesoft-y9/y9-flowable" target="_blank">码云地址</a> |
@@ -196,6 +246,10 @@ webapp -- 后端工程
 
 官网：<a href="https://www.risesoft.net/" target="_blank">https://www.risesoft.net/</a>
 
+### 中国城市发展研究会
+
+官网：<a href="https://www.china-cfh.com/" target="_blank">https://www.china-cfh.com/</a>
+
 ## 咨询与合作
 
 联系人：曲经理
@@ -203,7 +257,7 @@ webapp -- 后端工程
 微信号：qq349416828
 
 备注：开源数据流引擎咨询-姓名
-<div><img style="width: 40%" src="https://vue.youshengyun.com/files/img/曲经理-二维码.png"><div/>
+<div><img style="width: 40%" src="https://vue.youshengyun.com/files/dataflow/img/qjfewm.png"><div/>
 联系人：有生博大-咨询热线
 
 座机号：010-86393151

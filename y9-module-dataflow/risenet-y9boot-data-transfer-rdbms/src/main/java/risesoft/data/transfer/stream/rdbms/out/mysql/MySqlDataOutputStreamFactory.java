@@ -57,7 +57,7 @@ public class MySqlDataOutputStreamFactory extends RdbmsDataOutputStreamFactory {
 
 	@Override
 	protected DataOutputStream getUpdateStream() {
-		return new MySqlUpadateDataOutputStream(DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password), workSql, resultSetMetaData, createCloumnHandles, dataBaseType, logger);
+		return new MySqlUpadateDataOutputStream(DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password), workSql, resultSetMetaData, createColumnHandles, dataBaseType, logger);
 	}
 
 }

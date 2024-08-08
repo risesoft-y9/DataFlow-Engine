@@ -1,4 +1,4 @@
-package net.risesoft.util;
+package net.risesoft.elastic.utils;
 
 import java.io.IOException;
 

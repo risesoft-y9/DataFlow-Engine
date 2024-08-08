@@ -11,10 +11,7 @@ import net.risesoft.api.persistence.security.RoleService;
 import net.risesoft.api.utils.AutoIdUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,29 +23,13 @@ import java.util.List;
  * @Version 1.0
  */
 @Service
-public class RoleServiceImpl extends AutomaticCrudService<Role, String>
-		implements RoleService, ApplicationListener<ApplicationStartedEvent> {
+public class RoleServiceImpl extends AutomaticCrudService<Role, String> implements RoleService {
 
 	public static final String ROLE_ADMIN = "ROLE_ADMIN";
 	public static final String ADMIN_ID = "1";
 
 	@Autowired
 	RoleDao roleDao;
-
-	@Transactional
-	@Override
-	public void onApplicationEvent(ApplicationStartedEvent event) {
-		if (roleDao.hasAdminRole() == 0) {
-			Role role = new Role();
-			role.setName(ROLE_ADMIN);
-			role.setId(ADMIN_ID);
-			role.setSystemManager(1);
-			role.setUserManager(1);
-			role.setEnvironments("");
-			role.setJobTypes("");
-			insert(role);
-		}
-	}
 
 	@Override
 	public void saveRole(Role role) {
@@ -60,7 +41,11 @@ public class RoleServiceImpl extends AutomaticCrudService<Role, String>
 			role.setId(AutoIdUtil.getRandomId26());
 			insert(role);
 		} else {
-			updateById(role);
+			if(findById(role.getId()) == null) {
+				insert(role);
+			}else {
+				updateById(role);
+			}
 		}
 	}
 
@@ -69,8 +54,8 @@ public class RoleServiceImpl extends AutomaticCrudService<Role, String>
 
 	@Override
 	public void deleteByRoleId(String id) {
-		if (id == ADMIN_ID) {
-			throw new ServiceOperationException("系统超级管理员不能被删除");
+		if (ADMIN_ID.equals(id)) {
+			throw new ServiceOperationException("管理员角色不能删除");
 		}
 		deleteById(id);
 		roleLinkService.delete(ObjectBuilderFactory.builder(RoleUserLink.class).builder("roleId", id));
@@ -84,6 +69,11 @@ public class RoleServiceImpl extends AutomaticCrudService<Role, String>
 	@Override
 	public Role findById(String id) {
 		return getOne(id);
+	}
+
+	@Override
+	public Integer hasAdminRole() {
+		return roleDao.hasAdminRole();
 	}
 
 }

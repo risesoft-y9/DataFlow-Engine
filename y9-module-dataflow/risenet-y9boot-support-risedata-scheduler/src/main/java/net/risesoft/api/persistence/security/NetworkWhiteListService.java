@@ -78,4 +78,6 @@ public interface NetworkWhiteListService {
 	 * @return
 	 */
 	NetworkWhiteList findById(String id);
+	
+	List<NetworkWhiteList> findAll();
 }

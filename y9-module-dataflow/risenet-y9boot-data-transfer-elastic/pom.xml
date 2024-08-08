@@ -1,47 +1,72 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>risenet-y9boot-data-transfer-elastic</artifactId>
-	<packaging>jar</packaging>
-
-	<parent>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
         <groupId>net.risesoft</groupId>
         <artifactId>y9-module-dataflow</artifactId>
-        <version>v9.6.6-SNAPSHOT</version>
+        <version>v9.6.7-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+    <artifactId>risenet-y9boot-data-transfer-elastic</artifactId>
+    <packaging>jar</packaging>
+    <name>risenet-y9boot-data-transfer-elastic</name>
+    <description>DataFlow Engine transfer elastic</description>
+    <url>https://gitee.com/risesoft-y9/y9-dataflow</url>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
-	
-	<dependencies>
-		<dependency>
-			<groupId>net.risesoft</groupId>
-			<artifactId>risenet-y9boot-data-transfer-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
-	
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <licenses>
+        <license>
+            <name>GNU General Public License (GPL) version 3.0</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0.en.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>wanghongzhe</name>
+            <email>wanghongzhe@risesoft.net</email>
+            <organization>risesoft</organization>
+            <organizationUrl>https://www.risesoft.net</organizationUrl>
+        </developer>
+
+        <developer>
+            <name>panzhaoxiong</name>
+            <email>panzhaoxiong@risesoft.net</email>
+            <organization>risesoft</organization>
+            <organizationUrl>https://www.risesoft.net</organizationUrl>
+        </developer>
+
+        <developer>
+            <name>libo</name>
+            <email>libo@risesoft.net</email>
+            <organization>risesoft</organization>
+            <organizationUrl>https://www.risesoft.net</organizationUrl>
+        </developer>
+    </developers>
+
+    <properties>
+    </properties>
+
+    <scm>
+        <url>https://gitee.com/risesoft-y9/y9-dataflow</url>
+        <connection>https://gitee.com/risesoft-y9/y9-dataflow</connection>
+        <developerConnection>https://gitee.com/risesoft-y9/y9-dataflow</developerConnection>
+    </scm>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.risesoft</groupId>
+            <artifactId>risenet-y9boot-data-common-tools</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.risesoft</groupId>
+            <artifactId>risenet-y9boot-data-transfer-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
 </project>

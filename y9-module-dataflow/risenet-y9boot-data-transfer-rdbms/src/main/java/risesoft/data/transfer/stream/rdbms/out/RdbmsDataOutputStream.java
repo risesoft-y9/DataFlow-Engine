@@ -20,7 +20,7 @@ import risesoft.data.transfer.stream.rdbms.out.columns.PreparedStatementHandle;
 import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
 
 public abstract class RdbmsDataOutputStream implements DataOutputStream {
-	protected Map<String, PreparedStatementHandle> createCloumnHandles;
+	protected Map<String, PreparedStatementHandle> createColumnHandles;
 	protected Triple<List<String>, List<Integer>, List<String>> resultSetMetaData;
 	protected Connection connection;
 	protected String workSql;
@@ -29,10 +29,10 @@ public abstract class RdbmsDataOutputStream implements DataOutputStream {
 
 	public RdbmsDataOutputStream(Connection connection, String workSql,
 			Triple<List<String>, List<Integer>, List<String>> resultSetMetaData,
-			Map<String, PreparedStatementHandle> createCloumnHandles, DataBaseType dataBaseType, Logger logger) {
+			Map<String, PreparedStatementHandle> createColumnHandles, DataBaseType dataBaseType, Logger logger) {
 		this.connection = connection;
 		this.workSql = workSql;
-		this.createCloumnHandles = createCloumnHandles;
+		this.createColumnHandles = createColumnHandles;
 		this.resultSetMetaData = resultSetMetaData;
 		this.dataBaseType = dataBaseType;
 		this.logger = logger;
@@ -165,9 +165,7 @@ public abstract class RdbmsDataOutputStream implements DataOutputStream {
 					e.printStackTrace();
 				}
 			}
-
 		}
-
 	}
 
 }

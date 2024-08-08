@@ -62,12 +62,12 @@ public class DataTaskServiceImpl implements DataTaskService {
 	private final TaskMakeUpListener taskMakeUpListener;
 	
 	@Override
-	public Page<DataTaskEntity> findPage(List<String> ids, String name, String businessId, int page, int rows) {
+	public Page<DataTaskEntity> findPage(List<String> ids, String name, List<String> businessIds, int page, int rows) {
 		if (page < 0) {
             page = 1;
         }
         Pageable pageable = PageRequest.of(page - 1, rows, Sort.by(Sort.Direction.DESC, "createTime"));
-        DataTaskSpecification spec = new DataTaskSpecification(ids, businessId, name);
+        DataTaskSpecification spec = new DataTaskSpecification(ids, businessIds, name);
 		return dataTaskRepository.findAll(spec, pageable);
 	}
 
@@ -81,6 +81,7 @@ public class DataTaskServiceImpl implements DataTaskService {
 			taskModel.setDescription(dataTask.getDescription());
 			taskModel.setBusinessId(dataTask.getBusinessId());
 			taskModel.setUserId(dataTask.getUserId());
+			taskModel.setUserName(dataTask.getUserName());
 			taskModel.setBulkSync(false);
 			
 			TaskConfigModel taskConfigModel = new TaskConfigModel();
@@ -154,6 +155,7 @@ public class DataTaskServiceImpl implements DataTaskService {
 				entity.setId(Y9IdGenerator.genId());
 			}
 			entity.setUserId(Y9LoginUserHolder.getPersonId());
+			entity.setUserName(Y9LoginUserHolder.getUserInfo().getName());
 			return Y9Result.success(dataTaskRepository.save(entity), "保存成功");
 		}
 		return Y9Result.failure("数据不能为空");
@@ -174,6 +176,7 @@ public class DataTaskServiceImpl implements DataTaskService {
 		entity.setDescription(taskModel.getDescription());
 		entity.setName(taskModel.getName());
 		entity.setUserId(Y9LoginUserHolder.getPersonId());
+		entity.setUserName(Y9LoginUserHolder.getUserInfo().getName());
 		dataTaskRepository.save(entity);
 		
 		// 保存config
@@ -312,7 +315,7 @@ public class DataTaskServiceImpl implements DataTaskService {
 			map.put("id", dataTask.getId());
 			map.put("name", dataTask.getName());
 			map.put("description", dataTask.getDescription());
-			map.put("userName", "");
+			map.put("userName", dataTask.getUserName());
 			map.put("createTime", dataTask.getCreateTime());
 			
 			DataBusinessEntity business = dataBusinessRepository.findById(dataTask.getBusinessId()).orElse(null);

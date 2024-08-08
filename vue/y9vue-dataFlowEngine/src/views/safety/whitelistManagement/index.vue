@@ -79,6 +79,7 @@
         columns: [
             {
                 type: 'index',
+                width: 80,
                 title: computed(() => t('序号')),
                 showOverflowTooltip: false
             },
@@ -280,7 +281,7 @@
             //表单验证规则
             ipMatch: [
                 { required: true, message: '请输入可注册IP', trigger: 'blur' },
-                { validator: mobileValidator, trigger: 'blur' }
+                // { validator: mobileValidator, trigger: 'blur' }
             ],
             environment: [{ required: true, message: '请选择环境id', trigger: 'blur' }],
             description: [{ required: true, message: '请输入描述', trigger: 'blur' }]

@@ -32,7 +32,7 @@
     let tableConfig = ref({
         loading: false,
         border: false,
-        rowKey: 'name',
+        rowKey: 'id',
         headerBackground: true,
         columns: [
             {

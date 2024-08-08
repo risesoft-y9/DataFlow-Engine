@@ -8,6 +8,7 @@ import net.risesoft.api.job.log.LogAnalyseService;
 import net.risesoft.api.persistence.job.JobLogService;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.api.persistence.model.log.LogAnalyse;
+import net.risesoft.api.security.ConcurrentSecurity;
 import net.risesoft.controller.BaseController;
 import net.risesoft.pojo.Y9Result;
 
@@ -64,7 +65,13 @@ public class JobLogController extends BaseController {
 	@CheckHttpForArgs
 	@GetMapping("search")
 	public Y9Result<Object> search(JobLog job, LPageable page, String environment, String jobType, Integer[] jobIds) {
-		return Y9Result.success(jobLogService.search(job, page, getSecurityJurisdiction(environment), jobType, jobIds));
+		ConcurrentSecurity jurisdiction = null;
+		try {
+			jurisdiction = getSecurityJurisdiction(environment);
+			return Y9Result.success(jobLogService.search(job, page, jurisdiction, jobType, jobIds));
+		} catch (Exception e) {
+			return Y9Result.failure(e.getMessage());
+		}
 	}
 
 	@GetMapping("getConsole")
@@ -75,6 +82,11 @@ public class JobLogController extends BaseController {
 	@GetMapping("/searchByGroup")
 	public Y9Result<Object> searchByGroup(@RequestParam(required = true) Date startDate,
 			@RequestParam(required = true) Date endDate, String environment, LPageable page, String jobName) {
+		try {
+			getSecurityJurisdiction(environment);
+		} catch (Exception e) {
+			return Y9Result.failure(e.getMessage());
+		}
 		return Y9Result.success(jobLogService.searchByGroup(startDate, endDate, environment, page, jobName));
 	}
 

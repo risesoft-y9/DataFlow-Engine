@@ -31,7 +31,7 @@ import jodd.util.Base64;
 import lombok.RequiredArgsConstructor;
 import net.risesoft.api.utils.jdbc.filedTypeMapping.JdbcTypeMappingCache;
 import net.risesoft.api.utils.jdbc.filedTypeMapping.TypeDefinition;
-import net.risesoft.elastic.ElasticsearchRestClient;
+import net.risesoft.elastic.client.ElasticsearchRestClient;
 import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.service.DataSourceService;
@@ -722,21 +722,16 @@ public class DataSourceServiceImpl implements DataSourceService {
 				int count = 0;
 				for (Map.Entry<String, Object> entry : dataMap.entrySet()) {  
 					String column_name = entry.getKey();// 获得字段名
-					if("_class".equals(column_name)) {
-						continue;
-					}
-					String columnName = entry.getKey();// 获得字段中文名
+//					if("_class".equals(column_name)) {
+//						continue;
+//					}
 					Map<String, Object> value = (Map<String, Object>) entry.getValue();
 				    DataTableField field = new DataTableField();
 					String type_name = (String)value.get("type");// 获得字段类型名称
 
 					field.setId(Y9IdGenerator.genId());
 					field.setName(column_name);
-					if (StringUtils.isNotBlank(columnName)) {
-						field.setCname(columnName);
-					} else {
-						field.setCname(column_name);
-					}
+					field.setCname(column_name);
 					field.setFieldType(type_name);
 					field.setTableId(table.getId());
 					field.setIsState(true);
