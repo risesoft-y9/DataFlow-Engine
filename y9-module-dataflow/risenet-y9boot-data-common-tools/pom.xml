@@ -6,13 +6,12 @@
     <parent>
         <groupId>net.risesoft</groupId>
         <artifactId>y9-module-dataflow</artifactId>
-        <version>v9.6.7-SNAPSHOT</version>
+        <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>risenet-y9boot-data-common-tools</artifactId>
     <name>risenet-y9boot-data-common-tools</name>
     <description>DataFlow Engine common tools</description>
-    <url>https://gitee.com/risesoft-y9/y9-dataflow</url>
 
     <properties>
     </properties>
@@ -27,7 +26,6 @@
         <dependency>
             <groupId>net.risesoft</groupId>
             <artifactId>risenet-y9boot-common-util</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>

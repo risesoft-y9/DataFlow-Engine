@@ -5,16 +5,16 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>net.risesoft</groupId>
-        <artifactId>y9-digitalbase-parent</artifactId>
-        <version>v9.6.7-SNAPSHOT</version>
-        <relativePath>../y9-digitalbase/y9-digitalbase-parent/pom.xml</relativePath>
+        <artifactId>y9-digitalbase</artifactId>
+        <version>${revision}</version>
+        <relativePath>../y9-digitalbase/pom.xml</relativePath>
     </parent>
     <artifactId>y9-dataflow</artifactId>
     <packaging>pom</packaging>
-    <version>v9.6.7-SNAPSHOT</version>
+    <version>${revision}</version>
     <name>y9-dataflow</name>
     <description>DataFlow Engine project parent pom.xml file</description>
-    <url>https://gitee.com/risesoft-y9/y9-dataflow/</url>
+    <url>https://gitee.com/risesoft-y9/y9-dataflow/tree/main/</url>
 
     <licenses>
         <license>
@@ -57,6 +57,8 @@
         <gitee.url>https://gitee.com/risesoft-y9/y9-dataflow</gitee.url>
         <gitee.connection>scm:git:https://gitee.com/risesoft-y9/y9-dataflow.git</gitee.connection>
         <gitee.developerConnection>scm:git:https://gitee.com/risesoft-y9/y9-dataflow.git</gitee.developerConnection>
+
+        <revision>v9.6.7-SNAPSHOT</revision>
     </properties>
 
     <modules>

@@ -6,20 +6,13 @@
     <parent>
         <groupId>net.risesoft</groupId>
         <artifactId>y9-dataflow</artifactId>
-        <version>v9.6.7-SNAPSHOT</version>
+        <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>y9-module-dataflow</artifactId>
     <packaging>pom</packaging>
     <name>y9-module-dataflow</name>
     <description>DataFlow Engine y9-module-dataflow project parent pom.xml file</description>
-    <url>https://gitee.com/risesoft-y9/y9-dataflow</url>
-
-    <scm>
-        <url>${gitee.url}</url>
-        <connection>${gitee.connection}</connection>
-        <developerConnection>${gitee.developerConnection}</developerConnection>
-    </scm>
 
     <modules>
         <module>risenet-y9boot-beta-api</module>

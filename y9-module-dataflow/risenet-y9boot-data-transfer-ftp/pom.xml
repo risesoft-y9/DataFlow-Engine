@@ -5,14 +5,13 @@
     <parent>
         <groupId>net.risesoft</groupId>
         <artifactId>y9-module-dataflow</artifactId>
-        <version>v9.6.7-SNAPSHOT</version>
+        <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>risenet-y9boot-data-transfer-ftp</artifactId>
     <packaging>jar</packaging>
     <name>risenet-y9boot-data-transfer-ftp</name>
     <description>DataFlow Engine transfer ftp(For FTP processing)</description>
-    <url>https://gitee.com/risesoft-y9/y9-dataflow</url>
 
     <properties>
     </properties>

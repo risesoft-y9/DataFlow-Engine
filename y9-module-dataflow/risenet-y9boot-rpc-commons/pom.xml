@@ -7,7 +7,7 @@
     <parent>
         <groupId>net.risesoft</groupId>
         <artifactId>y9-module-dataflow</artifactId>
-        <version>v9.6.7-SNAPSHOT</version>
+        <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -15,7 +15,6 @@
     <packaging>jar</packaging>
     <name>risenet-y9boot-rpc-commons</name>
     <description>DataFlow Engine rpc commons</description>
-    <url>https://gitee.com/risesoft-y9/y9-dataflow</url>
 
     <properties>
     </properties>
