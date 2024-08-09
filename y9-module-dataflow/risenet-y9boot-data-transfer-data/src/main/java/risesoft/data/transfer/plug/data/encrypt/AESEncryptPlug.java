@@ -1,10 +1,11 @@
 package risesoft.data.transfer.plug.data.encrypt;
 
-
+import java.security.SecureRandom;
 import java.util.Base64;
 
 import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 
 import risesoft.data.transfer.core.column.Column;
 import risesoft.data.transfer.core.column.impl.StringColumn;
@@ -29,8 +30,16 @@ public class AESEncryptPlug implements Plug {
 			@ConfigParameter(required = true, description = "列名") String field, JobContext jobContext) {
 
 		try {
+			// 构造密钥生成器，指定为AES算法,不区分大小写
+			KeyGenerator keygen = KeyGenerator.getInstance("AES");
+			// 根据KEY规则初始化密钥生成器生成一个128位的随机源
+			SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
+			secureRandom.setSeed(key.getBytes("UTF-8"));
+			keygen.init(128, secureRandom);
+			// 生成密钥
+			SecretKey deskey = keygen.generateKey();
 			cipher = Cipher.getInstance("AES");
-			cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key.getBytes("UTF-8"), "AES"));
+			cipher.init(Cipher.ENCRYPT_MODE, deskey);
 		} catch (Exception e) {
 			throw TransferException.as(CommonErrorCode.CONFIG_ERROR, "创建加密对象失败!" + e.getMessage());
 		}

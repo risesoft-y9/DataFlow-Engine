@@ -191,8 +191,8 @@ public class ClassTools {
 		return res;
 	}
 
-	public static List<Class<?>> getInterfaceClass(Class<?> cla) {
-		List<Class<?>> interfaceCla = new ArrayList<>();
+	public static Set<Class<?>> getInterfaceClass(Class<?> cla) {
+		Set<Class<?>> interfaceCla = new HashSet<Class<?>>();
 		loadInterfaceClass(cla, interfaceCla);
 		return interfaceCla;
 	}
@@ -216,7 +216,7 @@ public class ClassTools {
 		return resList;
 	}
 
-	private static void loadInterfaceClass(Class<?> cla, List<Class<?>> classes) {
+	private static void loadInterfaceClass(Class<?> cla, Set<Class<?>> classes) {
 
 		Class<?> superclass = cla.getSuperclass();
 		if (superclass != null && superclass != Object.class) {

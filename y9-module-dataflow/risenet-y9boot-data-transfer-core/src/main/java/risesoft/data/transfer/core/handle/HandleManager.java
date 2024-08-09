@@ -3,6 +3,7 @@ package risesoft.data.transfer.core.handle;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import risesoft.data.transfer.core.record.ColumnDisposeHandle;
 import risesoft.data.transfer.core.record.RecordInHandle;
@@ -27,7 +28,7 @@ public class HandleManager {
 	 * @param handle
 	 */
 	public void addIfAbsent(Handle handle) {
-		List<Class<?>> classes = ClassTools.getInterfaceClass(handle.getClass());
+		Set<Class<?>> classes = ClassTools.getInterfaceClass(handle.getClass());
 		for (Class<?> class1 : classes) {
 			if (Handle.class.isAssignableFrom(class1)) {
 				HandleContext<?> handleContext = getAndCreateContext(class1);
@@ -41,7 +42,7 @@ public class HandleManager {
 	 * @param handle
 	 */
 	public void add(Handle handle) {
-		List<Class<?>> classes = ClassTools.getInterfaceClass(handle.getClass());
+		Set<Class<?>> classes = ClassTools.getInterfaceClass(handle.getClass());
 		for (Class<?> class1 : classes) {
 			if (Handle.class.isAssignableFrom(class1)) {
 				createContextAndAdd(class1, handle);

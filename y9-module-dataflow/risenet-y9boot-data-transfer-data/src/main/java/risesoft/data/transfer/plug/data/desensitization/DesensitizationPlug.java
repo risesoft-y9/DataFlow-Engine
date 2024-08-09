@@ -1,8 +1,6 @@
 package risesoft.data.transfer.plug.data.desensitization;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import risesoft.data.transfer.core.column.Column;
 import risesoft.data.transfer.core.column.impl.StringColumn;
@@ -11,10 +9,7 @@ import risesoft.data.transfer.core.exception.CommonErrorCode;
 import risesoft.data.transfer.core.exception.TransferException;
 import risesoft.data.transfer.core.factory.annotations.ConfigParameter;
 import risesoft.data.transfer.core.plug.Plug;
-import risesoft.data.transfer.core.record.AbstractRecordInHandle;
 import risesoft.data.transfer.core.record.ColumnDisposeHandlePlug;
-import risesoft.data.transfer.core.record.Record;
-import risesoft.data.transfer.core.record.RecordInHandle;
 
 /**
  * 字段脱敏 会把原有的字段变成string 类型 并在数据中间增加**

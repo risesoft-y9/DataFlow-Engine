@@ -46,7 +46,7 @@ public class DirtyDataPlug implements Plug, DirtyRecordHandle, JobEndHandle {
 	public void collectDirtyRecord(Record record, Throwable t, String errorMessage) {
 		size++;
 		if (this.record != -1 && size > this.record) {
-			throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "脏数据超出条数限制:" + record + "错误信息:" + errorMessage);
+			throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "脏数据超出条数限制:" + record + "错误信息:" + errorMessage, t);
 		}
 		if (communication.getMessage(DIRTY_DATA) == null || communication.getMessage(DIRTY_DATA).size() < 10) {
 			communication.addMessage(DIRTY_DATA, "脏数据:" + record + "error:" + errorMessage + "\n");

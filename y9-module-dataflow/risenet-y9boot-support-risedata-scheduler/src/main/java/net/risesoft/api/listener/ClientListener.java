@@ -1,6 +1,5 @@
 package net.risesoft.api.listener;
 
-import net.risedata.jdbc.executor.search.SearchExecutor;
 import net.risedata.rpc.provide.listener.Listener;
 import net.risedata.rpc.provide.net.ClinetConnection;
 import net.risesoft.api.api.RegisterApi;
@@ -34,7 +33,7 @@ public class ClientListener implements Listener {
     @Override
     public void onConnection(ClinetConnection clinetConnection) {
         if (LOG.isInfoEnabled()) {
-            LOG.info(clinetConnection.getRemoteAddress() + "connection ");
+            LOG.info(clinetConnection.getRemoteAddress() + " connection ");
         }
 
         synchronized (connections) {

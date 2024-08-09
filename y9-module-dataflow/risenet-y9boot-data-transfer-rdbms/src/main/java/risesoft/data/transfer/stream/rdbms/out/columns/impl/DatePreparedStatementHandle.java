@@ -37,7 +37,7 @@ public class DatePreparedStatementHandle implements PreparedStatementHandle {
 	public void fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, Column column,
 			DataBaseType dataBaseType, Triple<List<String>, List<Integer>, List<String>> resultSetMetaData)
 			throws Exception {
-		if (resultSetMetaData.getRight().get(columnIndex).equalsIgnoreCase("year")) {
+		if (resultSetMetaData.getRight().get(resultSetMetaData.getLeft().indexOf(column.getName())).equalsIgnoreCase("year")) {
 			if (column.asBigInteger() == null) {
 				preparedStatement.setString(columnIndex, null);
 			} else {
