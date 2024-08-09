@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.risesoft</groupId>
         <artifactId>y9-digitalbase</artifactId>
-        <version>${revision}</version>
+        <version>v9.6.7-SNAPSHOT</version>
         <relativePath>../y9-digitalbase/pom.xml</relativePath>
     </parent>
     <artifactId>y9-dataflow</artifactId>
@@ -64,5 +64,20 @@
     <modules>
         <module>y9-module-dataflow</module>
     </modules>
+
+    <repositories>
+        <repository>
+            <id>y9-internet-repo</id>
+            <url>https://svn.youshengyun.com:9900/nexus/repository/maven-public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <!-- <updatePolicy>always</updatePolicy> -->
+                <!-- always,daily(default),interval:XXX,never -->
+            </snapshots>
+        </repository>
+    </repositories>
 
 </project>
