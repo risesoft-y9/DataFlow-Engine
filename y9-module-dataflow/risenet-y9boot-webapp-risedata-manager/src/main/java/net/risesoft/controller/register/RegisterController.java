@@ -30,8 +30,9 @@ import reactor.core.publisher.Mono;
 @RestController()
 @RequestMapping("/api/rest/system/service")
 public class RegisterController extends BaseController {
-	@Autowired()
-	IServiceService iServiceService;
+	
+	@Autowired
+	private IServiceService iServiceService;
 
 	/**
 	 * 修改状态
@@ -42,8 +43,11 @@ public class RegisterController extends BaseController {
 	 * @return
 	 */
 	@RequestMapping("/updateStatus/{id}/{status}")
-	public boolean updateStatus(@PathVariable String id, @PathVariable int status) {
-		return iServiceService.setStatus(id, status);
+	public Y9Result<String> updateStatus(@PathVariable String id, @PathVariable int status) {
+		if(iServiceService.setStatus(id, status)) {
+			return Y9Result.successMsg("保存成功");
+		}
+		return Y9Result.failure("保存失败");
 	}
 
 	/**
@@ -142,9 +146,11 @@ public class RegisterController extends BaseController {
 	 * @return
 	 */
 	@RequestMapping("remove")
-	public boolean removeServer(String id) {
-		iServiceService.delById(id);
-		return true;
+	public Y9Result<String> removeServer(String id) {
+		if(iServiceService.delById(id)) {
+			return Y9Result.successMsg("删除成功");
+		}
+		return Y9Result.failure("删除失败");
 	}
 
 	// 发送事件执行操作
@@ -161,10 +167,9 @@ public class RegisterController extends BaseController {
 	 * @return
 	 */
 	@RequestMapping("/getServicesAll")
-	public List<IServiceInstanceModel> getServicesAll(
+	public Y9Result<List<IServiceInstanceModel>> getServicesAll(
 			@RequestParam(required = false, defaultValue = "Public") String environment, Integer status) {
-		return iServiceService.findAll(status, environment);
-
+		return Y9Result.success(iServiceService.findAll(status, environment));
 	}
 
 	/**
@@ -174,9 +179,10 @@ public class RegisterController extends BaseController {
 	 * @return
 	 */
 	@RequestMapping("/getServiceByName")
-	public Y9Result<List<IServiceInstanceModel>> getServiceByName(@RequestParam String name,@RequestParam(required = false, defaultValue = "Public") String environment) {
+	public Y9Result<List<IServiceInstanceModel>> getServiceByName(@RequestParam String name, 
+			@RequestParam(required = false, defaultValue = "Public") String environment) {
 		name = name.toUpperCase();
-		return Y9Result.success(iServiceService.getService(name,environment));
+		return Y9Result.success(iServiceService.getService(name, environment));
 	}
 
 	/**
@@ -187,9 +193,12 @@ public class RegisterController extends BaseController {
 	 * @return
 	 */
 	@PostMapping("/check")
-	public Y9Result<Object> check(String id) {
+	public Y9Result<String> check(String id) {
 		IServiceInstanceModel model = iServiceService.findById(id);
-		return Y9Result.success(CheckStatusTask.check(model));
+		if(CheckStatusTask.check(model)) {
+			return Y9Result.successMsg("节点正常");
+		}
+		return Y9Result.failure("节点异常");
 	}
 
 }

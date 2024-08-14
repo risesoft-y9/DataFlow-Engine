@@ -15,18 +15,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * @Description : 环境
- * @ClassName EnvironmentController
- * @Author lb
- * @Date 2022/8/3 10:28
- * @Version 1.0
- */
-@RestController()
+@RestController
 @RequestMapping("/api/rest/system/Environment")
 public class EnvironmentController {
+	
 	@Autowired
-	EnvironmentService environmentService;
+	private EnvironmentService environmentService;
+	
+	@Autowired
+	private SecurityManager securityManager;
 
 	/**
 	 * 获取所有环境根据权限 此权限是安全管理权限
@@ -35,11 +32,12 @@ public class EnvironmentController {
 	 */
 	@GetMapping("getAll")
 	public Y9Result<List<Environment>> getAll() {
+		ConcurrentSecurity concurrentSecurity = securityManager.getConcurrentSecurity();
+		if(concurrentSecurity.getEnvironments().size() > 0) {
+			return Y9Result.success(environmentService.findForEnvironment(concurrentSecurity.getEnvironments()));
+		}
 		return Y9Result.success(environmentService.findAll());
 	}
-
-	@Autowired
-	SecurityManager securityManager;
 
 	/**
 	 * 获取权限这个是根据权限配置的可操作环境
@@ -62,7 +60,6 @@ public class EnvironmentController {
 	@CheckResult
 	@PostMapping("insertEnvironment")
 	public Y9Result<Object> insertEnvironment(@RequestBody @Valid Environment environment, BindingResult result) {
-
 		environmentService.insertEnvironment(environment);
 		return Y9Result.success(environment.getName());
 	}

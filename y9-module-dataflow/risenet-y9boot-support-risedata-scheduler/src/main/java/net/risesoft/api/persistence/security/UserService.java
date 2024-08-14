@@ -14,6 +14,7 @@ import net.risesoft.api.persistence.model.security.DataUser;
  * @Version 1.0
  */
 public interface UserService {
+	
 	/**
 	 * 登录状态
 	 * 
@@ -22,7 +23,6 @@ public interface UserService {
 	 * @return 返回用户
 	 */
 	DataUser checkLogin(String account, String password);
-
 
 	/**
 	 * 修改密码 用户id 用户密码
@@ -75,7 +75,7 @@ public interface UserService {
 	 */
 	LPage<DataUser> searchForPageRole(DataUser betaUser, LPageable page, String roleId, boolean isNot);
 
-	String createUser( DataUser dataUser);
+	String createUser(DataUser dataUser);
 	
 	/**
 	 * 判断人员是否存在
@@ -83,5 +83,12 @@ public interface UserService {
 	 * @return
 	 */
 	Integer hasName(String name);
+	
+	/**
+	 * 根据登录名获取用户
+	 * @param account
+	 * @return
+	 */
+	DataUser getByLoginName(String account);
 
 }

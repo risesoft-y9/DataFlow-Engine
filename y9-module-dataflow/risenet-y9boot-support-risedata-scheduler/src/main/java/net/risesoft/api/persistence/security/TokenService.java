@@ -65,4 +65,11 @@ public interface TokenService {
 	 * @return
 	 */
 	List<String> getFailureToken();
+	
+	/**
+	 * 用外部登录方式
+	 * @param loginName
+	 * @return
+	 */
+	DataUser login(String loginName);
 }

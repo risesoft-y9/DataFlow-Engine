@@ -31,7 +31,8 @@ public class SecurityConfiguration {
 		securityConfig.setSecurityCheck(new HasSecurityManager());
 		securityConfig.setCheckUrl(Arrays.asList("**/api/rest/system/**"));// 白名单、环境
 		securityConfig.setWhiteList(Arrays.asList("**/api/rest/system/Environment/getEnvironment", "**/api/rest/system/Environment/getAll",
-				"**/api/rest/system/networkWhiteList/searchForPage", "**/api/rest/system/service/getServicesAll"));
+				"**/api/rest/system/networkWhiteList/searchForPage", "**/api/rest/system/service/getServicesAll", 
+				"**/api/rest/system/service/getServiceByName"));
 		return securityConfig;
 	}
 

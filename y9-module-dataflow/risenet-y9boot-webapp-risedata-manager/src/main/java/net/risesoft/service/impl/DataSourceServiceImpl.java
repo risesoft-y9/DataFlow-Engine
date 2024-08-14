@@ -297,9 +297,11 @@ public class DataSourceServiceImpl implements DataSourceService {
 			}
 			while (tables.next()) {
 				if (tables.getString("TABLE_NAME").equals(tableName)) {
-					DataTable table = new DataTable();
-
-					table.setId(Y9IdGenerator.genId());
+					DataTable table = dataTableRepository.findByBaseIdAndName(baseId, tableName);
+					if(table == null) {
+						table = new DataTable();
+						table.setId(Y9IdGenerator.genId());
+					}
 					table.setBaseId(baseId);
 					table.setName(tableName);
 					if (StringUtils.isNotBlank(tables.getString("REMARKS"))) {
@@ -320,16 +322,18 @@ public class DataSourceServiceImpl implements DataSourceService {
 					}
 					int count = 0;
 					while (columns.next()) {
-						DataTableField field = new DataTableField();
-
 						String column_name = columns.getString("COLUMN_NAME");// 获得字段名
 						String columnName = columns.getString("REMARKS");// 获得字段中文名
 						String type_name = columns.getString("TYPE_NAME");// 获得字段类型名称
 						int dataType = columns.getInt("DATA_TYPE"); // 对应的java.sql.Types类型
 						int columnSize = columns.getInt("COLUMN_SIZE");// 列大小
 						String decimalDigits = columns.getString("DECIMAL_DIGITS");// 小数位数
-
-						field.setId(Y9IdGenerator.genId());
+						
+						DataTableField field = dataTableFieldRepository.findByTableIdAndName(table.getId(), column_name);
+						if(field == null) {
+							field = new DataTableField();
+							field.setId(Y9IdGenerator.genId());
+						}
 						field.setName(column_name);
 						if (StringUtils.isNotBlank(columnName)) {
 							field.setCname(columnName);
@@ -712,8 +716,11 @@ public class DataSourceServiceImpl implements DataSourceService {
 				Map<String, Object> properties = (Map<String, Object>) mappings.get("mappings");
 				Map<String, Object> dataMap = (Map<String, Object>) properties.get("properties");
 				// 保存表信息
-				DataTable table = new DataTable();
-				table.setId(Y9IdGenerator.genId());
+				DataTable table = dataTableRepository.findByBaseIdAndName(baseId, tableName);
+				if(table == null) {
+					table = new DataTable();
+					table.setId(Y9IdGenerator.genId());
+				}
 				table.setBaseId(baseId);
 				table.setName(tableName);
 				table.setCname(tableName);
@@ -726,10 +733,13 @@ public class DataSourceServiceImpl implements DataSourceService {
 //						continue;
 //					}
 					Map<String, Object> value = (Map<String, Object>) entry.getValue();
-				    DataTableField field = new DataTableField();
 					String type_name = (String)value.get("type");// 获得字段类型名称
-
-					field.setId(Y9IdGenerator.genId());
+					
+					DataTableField field = dataTableFieldRepository.findByTableIdAndName(table.getId(), column_name);
+				    if(field == null) {
+				    	field = new DataTableField();
+				    	field.setId(Y9IdGenerator.genId());
+				    }
 					field.setName(column_name);
 					field.setCname(column_name);
 					field.setFieldType(type_name);

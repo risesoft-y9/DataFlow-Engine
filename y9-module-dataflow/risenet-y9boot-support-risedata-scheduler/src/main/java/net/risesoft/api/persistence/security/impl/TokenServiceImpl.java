@@ -87,4 +87,20 @@ public class TokenServiceImpl extends AutomaticCrudService<Token, String> implem
 		return tokenDao.getTokenForTime(getFailureTime());
 	}
 
+	@Override
+	public DataUser login(String loginName) {
+		DataUser dataUser = null;
+		// 判断当前登录人在表里存不存在
+		if(userService.hasName(loginName) == 0) {
+			dataUser = new DataUser();
+			dataUser.setAccount(loginName);
+			dataUser.setUserName(loginName);
+			dataUser.setPassword(loginName);
+			dataUser.setId(userService.createUser(dataUser));
+		}else {
+			dataUser = userService.getByLoginName(loginName);
+		}
+		return dataUser;
+	}
+
 }

@@ -100,7 +100,6 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 		for (String failureToken : failureTokens) {
 			newTime = TOKEN_TIME_MAP.get(failureToken);
 			if (newTime == null) {
-
 				if (removedToken.remove(failureToken)) {
 					tokenService.deleteToken(failureToken, time);
 				} else {
@@ -118,7 +117,6 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 					}
 					TOKEN_TIME_MAP.remove(failureToken);
 					TOKEN_SECURITY_MAP.remove(failureToken);
-
 				}
 			}
 		}
@@ -143,8 +141,7 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 		if (current != null) {
 			return ((InetSocketAddress) current.getConcurrentConnection().getRemoteAddress()).getHostString();
 		} else {
-			HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
-					.getRequest();
+			HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest();
 			return IpUtils.getIPAddress(request);
 		}
 	}
@@ -202,12 +199,6 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		try {
-			if (!enable) {
-				//临时 todo
-				//saveSecurity(tokenService.createToken(new DataUser(UserServiceImpl.DEFAULT_USER_ACCOUNT, UserServiceImpl.DEFAULT_USER_PASSWORD, "17054549457756469916186605")));
-				chain.doFilter(request, response);
-				return;
-			}
 			HttpServletRequest request1 = ((HttpServletRequest) request);
 			// 检查白名单
 //			String ip = getConcurrentIp();
@@ -226,6 +217,9 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 //			}
 			//检查token
 			String token = request1.getHeader(TOKEN_KEY);
+			if (!enable) {
+				token = Y9LoginUserHolder.getUserInfo().getLoginName();
+			}
 			String url = request1.getRequestURI();
 			if (StringUtils.isEmpty(token)) {
 				for (String excludeStartUrl : excludeEndUrls) {
@@ -260,20 +254,26 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 			chain.doFilter(request, response);
 		} catch (TokenException e) {
 			throwError(tokenError, request, response);
-			return;
 		} catch (Exception e) {
-			//e.printStackTrace();
 			throwError(Y9Result.failure(500, e.getMessage()), request, response);
 		} finally {
 			threadLocal.remove();
 		}
 	}
 
-	private void saveSecurity(String token) {
+	private void saveSecurity(String token) throws Exception {
 		// 获取用户信息
-		DataUser userToken = tokenService.getUserByToken(token);
+		DataUser userToken = null;
+		if (enable) {
+			userToken = tokenService.getUserByToken(token);
+		}else {
+			userToken = tokenService.login(token);
+		}
 		// 获取用户的权限
 		List<Role> roles = roleService.getRolesByUser(userToken.getId());
+		if(roles.size() == 0) {
+			throw new Exception("当前用户没有权限，请联系管理员");
+		}
 		ConcurrentSecurity concurrentSecurity = new ConcurrentSecurity(userToken, roles);
 		threadLocal.set(token);
 		TOKEN_SECURITY_MAP.put(token, concurrentSecurity);

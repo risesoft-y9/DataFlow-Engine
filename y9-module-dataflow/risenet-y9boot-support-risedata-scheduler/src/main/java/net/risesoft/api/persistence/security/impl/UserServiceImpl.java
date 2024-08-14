@@ -111,4 +111,9 @@ public class UserServiceImpl extends AutomaticCrudService<DataUser, String> impl
 	public Integer hasName(String name) {
 		return userDao.hasName(name);
 	}
+
+	@Override
+	public DataUser getByLoginName(String account) {
+		return userDao.getUser(account);
+	}
 }

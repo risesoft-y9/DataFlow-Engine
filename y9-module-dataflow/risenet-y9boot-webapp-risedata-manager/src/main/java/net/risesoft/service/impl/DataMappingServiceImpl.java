@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import net.risesoft.api.security.ConcurrentSecurity;
+import net.risesoft.api.security.SecurityManager;
 import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.service.DataMappingService;
@@ -32,6 +34,7 @@ public class DataMappingServiceImpl implements DataMappingService {
 	private final DataMappingRepository dataMappingRepository;
 	private final DataMappingArgsRepository dataMappingArgsRepository;
 	private final DataTaskCoreRepository dataTaskCoreRepository;
+	private final SecurityManager securityManager;
 	
 	@Override
 	public Page<DataMappingEntity> getDataPage(String typeName, String className, int page, int rows) {
@@ -51,6 +54,10 @@ public class DataMappingServiceImpl implements DataMappingService {
 	@Override
 	@Transactional(readOnly = false)
 	public Y9Result<String> deleteData(String id) {
+		// 判断有没有操作权限
+		if(!isSystemManager()) {
+			return Y9Result.failure("没有操作权限");
+		}
 		if(dataTaskCoreRepository.countByArgsId(id) > 0) {
 			return Y9Result.failure("存在任务在使用，无法删除");
 		}
@@ -62,6 +69,10 @@ public class DataMappingServiceImpl implements DataMappingService {
 	@Override
 	@Transactional(readOnly = false)
 	public Y9Result<DataMappingEntity> saveData(DataMappingEntity entity) {
+		// 判断有没有操作权限
+		if(!isSystemManager()) {
+			return Y9Result.failure("没有操作权限");
+		}
 		if (entity != null && StringUtils.isNotBlank(entity.getClassName())) {
 			DataMappingEntity info = dataMappingRepository.findByTypeNameAndClassNameAndFuncType(entity.getTypeName(), 
 					entity.getClassName(), entity.getFuncType());
@@ -93,6 +104,10 @@ public class DataMappingServiceImpl implements DataMappingService {
 	@Override
 	@Transactional(readOnly = false)
 	public Y9Result<String> deleteArgs(String id) {
+		// 判断有没有操作权限
+		if(!isSystemManager()) {
+			return Y9Result.failure("没有操作权限");
+		}
 		if(dataTaskCoreRepository.countByArgsId(id) > 0) {
 			return Y9Result.failure("存在任务在使用，无法删除");
 		}
@@ -103,6 +118,10 @@ public class DataMappingServiceImpl implements DataMappingService {
 	@Override
 	@Transactional(readOnly = false)
 	public Y9Result<DataMappingArgsEntity> saveArgsData(DataMappingArgsEntity entity) {
+		// 判断有没有操作权限
+		if(!isSystemManager()) {
+			return Y9Result.failure("没有操作权限");
+		}
 		if (entity != null && StringUtils.isNotBlank(entity.getName())) {
 			DataMappingArgsEntity info = dataMappingArgsRepository.findByNameAndMappingId(entity.getName(), entity.getMappingId());
 			if(info != null && !info.getId().equals(entity.getId())) {
@@ -148,6 +167,11 @@ public class DataMappingServiceImpl implements DataMappingService {
 			return dataMappingRepository.findByTypeName(typeName);
 		}
 		return dataMappingRepository.findByTypeNameAndFuncType(typeName, funcType);
+	}
+	
+	private boolean isSystemManager() {
+		ConcurrentSecurity security = securityManager.getConcurrentSecurity();
+		return security.isSystemManager();
 	}
 
 }

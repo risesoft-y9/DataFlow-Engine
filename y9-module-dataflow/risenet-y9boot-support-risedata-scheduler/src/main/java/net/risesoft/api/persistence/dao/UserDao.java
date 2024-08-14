@@ -15,7 +15,7 @@ public interface UserDao extends Repository<DataUser> {
     @Search("select USER_NAME from Y9_DATASERVICE_USER")
     List<String> findAll();
 
-    @Search("select count(*) from Y9_DATASERVICE_USER where USER_NAME=?")
+    @Search("select count(*) from Y9_DATASERVICE_USER where ACCOUNT=?")
     Integer hasName(String name);
 
     @Modify("update Y9_DATASERVICE_USER set PASSWORD=? where id=?")
@@ -23,5 +23,8 @@ public interface UserDao extends Repository<DataUser> {
 
     @Modify("delete from Y9_DATASERVICE_USER where ID=?")
     Integer deleteUser( String id);
+    
+    @Search("select * from Y9_DATASERVICE_USER where ACCOUNT = ?")
+    DataUser getUser(String account);
 
 }

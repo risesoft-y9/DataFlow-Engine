@@ -217,7 +217,7 @@ public class DataTaskServiceImpl implements DataTaskService {
 			taskCore.setId(DataServiceUtil.MASK + "-" + entity.getId());
 			taskCore.setTaskId(entity.getId());
 			taskCore.setTypeName("plugs");
-			taskCore.setKeyName("fields");
+			taskCore.setKeyName("field");
 			taskCore.setDataType(DataServiceUtil.MASK);
 			taskCore.setValue(maskFields);
 			taskCore.setSequence(1);
@@ -231,7 +231,7 @@ public class DataTaskServiceImpl implements DataTaskService {
 			taskCore.setId(DataServiceUtil.ENCRYP + "-" + entity.getId());
 			taskCore.setTaskId(entity.getId());
 			taskCore.setTypeName("plugs");
-			taskCore.setKeyName("fields");
+			taskCore.setKeyName("field");
 			taskCore.setDataType(DataServiceUtil.ENCRYP);
 			taskCore.setValue(encrypFields);
 			taskCore.setSequence(1);

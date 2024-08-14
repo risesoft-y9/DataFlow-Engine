@@ -2,7 +2,6 @@ package net.risesoft.service.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,7 +18,6 @@ import java.util.stream.Stream;
 
 import javax.annotation.Resource;
 
-import net.bytebuddy.asm.Advice;
 import net.risesoft.util.home.QueryTimeRangeCacheUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -251,7 +249,7 @@ public class HomeDataServiceImpl implements HomeDataService {
 		}
 
 	}
-	@SuppressWarnings("unused")
+	
 	public static <T, R> List<R> flatMapAndCollect(List<T> dataList, Function<T, Collection<R>> mapper) {
 		return dataList.stream().flatMap(mapper.andThen(Collection::stream)).collect(Collectors.toList());
 	}

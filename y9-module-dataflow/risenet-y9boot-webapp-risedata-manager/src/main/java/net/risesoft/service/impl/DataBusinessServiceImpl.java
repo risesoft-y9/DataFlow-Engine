@@ -39,7 +39,7 @@ public class DataBusinessServiceImpl implements DataBusinessService {
 		if (page < 0) {
             page = 1;
         }
-        Pageable pageable = PageRequest.of(page - 1, rows, Sort.by(Sort.Direction.DESC, "createTime"));
+        Pageable pageable = PageRequest.of(page - 1, rows, Sort.by(Sort.Direction.ASC, "createTime"));
         if(StringUtils.isBlank(parentId)) {
         	parentId = "0";
         }
@@ -56,6 +56,11 @@ public class DataBusinessServiceImpl implements DataBusinessService {
 	@Override
 	@Transactional(readOnly = false)
 	public Y9Result<String> deleteData(String id) {
+		ConcurrentSecurity security = securityManager.getConcurrentSecurity();
+		List<String> ids = security.getJobTypes();
+		if(ids.size() > 0 && !ids.contains(id)) {
+			return Y9Result.failure("没有该分类权限，无法对其进行操作");
+		}
 		if(dataTaskRepository.countByBusinessId(id) > 0) {
 			return Y9Result.failure("分类下存在任务，无法删除");
 		}
@@ -79,6 +84,12 @@ public class DataBusinessServiceImpl implements DataBusinessService {
 	@Transactional(readOnly = false)
 	public Y9Result<DataBusinessEntity> saveData(DataBusinessEntity entity) {
 		if (entity != null && StringUtils.isNotBlank(entity.getName())) {
+			// 判断是否顶节点，当权限不是管理员时，不允许添加顶节点
+			boolean top = StringUtils.isBlank(entity.getId()) && StringUtils.isBlank(entity.getParentId());
+			ConcurrentSecurity security = securityManager.getConcurrentSecurity();
+			if(security.getJobTypes().size() > 0 && top) {
+				return Y9Result.failure("权限不够，只能添加子节点");
+			}
 			DataBusinessEntity dataBusinessEntity = null;
 			if (StringUtils.isBlank(entity.getId())) {
 				dataBusinessEntity = new DataBusinessEntity();

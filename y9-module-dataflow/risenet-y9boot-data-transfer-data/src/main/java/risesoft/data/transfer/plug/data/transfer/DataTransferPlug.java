@@ -5,7 +5,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import risesoft.data.transfer.core.column.Column;
-import risesoft.data.transfer.core.column.impl.DateColumn;
 import risesoft.data.transfer.core.column.impl.StringColumn;
 import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.exception.CommonErrorCode;
@@ -16,7 +15,6 @@ import risesoft.data.transfer.core.record.ColumnDisposeHandlePlug;
 
 /**
  * 数据转换插件
- * 
  * 
  * @typeName DataTransferPlug
  * @date 2024年8月8日
