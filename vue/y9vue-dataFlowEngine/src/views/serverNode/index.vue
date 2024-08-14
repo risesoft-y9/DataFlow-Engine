@@ -125,8 +125,9 @@
                                     try {
                                         let result = await modifyServiceStatus(row.instanceId, row.status);
                                         ElNotification({
-                                            title: result ? t('修改成功') : t('修改失败'),
-                                            type: result ? 'success' : 'error',
+                                            title: result.success ? t('修改成功') : t('修改失败'),
+                                            message: result.msg,
+                                            type: result.success ? 'success' : 'error',
                                             duration: 2000,
                                             offset: 80
                                         });
@@ -194,73 +195,71 @@
                                 h('span', t('修改状态'))
                             ]
                         ),
+                        // h(
+                        //     'span',
+                        //     {
+                        //         style: {
+                        //             margin: '0 10px',
+                        //             display: 'inline-flex',
+                        //             alignItems: 'center'
+                        //         },
+                        //         onclick: async () => {
+                        //             ElMessageBox.confirm(`${t('是否确定重启服务器节点')} ?`, t('提示'), {
+                        //                 confirmButtonText: t('确定'),
+                        //                 cancelButtonText: t('取消'),
+                        //                 type: 'info'
+                        //             })
+                        //                 .then(async () => {
+                        //                     loading.value = true;
+                        //                     try {
+                        //                         await restartService(row.instanceId);
+                        //                     } catch (err) {
+                        //                         ElNotification({
+                        //                             title: t('成功'),
+                        //                             message: t('重启成功'),
+                        //                             type: 'success',
+                        //                             duration: 2000,
+                        //                             offset: 80
+                        //                         });
+                        //                     }
+                        //                     loading.value = false;
+                        //                 })
+                        //                 .catch(() => {
+                        //                     ElMessage({
+                        //                         type: 'info',
+                        //                         message: t('已取消重启'),
+                        //                         offset: 65
+                        //                     });
+                        //                 });
+                        //         }
+                        //     },
+                        //     [
+                        //         h('i', {
+                        //             class: 'ri-history-fill',
+                        //             style: {
+                        //                 marginRight: '1px'
+                        //             }
+                        //         }),
+                        //         h('span', t('重启'))
+                        //     ]
+                        // ),
                         h(
                             'span',
                             {
                                 style: {
-                                    margin: '0 10px',
-                                    display: 'inline-flex',
-                                    alignItems: 'center'
-                                },
-                                onclick: async () => {
-                                    ElMessageBox.confirm(`${t('是否确定重启服务器节点')} ?`, t('提示'), {
-                                        confirmButtonText: t('确定'),
-                                        cancelButtonText: t('取消'),
-                                        type: 'info'
-                                    })
-                                        .then(async () => {
-                                            loading.value = true;
-                                            try {
-                                                await restartService(row.instanceId);
-                                            } catch (err) {
-                                                ElNotification({
-                                                    title: t('成功'),
-                                                    message: t('重启成功'),
-                                                    type: 'success',
-                                                    duration: 2000,
-                                                    offset: 80
-                                                });
-                                            }
-                                            loading.value = false;
-                                        })
-                                        .catch(() => {
-                                            ElMessage({
-                                                type: 'info',
-                                                message: t('已取消重启'),
-                                                offset: 65
-                                            });
-                                        });
-                                }
-                            },
-                            [
-                                h('i', {
-                                    class: 'ri-history-fill',
-                                    style: {
-                                        marginRight: '1px'
-                                    }
-                                }),
-                                h('span', t('重启'))
-                            ]
-                        ),
-                        h(
-                            'span',
-                            {
-                                style: {
-                                    margin: '0px 10px 0 0',
+                                    margin: '0px 10px',
                                     display: 'inline-flex',
                                     alignItems: 'center'
                                 },
                                 onclick: async () => {
                                     let result = await checkServiceExample({ id: row.instanceId });
-                                    if (result.code == 0) {
-                                        ElNotification({
-                                            title: result.success ? t('检查成功') : t('检查失败'),
-                                            message: result.data ? t('节点连接正常') : t('节点连接失败'),
-                                            type: result.success ? 'success' : 'error',
-                                            duration: 2000,
-                                            offset: 80
-                                        });
-                                    }
+                                    ElNotification({
+                                        title: result.success ? t('检查成功') : t('检查失败'),
+                                        message: result.msg,
+                                        type: result.success ? 'success' : 'error',
+                                        duration: 2000,
+                                        offset: 80
+                                    });
                                 }
                             },
                             [
@@ -282,25 +281,25 @@
                                         cancelButtonText: t('取消'),
                                         type: 'info'
                                     })
-                                        .then(async () => {
-                                            loading.value = true;
-                                            let result = await deleteService({ id: row.instanceId });
-                                            ElNotification({
-                                                title: result ? t('成功') : t('失败'),
-                                                message: t('删除成功'),
-                                                type: result ? 'success' : 'error',
-                                                duration: 2000,
-                                                offset: 80
-                                            });
-                                            loading.value = false;
-                                        })
-                                        .catch(() => {
-                                            ElMessage({
-                                                type: 'info',
-                                                message: t('已取消删除'),
-                                                offset: 65
-                                            });
+                                    .then(async () => {
+                                        loading.value = true;
+                                        let result = await deleteService({ id: row.instanceId });
+                                        ElNotification({
+                                            title: result.success ? t('成功') : t('失败'),
+                                            message: result.msg,
+                                            type: result.success ? 'success' : 'error',
+                                            duration: 2000,
+                                            offset: 80
                                         });
+                                        loading.value = false;
+                                    })
+                                    .catch(() => {
+                                        ElMessage({
+                                            type: 'info',
+                                            message: t('已取消删除'),
+                                            offset: 65
+                                        });
+                                    });
                                 },
                                 style: {
                                     display: 'inline-flex',
@@ -366,7 +365,7 @@
 
     async function getServicesData() {
         let result = await getServicesList(filterData.value);
-        tableConfig.value.tableData = result;
+        tableConfig.value.tableData = result.data;
     }
 
     // 搜索

@@ -15,6 +15,7 @@ import y9_storage from '@/utils/storage';
 import NProgress from 'nprogress'; // progress bar
 import { $y9_SSO } from '../main';
 import { getLoginInfo } from './getInitData';
+import { isStarred } from '@/api/gitee';
 
 NProgress.configure({
     showSpinner: false,
@@ -131,23 +132,79 @@ async function y9ToRoute(from, to) {
     }
 }
 
+// 所有路由上带的参数塞到一个对象里
+const parseQueryString = (string) => {
+    if (string == '') {
+        return false;
+    }
+    var segments = string.split('&').map((s) => s.split('='));
+    var queryString = {};
+    segments.forEach((s) => (queryString[s[0]] = s[1]));
+    return queryString;
+};
+// 存储任意路由的参数
+const cacheQuery = (query) => {
+    // 维护同一个参数，任意组件内可取出使用对应的参数
+    let session_query = y9_storage.getObjectItem('query');
+    if (session_query) {
+        for (const key in query) {
+            session_query[key] = query[key];
+        }
+        y9_storage.setObjectItem('query', session_query);
+    } else {
+        y9_storage.setObjectItem('query', query);
+    }
+};
+
 let flag = 0;
 export const routerBeforeEach = async (to, from) => {
+    if(!y9_storage.getStringItem('initCheck')) {
+        y9_storage.setStringItem('initCheck', 'false');
+    }
+    flag++;
     const settingStore = useSettingStore();
     // 进度条
     if (settingStore.getProgress) {
         NProgress.start();
     }
-    console.log(to.path, from.path);
+    
     // 检查路由白名单
-    let isWriteRoute = await checkWriteList(to, from);
-    // console.log(`isWriteList = ${isWriteRoute}`);
-    if (isWriteRoute) {
-        return true;
+    if(to.fullPath.indexOf("?platform=gitee&code=") == -1) {
+        let isWriteRoute = await checkWriteList(to, from);
+        if (isWriteRoute) {
+            return true;
+        }
+    }
+
+    // 路由是否带参数
+    let query = parseQueryString(window.location.search.substring(1));
+    if (query) {
+        cacheQuery(query);
     }
 
     // 不使用数据流引擎单点登陆，直接进入页面级组件
     if (import.meta.env.VUE_APP_APPFEATURES == '1') {
+        // 特殊判断，gitee上是否点赞
+        // if (query.platform && query.code && query.platform === 'gitee') {
+        //     let result = await isStarred(query.code);
+        //     if (!result.data) {
+        //         router.push({ path: '/unstarred' });
+        //         return;
+        //     } else {
+        //         y9_storage.setStringItem('initCheck', 'true');
+        //     }
+        // }
+        // if (y9_storage.getStringItem('initCheck') === 'false' && to.path !== '/unstarred') {
+        //     const giteeAuthUrl =
+        //         'https://gitee.com/oauth/authorize?client_id=e05fe4423a35a22d85978c0c28c6acceda1c7636201f83a5e86545503041ae5a&redirect_uri=https%3A%2F%2Ftest.youshengyun.com%2Fy9vue-dataFlowEngine%2F%3Fplatform%3Dgitee&response_type=code';
+        //     window.location = giteeAuthUrl;
+        //     return false;
+        // }
+        // if(y9_storage.getStringItem('initCheck') === 'true' && to.fullPath.indexOf("?platform=gitee&code=") > -1) {
+        //     window.location = import.meta.env.VUE_APP_HOST_INDEX + 'home';
+        //     return;
+        // }
+
         // 默认返回所有路由
         await checkRole();
         return await y9ToRoute(from, to);
@@ -155,13 +212,29 @@ export const routerBeforeEach = async (to, from) => {
     // 正常使用数据流引擎单点登录方式
     else {
         let CHECK = await check();
-        console.log(`CHECK = ${CHECK}`);
         if (CHECK) {
+            // if(flag > 1) {
+            //     // 特殊判断，gitee上是否点赞
+            //     if (query.platform && query.code && query.platform === 'gitee') {
+            //         let result = await isStarred(query.code);
+            //         if (!result.data) {
+            //             router.push({ path: '/unstarred' });
+            //             return;
+            //         } else {
+            //             y9_storage.setStringItem('initCheck', 'true');
+            //         }
+            //     }
+            //     if (y9_storage.getStringItem('initCheck') === 'false' && to.path !== '/unstarred') {
+            //         const giteeAuthUrl =
+            //             'https://gitee.com/oauth/authorize?client_id=e05fe4423a35a22d85978c0c28c6acceda1c7636201f83a5e86545503041ae5a&redirect_uri=https%3A%2F%2Ftest.youshengyun.com%2Fy9vue-dataFlowEngine%2F%3Fplatform%3Dgitee&response_type=code';
+            //         window.location = giteeAuthUrl;
+            //         return false;
+            //     }
+            // }
             return await y9ToRoute(from, to);
         } else {
             await $y9_SSO.checkLogin();
         }
-
         return false;
     }
 };

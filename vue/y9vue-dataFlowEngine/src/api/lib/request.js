@@ -96,10 +96,8 @@ function y9Request(baseUrl = '') {
                                 message: t('当前用户登入信息已失效，请重新登入再操作'),
                                 beforeClose: (action, instance, done) => {
                                     if (isExternal(settings.serverLoginUrl)) {
-                                        console.log(111);
                                         window.location.href = settings.serverLoginUrl;
                                     } else {
-                                        console.log(222);
                                         sessionStorage.clear();
                                         window.location.reload();
                                     }
@@ -118,12 +116,12 @@ function y9Request(baseUrl = '') {
                         return res;
                     default:
                         if (!noVerifyBool) {
-                            console.error(res.msg);
-                            // ElMessage({
-                            //     message: res.msg || 'Errors',
-                            //     type: 'error',
-                            //     duration: 1500,
-                            // });
+                            //console.error(res.msg);
+                            ElMessage({
+                                message: res.msg,
+                                type: 'error',
+                                duration: 1500,
+                            });
                         }
                         break;
                 }

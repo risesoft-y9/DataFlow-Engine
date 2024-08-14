@@ -19,7 +19,7 @@
           <el-option
               v-for="item in state.environmentAll"
               :key="item.id"
-              :label="item.name"
+              :label="item.description"
               :value="item.name"
           />
         </el-select>
@@ -148,7 +148,7 @@ const state = reactive({
     label: 'name',
   },
   form: {
-    environment: 'Public',//环境id
+    environment: '',//环境id
     dispatchType: null,//调度类型
     status: '',//开关
     jobType: null,
@@ -338,7 +338,7 @@ let filterConfig = ref({
 onMounted(() => {
   initParams() //弹窗数据
   getEnvironment()
-  initTableData();
+  //initTableData();
   getTree()
 });
 
@@ -391,9 +391,11 @@ const getTree = async () => {
 }
 //获取环境 todo 后续改成获取用户
 const getEnvironment = async () => {
-  let res = await getEnvironmentAll()
+  let res = await getEnvironmentAll();
   if (res) {
-    state.environmentAll = res.data
+    state.environmentAll = res.data;
+    state.form.environment = res.data[0].name;
+    initTableData();
   }
 }
 

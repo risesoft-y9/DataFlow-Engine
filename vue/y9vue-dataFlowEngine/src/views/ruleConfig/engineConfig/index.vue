@@ -104,7 +104,7 @@
             {
                 title: computed(() => t('类别名称')),
                 key: 'typeName',
-                width: 100,
+                width: 120,
                 showOverflowTooltip: false
             },
             {
@@ -129,7 +129,7 @@
             {
                 title: computed(() => t('唯一')),
                 key: 'onlyOne',
-                width: 100,
+                width: 80,
                 render: (row) => {
                     if (row.onlyOne == 1) {
                         return '是';

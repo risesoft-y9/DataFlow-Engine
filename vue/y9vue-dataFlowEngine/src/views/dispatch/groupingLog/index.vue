@@ -19,7 +19,7 @@
           <el-option
               v-for="item in state.environmentAll"
               :key="item.id"
-              :label="item.name"
+              :label="item.description"
               :value="item.name"
           />
         </el-select>
@@ -105,7 +105,7 @@ const state = reactive({
     label: 'name',
   },
   form: {
-    environment: 'Public',//环境id
+    environment: '',//环境id
     status: 2,//
     startDate: '',
     endDate: ''
@@ -240,9 +240,9 @@ onMounted(() => {
   const endDate = moment().format('YYYY-MM-DD');
   state.form.startDate = startDate
   state.form.endDate = endDate
-  getEnvironment()
+  getEnvironment();
 
-  initTableData();
+  //initTableData();
 });
 const envChange = () => {
   tableConfig.value.pageConfig.currentPage = 1;
@@ -257,13 +257,17 @@ const getTree = async () => {
     }
   }
 }
-//获取环境 todo 后续改成获取用户
+
+//获取环境
 const getEnvironment = async () => {
-  let res = await getEnvironmentAll()
+  let res = await getEnvironmentAll();
   if (res) {
-    state.environmentAll = res.data
+    state.environmentAll = res.data;
+    state.form.environment = res.data[0].name;
+    initTableData();
   }
 }
+
 let rowData = ref({})
 const logReport = () => {
   rowData.value = {

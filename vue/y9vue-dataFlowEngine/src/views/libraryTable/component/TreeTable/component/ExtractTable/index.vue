@@ -180,11 +180,10 @@ const handle=async (row)=>{
     </template>
     <template v-slot:operation="{ row }">
       <div class="operation">
-        <div class="fields" @click="handle(row)" v-if="row.status==0">
+        <div class="fields" @click="handle(row)">
           <i class="ri-edit-line"></i>
-          <span class="text">{{ $t('提取') }}</span>
+          <span class="text">{{ $t('提取') }}<span v-if="row.status==1">(已提取)</span></span>
         </div>
-        <div v-else>已提取</div>
       </div>
     </template>
   </y9Table>

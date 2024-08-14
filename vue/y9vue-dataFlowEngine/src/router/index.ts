@@ -21,6 +21,7 @@ import logMonitoringRouter from './modules/logMonitoringRouter';
 import serverNodeRouter from './modules/serverNodeRouter';
 import safetyRouter from './modules/safetyRouter';
 import systemManagementRouter from './modules/systemManagementRouter';
+import y9_storage from '@/utils/storage';
 //constantRoutes为不需要动态判断权限的路由，如登录、404、500等
 export const constantRoutes: Array<any> = [
     {
@@ -53,11 +54,20 @@ export const constantRoutes: Array<any> = [
             title: 'Not Found'
         },
         component: () => import('@/views/404/index.vue')
-    }
+    },
+    {
+        path: '/unstarred',
+        hidden: true,
+        meta: {
+            title: 'unstarred'
+        },
+        component: () => import('@/views/401/unstarred.vue')
+    },
 ];
 
 // 根据条件显示系统管理菜单
-const systemRouter = import.meta.env.VUE_APP_APPFEATURES == '1' ? systemManagementRouter : {};
+let loginName = y9_storage.getObjectItem('ssoUserInfo').loginName;
+const systemRouter = import.meta.env.VUE_APP_APPFEATURES == '1' || loginName === 'admin' ? systemManagementRouter : {};
 //asyncRoutes需求动态判断权限并动态添加的页面  这里的路由模块顺序也是菜单显示的顺序（位置：src->router->modules）
 export const asyncRoutes = [
     homeRouter,
