@@ -84,12 +84,12 @@ public class DbMetaDataUtil {
 			DatabaseMetaData dbmd = connection.getMetaData();
 			String dialect = dbmd.getDatabaseProductName().toLowerCase();
 			if ("mysql".equals(dialect) || "microsoft".equals(dialect)) {
-				rs = dbmd.getTables(connection.getCatalog(), null, tableName, new String[] { "TABLE" });
+				rs = dbmd.getTables(connection.getCatalog(), null, tableName, new String[] { "TABLE", "VIEW" });
 			} else {
 				//获取模式名
 //				String schema = dbmd.getUserName().toUpperCase();
 				String schema = connection.getSchema();
-				rs = dbmd.getTables(null, schema, tableName, new String[] { "TABLE" });
+				rs = dbmd.getTables(null, schema, tableName, new String[] { "TABLE", "VIEW" });
 			}
 			if (rs.next()) {
 				return true;
@@ -125,9 +125,9 @@ public class DbMetaDataUtil {
 			schema = StringUtils.isBlank(schema)?null:schema;
 			String dialect = metaData.getDatabaseProductName().toLowerCase();
 			if ("mysql".equals(dialect) || "microsoft".equals(dialect)) {
-				tables = metaData.getTables(connection.getCatalog(), null, null, new String[] { "TABLE" });
+				tables = metaData.getTables(connection.getCatalog(), null, null, new String[] { "TABLE", "VIEW" });
 			} else {
-				tables = metaData.getTables(null, schema, null, new String[] { "TABLE" });
+				tables = metaData.getTables(null, schema, null, new String[] { "TABLE", "VIEW" });
 			}
 			while (tables.next()) {
 			    //获得表名

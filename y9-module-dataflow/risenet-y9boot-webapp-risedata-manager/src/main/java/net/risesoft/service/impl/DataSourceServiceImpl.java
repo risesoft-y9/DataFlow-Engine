@@ -291,9 +291,9 @@ public class DataSourceServiceImpl implements DataSourceService {
 			String schema = StringUtils.isBlank(dataSourceEntity.getBaseSchema()) ? null : dataSourceEntity.getBaseSchema();
 			String dialect = metaData.getDatabaseProductName().toLowerCase();
 			if ("mysql".equals(dialect) || "microsoft".equals(dialect)) {
-				tables = metaData.getTables(connection.getCatalog(), null, tableName, new String[] { "TABLE" });
+				tables = metaData.getTables(connection.getCatalog(), null, tableName, new String[] { "TABLE", "VIEW" });
 			} else {
-				tables = metaData.getTables(null, schema, tableName, new String[] { "TABLE" });
+				tables = metaData.getTables(null, schema, tableName, new String[] { "TABLE", "VIEW" });
 			}
 			while (tables.next()) {
 				if (tables.getString("TABLE_NAME").equals(tableName)) {
