@@ -17,7 +17,7 @@ INSERT INTO y9_dataservice_mapping (ID,CREATE_TIME,UPDATE_TIME,CLASSNAME,DESCRIP
 	 ('1670391851091234816','2024-06-14 09:40:51.685000000','2024-06-14 09:40:51.685000000','risesoft.data.transfer.stream.rdbms.in.RdbmsDataInputStreamFactory','通用型关系数据库输入流','kingbase','input',1),
 	 ('1670391963125288960','2024-06-14 09:41:18.394000000','2024-06-14 09:41:18.394000000','risesoft.data.transfer.stream.rdbms.out.RdbmsDataOutputStreamFactory','通用型关系数据库输出流','kingbase','output',1),
 	 ('1670392118566195200','2024-06-14 09:41:55.455000000','2024-06-14 09:41:55.455000000','risesoft.data.transfer.stream.rdbms.in.RdbmsDataInputStreamFactory','通用型关系数据库输入流','dm','input',1),
-	 ('1670392199415599104','2024-06-14 09:42:14.730000000','2024-06-14 09:42:14.730000000','risesoft.data.transfer.stream.rdbms.out.RdbmsDataOutputStreamFactory','通用型关系数据库输出流','dm','output',1);
+	 ('1670392199415599104','2024-06-14 09:42:14.730000000','2024-06-14 09:42:14.730000000','risesoft.data.transfer.stream.rdbms.out.RdbmsDataOutputStreamFactory','通用型关系数据库输出流','dm','output',1),
 	 ('1677017895743262720','2024-06-14 09:41:55.455000000','2024-06-14 09:41:55.455000000','risesoft.data.transfer.stream.es.out.ElasticsearchOutputStreamFactory','通用型ES输出流','elasticsearch','output',1),
 	 ('1677018049745522688','2024-06-14 09:42:14.730000000','2024-06-14 09:42:14.730000000','risesoft.data.transfer.stream.es.in.ElasticsearchInputStreamFactory','通用型ES输入流','elasticsearch','input',1);
 	 
