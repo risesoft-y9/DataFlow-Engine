@@ -21,6 +21,7 @@ import logMonitoringRouter from './modules/logMonitoringRouter';
 import serverNodeRouter from './modules/serverNodeRouter';
 import safetyRouter from './modules/safetyRouter';
 import systemManagementRouter from './modules/systemManagementRouter';
+import interfaceRouter from './modules/interfaceRouter';
 import y9_storage from '@/utils/storage';
 //constantRoutes为不需要动态判断权限的路由，如登录、404、500等
 export const constantRoutes: Array<any> = [
@@ -63,6 +64,14 @@ export const constantRoutes: Array<any> = [
         },
         component: () => import('@/views/401/unstarred.vue')
     },
+    {
+        path: '/api-test',
+        hidden: true,
+        meta: {
+            title: '接口在线测试'
+        },
+        component: () => import('@/views/test/apiTest.vue')
+    },
 ];
 
 // 根据条件显示系统管理菜单
@@ -74,6 +83,7 @@ export const asyncRoutes = [
     dataSourceRouter,
     libraryTableRouter,
     businessClassifyRouter,
+    interfaceRouter,
     ruleConfigRouter,
     taskConfigRouter,
     dispatchRouter,

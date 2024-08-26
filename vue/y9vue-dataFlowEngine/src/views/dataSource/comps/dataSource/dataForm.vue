@@ -623,8 +623,6 @@
         if (checkPassCount === formList.value.length) {
             props.changeLoading && props.changeLoading(true);
 
-            //模拟接口请求，将数据提交给后端
-            console.log('提交给后端的数据：', formData);
             //请求接口
             let result = await saveDataConnectInfo(formData);
             props.changeLoading && props.changeLoading(false);
