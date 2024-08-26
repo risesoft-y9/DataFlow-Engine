@@ -2,8 +2,6 @@ package net.risesoft.pojo.home;
 
 import net.risesoft.util.home.QueryTimeRangeCacheUtil;
 
-import java.time.LocalDate;
-
 public class HomeQueryModel {
 
     private CurrentTaskQueryInfo currentTaskQueryInfo;

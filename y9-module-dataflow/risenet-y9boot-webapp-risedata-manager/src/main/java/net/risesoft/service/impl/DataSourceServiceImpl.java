@@ -635,7 +635,7 @@ public class DataSourceServiceImpl implements DataSourceService {
 					// 查询表字段信息
 					List<DataTableField> fieldList = dataTableFieldRepository.findByTableIdOrderByDisplayOrderAsc(tableId);
 					// 生成建表字段列表
-					List<DbColumn> columnList = DDL.getDbColumn(fieldList);
+					List<DbColumn> columnList = getDbColumn(fieldList);
 					// 建表
 					DDL.addTableColumn(dataSource, table.getName(), table.getCname(), Y9JsonUtil.writeValueAsString(columnList));
 					// 更新字段状态信息
@@ -654,6 +654,31 @@ public class DataSourceServiceImpl implements DataSourceService {
 			e.printStackTrace();
 			return Y9Result.failure("表生成失败:" + e.getMessage());
 		}
+	}
+	
+	/**
+	 * 获取要创建的字段
+	 * @param fieldList
+	 * @return
+	 */
+	private List<DbColumn> getDbColumn(List<DataTableField> fieldList) {
+		List<DbColumn> dbcs = new ArrayList<DbColumn>();
+		for (DataTableField fieldTemp : fieldList) {
+			DbColumn dbColumn = new DbColumn();
+			dbColumn.setColumn_name(fieldTemp.getName());
+			dbColumn.setColumn_name_old(fieldTemp.getOldName());
+			dbColumn.setNullable("YES".equals(fieldTemp.getFieldNull()) ? true : false);
+			dbColumn.setIsCreateIndex(false);
+			dbColumn.setType_name(fieldTemp.getFieldType());
+			dbColumn.setData_type(fieldTemp.getTypeNum());
+			//不能有长度的字段置为0
+			dbColumn.setData_length(fieldTemp.getFieldLength());
+			dbColumn.setComment(fieldTemp.getCname());
+			dbColumn.setPrimaryKey("Y".equals(fieldTemp.getFieldPk()) ? true : false);
+			dbColumn.setIsState(fieldTemp.getIsState()==null ? false:fieldTemp.getIsState());
+			dbcs.add(dbColumn);
+		}
+		return dbcs;
 	}
 
 	@Override

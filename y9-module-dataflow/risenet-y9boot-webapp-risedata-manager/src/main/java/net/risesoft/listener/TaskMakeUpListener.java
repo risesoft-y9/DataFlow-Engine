@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
@@ -54,34 +55,43 @@ public class TaskMakeUpListener {
     	}
     	
     	// 保存源头数据信息
-    	this.saveSource(taskId, configModel);
+    	CompletableFuture.runAsync(() -> saveSource(taskId, configModel));
     	
     	// 保存目标数据信息
-    	this.saveTarget(taskId, configModel);
+    	CompletableFuture.runAsync(() -> saveTarget(taskId, configModel));
     	
     	// 保存输出通道
-    	DataTaskCoreEntity channelOut = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.CHANNEL,
-    			DataServiceUtil.OUTPUT, "name", 1);
-    	this.saveCore(taskId, DataServiceUtil.CHANNEL + "." + DataServiceUtil.OUTPUT, channelOut, 1);
+    	CompletableFuture.runAsync(() -> {
+    		DataTaskCoreEntity channelOut = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.CHANNEL,
+        			DataServiceUtil.OUTPUT, "name", 1);
+    		saveCore(taskId, DataServiceUtil.CHANNEL + "." + DataServiceUtil.OUTPUT, channelOut, 1);
+    	});
     	
     	// 保存输入通道
-    	DataTaskCoreEntity channelIn = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.CHANNEL,
-    			DataServiceUtil.INPUT, "name", 1);
-    	this.saveCore(taskId, DataServiceUtil.CHANNEL + "." + DataServiceUtil.INPUT, channelIn, 1);
+    	CompletableFuture.runAsync(() -> {
+    		DataTaskCoreEntity channelIn = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.CHANNEL,
+        			DataServiceUtil.INPUT, "name", 1);
+    		saveCore(taskId, DataServiceUtil.CHANNEL + "." + DataServiceUtil.INPUT, channelIn, 1);
+    	});
     	
     	// 保存交换机
-    	DataTaskCoreEntity exchange = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.EXCHANGE,
-    			DataServiceUtil.EXCHANGE, "name", 1);
-    	this.saveCore(taskId, DataServiceUtil.EXCHANGE, exchange, 1);
+    	CompletableFuture.runAsync(() -> {
+    		DataTaskCoreEntity exchange = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.EXCHANGE,
+        			DataServiceUtil.EXCHANGE, "name", 1);
+    		saveCore(taskId, DataServiceUtil.EXCHANGE, exchange, 1);
+    	});
     	
     	// 保存执行器
-    	DataTaskCoreEntity executorInput = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.EXECUTOR,
-    			DataServiceUtil.INPUT, "name", 1);
-    	this.saveCore(taskId, DataServiceUtil.EXECUTOR + "." + DataServiceUtil.INPUT, executorInput, 1);
-    	
-    	DataTaskCoreEntity executorOut = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.EXECUTOR,
-    			DataServiceUtil.OUTPUT, "name", 1);
-    	this.saveCore(taskId, DataServiceUtil.EXECUTOR + "." + DataServiceUtil.OUTPUT, executorOut, 1);
+    	CompletableFuture.runAsync(() -> {
+    		DataTaskCoreEntity executorInput = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.EXECUTOR,
+        			DataServiceUtil.INPUT, "name", 1);
+    		saveCore(taskId, DataServiceUtil.EXECUTOR + "." + DataServiceUtil.INPUT, executorInput, 1);
+    	});
+    	CompletableFuture.runAsync(() -> {
+    		DataTaskCoreEntity executorOut = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.EXECUTOR,
+        			DataServiceUtil.OUTPUT, "name", 1);
+    		saveCore(taskId, DataServiceUtil.EXECUTOR + "." + DataServiceUtil.OUTPUT, executorOut, 1);
+    	});
     	
     	// 保存其它配置
     	int index = 1;
@@ -89,7 +99,8 @@ public class TaskMakeUpListener {
     			DataServiceUtil.PRINTLOG, "name");
     	if(printLogs != null && printLogs.size() > 0) {
     		for(DataTaskCoreEntity dataTaskCoreEntity : printLogs) {
-    			this.saveCore(taskId, DataServiceUtil.PLUGS, dataTaskCoreEntity, index);
+    			int num = index;
+    			CompletableFuture.runAsync(() -> saveCore(taskId, DataServiceUtil.PLUGS, dataTaskCoreEntity, num));
     			index++;
     		}
     	}
@@ -98,7 +109,8 @@ public class TaskMakeUpListener {
     			DataServiceUtil.DIRTYDATA, "name");
     	if(dirtyDatas != null && dirtyDatas.size() > 0) {
     		for(DataTaskCoreEntity dataTaskCoreEntity : dirtyDatas) {
-    			this.saveCore(taskId, DataServiceUtil.PLUGS, dataTaskCoreEntity, index);
+    			int num = index;
+    			CompletableFuture.runAsync(() -> saveCore(taskId, DataServiceUtil.PLUGS, dataTaskCoreEntity, num));
     			index++;
     		}
     	}
@@ -124,6 +136,7 @@ public class TaskMakeUpListener {
         	dataTaskMakeUpEntity.setArgsValue(Y9JsonUtil.writeValueAsString(map));
         	dataTaskMakeUpEntity.setTabIndex(index);
         	dataTaskMakeUpRepository.save(dataTaskMakeUpEntity);
+        	index++;
     	}
     	
     	configService.refreshConfig(taskId, taskName);

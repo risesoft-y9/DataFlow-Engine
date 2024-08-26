@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
@@ -128,37 +129,44 @@ public class SourceController {
 	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "分页获取数据库的表信息数据", logLevel = LogLevelEnum.RSLOG, enable = false)
 	@GetMapping("/getTableAll")
 	public Y9Page<Map<String, Object>> getTableAll(String baseId, String name, Integer page, Integer size) {
-		List<Map<String, Object>> listMap = new ArrayList<Map<String, Object>>();
         Page<DataTable> pageList = dataSourceService.findAllTable(baseId, name, page, size);
-		for (DataTable record : pageList) {
-		    Map<String, Object> row = new HashMap<String, Object>();
-		    row.put("id", record.getId());
-		    row.put("name", record.getName());
-		    row.put("cname", record.getCname());
-		    row.put("baseId", record.getBaseId());
-		    DataSourceEntity source = dataSourceService.getDataSourceById(record.getBaseId());
-		    row.put("baseType", source.getBaseType());
-		    row.put("baseName", source.getBaseName());
-		    if(record.getStatus() == 1) {
-		    	if(source.getType() == 0) {
-		    		row.put("dataNum", DbMetaDataUtil.getTableDataNum(dataSourceService.getDataSource(source.getId()), record.getName()));
-		    	}else if(source.getBaseType().equals(DataConstant.ES)){
-		    		ElasticsearchRestClient elasticsearchRestClient = new ElasticsearchRestClient(source.getUrl(), 
-		    				source.getUsername(), source.getPassword());
-		    		try {
-						row.put("dataNum", elasticsearchRestClient.getCount(record.getName()));
-					} catch (Exception e) {
-						row.put("dataNum", e.getMessage());
-					}
-		    	}
-		    }else {
-		    	row.put("dataNum", 0);
-		    }
-		    row.put("status", record.getStatus());
-		    listMap.add(row);
-		}
+        // 并行解析数据
+        List<CompletableFuture<Map<String, Object>>> futures = pageList.stream()  
+                .map(n -> CompletableFuture.supplyAsync(() -> getDataMap(n))) // 创建异步任务  
+                .collect(Collectors.toList()); // 收集所有的 CompletableFuture
+        // 等待所有任务完成，获取结果
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+        List<Map<String, Object>> listMap = futures.stream().map(CompletableFuture::join).collect(Collectors.toList());
         return Y9Page.success(page, pageList.getTotalPages(), pageList.getTotalElements(), listMap, "获取数据成功");
     }
+	
+	private Map<String, Object> getDataMap(DataTable record) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("id", record.getId());
+		map.put("name", record.getName());
+		map.put("cname", record.getCname());
+		map.put("baseId", record.getBaseId());
+	    DataSourceEntity source = dataSourceService.getDataSourceById(record.getBaseId());
+	    map.put("baseType", source.getBaseType());
+	    map.put("baseName", source.getBaseName());
+	    if(record.getStatus() == 1) {
+	    	if(source.getType() == 0) {
+	    		map.put("dataNum", DbMetaDataUtil.getTableDataNum(dataSourceService.getDataSource(source.getId()), record.getName()));
+	    	}else if(source.getBaseType().equals(DataConstant.ES)){
+	    		ElasticsearchRestClient elasticsearchRestClient = new ElasticsearchRestClient(source.getUrl(), 
+	    				source.getUsername(), source.getPassword());
+	    		try {
+	    			map.put("dataNum", elasticsearchRestClient.getCount(record.getName()));
+				} catch (Exception e) {
+					map.put("dataNum", e.getMessage());
+				}
+	    	}
+	    }else {
+	    	map.put("dataNum", 0);
+	    }
+	    map.put("status", record.getStatus());
+	    return map;
+	}
 	
 	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "获取数据库需要提取的表", logLevel = LogLevelEnum.RSLOG, enable = false)
 	@GetMapping("/getNotExtractList")
