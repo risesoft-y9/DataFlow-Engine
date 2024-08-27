@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import risesoft.data.transfer.core.config.ConfigLoad;
 import risesoft.data.transfer.core.config.ConfigLoadManager;
+import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.exception.InstallException;
 import risesoft.data.transfer.core.instruction.factory.InstructionFactory;
 import risesoft.data.transfer.core.util.ClassTools;
@@ -38,7 +39,7 @@ public class ParseInstructionFactory {
 		ConfigLoadManager.addLoad(new ConfigLoad() {
 
 			@Override
-			public Configuration laod(Configuration config) {
+			public Configuration laod(Configuration config,JobContext jobContext) {
 				String jsonConfig = config.toJSON();
 				Matcher matcher = p.matcher(jsonConfig);
 				Map<String, Byte> setMap = new HashMap<String, Byte>();
@@ -50,7 +51,7 @@ public class ParseInstructionFactory {
 					InstructionFactory instructionFactory = INSTRUCTION_FACTORY_MAP.get(matcher.group(1));
 					if (instructionFactory != null) {
 						jsonConfig = jsonConfig.replace(matcher.group(0),
-								instructionFactory.getInstance(matcher.group(2).split(",")).executor(jsonConfig));
+								instructionFactory.getInstance(matcher.group(2).split(",")).executor(jsonConfig,jobContext));
 					}
 				}
 				return setMap.size() == 0 ? config : Configuration.from(jsonConfig);

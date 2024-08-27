@@ -3,6 +3,7 @@ package risesoft.data.transfer.core.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.util.Configuration;
 
 /**
@@ -20,11 +21,12 @@ public class ConfigLoadManager {
 	 * 解析配置
 	 * 
 	 * @param config
+	 * @param jobContext
 	 * @return
 	 */
-	public static Configuration loadConfig(Configuration config) {
+	public static Configuration loadConfig(Configuration config,JobContext jobContext) {
 		for (ConfigLoad configLoad : CONFIG_LOADS) {
-			config = configLoad.laod(config);
+			config = configLoad.laod(config,jobContext);
 		}
 		return config;
 	}

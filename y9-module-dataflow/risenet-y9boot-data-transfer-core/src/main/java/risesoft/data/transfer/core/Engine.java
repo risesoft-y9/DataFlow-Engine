@@ -95,7 +95,7 @@ public class Engine {
 			jobContext.setName(configuration.getString(JOB_NAME_KEY, Thread.currentThread().getName()));
 			jobContext.setLoggerFactory(loggerFactory);
 			// 加载配置插件
-			Configuration loadedConfiguration = ConfigLoadManager.loadConfig(configuration);
+			Configuration loadedConfiguration = ConfigLoadManager.loadConfig(configuration,jobContext);
 			jobContext.putInstance(loadedConfiguration);
 			PlugManager.loadPlug(loadedConfiguration, jobContext);
 			jobContext.doHandle(InitApplicationConfigHandle.class, (handle) -> {

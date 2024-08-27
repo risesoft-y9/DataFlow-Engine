@@ -1,5 +1,6 @@
 package risesoft.data.transfer.core.config;
 
+import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.util.Configuration;
 
 /**
@@ -15,8 +16,9 @@ public interface ConfigLoad {
 	 * 加载配置
 	 * 
 	 * @param config
+	 * @param jobContext
 	 * @return
 	 */
-	Configuration laod(Configuration config);
+	Configuration laod(Configuration config,JobContext jobContext);
 
 }
