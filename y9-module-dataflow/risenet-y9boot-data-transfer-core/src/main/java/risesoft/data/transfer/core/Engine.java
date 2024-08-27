@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import risesoft.data.transfer.core.channel.JoinOutExecutorChannel;
 import risesoft.data.transfer.core.channel.OutChannel;
+import risesoft.data.transfer.core.config.ConfigLoadManager;
 import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.context.StreamContext;
 import risesoft.data.transfer.core.exchange.CoreExchange;
@@ -30,74 +31,16 @@ import risesoft.data.transfer.core.util.ConfigurationConst;
 import risesoft.data.transfer.core.util.ValueUtils;
 
 /**
- * 组织 启动
- * 根据任务配置加载对应的组件类
- * 多个任务共享核心组件。
- * {
-	"job":[{
-	  "input":{
-	     "name":"${输出器名字}"
-	     "args":{
-	     ...
-	     }
-	  },
-	  "output":{
-	     "name":"${输出器名字}"
-	     "args":{
-	     ...
-	     }
-	  }
-	}],		
-	"core":{
-	   "channel":{
-	     "out":{
-	        "name":"${通道class}",
-	       "args":{
-	       ...
-	       }
-	     },
-	 	 "in":{
-	       "name":"${输入交换机class}"
-	         "args":{
-	          ...
-	       }
-	     }
-	   },
-	   "exchange":{
-	       "name":"${核心交换机class}"
-	         "args":{
-	          ...
-	       }
-
-	   },
-	   "executor":{
-	     "input":{
-	       "name":"${输入器执行线程池}"
-	       "args":{
-	       ...
-	       }
-	     },
-	     "output":{
-	       "name":"${输出器执行线程池}"
-	       "args":{
-	       ...
-	       }
-	     },
-	   },
-	   "errorLimit":{
-	     "record":${脏数据条数},
-	     "percentage":${比例}
-	   }
-	},
-	"plugs":[
-	  {
-	    "name":"${class名字}"
-	     "args":{
-	       ...
-	     }
-	  }
-	]	
-}
+ * 组织 启动 根据任务配置加载对应的组件类 多个任务共享核心组件。 { "job":[{ "input":{ "name":"${输出器名字}"
+ * "args":{ ... } }, "output":{ "name":"${输出器名字}" "args":{ ... } } }], "core":{
+ * "channel":{ "out":{ "name":"${通道class}", "args":{ ... } }, "in":{
+ * "name":"${输入交换机class}" "args":{ ... } } }, "exchange":{
+ * "name":"${核心交换机class}" "args":{ ... }
+ * 
+ * }, "executor":{ "input":{ "name":"${输入器执行线程池}" "args":{ ... } }, "output":{
+ * "name":"${输出器执行线程池}" "args":{ ... } }, }, "errorLimit":{ "record":${脏数据条数},
+ * "percentage":${比例} } }, "plugs":[ { "name":"${class名字}" "args":{ ... } } ] }
+ * 
  * @typeName Engine
  * @date 2023年12月4日
  * @author lb
@@ -142,8 +85,7 @@ public class Engine {
 	 */
 	public static JobContext start(String jobId, Configuration configuration, JobListener jobListener,
 			LoggerFactory loggerFactory) {
-		JobContext jobContext = new JobContext(new Communication(), jobId, new HandleManager(), configuration,
-				jobListener);
+		JobContext jobContext = new JobContext(new Communication(), jobId, new HandleManager(), jobListener);
 		try {
 			// 输出通道连接输出器
 			if (loggerFactory == null) {
@@ -152,40 +94,41 @@ public class Engine {
 			}
 			jobContext.setName(configuration.getString(JOB_NAME_KEY, Thread.currentThread().getName()));
 			jobContext.setLoggerFactory(loggerFactory);
-			PlugManager.loadPlug(configuration, jobContext);
-
+			// 加载配置插件
+			Configuration loadedConfiguration = ConfigLoadManager.loadConfig(configuration);
+			jobContext.putInstance(loadedConfiguration);
+			PlugManager.loadPlug(loadedConfiguration, jobContext);
 			jobContext.doHandle(InitApplicationConfigHandle.class, (handle) -> {
-				handle.initApplicationConfig(configuration);
+				handle.initApplicationConfig(loadedConfiguration);
 			});
 
 			jobContext.getLogger().info(Engine.class, "正在装配核心组件");
-			createJobs(configuration, jobContext);
+			createJobs(loadedConfiguration, jobContext);
 			jobContext
-					.setInExecutorTaskQueue(FactoryManager.getInstanceOfConfiguration(
-							ValueUtils.getRequired(configuration.getConfiguration(ConfigurationConst.EXECUTOR_INPUT),
-									"缺少输入队列执行器"),
+					.setInExecutorTaskQueue(FactoryManager.getInstanceOfConfiguration(ValueUtils.getRequired(
+							loadedConfiguration.getConfiguration(ConfigurationConst.EXECUTOR_INPUT), "缺少输入队列执行器"),
 							ExecutorTaskQueue.class, jobContext.getInstanceMap()))
 					.setInChannelConfiguration(ValueUtils
-							.getRequired(configuration.getConfiguration(ConfigurationConst.IN_CHANNEL), "缺失输入通道"))
-					.setOutExecutorTaskQueue(FactoryManager.getInstanceOfConfiguration(
-							ValueUtils.getRequired(configuration.getConfiguration(ConfigurationConst.EXECUTOR_OUTPUT),
-									"缺少输出队列执行器"),
-							ExecutorTaskQueue.class, jobContext.getInstanceMap()))
+							.getRequired(loadedConfiguration.getConfiguration(ConfigurationConst.IN_CHANNEL), "缺失输入通道"))
+					.setOutExecutorTaskQueue(
+							FactoryManager
+									.getInstanceOfConfiguration(
+											ValueUtils.getRequired(loadedConfiguration
+													.getConfiguration(ConfigurationConst.EXECUTOR_OUTPUT), "缺少输出队列执行器"),
+											ExecutorTaskQueue.class, jobContext.getInstanceMap()))
 					.setCoreExchange(
 							new CoreExchange(
-									FactoryManager
-											.getInstanceOfConfiguration(
-													ValueUtils.getRequired(configuration.getConfiguration(
-															ConfigurationConst.CORE_EXCHANGE), "缺少核心交换机"),
-													Exchange.class, jobContext.getInstanceMap()),
+									FactoryManager.getInstanceOfConfiguration(
+											ValueUtils.getRequired(loadedConfiguration
+													.getConfiguration(ConfigurationConst.CORE_EXCHANGE), "缺少核心交换机"),
+											Exchange.class, jobContext.getInstanceMap()),
 									jobContext.getCommunication()))
 					.getCoreExchange()
 					// 使用一个链接的
-					.setOutChannel(
-							FactoryManager.getInstanceOfConfiguration(
-									ValueUtils.getRequired(
-											configuration.getConfiguration(ConfigurationConst.OUT_CHANNEL), "缺失输出通道"),
-									OutChannel.class, jobContext.getInstanceMap()));
+					.setOutChannel(FactoryManager.getInstanceOfConfiguration(
+							ValueUtils.getRequired(loadedConfiguration.getConfiguration(ConfigurationConst.OUT_CHANNEL),
+									"缺失输出通道"),
+							OutChannel.class, jobContext.getInstanceMap()));
 			jobContext.getCoreExchange().getOutChannel()
 					.setOutPutStream(new JoinOutExecutorChannel(jobContext.getOutExecutorTaskQueue()));
 			jobContext.getLogger().info(Engine.class, "组件装配完成任务开始");
@@ -248,7 +191,7 @@ public class Engine {
 				communication.setThrowable(e);
 			}
 			jobContext.getJobListener().end(communication);
-			
+
 		}
 
 	}

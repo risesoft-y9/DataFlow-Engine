@@ -11,7 +11,6 @@ import risesoft.data.transfer.core.factory.FactoryManager;
 import risesoft.data.transfer.core.handle.DoHandle;
 import risesoft.data.transfer.core.handle.HandleManager;
 import risesoft.data.transfer.core.job.Job;
-import risesoft.data.transfer.core.job.JobEngine;
 import risesoft.data.transfer.core.listener.JobListener;
 import risesoft.data.transfer.core.log.Logger;
 import risesoft.data.transfer.core.log.LoggerFactory;
@@ -96,8 +95,7 @@ public class JobContext {
 
 	private Map<String, Object> contextMap;
 
-	public JobContext(Communication communication, String jobId, HandleManager handles, Configuration configuration,
-			JobListener jobListener) {
+	public JobContext(Communication communication, String jobId, HandleManager handles, JobListener jobListener) {
 		super();
 		this.communication = communication;
 		this.jobId = jobId;
@@ -109,7 +107,6 @@ public class JobContext {
 		putInstance(this);
 		putInstance(handles);
 		putInstance(communication);
-		putInstance(configuration);
 	}
 
 	/**
