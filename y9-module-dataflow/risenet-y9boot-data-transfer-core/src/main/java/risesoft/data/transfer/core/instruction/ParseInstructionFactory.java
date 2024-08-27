@@ -39,7 +39,7 @@ public class ParseInstructionFactory {
 		ConfigLoadManager.addLoad(new ConfigLoad() {
 
 			@Override
-			public Configuration laod(Configuration config,JobContext jobContext) {
+			public Configuration laod(Configuration config, JobContext jobContext) {
 				String jsonConfig = config.toJSON();
 				Matcher matcher = p.matcher(jsonConfig);
 				Map<String, Byte> setMap = new HashMap<String, Byte>();
@@ -50,8 +50,8 @@ public class ParseInstructionFactory {
 					setMap.put(matcher.group(0), Byte.MIN_VALUE);
 					InstructionFactory instructionFactory = INSTRUCTION_FACTORY_MAP.get(matcher.group(1));
 					if (instructionFactory != null) {
-						jsonConfig = jsonConfig.replace(matcher.group(0),
-								instructionFactory.getInstance(matcher.group(2).split(",")).executor(jsonConfig,jobContext));
+						jsonConfig = jsonConfig.replace(matcher.group(0), instructionFactory
+								.getInstance(matcher.group(2).split(","), jsonConfig).executor(jsonConfig, jobContext));
 					}
 				}
 				return setMap.size() == 0 ? config : Configuration.from(jsonConfig);

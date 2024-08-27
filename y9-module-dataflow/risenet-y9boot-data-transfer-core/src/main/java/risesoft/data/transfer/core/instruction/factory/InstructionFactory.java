@@ -23,5 +23,5 @@ public interface InstructionFactory {
 	 * @param args
 	 * @return
 	 */
-	Instruction getInstance(String[] args);
+	Instruction getInstance(String[] args,String config);
 }
