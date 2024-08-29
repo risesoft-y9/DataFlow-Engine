@@ -740,6 +740,11 @@ public class DataSourceServiceImpl implements DataSourceService {
 				Map<String, Object> mappings = (Map<String, Object>) map.get(tableName);
 				Map<String, Object> properties = (Map<String, Object>) mappings.get("mappings");
 				Map<String, Object> dataMap = (Map<String, Object>) properties.get("properties");
+				// 低版本的es存在type值，需要先获取type
+				if(dataMap == null) {
+					Map<String, Object> type = (Map<String, Object>) properties.values().stream().findFirst().get();
+					dataMap = (Map<String, Object>) type.get("properties");
+				}
 				// 保存表信息
 				DataTable table = dataTableRepository.findByBaseIdAndName(baseId, tableName);
 				if(table == null) {

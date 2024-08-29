@@ -39,8 +39,13 @@ public class DataInterfaceEntity extends BaseEntity {
 	private String requestType;
 	
 	@Column(name = "DATATYPE", nullable = false)
-	@Comment(value = "类型：1-外置， 0-内置")
+	@Comment(value = "接口类型：1-外置， 0-内置")
 	@ColumnDefault("1")
 	private Integer dataType;
+	
+	@Column(name = "PATTERN", nullable = false)
+	@Comment(value = "接口数据源传输类型：1-输入，0-输出")
+	@ColumnDefault("0")
+	private Integer pattern;
 
 }
