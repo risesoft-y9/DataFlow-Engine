@@ -14,6 +14,7 @@ import risesoft.data.transfer.core.config.ConfigLoadManager;
 import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.exception.InstallException;
 import risesoft.data.transfer.core.instruction.factory.InstructionFactory;
+import risesoft.data.transfer.core.start.StartConfiguration;
 import risesoft.data.transfer.core.util.ClassTools;
 import risesoft.data.transfer.core.util.ClassUtils;
 import risesoft.data.transfer.core.util.Configuration;
@@ -26,7 +27,7 @@ import risesoft.data.transfer.core.util.Configuration;
  * @date 2024年8月23日
  * @author lb
  */
-public class ParseInstructionFactory {
+public class ParseInstructionFactory implements StartConfiguration{
 	private static final String rgex = "\\$(.*?)\\{(.*?)\\}";
 	private static final Pattern p = Pattern.compile(rgex);
 
