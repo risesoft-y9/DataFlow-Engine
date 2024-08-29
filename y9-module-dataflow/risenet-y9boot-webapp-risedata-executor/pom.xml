@@ -62,6 +62,11 @@
             <artifactId>risenet-y9boot-data-transfer-ftp</artifactId>
             <version>${project.version}</version>
         </dependency>
+            <dependency>
+            <groupId>net.risesoft</groupId>
+            <artifactId>risenet-y9boot-data-transfer-assembler</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>net.risesoft</groupId>
             <artifactId>risenet-y9boot-data-transfer-stream</artifactId>

@@ -96,6 +96,10 @@ public class JobController {
 				null);
 		result.put("success", resultJobListener.isSuccess());
 		result.put("msg", resultJobListener.getMessage());
+		if (!resultJobListener.isSuccess()) {
+
+			resultJobListener.getCommunication().getThrowable().printStackTrace();
+		}
 		return result;
 	}
 

@@ -1,0 +1,39 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>net.risesoft</groupId>
+		<artifactId>y9-module-dataflow</artifactId>
+		<version>${revision}</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+	<artifactId>risenet-y9boot-data-transfer-assembler</artifactId>
+	<packaging>jar</packaging>
+	<description>DataFlow Engine transfer stream</description>
+	<!-- <description>对于流的处理</description>-->
+
+	<properties>
+	</properties>
+	<name>risenet-y9boot-data-transfer-assembler</name>
+
+	<scm>
+		<url>${gitee.url}</url>
+		<connection>${gitee.connection}</connection>
+		<developerConnection>${gitee.developerConnection}</developerConnection>
+	</scm>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>0.10.2</version>
+		</dependency>
+		<dependency>
+			<groupId>net.risesoft</groupId>
+			<artifactId>risenet-y9boot-data-transfer-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>
