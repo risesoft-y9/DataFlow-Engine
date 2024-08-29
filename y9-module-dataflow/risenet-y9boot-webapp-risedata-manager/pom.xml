@@ -11,7 +11,7 @@
     </parent>
     <artifactId>risenet-y9boot-webapp-risedata-manager</artifactId>
     <packaging>war</packaging>
-	
+
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
@@ -97,13 +97,8 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jstl</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -138,28 +133,6 @@
         </dependency>
 
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>y9-repo</id>
-            <name>local private nexus</name>
-            <url>https://svn.youshengyun.com:9900/nexus/repository/maven-public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <!-- <updatePolicy>always</updatePolicy> -->
-            </snapshots>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>y9-repo-plugin</id>
-            <name>local private plugin nexus</name>
-            <url>https://svn.youshengyun.com:9900/nexus/repository/maven-public</url>
-        </pluginRepository>
-    </pluginRepositories>
 
     <build>
         <finalName>risedata</finalName>

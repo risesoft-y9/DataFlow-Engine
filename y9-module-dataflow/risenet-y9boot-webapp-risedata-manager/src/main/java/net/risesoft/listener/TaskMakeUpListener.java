@@ -54,44 +54,46 @@ public class TaskMakeUpListener {
     		dataTaskMakeUpRepository.deleteAll(taskMakeUpList);
     	}
     	
+    	List<CompletableFuture<Void>> futures = new ArrayList<>();
+    	
     	// 保存源头数据信息
-    	CompletableFuture.runAsync(() -> saveSource(taskId, configModel));
+    	futures.add(CompletableFuture.runAsync(() -> saveSource(taskId, configModel)));
     	
     	// 保存目标数据信息
-    	CompletableFuture.runAsync(() -> saveTarget(taskId, configModel));
+    	futures.add(CompletableFuture.runAsync(() -> saveTarget(taskId, configModel)));
     	
     	// 保存输出通道
-    	CompletableFuture.runAsync(() -> {
+    	futures.add(CompletableFuture.runAsync(() -> {
     		DataTaskCoreEntity channelOut = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.CHANNEL,
         			DataServiceUtil.OUTPUT, "name", 1);
     		saveCore(taskId, DataServiceUtil.CHANNEL + "." + DataServiceUtil.OUTPUT, channelOut, 1);
-    	});
+    	}));
     	
     	// 保存输入通道
-    	CompletableFuture.runAsync(() -> {
+    	futures.add(CompletableFuture.runAsync(() -> {
     		DataTaskCoreEntity channelIn = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.CHANNEL,
         			DataServiceUtil.INPUT, "name", 1);
     		saveCore(taskId, DataServiceUtil.CHANNEL + "." + DataServiceUtil.INPUT, channelIn, 1);
-    	});
+    	}));
     	
     	// 保存交换机
-    	CompletableFuture.runAsync(() -> {
+    	futures.add(CompletableFuture.runAsync(() -> {
     		DataTaskCoreEntity exchange = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.EXCHANGE,
         			DataServiceUtil.EXCHANGE, "name", 1);
     		saveCore(taskId, DataServiceUtil.EXCHANGE, exchange, 1);
-    	});
+    	}));
     	
     	// 保存执行器
-    	CompletableFuture.runAsync(() -> {
+    	futures.add(CompletableFuture.runAsync(() -> {
     		DataTaskCoreEntity executorInput = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.EXECUTOR,
         			DataServiceUtil.INPUT, "name", 1);
     		saveCore(taskId, DataServiceUtil.EXECUTOR + "." + DataServiceUtil.INPUT, executorInput, 1);
-    	});
-    	CompletableFuture.runAsync(() -> {
+    	}));
+    	futures.add(CompletableFuture.runAsync(() -> {
     		DataTaskCoreEntity executorOut = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.EXECUTOR,
         			DataServiceUtil.OUTPUT, "name", 1);
     		saveCore(taskId, DataServiceUtil.EXECUTOR + "." + DataServiceUtil.OUTPUT, executorOut, 1);
-    	});
+    	}));
     	
     	// 保存其它配置
     	int index = 1;
@@ -100,7 +102,7 @@ public class TaskMakeUpListener {
     	if(printLogs != null && printLogs.size() > 0) {
     		for(DataTaskCoreEntity dataTaskCoreEntity : printLogs) {
     			int num = index;
-    			CompletableFuture.runAsync(() -> saveCore(taskId, DataServiceUtil.PLUGS, dataTaskCoreEntity, num));
+    			futures.add(CompletableFuture.runAsync(() -> saveCore(taskId, DataServiceUtil.PLUGS, dataTaskCoreEntity, num)));
     			index++;
     		}
     	}
@@ -110,7 +112,7 @@ public class TaskMakeUpListener {
     	if(dirtyDatas != null && dirtyDatas.size() > 0) {
     		for(DataTaskCoreEntity dataTaskCoreEntity : dirtyDatas) {
     			int num = index;
-    			CompletableFuture.runAsync(() -> saveCore(taskId, DataServiceUtil.PLUGS, dataTaskCoreEntity, num));
+    			futures.add(CompletableFuture.runAsync(() -> saveCore(taskId, DataServiceUtil.PLUGS, dataTaskCoreEntity, num)));
     			index++;
     		}
     	}
@@ -139,7 +141,10 @@ public class TaskMakeUpListener {
         	index++;
     	}
     	
+    	// 等待所有任务执行完成再刷新
+    	futures.forEach(CompletableFuture::join);
     	configService.refreshConfig(taskId, taskName);
+    	
         LOGGER.debug("任务["+taskId+"]-配置组成更新完成");
     }
     

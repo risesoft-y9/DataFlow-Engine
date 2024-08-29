@@ -48,6 +48,15 @@
                 </el-form-item>
                 <span v-else>{{ row.dataType == '1' ? '外置' : '内置' }}</span>
             </template>
+            <template #pattern="{ row, column, index }">
+                <el-form-item v-if="editIndex === index" prop="pattern">
+                    <el-select v-model="formData.pattern">
+                        <el-option key="1" label="输入" value="1"></el-option>
+                        <el-option key="0" label="输出" value="0"></el-option>
+                    </el-select>
+                </el-form-item>
+                <span v-else>{{ row.pattern == '1' ? '输入' : '输出' }}</span>
+            </template>
             <template #opt_button="{ row, column, index }">
                 <div v-if="editIndex === index">
                     <el-link type="primary" :underline="false" @click="saveData(interfaceRef)"
@@ -104,7 +113,7 @@
     const data = reactive({
         isEmptyData: false,
         editIndex: '',
-        formData: { id: '', interfaceUrl: '', interfaceName: '', requestType: 'GET', dataType: '1' },
+        formData: { id: '', interfaceUrl: '', interfaceName: '', requestType: 'GET', dataType: '1', pattern: '0' },
         isEdit: false,
         tableConfig: {
             columns: [
@@ -112,6 +121,7 @@
                 { title: '接口名称', key: 'interfaceName', width: '240', slot: 'interfaceName' },
                 { title: '请求方式', key: 'requestType', width: '110', slot: 'requestType' },
                 { title: '接口地址', key: 'interfaceUrl', slot: 'interfaceUrl', align: 'left' },
+                { title: '传输类型', key: 'pattern', slot: 'pattern', width: '110' },
                 { title: '接口类型', key: 'dataType', slot: 'dataType', width: '110' },
                 { title: '添加时间', key: 'createTime', width: '160' },
                 { title: '操作', width: '330', slot: 'opt_button' }
@@ -211,12 +221,14 @@
                 interfaceUrl: '',
                 requestType: 'GET',
                 dataType: '1',
+                pattern: '0'
             });
             formData.value.id = '';
             formData.value.interfaceName = '';
             formData.value.interfaceUrl = '';
             formData.value.requestType = 'GET';
             formData.value.dataType = '1';
+            formData.value.pattern = '0';
             isEdit.value = false;
         }
     };
@@ -228,6 +240,7 @@
         formData.value.interfaceUrl = rows.interfaceUrl;
         formData.value.requestType = rows.requestType;
         formData.value.dataType = rows.dataType + '';
+        formData.value.pattern = rows.pattern + '';
         isEdit.value = true;
         for (let i = 0; i < tableConfig.value.tableData.length; i++) {
             if (tableConfig.value.tableData[i].id == '') {
@@ -297,6 +310,7 @@
         formData.value.interfaceUrl = '';
         formData.value.requestType = 'GET';
         formData.value.dataType = '1';
+        formData.value.pattern = '0';
         refForm.resetFields();
         for (let i = 0; i < tableConfig.value.tableData.length; i++) {
             if (tableConfig.value.tableData[i].id == '') {
