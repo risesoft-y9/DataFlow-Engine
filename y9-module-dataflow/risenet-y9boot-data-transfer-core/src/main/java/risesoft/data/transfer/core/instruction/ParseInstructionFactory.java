@@ -52,7 +52,7 @@ public class ParseInstructionFactory implements StartConfiguration{
 					InstructionFactory instructionFactory = INSTRUCTION_FACTORY_MAP.get(matcher.group(1));
 					if (instructionFactory != null) {
 						jsonConfig = jsonConfig.replace(matcher.group(0), instructionFactory
-								.getInstance(matcher.group(2).split(","), jsonConfig).executor(jsonConfig, jobContext));
+								.getInstance(matcher.group(2).split("#"), jsonConfig).executor(jsonConfig, jobContext));
 					}
 				}
 				return setMap.size() == 0 ? config : Configuration.from(jsonConfig);
