@@ -1,106 +1,59 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-      
-  <modelVersion>4.0.0</modelVersion>
-      
-  <parent>
-            
-    <groupId>net.risesoft</groupId>
-            
-    <artifactId>y9-dataflow</artifactId>
-            
-    <version>${revision}</version>
-            
-    <relativePath>../pom.xml</relativePath>
-        
-  </parent>
-      
-  <artifactId>y9-module-dataflow</artifactId>
-      
-  <packaging>pom</packaging>
-      
-  <name>y9-module-dataflow</name>
-      
-  <description>DataFlow Engine y9-module-dataflow project parent pom.xml file</description>
-      
-  <modules>
-            
-    <module>risenet-y9boot-beta-api</module>
-            
-    <module>risenet-y9boot-beta-client</module>
-            
-    <module>risenet-y9boot-data-common-tools</module>
-            
-    <module>risenet-y9boot-data-jdbc</module>
-            
-    <module>risenet-y9boot-data-jdbc-commons</module>
-            
-    <module>risenet-y9boot-data-transfer-base</module>
-            
-    <module>risenet-y9boot-data-transfer-core</module>
-            
-    <module>risenet-y9boot-data-transfer-data</module>
-            
-    <module>risenet-y9boot-data-transfer-elastic</module>
-            
-    <module>risenet-y9boot-data-transfer-rdbms</module>
-            
-    <module>risenet-y9boot-data-transfer-ftp</module>
-            
-    <module>risenet-y9boot-data-transfer-stream</module>
-            
-    <module>risenet-y9boot-rpc-commons</module>
-            
-    <module>risenet-y9boot-rpc-consumer</module>
-            
-    <module>risenet-y9boot-rpc-provide</module>
-            
-    <module>risenet-y9boot-support-risedata-scheduler</module>
-            
-    <module>risenet-y9boot-webapp-risedata-executor</module>
-            
-    <module>risenet-y9boot-webapp-risedata-manager</module>
-          
-    <module>risenet-y9boot-data-transfer-assembler</module>
-      
-  </modules>
-      
-  <profiles>
-            
-    <profile>
-                  
-      <id>deploy-maven-central</id>
-                  
-      <build>
-                        
-        <plugins>
-                              
-          <plugin>
-                                    
-            <groupId>org.sonatype.central</groupId>
-                                    
-            <artifactId>central-publishing-maven-plugin</artifactId>
-                                    
-            <configuration>
-                                          
-              <excludeArtifacts>
-                                                
-                <artifact>risenet-y9boot-webapp-risedata-executor</artifact>
-                                                
-                <artifact>risenet-y9boot-webapp-risedata-manager</artifact>
-                                            
-              </excludeArtifacts>
-                                      
-            </configuration>
-                                
-          </plugin>
-                          
-        </plugins>
-                    
-      </build>
-              
-    </profile>
-        
-  </profiles>
-  
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>net.risesoft</groupId>
+        <artifactId>y9-dataflow</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <artifactId>y9-module-dataflow</artifactId>
+    <packaging>pom</packaging>
+    <name>y9-module-dataflow</name>
+    <description>DataFlow Engine y9-module-dataflow project parent pom.xml file</description>
+
+    <modules>
+        <module>risenet-y9boot-beta-api</module>
+        <module>risenet-y9boot-beta-client</module>
+        <module>risenet-y9boot-data-common-tools</module>
+        <module>risenet-y9boot-data-jdbc</module>
+        <module>risenet-y9boot-data-jdbc-commons</module>
+        <module>risenet-y9boot-data-transfer-base</module>
+        <module>risenet-y9boot-data-transfer-core</module>
+        <module>risenet-y9boot-data-transfer-data</module>
+        <module>risenet-y9boot-data-transfer-elastic</module>
+        <module>risenet-y9boot-data-transfer-rdbms</module>
+        <module>risenet-y9boot-data-transfer-ftp</module>
+        <module>risenet-y9boot-data-transfer-stream</module>
+        <module>risenet-y9boot-data-transfer-assembler</module>
+        <module>risenet-y9boot-rpc-commons</module>
+        <module>risenet-y9boot-rpc-consumer</module>
+        <module>risenet-y9boot-rpc-provide</module>
+        <module>risenet-y9boot-support-risedata-scheduler</module>
+        <module>risenet-y9boot-webapp-risedata-executor</module>
+        <module>risenet-y9boot-webapp-risedata-manager</module>
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>deploy-maven-central</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <configuration>
+                            <excludeArtifacts>
+                                <artifact>risenet-y9boot-webapp-risedata-executor</artifact>
+                                <artifact>risenet-y9boot-webapp-risedata-manager</artifact>
+                            </excludeArtifacts>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
