@@ -7,7 +7,14 @@ import risesoft.data.transfer.core.handle.HandleManager;
 import risesoft.data.transfer.core.handle.InitApplicationConfigHandle;
 import risesoft.data.transfer.core.plug.Plug;
 import risesoft.data.transfer.core.util.Configuration;
-
+/**
+ * 根据监听的handle发送对应的事件，当未指定日志工厂时，默认使用此日志工厂。
+ * 
+ * 
+ * @typeName HandledLoggerFactory
+ * @date 2024年9月4日
+ * @author lb
+ */
 public class HandledLoggerFactory implements Plug,LoggerFactory, InitApplicationConfigHandle, LogHandleReference {
 	private boolean debug;
 
