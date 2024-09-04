@@ -10,8 +10,7 @@
 	</parent>
 	<artifactId>risenet-y9boot-data-transfer-assembler</artifactId>
 	<packaging>jar</packaging>
-	<description>DataFlow Engine transfer stream</description>
-	<!-- <description>对于流的处理</description>-->
+	<description>DataFlow Engine transfer assembler</description>
 
 	<properties>
 	</properties>

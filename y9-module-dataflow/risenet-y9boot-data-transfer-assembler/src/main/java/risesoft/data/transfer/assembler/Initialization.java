@@ -1,7 +1,6 @@
 package risesoft.data.transfer.assembler;
 
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
