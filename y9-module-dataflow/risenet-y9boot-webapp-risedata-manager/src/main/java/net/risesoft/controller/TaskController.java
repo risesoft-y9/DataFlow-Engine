@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -44,7 +46,6 @@ public class TaskController {
 	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "分页获取任务列表", logLevel = LogLevelEnum.RSLOG, enable = false)
 	@GetMapping("/findPage")
 	public Y9Page<Map<String, Object>> findPage(String jobId, String name, String businessId, Integer page, Integer size) {
-		List<Map<String, Object>> listMap = new ArrayList<Map<String, Object>>();
 		List<String> ids = new ArrayList<String>();
 		if(StringUtils.isNotBlank(jobId)) {
 			ids = jobService.findArgsById(jobId);
@@ -59,25 +60,33 @@ public class TaskController {
 			}
 		}
 		Page<DataTaskEntity> pageList = dataTaskService.findPage(ids, name, bIds, page, size);
-		for(DataTaskEntity task : pageList) {
-			Map<String, Object> row = new HashMap<String, Object>();
-			row.put("id", task.getId());
-			row.put("name", task.getName());
-			row.put("description", task.getDescription());
-			row.put("businessId", task.getBusinessId());
-			row.put("business", dataBusinessService.getById(task.getBusinessId()).getName());
-			row.put("createTime", task.getCreateTime());
-			row.put("user", task.getUserName());
-			int count = jobService.findCountJobByArgs(task.getId());
-			if(count == 0) {
-				row.put("status", "未设置调度");
-			}else {
-				row.put("status", "已设调度数：" + count);
-			}
-			listMap.add(row);
-		}
-		return Y9Page.success(page, pageList.getTotalPages(), pageList.getTotalElements(), listMap, "获取数据成功");
+		// 并行解析数据
+        List<CompletableFuture<Map<String, Object>>> futures = pageList.stream()  
+                .map(n -> CompletableFuture.supplyAsync(() -> getDataMap(n))) // 创建异步任务  
+                .collect(Collectors.toList()); // 收集所有的 CompletableFuture
+        // 等待所有任务完成，获取结果
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+        List<Map<String, Object>> listMap = futures.stream().map(CompletableFuture::join).collect(Collectors.toList());
+        return Y9Page.success(page, pageList.getTotalPages(), pageList.getTotalElements(), listMap, "获取数据成功");
     }
+	
+	private Map<String, Object> getDataMap(DataTaskEntity task) {
+		Map<String, Object> row = new HashMap<String, Object>();
+		row.put("id", task.getId());
+		row.put("name", task.getName());
+		row.put("description", task.getDescription());
+		row.put("businessId", task.getBusinessId());
+		row.put("business", dataBusinessService.getById(task.getBusinessId()).getName());
+		row.put("createTime", task.getCreateTime());
+		row.put("user", task.getUserName());
+		int count = jobService.findCountJobByArgs(task.getId());
+		if(count == 0) {
+			row.put("status", "未设置调度");
+		}else {
+			row.put("status", "已设调度数：" + count);
+		}
+		return row;
+	}
 	
 	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "保存任务基本信息", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/saveTask")

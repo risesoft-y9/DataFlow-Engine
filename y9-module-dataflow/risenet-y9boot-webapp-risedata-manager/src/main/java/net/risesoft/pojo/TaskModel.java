@@ -60,11 +60,6 @@ public class TaskModel {
 	private String encrypFields;
 	
 	/**
-	 * 增量同步
-	 */
-	private Boolean bulkSync;
-	
-	/**
 	 * 异字段
 	 */
 	private List<DifferentField> differentField;

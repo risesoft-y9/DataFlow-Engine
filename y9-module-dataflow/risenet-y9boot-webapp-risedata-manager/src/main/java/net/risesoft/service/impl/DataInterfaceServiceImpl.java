@@ -21,6 +21,7 @@ import net.risesoft.y9public.entity.DataInterfaceEntity;
 import net.risesoft.y9public.entity.DataInterfaceParamsEntity;
 import net.risesoft.y9public.repository.DataInterfaceParamsRepository;
 import net.risesoft.y9public.repository.DataInterfaceRepository;
+import net.risesoft.y9public.repository.DataTaskConfigRepository;
 import net.risesoft.y9public.repository.spec.DataInterfaceSpecification;
 
 @Service(value = "dataInterfaceService")
@@ -29,6 +30,7 @@ public class DataInterfaceServiceImpl implements DataInterfaceService {
 	
 	private final DataInterfaceRepository dataInterfaceRepository;
 	private final DataInterfaceParamsRepository dataInterfaceParamsRepository;
+	private final DataTaskConfigRepository dataTaskConfigRepository;
 	
 	@Override
 	public Page<DataInterfaceEntity> searchPage(String search, String requestType, Integer dataType, int page, int rows) {
@@ -48,6 +50,9 @@ public class DataInterfaceServiceImpl implements DataInterfaceService {
 	@Override
 	@Transactional(readOnly = false)
 	public Y9Result<String> deleteData(String id) {
+		if(dataTaskConfigRepository.findByTableId(id).size() > 0) {
+			return Y9Result.failure("已关联任务，无法删除");
+		}
 		dataInterfaceRepository.deleteById(id);
 		return Y9Result.successMsg("删除成功");
 	}
@@ -96,6 +101,9 @@ public class DataInterfaceServiceImpl implements DataInterfaceService {
 		} catch (Exception e) {
 			return Y9Result.failure("接口返回格式不对，data值必须为List<Map<String, Object>>");
 		}
+		if(listMap == null) {
+			return Y9Result.successMsg("返回值data为空，不用保存返回参数");
+		}
 		Map<String, Object> rmap = listMap.get(0);
 		String parentId = (String)map.get("interfaceId");
 		// 先删除已存在数据
@@ -115,6 +123,11 @@ public class DataInterfaceServiceImpl implements DataInterfaceService {
 			}
 		}
 		return Y9Result.successMsg("保存成功");
+	}
+
+	@Override
+	public List<DataInterfaceEntity> findByPattern(Integer pattern) {
+		return dataInterfaceRepository.findByPattern(pattern);
 	}
 
 }

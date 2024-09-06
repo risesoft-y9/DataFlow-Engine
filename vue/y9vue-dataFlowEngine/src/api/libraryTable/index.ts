@@ -14,40 +14,30 @@ export const getTableList = async (params) => {
         cType: false,
         params
     });
-    // let data=[
-    // 	{
-    // 		"name": "y9_dataservice_datasource",
-    // 		"cname": "本地数据库-abc",
-    // 		"id": "1613604088556032000",
-    // 		"baseName": "开发云测试库",
-    // 		"baseType": "mysql"
-    // 	},
-    // 	{
-    // 		"name": "y9_dataservice_category",
-    // 		"cname": "福田数据库",
-    // 		"id": "1613597006939295744",
-    // 		"baseName": "开发云测试库",
-    // 		"baseType": "mysql"
-    // 	},
-    // 	{
-    // 		"name": "ft_data_serviceitem",
-    // 		"cname": "开发云数据库",
-    // 		"id": "1611454786870185984",
-    // 		"baseName": "本地数据库-abc",
-    // 		"baseType": "mysql"
-    // 	}
-    // ]
-    // return data
 };
 
 /**
- * 分页获取表字段信息
+ * 获取表字段信息
  * @param params
  * @returns
  */
 export const getTableField = async (params) => {
     return await platformRequest({
         url: 'source/getFieldList',
+        method: 'GET',
+        cType: false,
+        params
+    });
+};
+
+/**
+ * 获取接口返回字段信息
+ * @param params
+ * @returns
+ */
+export const getApiField = async (params) => {
+    return await platformRequest({
+        url: 'interface/getApiField',
         method: 'GET',
         cType: false,
         params

@@ -1,6 +1,9 @@
 package net.risesoft.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
@@ -56,10 +59,13 @@ public class InterfaceController {
 		return dataInterfaceService.deleteData(id);
 	}
 	
-	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "获取接口参数信息", logLevel = LogLevelEnum.RSLOG, enable = false)
+	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "获取接口和参数信息", logLevel = LogLevelEnum.RSLOG, enable = false)
 	@GetMapping(value = "/findParamsList")
-	public Y9Result<List<DataInterfaceParamsEntity>> findParamsList(@RequestParam String parentId, Integer dataType) {
-		return Y9Result.success(dataInterfaceService.findByParentIdAndDataType(parentId, dataType), "获取成功");
+	public Y9Result<Map<String, Object>> findParamsList(@RequestParam String parentId, Integer dataType) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("interface", dataInterfaceService.getById(parentId));
+		map.put("params", dataInterfaceService.findByParentIdAndDataType(parentId, dataType));
+		return Y9Result.success(map, "获取成功");
 	}
 	
 	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "保存接口参数信息", logLevel = LogLevelEnum.RSLOG)
@@ -79,6 +85,33 @@ public class InterfaceController {
 	public Y9Result<String> saveResponseParams(@RequestBody String data) {
 		return dataInterfaceService.saveResponseParams(data);
 	}
+	
+	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "获取接口返回字段信息", logLevel = LogLevelEnum.RSLOG, enable = false)
+	@GetMapping("/getApiField")
+	public Y9Result<List<Map<String, Object>>> getApiField(@RequestParam String apiId) {
+		List<Map<String, Object>> listMap = new ArrayList<>();
+		DataInterfaceEntity dataInterfaceEntity = dataInterfaceService.getById(apiId);
+		List<DataInterfaceParamsEntity> paramList = null;
+		if(dataInterfaceEntity.getPattern() == 0) {
+			// 获取接口取返回参数字段
+			paramList = dataInterfaceService.findByParentIdAndDataType(apiId, 1);
+		}else {
+			// 保存接口取请求参数字段
+			paramList = dataInterfaceService.findByParentIdAndDataType(apiId, 0);
+		}
+		for(DataInterfaceParamsEntity param : paramList) {
+			if(param.getReqType().equals("Headers")) {
+				continue;
+			}
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("id", param.getId());
+			map.put("name", param.getParamName());
+			map.put("cname", param.getRemark());
+			map.put("fieldType", param.getParamType());
+			listMap.add(map);
+		}
+        return Y9Result.success(listMap, "获取数据成功");
+    }
 	
 	@RiseLog(operationType = OperationTypeEnum.CHECK, operationName = "接口测试", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/apiTest")

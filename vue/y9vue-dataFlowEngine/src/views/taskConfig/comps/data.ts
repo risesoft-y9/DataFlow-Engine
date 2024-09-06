@@ -1,6 +1,6 @@
 import {reactive, ref} from "vue";
 import {getDataTableList} from "@/api/taskConfig";
-import {getTableField} from "@/api/libraryTable";
+import {getTableField, getApiField} from "@/api/libraryTable";
 
 /**
  * 公共类数据
@@ -22,12 +22,13 @@ export const addTaskForm = reactive({
         businessId:null,//业务分类id
         description: null,//任务描述
         sourceId: null,//源头id
+        sourceType: null,//类型
         targetId: null,//目标id
+        targetType: null,//类型
         userId:'',//可选用户id
     },
     treeData:[],//业务分类列表
 })
-
 
 /**
  * 源头表数据
@@ -44,7 +45,6 @@ export const tableSetForm = reactive({
         radios: null,//切分模式
         maskFields: null,//数据脱敏字段
         encrypFields: null,//数据加密字段
-        bulkSync: false,//增量同步
         tableNumber:null,//平均切分数量
         splitFactor:null,//执行数切分基数
     },
@@ -119,38 +119,56 @@ export const getTableListAll = async (sourceId,targetId) => {
 const updateForm = (form, data,type) => {
     form.tableOptions = data.tableList;
     form.classListOptions = data.classList;
-    // if(globalData.type=='add'){
-        if(type=='input'){
-            form.tableData.sourceName = data?.classList[0]?.id;
-        }else{
-            form.tableData.targeName = data?.classList[0]?.id;
-        }
-    // }
+    if(type=='input'){
+        form.tableData.sourceName = data?.classList[0]?.id;
+    }else{
+        form.tableData.targeName = data?.classList[0]?.id;
+    }
 }
 
 //获取字段详情
 export const getTableFieldListAll = async (sourceTable,targetTable) => {
-    let res = await getTableField({tableId:sourceTable});
+    let res;
+    debugger
+    if(addTaskForm.tableData.sourceType == 'api') {
+        res = await getApiField({apiId: sourceTable});
+    }else {
+        res = await getTableField({tableId: sourceTable});
+    }
     if (res) {
         tableSetForm.tableFieldList = res.data
     }
-    let ret = await getTableField({tableId:targetTable});
+    let ret;
+    if(addTaskForm.tableData.targetType == 'api') {
+        ret = await getApiField({apiId: targetTable});
+    }else {
+        ret = await getTableField({tableId: targetTable});
+    }
     if (ret) {
         goalTableForm.tableFieldList = ret.data
     }
 }
-export const radioChange = async (type) => {
-    addTaskLoading.value=true
+
+/**
+ * 选择数据源
+ * @param type
+ * @param baseType 
+ */
+export const radioChange = async (type, baseType) => {
+    addTaskLoading.value = true
     tableSetRef?.value?.resetFields()
     goalTableRef?.value?.resetFields()
     if (type == 'input') {
-        await clearFormData(tableSetForm,type);
+        addTaskForm.tableData.sourceType = baseType;
+        await clearFormData(tableSetForm, type);
     } else {
-       await clearFormData(goalTableForm,type);
+        addTaskForm.tableData.targetType = baseType;
+        await clearFormData(goalTableForm, type);
     }
     await getTableList(type) //获取表格和执行类
-    addTaskLoading.value=false
+    addTaskLoading.value = false
 }
+
 const clearFormData = (form,type) => {
     form.tableOptions = [];
     form.tableData.name = null; //清空列表
@@ -160,8 +178,9 @@ const clearFormData = (form,type) => {
     if(type=='input'){
         form.tableData.sourceCloumn = []; //清空源头字段详情
         form.tableData.sourceName = null;
-        form.tableData.sourceTable=null
-        form.tableData.splitPk=null //清除切分字段
+        form.tableData.sourceTable = null;
+        form.tableData.splitPk = null; //清除切分字段
+        form.tableData.whereSql = null;
         // form.tableData?.differentField?.forEach((item)=>{
         //     item.source=null
         //     item.rules1 = [{required: true, message: '请选择', trigger: ['blur', 'change']}]
@@ -170,7 +189,7 @@ const clearFormData = (form,type) => {
     }else{
         form.tableData.targetCloumn = []; //清空目标字段详情
         form.tableData.targeName = null;
-        form.tableData.targetTable=null
+        form.tableData.targetTable = null;
         // form.tableData?.differentField?.forEach((item)=>{
         //     item.target=null
         //     item.rules2 = [{required: true, message: '请选择', trigger: ['blur', 'change']}]

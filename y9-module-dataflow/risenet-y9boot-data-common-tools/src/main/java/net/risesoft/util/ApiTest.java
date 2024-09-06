@@ -36,7 +36,7 @@ public class ApiTest {
 					if(StringUtils.isBlank(name)) {
 						continue;
 					}
-					method.addRequestHeader(name, (String) hmap.get("value"));
+					method.addRequestHeader(name, hmap.get("value") + "");
 				}
 				String str = "";
 				List<Map<String, Object>> params = requestModel.getParams();
@@ -45,7 +45,7 @@ public class ApiTest {
 					if(StringUtils.isBlank(name)) {
 						continue;
 					}
-					str = str + name + "=" + URLEncoder.encode((String) pmap.get("value"), "UTF-8") + "&";
+					str = str + name + "=" + URLEncoder.encode(pmap.get("value") + "", "UTF-8") + "&";
 				}
 				if(StringUtils.isNotBlank(str)) {
 					url = url + "?" + str.substring(0, str.length() - 1);
@@ -90,9 +90,9 @@ public class ApiTest {
 					if(StringUtils.isBlank(name)) {
 						continue;
 					}
-					method.addParameter((String) pmap.get("name"), (String) pmap.get("value"));
+					method.addParameter((String) pmap.get("name"), pmap.get("value") + "");
 				}
-				if(StringUtils.isNotBlank(requestModel.getBody())){
+				if(StringUtils.isNotBlank(requestModel.getBody()) && !requestModel.getBody().equals("{}")){
 					//主体body
 					StringRequestEntity requestEntity = new StringRequestEntity(requestModel.getBody(), 
 							requestModel.getContentType(), "UTF-8");

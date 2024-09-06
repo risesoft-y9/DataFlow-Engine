@@ -2,7 +2,7 @@
     <el-form ref="paramsForm" label-width="100px">
         <template v-for="item of params">
             <el-form-item :label="item.paramName">
-                <el-input v-model="item.value" clearable></el-input>
+                <el-input v-model="item.paramValue" clearable :placeholder="`${item.reqType}参数：${item.remark}`"></el-input>
             </el-form-item>
         </template>
         <el-form-item label="返回结果">
@@ -11,7 +11,7 @@
     </el-form>
 </template>
 <script lang="ts" setup>
-    import { defineProps, onMounted, reactive } from 'vue';
+    import { defineProps, onMounted, reactive, toRefs } from 'vue';
 
     const props = defineProps({
         row: {

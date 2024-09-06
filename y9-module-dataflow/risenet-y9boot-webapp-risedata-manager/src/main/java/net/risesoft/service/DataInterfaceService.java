@@ -67,4 +67,11 @@ public interface DataInterfaceService {
 	 */
 	Y9Result<String> saveResponseParams(String data);
 	
+	/**
+	 * 根据传输类型获取接口列表
+	 * @param pattern
+	 * @return
+	 */
+	List<DataInterfaceEntity> findByPattern(Integer pattern);
+	
 }

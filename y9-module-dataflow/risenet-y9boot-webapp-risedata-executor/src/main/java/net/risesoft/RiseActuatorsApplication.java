@@ -7,8 +7,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import net.risedata.rpc.annotation.RPCScan;
 import risesoft.data.transfer.assembler.Initialization;
-import risesoft.data.transfer.core.instruction.ParseInstructionFactory;
-import risesoft.data.transfer.core.instruction.factory.InstructionFactory;
 import risesoft.data.transfer.core.start.StartConfiguration;
 
 @SpringBootApplication

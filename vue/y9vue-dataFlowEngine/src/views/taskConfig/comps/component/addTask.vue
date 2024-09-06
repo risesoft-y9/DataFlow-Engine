@@ -51,10 +51,7 @@ const setInitData = () => {
     for (let key in addTaskForm.tableData) {
       addTaskForm.tableData[key] = null;
     }
-  } else {
-
   }
-
 }
 const getData = async () => {
   await getTree() //获取树形结构
@@ -69,7 +66,11 @@ const getData = async () => {
 const getDataAll = async () => {
   let res = await getDataById({id: globalData.row.id})
   if (res) {
-    let ret = res.data
+    let ret = res.data;
+    
+    addTaskForm.tableData.sourceType = ret.taskConfigModel.sourceType;
+    addTaskForm.tableData.targetType = ret.taskConfigModel.targetType;
+
     ret.taskConfigModel.sourceCloumn=ret.taskConfigModel?.sourceCloumn?.split(',')
     ret.taskConfigModel.targetCloumn=ret.taskConfigModel?.targetCloumn?.split(',')
     ret.taskConfigModel.updateField=ret.taskConfigModel?.updateField?.split(',')
@@ -141,10 +142,17 @@ const  setOtherData=(ret)=>{
   }
   globalData.allData=ret
 }
+
 const getDataSource = async () => {
   let res = await findByTypeList({type: 0})
   if (res) {
-    state.dataSource = res.data
+    let apiData = {
+      id: 'api', 
+      baseName: '接口数据源', 
+      baseType: 'api'
+    }
+    state.dataSource = res.data;
+    state.dataSource.unshift(apiData);
   }
 }
 
@@ -160,7 +168,7 @@ const getTree = async () => {
 
 const rules = {
   name: [
-    {required: true, message: '请输入业务名称', trigger: ['blur', 'change']}
+    {required: true, message: '请输入任务名称', trigger: ['blur', 'change']}
   ],
   businessId: [
     {required: true, message: '请选择业务分类', trigger: ['blur', 'change']}
@@ -232,7 +240,7 @@ let ruleFormRef = ref(addTaskFormRef)
         </template>
         <el-form-item prop="sourceId">
           <el-radio-group v-model="addTaskForm.tableData.sourceId">
-            <el-radio @change="radioChange('input')" v-for="item in state.dataSource" :label="item.id">
+            <el-radio @change="radioChange('input', item.baseType)" v-for="item in state.dataSource" :label="item.id">
               【{{ item.baseType }}】{{ item.baseName }}
             </el-radio>
           </el-radio-group>
@@ -247,7 +255,7 @@ let ruleFormRef = ref(addTaskFormRef)
         </template>
         <el-form-item prop="targetId">
           <el-radio-group v-model="addTaskForm.tableData.targetId">
-            <el-radio @change="radioChange('output')" v-for="item in state.dataSource" :label="item.id">
+            <el-radio @change="radioChange('output', item.baseType)" v-for="item in state.dataSource" :label="item.id">
               【{{ item.baseType }}】{{ item.baseName }}
             </el-radio>
           </el-radio-group>

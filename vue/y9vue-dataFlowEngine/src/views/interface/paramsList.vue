@@ -35,6 +35,12 @@
                 </el-form-item>
                 <span v-else>{{ row.paramName }}</span>
             </template>
+            <template #paramValue="{ row, column, index }">
+                <el-form-item v-if="editIndex === index" prop="paramValue">
+                    <el-input v-model="formData.paramValue" clearable />
+                </el-form-item>
+                <span v-else>{{ row.paramValue }}</span>
+            </template>
             <template #reqType="{ row, column, index }">
                 <el-form-item v-if="editIndex === index" prop="reqType">
                     <el-select v-model="formData.reqType">
@@ -77,7 +83,7 @@
 </template>
 <script lang="ts" setup>
     import axios from 'axios';
-    import { defineProps, reactive, ref } from 'vue';
+    import { defineProps, onMounted, reactive, ref, toRefs } from 'vue';
     import { ElLoading, ElMessage, ElMessageBox, FormRules } from 'element-plus';
     import {
         findParamsList,
@@ -103,7 +109,7 @@
     const data = reactive({
         isEmptyData: false,
         editIndex: '',
-        formData: { id: '', paramName: '', paramType: '', reqType: '', parentId: '' },
+        formData: { id: '', paramName: '', paramType: '', reqType: '', parentId: '', paramValue: '', remark: '' },
         isEdit: false,
         tableConfig: {
             columns: [
@@ -111,6 +117,7 @@
                 { title: '类型', key: 'reqType', width: '180', slot: 'reqType' },
                 { title: '参数名称', key: 'paramName', slot: 'paramName' },
                 { title: '参数类型', key: 'paramType', width: '180', slot: 'paramType' },
+                { title: '参数值', key: 'paramValue', slot: 'paramValue' },
                 { title: '参数备注', key: 'remark', width: '200', slot: 'remark' },
                 { title: '添加时间', key: 'createTime', width: '180' },
                 { title: '操作', width: '180', slot: 'opt_button' }
@@ -170,14 +177,16 @@
     async function getTableList() {
         if (activeName.value == 'Request') {
             let res = await findParamsList({parentId: props.row.id, dataType: 0});
-            tableConfig.value.tableData = res.data;
+            tableConfig.value.tableData = res.data.params;
         } else if (activeName.value == 'Response') {
             let res = await findParamsList({parentId: props.row.id, dataType: 1});
-            tableConfig.value.tableData = res.data;
+            tableConfig.value.tableData = res.data.params;
         }
     }
 
-    getTableList();
+    onMounted(() => {
+        getTableList();
+    });
 
     function tabclick(tab, event) {
         //页签切换
@@ -210,12 +219,14 @@
                 reqType: '',
                 paramName: '',
                 paramType: '',
+                paramValue: '',
                 remark: '',
                 parentId: props.row.id
             });
             formData.value.id = '';
             formData.value.paramName = '';
             formData.value.paramType = '';
+            formData.value.paramValue = '';
             formData.value.remark = '';
             formData.value.reqType = '';
             formData.value.parentId = props.row.id;
@@ -233,6 +244,7 @@
         formData.value.id = rows.id;
         formData.value.paramName = rows.paramName;
         formData.value.paramType = rows.paramType;
+        formData.value.paramValue = rows.paramValue;
         formData.value.remark = rows.remark;
         formData.value.reqType = rows.reqType;
         formData.value.parentId = rows.parentId;
@@ -273,6 +285,7 @@
         editIndex.value = '';
         formData.value.paramName = '';
         formData.value.paramType = '';
+        formData.value.paramValue = '';
         formData.value.remark = '';
         formData.value.reqType = '';
         paramsRef.value.resetFields();
@@ -330,17 +343,17 @@
         let formData = new FormData();
         tableConfig.value.tableData.forEach((item) => {
             if (item.reqType == 'Headers') {
-                headObj.value.push({name: item.paramName, value: item.value});
+                headObj.value.push({name: item.paramName, value: item.paramValue});
             }
             if (item.reqType == 'Body') {
-                formData.append(item.paramName, item.value);
+                formData.append(item.paramName, item.paramValue);
             }
             if (item.reqType == 'Params') {
-                paramsObj.value.push({name: item.paramName, value: item.value});
+                paramsObj.value.push({name: item.paramName, value: item.paramValue});
             }
         });
         let res = await apiTest({method: props.row.requestType, url: props.row.interfaceUrl, headers: headObj.value, 
-            params: paramsObj.value, body: JSON.stringify(formData), contentType: 'application/json'});
+            params: paramsObj.value, body: JSON.stringify(formData), contentType: props.row.contentType});
         if (res.success) {
             dialogConfig.value.resetText = '生成响应参数';
         }
@@ -350,20 +363,24 @@
 
     async function saveAllResParams(resolve, reject) {
         let resData = JSON.parse(editParamsRef.value.resData);
+        let jsonData = resData.data;
         if (typeof resData.data != 'object') {
-            ElMessage({ type: 'error', message: '响应格式不符合，无法生成响应参数', offset: 65 });
-            reject();
-        } else {
-            dialogConfig.value.loading = true;
-            let res = await saveResponseParams({interfaceId: props.row.id, jsonData: resData.data});
-            if (res.success) {
-                ElMessage({ type: 'success', message: res.msg, offset: 65 });
-            } else {
-                ElMessage({ type: 'error', message: res.msg, offset: 65 });
+            if (typeof resData.rows != 'object') {
+                ElMessage({ type: 'error', message: '响应格式不符合，无法生成响应参数', offset: 65 });
+                reject();
+            }else {
+                jsonData = resData.rows;
             }
-            dialogConfig.value.loading = false;
-            return reject();
         }
+        dialogConfig.value.loading = true;
+        let res = await saveResponseParams({interfaceId: props.row.id, jsonData: jsonData});
+        if (res.success) {
+            ElMessage({ type: 'success', message: res.msg, offset: 65 });
+        } else {
+            ElMessage({ type: 'error', message: res.msg, offset: 65 });
+        }
+        dialogConfig.value.loading = false;
+        reject();
     }
 </script>
 

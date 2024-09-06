@@ -30,6 +30,8 @@ import net.risesoft.y9.Y9LoginUserHolder;
 import net.risesoft.y9.json.Y9JsonUtil;
 import net.risesoft.y9.util.Y9BeanUtil;
 import net.risesoft.y9public.entity.DataBusinessEntity;
+import net.risesoft.y9public.entity.DataInterfaceEntity;
+import net.risesoft.y9public.entity.DataInterfaceParamsEntity;
 import net.risesoft.y9public.entity.DataSourceEntity;
 import net.risesoft.y9public.entity.DataTable;
 import net.risesoft.y9public.entity.DataTableField;
@@ -37,6 +39,8 @@ import net.risesoft.y9public.entity.DataTaskConfigEntity;
 import net.risesoft.y9public.entity.DataTaskCoreEntity;
 import net.risesoft.y9public.entity.DataTaskEntity;
 import net.risesoft.y9public.repository.DataBusinessRepository;
+import net.risesoft.y9public.repository.DataInterfaceParamsRepository;
+import net.risesoft.y9public.repository.DataInterfaceRepository;
 import net.risesoft.y9public.repository.DataMappingRepository;
 import net.risesoft.y9public.repository.DataSourceRepository;
 import net.risesoft.y9public.repository.DataTableFieldRepository;
@@ -60,6 +64,8 @@ public class DataTaskServiceImpl implements DataTaskService {
 	private final DataTableFieldRepository dataTableFieldRepository;
 	private final DataMappingRepository dataMappingRepository;
 	private final TaskMakeUpListener taskMakeUpListener;
+	private final DataInterfaceParamsRepository dataInterfaceParamsRepository;
+	private final DataInterfaceRepository dataInterfaceRepository;
 	
 	@Override
 	public Page<DataTaskEntity> findPage(List<String> ids, String name, List<String> businessIds, int page, int rows) {
@@ -82,7 +88,6 @@ public class DataTaskServiceImpl implements DataTaskService {
 			taskModel.setBusinessId(dataTask.getBusinessId());
 			taskModel.setUserId(dataTask.getUserId());
 			taskModel.setUserName(dataTask.getUserName());
-			taskModel.setBulkSync(false);
 			
 			TaskConfigModel taskConfigModel = new TaskConfigModel();
 			DataTaskConfigEntity taskConfig = dataTaskConfigRepository.findByTaskId(dataTask.getId());
@@ -105,10 +110,6 @@ public class DataTaskServiceImpl implements DataTaskService {
 				// 数据加密字段
 				if(taskId.startsWith(DataServiceUtil.ENCRYP)) {
 					taskModel.setEncrypFields(taskCore.getValue());
-				}
-				// 增量同步
-				if(taskId.startsWith(DataServiceUtil.BULKSYNC)) {
-					taskModel.setBulkSync(true);
 				}
 				// 异字段
 				if(taskId.startsWith(DataServiceUtil.DIFFERENT)) {
@@ -238,20 +239,6 @@ public class DataTaskServiceImpl implements DataTaskService {
 			dataTaskCoreRepository.save(taskCore);
 		}
 		
-		// 增量同步
-		Boolean bulkSync = taskModel.getBulkSync();
-		if(bulkSync) {
-			DataTaskCoreEntity taskCore = new DataTaskCoreEntity();
-			taskCore.setId(DataServiceUtil.BULKSYNC + "-" + entity.getId());
-			taskCore.setTaskId(entity.getId());
-			taskCore.setTypeName("plugs");
-			taskCore.setKeyName("state");
-			taskCore.setDataType(DataServiceUtil.BULKSYNC);
-			taskCore.setValue("1");
-			taskCore.setSequence(1);
-			dataTaskCoreRepository.save(taskCore);
-		}
-		
 		// 日期格式
 		List<DateField> dateField = taskModel.getDateField();
 		if(dateField != null && dateField.size() > 0) {
@@ -310,127 +297,168 @@ public class DataTaskServiceImpl implements DataTaskService {
 	@Override
 	public Map<String, Object> getTaskDetails(String id) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		DataTaskEntity dataTask = dataTaskRepository.findById(id).orElse(null);
-		if(dataTask != null) {
-			map.put("id", dataTask.getId());
-			map.put("name", dataTask.getName());
-			map.put("description", dataTask.getDescription());
-			map.put("userName", dataTask.getUserName());
-			map.put("createTime", dataTask.getCreateTime());
-			
-			DataBusinessEntity business = dataBusinessRepository.findById(dataTask.getBusinessId()).orElse(null);
-			map.put("business", business.getName());
-			
-			DataTaskConfigEntity taskConfig = dataTaskConfigRepository.findByTaskId(dataTask.getId());
-			DataSourceEntity source = dataSourceRepository.findById(taskConfig.getSourceId()).orElse(null);
-			map.put("sourceName", "[" + source.getBaseType() + "]" + source.getBaseName());
-			DataTable sourceTable = dataTableRepository.findById(taskConfig.getSourceTable()).orElse(null);
-			map.put("sourceTable", sourceTable.getCname() + "(" + sourceTable.getName() + ")");
-			map.put("sourceClass", dataMappingRepository.findById(taskConfig.getSourceName()).orElse(null).getClassName());
-			List<String> sourceCloumn = new ArrayList<String>();
-			String[] sourceCloumns = taskConfig.getSourceCloumn().split(",");
-			for(String field : sourceCloumns) {
-				DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
-				if(tableField != null) {
-					sourceCloumn.add(tableField.getCname() + "(" + tableField.getName() + ")");
-				}
-			}
-			map.put("sourceCloumn", sourceCloumn);
-			map.put("fetchSize", taskConfig.getFetchSize());
-			map.put("whereSql", taskConfig.getWhereSql());
-			if(StringUtils.isNotBlank(taskConfig.getSplitPk())) {
-				DataTableField tableField = dataTableFieldRepository.findById(taskConfig.getSplitPk()).orElse(null);
-				if(tableField != null) {
-					map.put("splitPk", tableField.getName());
+		try {
+			DataTaskEntity dataTask = dataTaskRepository.findById(id).orElse(null);
+			if(dataTask != null) {
+				map.put("id", dataTask.getId());
+				map.put("name", dataTask.getName());
+				map.put("description", dataTask.getDescription());
+				map.put("userName", dataTask.getUserName());
+				map.put("createTime", dataTask.getCreateTime());
+				
+				DataBusinessEntity business = dataBusinessRepository.findById(dataTask.getBusinessId()).orElse(null);
+				map.put("business", business.getName());
+				
+				DataTaskConfigEntity taskConfig = dataTaskConfigRepository.findByTaskId(dataTask.getId());
+				if(taskConfig.getSourceType().equals("api")) {
+					map.put("sourceName", "接口");
+					DataInterfaceEntity dataInterfaceEntity = dataInterfaceRepository.findById(taskConfig.getSourceTable()).orElse(null);
+					map.put("sourceTable", dataInterfaceEntity.getInterfaceName() + "(" + dataInterfaceEntity.getInterfaceUrl() + ")");
 				}else {
-					map.put("splitPk", "字段获取不到");
+					DataSourceEntity source = dataSourceRepository.findById(taskConfig.getSourceId()).orElse(null);
+					map.put("sourceName", "[" + source.getBaseType() + "]" + source.getBaseName());
+					DataTable sourceTable = dataTableRepository.findById(taskConfig.getSourceTable()).orElse(null);
+					map.put("sourceTable", sourceTable.getCname() + "(" + sourceTable.getName() + ")");
 				}
-			}else {
-				map.put("splitPk", "");
-			}
-			map.put("precise", taskConfig.getPrecise());
-			map.put("tableNumber", taskConfig.getTableNumber());
-			map.put("splitFactor", taskConfig.getSplitFactor());
-			
-			DataSourceEntity tagert = dataSourceRepository.findById(taskConfig.getTargetId()).orElse(null);
-			map.put("tagertName", "[" + tagert.getBaseType() + "]" + tagert.getBaseName());
-			DataTable tagertTable = dataTableRepository.findById(taskConfig.getTargetTable()).orElse(null);
-			map.put("tagertTable", tagertTable.getCname() + "(" + tagertTable.getName() + ")");
-			map.put("tagertClass", dataMappingRepository.findById(taskConfig.getTargeName()).orElse(null).getClassName());
-			List<String> targetCloumn = new ArrayList<String>();
-			String[] targetCloumns = taskConfig.getTargetCloumn().split(",");
-			for(String field : targetCloumns) {
-				DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
-				if(tableField != null) {
-					targetCloumn.add(tableField.getCname() + "(" + tableField.getName() + ")");
-				}
-			}
-			map.put("targetCloumn", targetCloumn);
-			map.put("writerType", taskConfig.getWriterType());
-			String text = "";
-			if(StringUtils.isNotBlank(taskConfig.getUpdateField())) {
-				String[] ids = taskConfig.getUpdateField().split(",");
-				for(String field : ids) {
-					DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
-					if(tableField != null) {
-						text += StringUtils.isBlank(text)?tableField.getName():","+tableField.getName();
+				map.put("sourceClass", dataMappingRepository.findById(taskConfig.getSourceName()).orElse(null).getClassName());
+				List<String> sourceCloumn = new ArrayList<String>();
+				String[] sourceCloumns = taskConfig.getSourceCloumn().split(",");
+				for(String field : sourceCloumns) {
+					if(taskConfig.getSourceType().equals("api")) {
+						DataInterfaceParamsEntity dataParamsEntity = dataInterfaceParamsRepository.findById(field).orElse(null);
+						if(dataParamsEntity != null) {
+							sourceCloumn.add(dataParamsEntity.getRemark() + "(" + dataParamsEntity.getParamName() + ")");
+						}
 					}else {
-						text += StringUtils.isBlank(text)?"字段获取不到":",字段获取不到";
+						DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
+						if(tableField != null) {
+							sourceCloumn.add(tableField.getCname() + "(" + tableField.getName() + ")");
+						}
 					}
 				}
+				map.put("sourceCloumn", sourceCloumn);
+				map.put("fetchSize", taskConfig.getFetchSize());
+				map.put("whereSql", taskConfig.getWhereSql());
+				if(StringUtils.isNotBlank(taskConfig.getSplitPk())) {
+					DataTableField tableField = dataTableFieldRepository.findById(taskConfig.getSplitPk()).orElse(null);
+					if(tableField != null) {
+						map.put("splitPk", tableField.getName());
+					}else {
+						map.put("splitPk", "字段获取不到");
+					}
+				}else {
+					map.put("splitPk", "");
+				}
+				map.put("precise", taskConfig.getPrecise());
+				map.put("tableNumber", taskConfig.getTableNumber());
+				map.put("splitFactor", taskConfig.getSplitFactor());
+				
+				if(taskConfig.getTargetType().equals("api")) {
+					map.put("tagertName", "接口");
+					DataInterfaceEntity dataInterfaceEntity = dataInterfaceRepository.findById(taskConfig.getTargetTable()).orElse(null);
+					map.put("tagertTable", dataInterfaceEntity.getInterfaceName() + "(" + dataInterfaceEntity.getInterfaceUrl() + ")");
+				}else {
+					DataSourceEntity tagert = dataSourceRepository.findById(taskConfig.getTargetId()).orElse(null);
+					map.put("tagertName", "[" + tagert.getBaseType() + "]" + tagert.getBaseName());
+					DataTable tagertTable = dataTableRepository.findById(taskConfig.getTargetTable()).orElse(null);
+					map.put("tagertTable", tagertTable.getCname() + "(" + tagertTable.getName() + ")");
+				}
+				map.put("tagertClass", dataMappingRepository.findById(taskConfig.getTargeName()).orElse(null).getClassName());
+				List<String> targetCloumn = new ArrayList<String>();
+				String[] targetCloumns = taskConfig.getTargetCloumn().split(",");
+				for(String field : targetCloumns) {
+					if(taskConfig.getTargetType().equals("api")) {
+						DataInterfaceParamsEntity dataParamsEntity = dataInterfaceParamsRepository.findById(field).orElse(null);
+						if(dataParamsEntity != null) {
+							targetCloumn.add(dataParamsEntity.getRemark() + "(" + dataParamsEntity.getParamName() + ")");
+						}
+					}else {
+						DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
+						if(tableField != null) {
+							targetCloumn.add(tableField.getCname() + "(" + tableField.getName() + ")");
+						}
+					}
+				}
+				map.put("targetCloumn", targetCloumn);
+				map.put("writerType", taskConfig.getWriterType());
+				String text = "";
+				if(StringUtils.isNotBlank(taskConfig.getUpdateField())) {
+					String[] ids = taskConfig.getUpdateField().split(",");
+					for(String field : ids) {
+						DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
+						if(tableField != null) {
+							text += StringUtils.isBlank(text)?tableField.getName():","+tableField.getName();
+						}else {
+							text += StringUtils.isBlank(text)?"字段获取不到":",字段获取不到";
+						}
+					}
+				}
+				map.put("updateField", text);
+				
+				List<TaskCoreModel> taskCoreModels = new ArrayList<TaskCoreModel>();
+				List<DataTaskCoreEntity> taskCoreList = dataTaskCoreRepository.findByTaskId(dataTask.getId());
+				for(DataTaskCoreEntity taskCore : taskCoreList) {
+					String taskId = taskCore.getId();
+					if(taskId.indexOf("-") == -1) {
+						taskCore.setDataType(DataServiceUtil.getTitle(taskCore.getDataType()));
+						TaskCoreModel taskCoreModel = new TaskCoreModel();
+						Y9BeanUtil.copyProperties(taskCore, taskCoreModel);
+						taskCoreModels.add(taskCoreModel);
+					}
+					// 数据脱敏字段
+					else if(taskId.startsWith(DataServiceUtil.MASK)) {
+						map.put("maskFields", taskCore.getValue());
+					}
+					// 数据加密字段
+					else if(taskId.startsWith(DataServiceUtil.ENCRYP)) {
+						map.put("encrypFields", taskCore.getValue());
+					}
+					// 异字段
+					else if(taskId.startsWith(DataServiceUtil.DIFFERENT)) {
+						List<DifferentField> diffList = Y9JsonUtil.readList(taskCore.getValue(), DifferentField.class);
+						for(DifferentField diff : diffList) {
+							if(taskConfig.getSourceType().equals("api")) {
+								diff.setSource(dataInterfaceParamsRepository.findById(diff.getSource()).orElse(null).getParamName());
+							}else {
+								diff.setSource(dataTableFieldRepository.findById(diff.getSource()).orElse(null).getName());
+							}
+							if(taskConfig.getTargetType().equals("api")) {
+								diff.setTarget(dataInterfaceParamsRepository.findById(diff.getTarget()).orElse(null).getParamName());
+							}else {
+								diff.setTarget(dataTableFieldRepository.findById(diff.getTarget()).orElse(null).getName());
+							}
+						}
+						map.put("differentField", diffList);
+					}
+					// 日期格式
+					else if(taskId.startsWith(DataServiceUtil.DATE)) {
+						List<DateField> dateList = Y9JsonUtil.readList(taskCore.getValue(), DateField.class);
+						for(DateField date : dateList) {
+							if(taskConfig.getSourceType().equals("api")) {
+								date.setFieldName(dataInterfaceParamsRepository.findById(date.getFieldName()).orElse(null).getParamName());
+							}else {
+								date.setFieldName(dataTableFieldRepository.findById(date.getFieldName()).orElse(null).getName());
+							}
+						}
+						map.put("format", dateList);
+					}
+					// 数据转换
+					else if(taskId.startsWith(DataServiceUtil.CONVERT)) {
+						List<ConvertField> convertList = Y9JsonUtil.readList(taskCore.getValue(), ConvertField.class);
+						for(ConvertField convert : convertList) {
+							if(taskConfig.getSourceType().equals("api")) {
+								convert.setFieldName(dataInterfaceParamsRepository.findById(convert.getFieldName()).orElse(null).getParamName());
+							}else {
+								convert.setFieldName(dataTableFieldRepository.findById(convert.getFieldName()).orElse(null).getName());
+							}
+						}
+						map.put("convertField", convertList);
+					}
+				}
+				map.put("taskCoreList", taskCoreModels);
 			}
-			map.put("updateField", text);
-			
-			map.put("bulkSync", false);
-			List<TaskCoreModel> taskCoreModels = new ArrayList<TaskCoreModel>();
-			List<DataTaskCoreEntity> taskCoreList = dataTaskCoreRepository.findByTaskId(dataTask.getId());
-			for(DataTaskCoreEntity taskCore : taskCoreList) {
-				String taskId = taskCore.getId();
-				if(taskId.indexOf("-") == -1) {
-					taskCore.setDataType(DataServiceUtil.getTitle(taskCore.getDataType()));
-					TaskCoreModel taskCoreModel = new TaskCoreModel();
-					Y9BeanUtil.copyProperties(taskCore, taskCoreModel);
-					taskCoreModels.add(taskCoreModel);
-				}
-				// 数据脱敏字段
-				else if(taskId.startsWith(DataServiceUtil.MASK)) {
-					map.put("maskFields", taskCore.getValue());
-				}
-				// 数据加密字段
-				else if(taskId.startsWith(DataServiceUtil.ENCRYP)) {
-					map.put("encrypFields", taskCore.getValue());
-				}
-				// 增量同步
-				else if(taskId.startsWith(DataServiceUtil.BULKSYNC)) {
-					map.put("bulkSync", true);
-				}
-				// 异字段
-				else if(taskId.startsWith(DataServiceUtil.DIFFERENT)) {
-					List<DifferentField> diffList = Y9JsonUtil.readList(taskCore.getValue(), DifferentField.class);
-					for(DifferentField diff : diffList) {
-						diff.setSource(dataTableFieldRepository.findById(diff.getSource()).orElse(null).getName());
-						diff.setTarget(dataTableFieldRepository.findById(diff.getTarget()).orElse(null).getName());
-					}
-					map.put("differentField", diffList);
-				}
-				// 日期格式
-				else if(taskId.startsWith(DataServiceUtil.DATE)) {
-					List<DateField> dateList = Y9JsonUtil.readList(taskCore.getValue(), DateField.class);
-					for(DateField date : dateList) {
-						date.setFieldName(dataTableFieldRepository.findById(date.getFieldName()).orElse(null).getName());
-					}
-					map.put("format", dateList);
-				}
-				// 数据转换
-				else if(taskId.startsWith(DataServiceUtil.CONVERT)) {
-					List<ConvertField> convertList = Y9JsonUtil.readList(taskCore.getValue(), ConvertField.class);
-					for(ConvertField convert : convertList) {
-						convert.setFieldName(dataTableFieldRepository.findById(convert.getFieldName()).orElse(null).getName());
-					}
-					map.put("convertField", convertList);
-				}
-			}
-			map.put("taskCoreList", taskCoreModels);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return map;
 	}

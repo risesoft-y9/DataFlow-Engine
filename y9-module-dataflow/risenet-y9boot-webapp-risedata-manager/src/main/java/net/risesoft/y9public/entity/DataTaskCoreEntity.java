@@ -37,7 +37,7 @@ public class DataTaskCoreEntity extends BaseEntity {
 	@Comment(value = "参数名称")
 	private String keyName;
 	
-	@Column(name = "VALUE", length = 600)
+	@Column(name = "VALUE", length = 1200)
 	@Comment(value = "参数值")
 	private String value;
 	

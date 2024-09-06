@@ -38,6 +38,10 @@ public class DataInterfaceEntity extends BaseEntity {
 	@Comment(value = "请求方式")
 	private String requestType;
 	
+	@Column(name = "CONTENTTYPE", length = 50)
+	@Comment(value = "content-type")
+	private String contentType;
+	
 	@Column(name = "DATATYPE", nullable = false)
 	@Comment(value = "接口类型：1-外置， 0-内置")
 	@ColumnDefault("1")

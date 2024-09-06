@@ -37,10 +37,10 @@ const save = async () => {
     businessId: '',//业务id
     maskFields: '',//脱敏字段
     encrypFields: "",//加密字段
-    bulkSync: '',//增量同步
     format: '',//日期格式
     taskConfigModel: {
       sourceId: "",//源头表id
+      sourceType: '',//类型
       sourceTable: '',//数据表id
       sourceCloumn: '',//字段列
       sourceName: '',//执行类
@@ -52,6 +52,7 @@ const save = async () => {
       splitFactor: '',//执行数切分数
 
       targetId: "",//目标源id
+      targetType: '',//类型
       targetTable: '',//目标数据表id
 
       updateField:'',// 输出类型为更新时的选项

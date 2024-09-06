@@ -34,8 +34,7 @@ const state = reactive({
         {label: '切分数量', key: 'tableNumber', span: 1, value: ''},
         {label: '外部基础', key: 'splitFactor', span: 1, value: ''},
         {label: '数据脱敏', key: 'maskFields', span: 1, value: ''},
-        {label: '数据加密', key: 'encrypFields', span: 1, value: ''},
-        {label: '增量同步', key: 'bulkSync', span: 1, value: ''},
+        {label: '数据加密', key: 'encrypFields', span: 1, value: ''}
       ]
     },
     {
@@ -67,8 +66,7 @@ const state = reactive({
 const getData = async () => {
   let res = await getTaskDetails({id: globalData.row.id})
   if (res) {
-    let data = res.data
-    console.log(data, 333)
+    let data = res.data;
     data.taskCoreList.forEach((item) => {
       if (item.keyName == 'name') {
         item.label = item.dataType + '执行类'
@@ -84,8 +82,7 @@ const getData = async () => {
         }
       }
     })
-    console.log(groupedData, 'groupedDatagroupedData')
-    data.bulkSync ? data.bulkSync = '开' : data.bulkSync = "关"
+    
     data.writerType == 'insert' ? data.writerType = '新增' : data.writerType = "更新"
     if (data.precise) {
       state.taskInfo[1].list[6].value = '精准切分'
@@ -110,7 +107,6 @@ const getData = async () => {
         }
       })
     })
-    console.log(state.taskInfo, 995)
   }
 }
 

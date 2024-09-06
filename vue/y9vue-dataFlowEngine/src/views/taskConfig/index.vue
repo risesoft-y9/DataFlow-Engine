@@ -32,22 +32,6 @@
       </div>
     </template>
 
-    <template #typeName="{ row, column, index }">
-      <el-input v-if="editId == row.id" v-model="formData.typeName"/>
-      <template v-else>{{ row.typeName }}</template>
-    </template>
-    <template #className="{ row, column, index }">
-      <el-input v-if="editId == row.id" v-model="formData.className"/>
-      <template v-else>{{ row.name }}</template>
-    </template>
-    <template #description="{ row, column, index }">
-      <el-input v-if="editId == row.id" v-model="formData.description"/>
-      <template v-else>{{ row.description }}</template>
-    </template>
-    <!-- <template #createTime="{ row, column, index }">
-    <el-input v-if="editId == row.id" v-model="formData.createTime" />
-    <template v-else>{{ row.createTime }}</template>
-</template> -->
     <template #operation="{ row, column, index }">
       <div class="operation">
         <div class="fields" @click="handle(3, row)">
@@ -85,7 +69,6 @@ import {ref, onMounted, computed, inject, reactive} from 'vue';
 import {ElMessageBox, ElNotification, ElMessage} from 'element-plus';
 import {useI18n} from 'vue-i18n';
 import {getStoragePageSize} from '@/utils/index';
-import {getTableList, saveConfigureMapping} from '@/api/engineConfig/index';
 import moment from 'moment';
 
 const {t} = useI18n();
@@ -97,13 +80,6 @@ import {addTaskForm, globalData, taskSetForm} from '@/views/taskConfig/comps/dat
 import {setTreeData} from '@/utils/object';
 import {deleteTableField} from '@/api/libraryTable';
 
-interface formDataType {
-  typeName?: string;
-  className?: string;
-  description?: string;
-  createTime?: string;
-}
-
 // loading
 let loading = ref(false);
 const props = defineProps({
@@ -111,8 +87,6 @@ const props = defineProps({
     default: {},
   }
 })
-// 表格的每行列的参数对象
-let formData = ref<formDataType>({});
 
 const state = reactive({
   treeData: [],
@@ -149,31 +123,32 @@ let tableConfig = ref({
     },
     {
       title: computed(() => t('任务名称')),
-      key: 'className',
-      slot: 'className'
+      key: 'name',
+      width: 220,
     },
-
     {
       title: computed(() => t('描述')),
       key: 'description',
-      slot: 'description'
     },
     {
       title: computed(() => t('业务分类')),
+      width: 180,
       key: 'business'
     },
     {
       title: computed(() => t('任务状态')),
+      width: 120,
       key: 'status'
     },
     {
       title: computed(() => t('创建者')),
+      width: 100,
       key: 'user'
     },
     {
       title: computed(() => t('创建时间')),
       key: 'createTime',
-      width: 200,
+      width: 150,
       render(row) {
         return h('div', {}, moment(row.createTime).format('YYYY-MM-DD HH:mm:ss'));
       }

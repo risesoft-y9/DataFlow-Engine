@@ -40,6 +40,10 @@ public class DataTaskConfigEntity extends BaseEntity {
 	@Comment(value = "源头-数据源id")
 	private String sourceId;
 	
+	@Column(name = "SOURCETYPE", length = 50)
+	@Comment(value = "源头-数据源类型")
+	private String sourceType;
+	
 	@Column(name = "SOURCETABLEID", length = 50, nullable = false)
 	@Comment(value = "源头-数据表")
 	private String sourceTable;
@@ -83,6 +87,10 @@ public class DataTaskConfigEntity extends BaseEntity {
 	@Column(name = "TARGETID", length = 50, nullable = false)
 	@Comment(value = "目标-数据源id")
 	private String targetId;
+	
+	@Column(name = "TARGETTYPE", length = 50)
+	@Comment(value = "目标-数据源类型")
+	private String targetType;
 	
 	@Column(name = "TARGETTABLEID", length = 50, nullable = false)
 	@Comment(value = "目标-数据表")

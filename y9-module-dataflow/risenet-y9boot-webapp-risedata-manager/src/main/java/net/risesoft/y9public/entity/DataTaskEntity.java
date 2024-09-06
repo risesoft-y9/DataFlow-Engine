@@ -25,11 +25,11 @@ public class DataTaskEntity extends BaseEntity {
 	@Comment(value = "主键")
 	private String id;
 
-	@Column(name = "NAME", length = 300, nullable = false)
+	@Column(name = "NAME", length = 500, nullable = false)
 	@Comment(value = "任务名称")
 	private String name;
 	
-	@Column(name = "DESCRIPTION", length = 800)
+	@Column(name = "DESCRIPTION", length = 1200)
 	@Comment(value = "描述")
 	private String description;
 	

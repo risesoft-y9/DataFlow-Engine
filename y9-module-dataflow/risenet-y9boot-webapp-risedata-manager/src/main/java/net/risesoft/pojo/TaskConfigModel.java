@@ -28,6 +28,11 @@ public class TaskConfigModel {
 	private String sourceId;
 	
 	/**
+	 * 源头-数据源类型
+	 */
+	private String sourceType;
+	
+	/**
 	 * 源头-数据表
 	 */
 	private String sourceTable;
@@ -76,6 +81,11 @@ public class TaskConfigModel {
 	 * 目标-数据源id
 	 */
 	private String targetId;
+	
+	/**
+	 * 目标-数据源类型
+	 */
+	private String targetType;
 	
 	/**
 	 * 目标-数据表

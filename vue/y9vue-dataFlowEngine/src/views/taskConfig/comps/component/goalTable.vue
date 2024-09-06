@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {onMounted, reactive, ref} from "vue";
-import {globalData, goalTableForm, goalTableRef, tableSetForm} from '../data'
-import {getTableField} from "@/api/libraryTable";
+import {addTaskForm, globalData, goalTableForm, goalTableRef, tableSetForm} from '../data'
+import {getApiField, getTableField} from "@/api/libraryTable";
 import {v4 as uuidv4} from 'uuid';
 
 const emits = defineEmits(['next', 'top', 'goBack', 'goBackSet', 'setTask', 'close'])
@@ -86,8 +86,12 @@ const setInitData = () => {
 }
 
 const getTableFieldList = async () => {
-  let params = {tableId: goalTableForm.tableData.targetTable,};
-  let res = await getTableField(params);
+  let res;
+  if(addTaskForm.tableData.targetType == 'api') {
+    res = await getApiField({apiId: goalTableForm.tableData.targetTable});
+  }else {
+    res = await getTableField({tableId: goalTableForm.tableData.targetTable});
+  }
   if (res) {
     goalTableForm.tableFieldList = res.data
     goalTableForm.tableData.targetCloumn = []//清空字段详情勾选
@@ -363,7 +367,8 @@ let ruleFormRef = ref(goalTableRef)
       <el-descriptions-item label-align="center">
         <template #label>
           <div>
-            <span>表名称</span>
+            <span v-if="addTaskForm.tableData.targetType == 'api'">接口名称</span>
+            <span v-else>表名称</span>
             <span class="y9-required-icon">*</span>
           </div>
         </template>
@@ -372,7 +377,7 @@ let ruleFormRef = ref(goalTableRef)
               @change="tableChange"
               v-model="goalTableForm.tableData.targetTable"
               class="m-2"
-              placeholder="请选择表"
+              placeholder="请选择"
               size="small"
           >
             <el-option
@@ -388,7 +393,6 @@ let ruleFormRef = ref(goalTableRef)
         <template #label>
           <div>
             <span>字段详情</span>
-            <!--            <span class="y9-required-icon">*</span>-->
           </div>
         </template>
         <el-form-item>
@@ -425,374 +429,209 @@ let ruleFormRef = ref(goalTableRef)
           </el-select>
         </el-form-item>
       </el-descriptions-item>
-      <el-descriptions-item label-align="center" label="输出类型">
-        <template #label>
-          <div>
-            <span>输出类型</span>
-            <span class="y9-required-icon">*</span>
-          </div>
-        </template>
-        <el-form-item prop="writerType">
-          <el-radio-group v-model="goalTableForm.tableData.writerType" @change="radioChange">
-            <el-radio :label="'insert'">新增（insert）</el-radio>
-            <el-radio :label="'update'">更新（update）</el-radio>
-          </el-radio-group>
-        </el-form-item>
-      </el-descriptions-item>
-      <div v-if="goalTableForm.tableData.writerType=='update'">
-        <el-descriptions-item label-align="center" label="更新字段">
+      <div v-if="addTaskForm.tableData.targetType != 'api'">
+        <el-descriptions-item label-align="center" label="输出类型">
           <template #label>
             <div>
-              <span>更新字段</span>
+              <span>输出类型</span>
               <span class="y9-required-icon">*</span>
             </div>
           </template>
-          <el-form-item prop="updateField">
-            <el-tree-select
-                node-key="id"
-                v-model="goalTableForm.tableData.updateField"
-                :data="targetFilteredTableFieldList"
-                :props="state.defaultProps"
-                multiple
-                placeholder="请选择更新字段"
-                size="small"
-                filterable
-                :render-after-expand="false"
-                check-strictly
-                check-on-click-node
-                show-checkbox
-            >
-            </el-tree-select>
+          <el-form-item prop="writerType">
+            <el-radio-group v-model="goalTableForm.tableData.writerType" @change="radioChange">
+              <el-radio :label="'insert'">新增（insert）</el-radio>
+              <el-radio :label="'update'">更新（update）</el-radio>
+            </el-radio-group>
           </el-form-item>
         </el-descriptions-item>
-        <el-descriptions-item label-align="center" label="异字段同步">
-          <template #label>
-            <div>
-              <span>异字段同步</span>
-              <!--            <span class="y9-required-icon">*</span>-->
-            </div>
-          </template>
-          <div class="sync" v-for="(items,index) in goalTableForm.tableData.differentField">
-            <div class="w100">
-              <el-form-item :rules="items.rules1" :prop="`differentField[${index}].source`">
-                <el-select
-                    v-model="items.source"
-                    value-key="id"
-                    clearable
-                    placeholder="请选择源头字段"
-                    size="small"
-                    @change="fieldChange(items,1,`differentField[${index}].target`)"
-
-                >
-                  <el-option
-                      v-for="item in filteredTableFieldList"
-                      :key="item.id"
-                      :label="`${item.name}:${item.cname}(${item.fieldType})`"
-                      :value="item.id"
-                  />
-                </el-select>
-              </el-form-item>
-            </div>
-            <div class="seg"> -</div>
-            <div class="w100">
-              <el-form-item :rules="items.rules2" :prop="`differentField[${index}].target`">
-                <el-select
-                    v-model="items.target"
-                    value-key="id"
-                    placeholder="请选择目标字段"
-                    size="small"
-                    clearable
-                    @change="fieldChange(items,2,`differentField[${index}].source`)"
-
-                >
-                  <el-option
-                      v-for="item in targetFilteredTableFieldList"
-                      :key="item.id"
-                      :label="`${item.name}:${item.cname}(${item.fieldType})`"
-                      :value="item.id"
-                  />
-                </el-select>
-              </el-form-item>
-            </div>
-            <div class="icon" @click="addField">
-              <el-icon size="20">
-                <CirclePlus/>
-              </el-icon>
-            </div>
-            <div class="icon" v-if="goalTableForm.tableData.differentField.length>1" @click="deleteField(items,index)">
-              <el-icon size="20">
-                <CircleClose/>
-              </el-icon>
-            </div>
-          </div>
-        </el-descriptions-item>
-        <el-descriptions-item label-align="center" label="日期格式转换">
-          <template #label>
-            <div>
-              <span>日期格式转换</span>
-              <!--            <span class="y9-required-icon">*</span>-->
-            </div>
-          </template>
-          <div class="sync" v-for="(items,index) in goalTableForm.tableData.dateField">
-            <div class="w100">
-              <el-form-item :rules="items.rules1" :prop="`dateField[${index}].fieldName`">
-                <el-select
-                    clearable
-                    v-model="items.fieldName"
-                    value-key="id"
-                    placeholder="请选择转换字段"
-                    size="small"
-                    @change="formatIdChange(items,1,index)"
-                >
-                  <el-option
-                      v-for="item in targetFilteredTableFieldList"
-                      :key="item.id"
-                      :label="`${item.name}:${item.cname}`"
-                      :value="item.id"
-                  />
-                </el-select>
-              </el-form-item>
-            </div>
-            <div class="seg">-</div>
-            <div class="w100">
-              <el-form-item :rules="items.rules2" :prop="`dateField[${index}].format`">
-                <el-input @change="formatIdChange(items,2,index)" clearable
-                          placeholder="请输入" v-model="items.format"></el-input>
-              </el-form-item>
-            </div>
-            <div class="icon" @click="dataAddFormatId">
-              <el-icon size="20">
-                <CirclePlus/>
-              </el-icon>
-            </div>
-            <div class="icon" v-if="goalTableForm.tableData.dateField.length>1"
-                 @click="dataDeleteFormatId(items,index)">
-              <el-icon size="20">
-                <CircleClose/>
-              </el-icon>
-            </div>
-          </div>
-        </el-descriptions-item>
-        <el-descriptions-item label-align="center" label="数据转换">
-          <template #label>
-            <div>
-              <span>数据转换</span>
-              <!--            <span class="y9-required-icon">*</span>-->
-            </div>
-          </template>
-          <div class="sync" v-for="(items,index) in goalTableForm.tableData.convertField">
-            <div class="w100">
-              <el-form-item :rules="items.rules1" :prop="`convertField[${index}].fieldName`">
-                <el-select
-                    clearable
-                    v-model="items.fieldName"
-                    value-key="id"
-                    placeholder="请选择转换字段"
-                    size="small"
-                    @change="dataChange(items,1,index)"
-                >
-                  <el-option
-                      v-for="item in targetFilteredTableFieldList"
-                      :key="item.id"
-                      :label="`${item.name}:${item.cname}`"
-                      :value="item.id"
-                  />
-                </el-select>
-              </el-form-item>
-            </div>
-            <div class="seg">:</div>
-            <div class="w100">
-              <el-form-item :rules="items.rules2" :prop="`convertField[${index}].oldData`">
-                <el-input @change="dataChange(items,2,index)" clearable
-                          placeholder="原始数据" v-model="items.oldData"></el-input>
-              </el-form-item>
-            </div>
-            <div class="seg">-</div>
-            <div class="w100">
-              <el-form-item :rules="items.rules3" :prop="`convertField[${index}].newData`">
-                <el-input clearable @change="dataChange(items,3,index)"
-                          placeholder="更新数据" v-model="items.newData"></el-input>
-              </el-form-item>
-            </div>
-            <div class="icon" @click="dataAddField">
-              <el-icon size="20">
-                <CirclePlus/>
-              </el-icon>
-            </div>
-            <div class="icon" v-if="goalTableForm.tableData.convertField.length>1"
-                 @click="dataDeleteField(items,index)">
-              <el-icon size="20">
-                <CircleClose/>
-              </el-icon>
-            </div>
-          </div>
-        </el-descriptions-item>
+        <div v-if="goalTableForm.tableData.writerType == 'update'">
+          <el-descriptions-item label-align="center" label="更新字段">
+            <template #label>
+              <div>
+                <span>更新字段</span>
+                <span class="y9-required-icon">*</span>
+              </div>
+            </template>
+            <el-form-item prop="updateField">
+              <el-tree-select
+                  node-key="id"
+                  v-model="goalTableForm.tableData.updateField"
+                  :data="targetFilteredTableFieldList"
+                  :props="state.defaultProps"
+                  multiple
+                  placeholder="请选择更新字段"
+                  size="small"
+                  filterable
+                  :render-after-expand="false"
+                  check-strictly
+                  check-on-click-node
+                  show-checkbox
+              >
+              </el-tree-select>
+            </el-form-item>
+          </el-descriptions-item>
+        </div>
       </div>
-      <div v-else>
-        <el-descriptions-item label-align="center" label="异字段同步">
-          <template #label>
-            <div>
-              <span>异字段同步</span>
-              <!--            <span class="y9-required-icon">*</span>-->
-            </div>
-          </template>
-          <div class="sync" v-for="(items,index) in goalTableForm.tableData.differentField">
-            <div class="w100">
-              <el-form-item :rules="items.rules1" :prop="`differentField[${index}].source`">
-                <el-select
-                    v-model="items.source"
-                    value-key="id"
-                    clearable
-                    placeholder="请选择源头字段"
-                    size="small"
-                    @change="fieldChange(items,1,`differentField[${index}].target`)"
-
-                >
-                  <el-option
-                      v-for="item in filteredTableFieldList"
-                      :key="item.id"
-                      :label="`${item.name}:${item.cname}(${item.fieldType})`"
-                      :value="item.id"
-                  />
-                </el-select>
-              </el-form-item>
-            </div>
-            <div class="seg"> -</div>
-            <div class="w100">
-              <el-form-item :rules="items.rules2" :prop="`differentField[${index}].target`">
-                <el-select
-                    v-model="items.target"
-                    value-key="id"
-                    placeholder="请选择目标字段"
-                    size="small"
-                    clearable
-                    @change="fieldChange(items,2,`differentField[${index}].source`)"
-
-                >
-                  <el-option
-                      v-for="item in targetFilteredTableFieldList"
-                      :key="item.id"
-                      :label="`${item.name}:${item.cname}(${item.fieldType})`"
-                      :value="item.id"
-                  />
-                </el-select>
-              </el-form-item>
-            </div>
-            <div class="icon" @click="addField">
-              <el-icon size="20">
-                <CirclePlus/>
-              </el-icon>
-            </div>
-            <div class="icon" v-if="goalTableForm.tableData.differentField.length>1" @click="deleteField(items,index)">
-              <el-icon size="20">
-                <CircleClose/>
-              </el-icon>
-            </div>
+      <el-descriptions-item label-align="center" label="异字段同步">
+        <template #label>
+          <div>
+            <span>异字段同步</span>
           </div>
-        </el-descriptions-item>
-        <el-descriptions-item label-align="center" label="日期格式转换">
-          <template #label>
-            <div>
-              <span>日期格式转换</span>
-              <!--            <span class="y9-required-icon">*</span>-->
-            </div>
-          </template>
-          <div class="sync" v-for="(items,index) in goalTableForm.tableData.dateField">
-            <div class="w100">
-              <el-form-item :rules="items.rules1" :prop="`dateField[${index}].fieldName`">
-                <el-select
-                    clearable
-                    v-model="items.fieldName"
-                    value-key="id"
-                    placeholder="请选择转换字段"
-                    size="small"
-                    @change="formatIdChange(items,1,index)"
-                >
-                  <el-option
-                      v-for="item in targetFilteredTableFieldList"
-                      :key="item.id"
-                      :label="`${item.name}:${item.cname}`"
-                      :value="item.id"
-                  />
-                </el-select>
-              </el-form-item>
-            </div>
-            <div class="seg">-</div>
-            <div class="w100">
-              <el-form-item :rules="items.rules2" :prop="`dateField[${index}].format`">
-                <el-input @change="formatIdChange(items,2,index)" clearable
-                          placeholder="请输入" v-model="items.format"></el-input>
-              </el-form-item>
-            </div>
-            <div class="icon" @click="dataAddField">
-              <el-icon size="20">
-                <CirclePlus/>
-              </el-icon>
-            </div>
-            <div class="icon" v-if="goalTableForm.tableData.convertField.length>1"
-                 @click="dataDeleteField(items,index)">
-              <el-icon size="20">
-                <CircleClose/>
-              </el-icon>
-            </div>
-          </div>
-        </el-descriptions-item>
-        <el-descriptions-item label-align="center" label="数据转换">
-          <template #label>
-            <div>
-              <span>数据转换</span>
-              <!--            <span class="y9-required-icon">*</span>-->
-            </div>
-          </template>
-          <div class="sync" v-for="(items,index) in goalTableForm.tableData.convertField">
-            <div class="w100">
-              <el-form-item :rules="items.rules1" :prop="`convertField[${index}].fieldName`">
-                <el-select
-                    clearable
-                    v-model="items.fieldName"
-                    value-key="id"
-                    placeholder="请选择转换字段"
-                    size="small"
-                    @change="dataChange(items,1,index)"
-                >
-                  <el-option
-                      v-for="item in targetFilteredTableFieldList"
-                      :key="item.id"
-                      :label="`${item.name}:${item.cname}`"
-                      :value="item.id"
-                  />
-                </el-select>
-              </el-form-item>
-            </div>
-            <div class="seg">:</div>
-            <div class="w100">
-              <el-form-item :rules="items.rules2" :prop="`convertField[${index}].oldData`">
-                <el-input @change="dataChange(items,2,index)" clearable
-                          placeholder="原始数据" v-model="items.oldData"></el-input>
-              </el-form-item>
-            </div>
-            <div class="seg">-</div>
-            <div class="w100">
-              <el-form-item :rules="items.rules3" :prop="`convertField[${index}].newData`">
-                <el-input clearable @change="dataChange(items,3,index)"
-                          placeholder="更新数据" v-model="items.newData"></el-input>
-              </el-form-item>
-            </div>
-            <div class="icon" @click="dataAddField">
-              <el-icon size="20">
-                <CirclePlus/>
-              </el-icon>
-            </div>
-            <div class="icon" v-if="goalTableForm.tableData.convertField.length>1"
-                 @click="dataDeleteField(items,index)">
-              <el-icon size="20">
-                <CircleClose/>
-              </el-icon>
-            </div>
-          </div>
-        </el-descriptions-item>
-      </div>
+        </template>
+        <div class="sync" v-for="(items,index) in goalTableForm.tableData.differentField">
+          <div class="w100">
+            <el-form-item :rules="items.rules1" :prop="`differentField[${index}].source`">
+              <el-select
+                  v-model="items.source"
+                  value-key="id"
+                  clearable
+                  placeholder="请选择源头字段"
+                  size="small"
+                  @change="fieldChange(items,1,`differentField[${index}].target`)"
 
+              >
+                <el-option
+                    v-for="item in filteredTableFieldList"
+                    :key="item.id"
+                    :label="`${item.name}:${item.cname}(${item.fieldType})`"
+                    :value="item.id"
+                />
+              </el-select>
+            </el-form-item>
+          </div>
+          <div class="seg"> -</div>
+          <div class="w100">
+            <el-form-item :rules="items.rules2" :prop="`differentField[${index}].target`">
+              <el-select
+                  v-model="items.target"
+                  value-key="id"
+                  placeholder="请选择目标字段"
+                  size="small"
+                  clearable
+                  @change="fieldChange(items,2,`differentField[${index}].source`)"
+
+              >
+                <el-option
+                    v-for="item in targetFilteredTableFieldList"
+                    :key="item.id"
+                    :label="`${item.name}:${item.cname}(${item.fieldType})`"
+                    :value="item.id"
+                />
+              </el-select>
+            </el-form-item>
+          </div>
+          <div class="icon" @click="addField">
+            <el-icon size="20">
+              <CirclePlus/>
+            </el-icon>
+          </div>
+          <div class="icon" v-if="goalTableForm.tableData.differentField.length>1" @click="deleteField(items,index)">
+            <el-icon size="20">
+              <CircleClose/>
+            </el-icon>
+          </div>
+        </div>
+      </el-descriptions-item>
+      <el-descriptions-item label-align="center" label="日期格式转换">
+        <template #label>
+          <div>
+            <span>日期格式转换</span>
+            <!--            <span class="y9-required-icon">*</span>-->
+          </div>
+        </template>
+        <div class="sync" v-for="(items,index) in goalTableForm.tableData.dateField">
+          <div class="w100">
+            <el-form-item :rules="items.rules1" :prop="`dateField[${index}].fieldName`">
+              <el-select
+                  clearable
+                  v-model="items.fieldName"
+                  value-key="id"
+                  placeholder="请选择转换字段"
+                  size="small"
+                  @change="formatIdChange(items,1,index)"
+              >
+                <el-option
+                    v-for="item in filteredTableFieldList"
+                    :key="item.id"
+                    :label="`${item.name}:${item.cname}`"
+                    :value="item.id"
+                />
+              </el-select>
+            </el-form-item>
+          </div>
+          <div class="seg">-</div>
+          <div class="w100">
+            <el-form-item :rules="items.rules2" :prop="`dateField[${index}].format`">
+              <el-input @change="formatIdChange(items,2,index)" clearable
+                        placeholder="请输入" v-model="items.format"></el-input>
+            </el-form-item>
+          </div>
+          <div class="icon" @click="dataAddFormatId">
+            <el-icon size="20">
+              <CirclePlus/>
+            </el-icon>
+          </div>
+          <div class="icon" v-if="goalTableForm.tableData.dateField.length>1"
+                @click="dataDeleteFormatId(items,index)">
+            <el-icon size="20">
+              <CircleClose/>
+            </el-icon>
+          </div>
+        </div>
+      </el-descriptions-item>
+      <el-descriptions-item label-align="center" label="数据转换">
+        <template #label>
+          <div>
+            <span>数据转换</span>
+          </div>
+        </template>
+        <div class="sync" v-for="(items,index) in goalTableForm.tableData.convertField">
+          <div class="w100">
+            <el-form-item :rules="items.rules1" :prop="`convertField[${index}].fieldName`">
+              <el-select
+                  clearable
+                  v-model="items.fieldName"
+                  value-key="id"
+                  placeholder="请选择转换字段"
+                  size="small"
+                  @change="dataChange(items,1,index)"
+              >
+                <el-option
+                    v-for="item in filteredTableFieldList"
+                    :key="item.id"
+                    :label="`${item.name}:${item.cname}`"
+                    :value="item.id"
+                />
+              </el-select>
+            </el-form-item>
+          </div>
+          <div class="seg">:</div>
+          <div class="w100">
+            <el-form-item :rules="items.rules2" :prop="`convertField[${index}].oldData`">
+              <el-input @change="dataChange(items,2,index)" clearable
+                        placeholder="原始数据" v-model="items.oldData"></el-input>
+            </el-form-item>
+          </div>
+          <div class="seg">-</div>
+          <div class="w100">
+            <el-form-item :rules="items.rules3" :prop="`convertField[${index}].newData`">
+              <el-input clearable @change="dataChange(items,3,index)"
+                        placeholder="更新数据" v-model="items.newData"></el-input>
+            </el-form-item>
+          </div>
+          <div class="icon" @click="dataAddField">
+            <el-icon size="20">
+              <CirclePlus/>
+            </el-icon>
+          </div>
+          <div class="icon" v-if="goalTableForm.tableData.convertField.length>1"
+                @click="dataDeleteField(items,index)">
+            <el-icon size="20">
+              <CircleClose/>
+            </el-icon>
+          </div>
+        </div>
+      </el-descriptions-item>
     </el-descriptions>
   </el-form>
 

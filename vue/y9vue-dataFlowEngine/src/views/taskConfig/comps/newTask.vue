@@ -5,16 +5,7 @@ import goalTable from './component/goalTable.vue'
 import taskSet from './component/taskSet.vue'
 import successTask from './component/successTask.vue'
 import saveTask from '../../dispatch/comp/saveTask/index.vue'
-import {shallowRef, watch} from 'vue'
-import {nextTick, onMounted} from "vue";
-import {
-  addTaskForm,
-  addTaskFormRef,
-  goalTableForm, goalTableRef,
-  tableSetForm,
-  tableSetRef,
-  taskSetForm
-} from "@/views/taskConfig/comps/data";
+import {ref, shallowRef, watch} from 'vue';
 
 const emits=defineEmits(['close'])
 const active = ref(0)
@@ -28,7 +19,6 @@ const top = () => {
   showTab.value = active.value
 }
 const goBack = () => {
-  console.log('点击返回')
   active.value = 0
   showTab.value = active.value
 }

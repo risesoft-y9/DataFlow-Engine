@@ -136,10 +136,7 @@ const getList = async (e, type) => {
     })
     state.dataList = res.data
     if (type == '1') {
-      // console.log(state.dataList,'state.dataList5')
-      // console.log(globalDataTask.tableData.args,'globalDataTask.tableData.args')
       let arr = state.dataList.filter(obj => globalDataTask.tableData.args.includes(obj.id)).map(obj => obj.id);
-      console.log(arr,'arrarr')
       if (arr.length == 0) {
         globalDataTask.tableData.args = []
       } else {
@@ -392,7 +389,7 @@ let ruleFormRef = ref()
             <el-option
                 v-for="item in globalDataTask.environmentAll"
                 :key="item.name"
-                :label="item.name"
+                :label="item.description"
                 :value="item.name"
             />
           </el-select>

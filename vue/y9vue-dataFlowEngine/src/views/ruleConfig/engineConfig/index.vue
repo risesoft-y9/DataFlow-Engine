@@ -74,7 +74,8 @@
         { label: 'kingbase', value: 'kingbase' },
         { label: 'dm', value: 'dm' },
         { label: 'ftp', value: 'ftp' },
-        { label: 'elasticsearch', value: 'elasticsearch' }
+        { label: 'elasticsearch', value: 'elasticsearch' },
+        { label: 'api', value: 'api' }
     ];
 
     // 功能类型的遍历数组

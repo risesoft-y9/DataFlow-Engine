@@ -36,6 +36,7 @@ import net.risesoft.log.OperationTypeEnum;
 import net.risesoft.log.annotation.RiseLog;
 import net.risesoft.pojo.Y9Page;
 import net.risesoft.pojo.Y9Result;
+import net.risesoft.service.DataInterfaceService;
 import net.risesoft.service.DataMappingService;
 import net.risesoft.service.DataSourceService;
 import net.risesoft.util.DataConstant;
@@ -45,6 +46,7 @@ import net.risesoft.util.sqlddl.SqlPaginationUtil;
 import net.risesoft.y9.json.Y9JsonUtil;
 import net.risesoft.y9.util.base64.Y9Base64Util;
 import net.risesoft.y9public.entity.DataSourceTypeEntity;
+import net.risesoft.y9public.entity.DataInterfaceEntity;
 import net.risesoft.y9public.entity.DataSourceEntity;
 import net.risesoft.y9public.entity.DataTable;
 import net.risesoft.y9public.entity.DataTableField;
@@ -57,6 +59,7 @@ public class SourceController {
 
 	private final DataSourceService dataSourceService;
 	private final DataMappingService dataMappingService;
+	private final DataInterfaceService dataInterfaceService;
 	
 	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "获取数据源分类列表", logLevel = LogLevelEnum.RSLOG, enable = false)
 	@GetMapping(value = "/findCategoryAll")
@@ -241,12 +244,26 @@ public class SourceController {
 	@GetMapping(value = "/getTableList")
 	public Y9Result<Map<String, Object>> getTableList(String sourceId, String type) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		DataSourceEntity source = dataSourceService.getDataSourceById(sourceId);
-		if(source == null) {
-			return Y9Result.failure("数据源不存在");
+		// 接口源
+		if(sourceId.equals("api")) {
+			List<Map<String, Object>> listMap = new ArrayList<>();
+			List<DataInterfaceEntity> interfaceList = dataInterfaceService.findByPattern(type.equals("input") ? 0 : 1);
+			for(DataInterfaceEntity dataInterfaceEntity : interfaceList) {
+				Map<String, Object> rmap = new HashMap<String, Object>();
+				rmap.put("id", dataInterfaceEntity.getId());
+				rmap.put("name", dataInterfaceEntity.getInterfaceName());
+				listMap.add(rmap);
+			}
+			map.put("tableList", listMap);
+			map.put("classList", dataMappingService.findByTypeNameAndFuncType("api", type));
+		}else {
+			DataSourceEntity source = dataSourceService.getDataSourceById(sourceId);
+			if(source == null) {
+				return Y9Result.failure("数据源不存在");
+			}
+			map.put("tableList", dataSourceService.getTableList(sourceId));
+			map.put("classList", dataMappingService.findByTypeNameAndFuncType(source.getBaseType(), type));
 		}
-		map.put("tableList", dataSourceService.getTableList(sourceId));
-		map.put("classList", dataMappingService.findByTypeNameAndFuncType(source.getBaseType(), type));
 		return Y9Result.success(map, "获取数据成功");
 	}
 	

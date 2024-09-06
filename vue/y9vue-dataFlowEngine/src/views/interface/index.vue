@@ -17,6 +17,19 @@
                 <el-button class="global-btn-main" type="primary" @click="apiTestPage"
                     ><i class="ri-links-line"></i>接口在线测试
                 </el-button>
+                <el-popover
+                    placement="bottom"
+                    title="接口返回格式要求："
+                    :width="700"
+                    trigger="click"
+                >
+                    <p>1.分页查询接口返回格式：{'currPage':0,'totalPages':1,'total':1,'rows':[{}],'code':0,'msg':'成功','success':true}</p>
+                    <p>2.查询接口返回格式：{'data':[{}],'code':0,'msg':'成功','success':true}</p>
+                    <p>3.保存接口返回格式：{'success':true,'code':0,'msg':'保存成功','data':null}</p>
+                    <template #reference>
+                        <el-icon size="20" style="margin-left: 10px;margin-top: 5px;"><Warning /></el-icon>
+                    </template>
+                </el-popover>
             </template>
             <template #interfaceName="{ row, column, index }">
                 <el-form-item v-if="editIndex === index" prop="interfaceName">
@@ -38,6 +51,17 @@
                     <el-input v-model="formData.interfaceUrl" clearable />
                 </el-form-item>
                 <span v-else>{{ row.interfaceUrl }}</span>
+            </template>
+            <template #contentType="{ row, column, index }">
+                <el-form-item v-if="editIndex === index" prop="contentType">
+                    <el-select v-model="formData.contentType" clearable>
+                        <el-option key="application/json" label="application/json" value="application/json"></el-option>
+                        <el-option key="application/x-www-form-urlencoded" label="application/x-www-form-urlencoded" 
+                            value="application/x-www-form-urlencoded"></el-option>
+                        <el-option key="multipart/form-data" label="multipart/form-data" value="multipart/form-data"></el-option>
+                    </el-select>
+                </el-form-item>
+                <span v-else>{{ row.contentType }}</span>
             </template>
             <template #dataType="{ row, column, index }">
                 <el-form-item v-if="editIndex === index" prop="dataType">
@@ -113,7 +137,7 @@
     const data = reactive({
         isEmptyData: false,
         editIndex: '',
-        formData: { id: '', interfaceUrl: '', interfaceName: '', requestType: 'GET', dataType: '1', pattern: '0' },
+        formData: { id: '', interfaceUrl: '', interfaceName: '', requestType: 'GET', dataType: '1', pattern: '0', contentType: '' },
         isEdit: false,
         tableConfig: {
             columns: [
@@ -121,6 +145,7 @@
                 { title: '接口名称', key: 'interfaceName', width: '240', slot: 'interfaceName' },
                 { title: '请求方式', key: 'requestType', width: '110', slot: 'requestType' },
                 { title: '接口地址', key: 'interfaceUrl', slot: 'interfaceUrl', align: 'left' },
+                { title: '请求类型', key: 'contentType', slot: 'contentType', width: '140' },
                 { title: '传输类型', key: 'pattern', slot: 'pattern', width: '110' },
                 { title: '接口类型', key: 'dataType', slot: 'dataType', width: '110' },
                 { title: '添加时间', key: 'createTime', width: '160' },
@@ -220,6 +245,7 @@
                 interfaceName: '',
                 interfaceUrl: '',
                 requestType: 'GET',
+                contentType: '',
                 dataType: '1',
                 pattern: '0'
             });
@@ -229,6 +255,7 @@
             formData.value.requestType = 'GET';
             formData.value.dataType = '1';
             formData.value.pattern = '0';
+            formData.value.contentType = '';
             isEdit.value = false;
         }
     };
@@ -241,6 +268,7 @@
         formData.value.requestType = rows.requestType;
         formData.value.dataType = rows.dataType + '';
         formData.value.pattern = rows.pattern + '';
+        formData.value.contentType = rows.contentType;
         isEdit.value = true;
         for (let i = 0; i < tableConfig.value.tableData.length; i++) {
             if (tableConfig.value.tableData[i].id == '') {
@@ -254,7 +282,7 @@
         row.value = rows;
         Object.assign(dialogConfig.value, {
             show: true,
-            width: '65%',
+            width: '70%',
             title: '接口参数',
             showFooter: false,
             type: 'paramsList'
@@ -272,7 +300,7 @@
     async function handleTest(rows) {
         row.value = rows;
         let res = await findParamsList({parentId: rows.id, dataType: 0});
-        paramsList.value = res.data;
+        paramsList.value = res.data.params;
         dialogConfig.value.resetText = false;
         Object.assign(dialogConfig.value, {
             show: true,
@@ -311,6 +339,7 @@
         formData.value.requestType = 'GET';
         formData.value.dataType = '1';
         formData.value.pattern = '0';
+        formData.value.contentType = '';
         refForm.resetFields();
         for (let i = 0; i < tableConfig.value.tableData.length; i++) {
             if (tableConfig.value.tableData[i].id == '') {
@@ -352,17 +381,17 @@
         let formData = new FormData();
         paramsList.value.forEach((item) => {
             if (item.reqType == 'Headers') {
-                headObj.value.push({name: item.paramName, value: item.value});
+                headObj.value.push({name: item.paramName, value: item.paramValue});
             }
             if (item.reqType == 'Body') {
-                formData.append(item.paramName, item.value);
+                formData.append(item.paramName, item.paramValue);
             }
             if (item.reqType == 'Params') {
-                paramsObj.value.push({name: item.paramName, value: item.value});
+                paramsObj.value.push({name: item.paramName, value: item.paramValue});
             }
         });
         let res = await apiTest({method: row.value.requestType, url: row.value.interfaceUrl, headers: headObj.value, 
-            params: paramsObj.value, body: JSON.stringify(formData), contentType: 'application/json'});
+            params: paramsObj.value, body: JSON.stringify(formData), contentType: row.value.contentType});
         if (res.success) {
             dialogConfig.value.resetText = '生成响应参数';
         }
@@ -372,20 +401,24 @@
 
     async function saveAllResParams(resolve, reject) {
         let resData = JSON.parse(editParamsRef.value.resData);
+        let jsonData = resData.data;
         if (typeof resData.data != 'object') {
-            ElMessage({ type: 'error', message: '响应格式不符合，无法生成响应参数', offset: 65 });
-            reject();
-        } else {
-            dialogConfig.value.loading = true;
-            let res = await saveResponseParams({interfaceId: row.value.id, jsonData: resData.data});
-            if (res.success) {
-                ElMessage({ type: 'success', message: res.msg, offset: 65 });
-            } else {
-                ElMessage({ type: 'error', message: res.msg, offset: 65 });
+            if (typeof resData.rows != 'object') {
+                ElMessage({ type: 'error', message: '响应格式不符合，无法生成响应参数', offset: 65 });
+                reject();
+            }else {
+                jsonData = resData.rows;
             }
-            dialogConfig.value.loading = false;
-            reject();
         }
+        dialogConfig.value.loading = true;
+        let res = await saveResponseParams({interfaceId: row.value.id, jsonData: jsonData});
+        if (res.success) {
+            ElMessage({ type: 'success', message: res.msg, offset: 65 });
+        } else {
+            ElMessage({ type: 'error', message: res.msg, offset: 65 });
+        }
+        dialogConfig.value.loading = false;
+        reject();
     }
 </script>
 

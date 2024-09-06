@@ -34,6 +34,10 @@ public class DataInterfaceParamsEntity extends BaseEntity {
 	@Comment(value = "参数类型")
 	private String paramType;
 	
+	@Column(name = "PARAMVALUE", length = 500)
+	@Comment(value = "参数值")
+	private String paramValue;
+	
 	@Column(name = "REMARK", length = 500)
 	@Comment(value = "说明")
 	private String remark;
