@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.lang3.StringUtils;
@@ -14,16 +15,23 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.risesoft.api.persistence.config.ConfigService;
 import net.risesoft.id.Y9IdGenerator;
+import net.risesoft.model.RequestModel;
+import net.risesoft.pojo.DateField;
 import net.risesoft.pojo.DifferentField;
 import net.risesoft.pojo.TaskConfigModel;
+import net.risesoft.util.ApiTest;
 import net.risesoft.util.DataServiceUtil;
 import net.risesoft.y9.json.Y9JsonUtil;
+import net.risesoft.y9public.entity.DataInterfaceEntity;
+import net.risesoft.y9public.entity.DataInterfaceParamsEntity;
 import net.risesoft.y9public.entity.DataMappingArgsEntity;
 import net.risesoft.y9public.entity.DataSourceEntity;
 import net.risesoft.y9public.entity.DataTable;
 import net.risesoft.y9public.entity.DataTableField;
 import net.risesoft.y9public.entity.DataTaskCoreEntity;
 import net.risesoft.y9public.entity.DataTaskMakeUpEntity;
+import net.risesoft.y9public.repository.DataInterfaceParamsRepository;
+import net.risesoft.y9public.repository.DataInterfaceRepository;
 import net.risesoft.y9public.repository.DataMappingArgsRepository;
 import net.risesoft.y9public.repository.DataMappingRepository;
 import net.risesoft.y9public.repository.DataSourceRepository;
@@ -44,6 +52,8 @@ public class TaskMakeUpListener {
 	private final DataTableFieldRepository dataTableFieldRepository;
 	private final DataMappingRepository dataMappingRepository;
 	private final DataMappingArgsRepository dataMappingArgsRepository;
+	private final DataInterfaceParamsRepository dataInterfaceParamsRepository;
+	private final DataInterfaceRepository dataInterfaceRepository;
 	private final ConfigService configService;
     
     @Async
@@ -130,9 +140,18 @@ public class TaskMakeUpListener {
         	Map<String, Object> map = new HashMap<String, Object>();
         	Map<String, Object> rmap = new HashMap<String, Object>();
         	for(DifferentField field : differentFields) {
-        		DataTableField dtf1 = dataTableFieldRepository.findById(field.getSource()).orElse(null);
-        		DataTableField dtf2 = dataTableFieldRepository.findById(field.getTarget()).orElse(null);
-        		rmap.put(dtf1.getName(), dtf2.getName());
+        		String sName = "", tName = "";
+        		if(configModel.getSourceType().equals("api")) {
+        			sName = dataInterfaceParamsRepository.findById(field.getSource()).orElse(null).getParamName();
+        		}else {
+        			sName = dataTableFieldRepository.findById(field.getSource()).orElse(null).getName();
+        		}
+        		if(configModel.getTargetType().equals("api")) {
+        			tName = dataInterfaceParamsRepository.findById(field.getTarget()).orElse(null).getParamName();
+        		}else {
+        			tName = dataTableFieldRepository.findById(field.getTarget()).orElse(null).getName();
+        		}
+        		rmap.put(sName, tName);
         	}
         	map.put("renameMap", rmap);
         	dataTaskMakeUpEntity.setArgsValue(Y9JsonUtil.writeValueAsString(map));
@@ -199,37 +218,76 @@ public class TaskMakeUpListener {
     	dataTaskMakeUpEntity.setNameValue(dataMappingRepository.findById(configModel.getSourceName()).orElse(null).getClassName());
     	Map<String, Object> map = new HashMap<String, Object>();
     	// 获取源头数据源信息
-    	DataSourceEntity dataSourceEntity = dataSourceRepository.findById(configModel.getSourceId()).orElse(null);
-    	map.put("jdbcUrl", dataSourceEntity.getUrl());
-    	map.put("userName", dataSourceEntity.getUsername());
-    	map.put("password", dataSourceEntity.getPassword());
-    	// 获取源头表信息
-    	DataTable dataTable = dataTableRepository.findById(configModel.getSourceTable()).orElse(null);
-    	map.put("tableName", dataTable.getName());
-    	
-    	if(StringUtils.isNotBlank(configModel.getSplitPk())) {
-    		DataTableField dataTableField = dataTableFieldRepository.findById(configModel.getSplitPk()).orElse(null);
-        	map.put("splitPk", dataTableField.getName());
+    	if(configModel.getSourceType().equals("api")) {
+    		map.put("requestModel", configModel.getWhereSql());
+    		List<String> sourceCloumn = new ArrayList<String>();// 接口返回字段
+    		Map<String, String> columnTypes = new HashMap<String, String>();// 字段类型
+    		// 获取接口返回参数
+    		List<DataInterfaceParamsEntity> paramList = dataInterfaceParamsRepository.findByParentIdAndDataType(configModel.getSourceTable(), 1);
+    		for(DataInterfaceParamsEntity param : paramList) {
+    			sourceCloumn.add(param.getParamName());
+    			columnTypes.put(param.getParamName(), param.getParamType());
+    		}
+    		map.put("column", sourceCloumn);
+    		map.put("columnTypes", columnTypes);
+    		// 判断是否有分页参数
+    		if(configModel.getWhereSql().indexOf("$page{") > -1) {
+    			RequestModel requestModel = Y9JsonUtil.readValue(configModel.getWhereSql(), RequestModel.class);
+    			map.put("isPage", true);
+    			int page = 0;
+    			List<Map<String, Object>> params = requestModel.getParams();
+    			for(Map<String, Object> pmap : params) {
+    				String value = pmap.get("value") + "";
+		        	if(value.startsWith("$page{")) {
+		        		page = Integer.valueOf(value.replace("$page{", "").replace("}", ""));
+		        		pmap.put("value", page);
+		        	}
+    			}
+    			map.put("page", page);
+    			requestModel.setParams(params);
+    			// 获取总页数
+    			Map<String, Object> resMap = Y9JsonUtil.readHashMap(ApiTest.sendApi(requestModel));
+    			if((boolean) resMap.get("success")) {
+    				map.put("totalPages", resMap.get("totalPages"));
+    			}else {
+    				map.put("totalPages", 0);
+    			}
+    		}else {
+    			map.put("isPage", false);
+    		}
     	}else {
-    		map.put("splitPk", "");
+    		DataSourceEntity dataSourceEntity = dataSourceRepository.findById(configModel.getSourceId()).orElse(null);
+        	map.put("jdbcUrl", dataSourceEntity.getUrl());
+        	map.put("userName", dataSourceEntity.getUsername());
+        	map.put("password", dataSourceEntity.getPassword());
+        	// 获取源头表信息
+        	DataTable dataTable = dataTableRepository.findById(configModel.getSourceTable()).orElse(null);
+        	map.put("tableName", dataTable.getName());
+        	
+        	if(StringUtils.isNotBlank(configModel.getSplitPk())) {
+        		DataTableField dataTableField = dataTableFieldRepository.findById(configModel.getSplitPk()).orElse(null);
+            	map.put("splitPk", dataTableField.getName());
+        	}else {
+        		map.put("splitPk", "");
+        	}
+        	
+        	map.put("where", configModel.getWhereSql());
+        	map.put("precise", configModel.getPrecise());
+        	map.put("tableNumber", configModel.getTableNumber());
+        	map.put("fetchSize", configModel.getFetchSize());
+        	map.put("splitFactor", configModel.getSplitFactor());
+        	
+        	// 获取源头字段信息
+        	String[] sourceCloumns = configModel.getSourceCloumn().split(",");
+        	List<String> sourceCloumn = new ArrayList<String>();
+    		for(String field : sourceCloumns) {
+    			DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
+    			if(tableField != null) {
+    				sourceCloumn.add(tableField.getName());
+    			}
+    		}
+        	map.put("column", sourceCloumn);
     	}
-    	
-    	map.put("where", configModel.getWhereSql());
-    	map.put("precise", configModel.getPrecise());
-    	map.put("tableNumber", configModel.getTableNumber());
-    	map.put("fetchSize", configModel.getFetchSize());
-    	map.put("splitFactor", configModel.getSplitFactor());
-    	
-    	// 获取源头字段信息
-    	String[] sourceCloumns = configModel.getSourceCloumn().split(",");
-    	List<String> sourceCloumn = new ArrayList<String>();
-		for(String field : sourceCloumns) {
-			DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
-			if(tableField != null) {
-				sourceCloumn.add(tableField.getName());
-			}
-		}
-    	map.put("column", sourceCloumn);
     	dataTaskMakeUpEntity.setArgsValue(Y9JsonUtil.writeValueAsString(map));
     	dataTaskMakeUpEntity.setTabIndex(1);
     	dataTaskMakeUpRepository.save(dataTaskMakeUpEntity);
@@ -244,38 +302,85 @@ public class TaskMakeUpListener {
     	dataTaskMakeUpEntity.setNameValue(dataMappingRepository.findById(configModel.getTargeName()).orElse(null).getClassName());
     	Map<String, Object> map = new HashMap<String, Object>();
     	// 获取目标数据源信息
-    	DataSourceEntity dataSourceEntity = dataSourceRepository.findById(configModel.getTargetId()).orElse(null);
-    	map.put("jdbcUrl", dataSourceEntity.getUrl());
-    	map.put("userName", dataSourceEntity.getUsername());
-    	map.put("password", dataSourceEntity.getPassword());
-    	// 获取目标表信息
-    	DataTable dataTable = dataTableRepository.findById(configModel.getTargetTable()).orElse(null);
-    	map.put("tableName", dataTable.getName());
-    	
-    	if(configModel.getWriterType().equals("update")) {
-    		String text = "";
-    		String[] ids = configModel.getUpdateField().split(",");
-			for(String field : ids) {
-				DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
-				if(tableField != null) {
-					text += StringUtils.isBlank(text)?tableField.getName():","+tableField.getName();
-				}
-			}
-    		map.put("writerType", configModel.getWriterType() + "(" + text + ")");
+    	if(configModel.getTargetType().equals("api")) {
+    		// 获取接口信息
+    		DataInterfaceEntity dataInterfaceEntity = dataInterfaceRepository.findById(configModel.getTargetTable()).orElse(null);
+    		RequestModel requestModel = new RequestModel();
+    		requestModel.setUrl(dataInterfaceEntity.getInterfaceUrl());
+    		requestModel.setMethod(dataInterfaceEntity.getRequestType());
+    		requestModel.setContentType(dataInterfaceEntity.getContentType());
+    		List<String> column = new ArrayList<String>();// 接口返回字段
+    		List<Map<String, Object>> headers = new ArrayList<Map<String,Object>>();
+    		List<Map<String, Object>> params = new ArrayList<Map<String,Object>>();
+    		Map<String, Object> body = new HashMap<String, Object>();
+    		boolean isBody = false;
+    		// 获取接口请求参数
+    		List<DataInterfaceParamsEntity> paramList = dataInterfaceParamsRepository.findByParentIdAndDataType(configModel.getTargetTable(), 0);
+    		for(DataInterfaceParamsEntity param : paramList) {
+    			if(param.getReqType().equals("Params") && StringUtils.isNotBlank(param.getParamValue())) {
+    				Map<String, Object> pMap = new HashMap<String, Object>();
+    				pMap.put("name", param.getParamName());
+    				pMap.put("value", param.getParamValue());
+    				params.add(pMap);
+    			}
+    			if(param.getReqType().equals("Headers") && StringUtils.isNotBlank(param.getParamValue())) {
+    				Map<String, Object> hMap = new HashMap<String, Object>();
+    				hMap.put("name", param.getParamName());
+    				hMap.put("value", param.getParamValue());
+    				headers.add(hMap);
+    			}
+    			if(param.getReqType().equals("Body")) {
+    				isBody = true;
+    				if(StringUtils.isNotBlank(param.getParamValue())) {
+    					body.put(param.getParamName(), param.getParamValue());
+    				}
+    			}
+    			if(!param.getReqType().equals("Headers")) {
+    				column.add(param.getParamName());
+    			}
+    		}
+    		if(body!= null && !body.isEmpty()) {
+    			requestModel.setBody(Y9JsonUtil.writeValueAsString(body));
+    		}
+    		map.put("isBody", isBody);
+    		requestModel.setHeaders(headers);
+    		requestModel.setParams(params);
+    		map.put("requestModel", Y9JsonUtil.writeValueAsString(requestModel));
+    		map.put("column", column);
     	}else {
-    		map.put("writerType", configModel.getWriterType());
+    		DataSourceEntity dataSourceEntity = dataSourceRepository.findById(configModel.getTargetId()).orElse(null);
+        	map.put("jdbcUrl", dataSourceEntity.getUrl());
+        	map.put("userName", dataSourceEntity.getUsername());
+        	map.put("password", dataSourceEntity.getPassword());
+        	// 获取目标表信息
+        	DataTable dataTable = dataTableRepository.findById(configModel.getTargetTable()).orElse(null);
+        	map.put("tableName", dataTable.getName());
+        	
+        	if(configModel.getWriterType().equals("update")) {
+        		String text = "";
+        		String[] ids = configModel.getUpdateField().split(",");
+    			for(String field : ids) {
+    				DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
+    				if(tableField != null) {
+    					text += StringUtils.isBlank(text)?tableField.getName():","+tableField.getName();
+    				}
+    			}
+        		map.put("writerType", configModel.getWriterType() + "(" + text + ")");
+        	}else {
+        		map.put("writerType", configModel.getWriterType());
+        	}
+        	
+        	// 获取目标字段信息
+        	String[] targetCloumns = configModel.getTargetCloumn().split(",");
+        	List<String> targetCloumn = new ArrayList<String>();
+    		for(String field : targetCloumns) {
+    			DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
+    			if(tableField != null) {
+    				targetCloumn.add(tableField.getName());
+    			}
+    		}
+        	map.put("column", targetCloumn);
     	}
-    	
-    	// 获取目标字段信息
-    	String[] targetCloumns = configModel.getTargetCloumn().split(",");
-    	List<String> targetCloumn = new ArrayList<String>();
-		for(String field : targetCloumns) {
-			DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
-			if(tableField != null) {
-				targetCloumn.add(tableField.getName());
-			}
-		}
-    	map.put("column", targetCloumn);
     	dataTaskMakeUpEntity.setArgsValue(Y9JsonUtil.writeValueAsString(map));
     	dataTaskMakeUpEntity.setTabIndex(1);
     	dataTaskMakeUpRepository.save(dataTaskMakeUpEntity);

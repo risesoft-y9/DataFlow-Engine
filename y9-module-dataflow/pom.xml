@@ -28,6 +28,7 @@
         <module>risenet-y9boot-data-transfer-ftp</module>
         <module>risenet-y9boot-data-transfer-stream</module>
         <module>risenet-y9boot-data-transfer-assembler</module>
+        <module>risenet-y9boot-data-transfer-api</module>
         <module>risenet-y9boot-rpc-commons</module>
         <module>risenet-y9boot-rpc-consumer</module>
         <module>risenet-y9boot-rpc-provide</module>
