@@ -131,6 +131,11 @@
             <groupId>com.oracle.database.nls</groupId>
             <artifactId>orai18n</artifactId>
         </dependency>
+        
+        <dependency>
+	        <groupId>io.projectreactor</groupId>
+	  		<artifactId>reactor-core</artifactId>
+	  	</dependency>
 
     </dependencies>
 
