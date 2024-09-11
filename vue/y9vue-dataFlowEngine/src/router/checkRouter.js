@@ -15,7 +15,7 @@ import y9_storage from '@/utils/storage';
 import NProgress from 'nprogress'; // progress bar
 import { $y9_SSO } from '../main';
 import { getLoginInfo } from './getInitData';
-import { isStarred } from '@/api/gitee';
+// import { isStarred } from '@/api/gitee';
 
 NProgress.configure({
     showSpinner: false,
@@ -158,7 +158,7 @@ const cacheQuery = (query) => {
 
 let flag = 0;
 export const routerBeforeEach = async (to, from) => {
-    if(!y9_storage.getStringItem('initCheck')) {
+    if (!y9_storage.getStringItem('initCheck')) {
         y9_storage.setStringItem('initCheck', 'false');
     }
     flag++;
@@ -167,9 +167,9 @@ export const routerBeforeEach = async (to, from) => {
     if (settingStore.getProgress) {
         NProgress.start();
     }
-    
+
     // 检查路由白名单
-    if(to.fullPath.indexOf("?platform=gitee&code=") == -1) {
+    if (to.fullPath.indexOf('?platform=gitee&code=') == -1) {
         let isWriteRoute = await checkWriteList(to, from);
         if (isWriteRoute) {
             return true;

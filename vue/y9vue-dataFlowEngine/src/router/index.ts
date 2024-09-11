@@ -57,21 +57,13 @@ export const constantRoutes: Array<any> = [
         component: () => import('@/views/404/index.vue')
     },
     {
-        path: '/unstarred',
-        hidden: true,
-        meta: {
-            title: 'unstarred'
-        },
-        component: () => import('@/views/401/unstarred.vue')
-    },
-    {
         path: '/api-test',
         hidden: true,
         meta: {
             title: '接口在线测试'
         },
         component: () => import('@/views/test/apiTest.vue')
-    },
+    }
 ];
 
 // 根据条件显示系统管理菜单
