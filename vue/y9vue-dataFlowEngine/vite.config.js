@@ -120,6 +120,31 @@ export default (serve) => {
             }),
             // 主题热更新，不得已分开插件，因为需要vite插件顺序enforce
             themePreprocessorHmrPlugin()
-        ]
+        ],
+        css: {
+            //流程设计引入
+            // css sass  charset 报错
+            postcss: {
+                plugins: [
+                    {
+                        postcssPlugin: 'internal:charset-removal',
+                        AtRule: {
+                            charset: (atRule) => {
+                                if (atRule.name === 'charset') {
+                                    atRule.remove();
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        optimizeDeps: {
+            //流程设计引入
+            include: ['element-plus/dist/locale/zh-cn.mjs', 'bpmn-js/lib/Modeler', 'bpmn-js-token-simulation']
+        },
+        define: {
+            __VUE_PROD_DEVTOOLS__: true
+        }
     });
 };

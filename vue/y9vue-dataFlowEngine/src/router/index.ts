@@ -17,6 +17,7 @@ import businessClassifyRouter from './modules/businessClassifyRouter';
 import ruleConfigRouter from './modules/ruleConfigRouter';
 import taskConfigRouter from './modules/taskConfigRouter';
 import dispatchRouter from './modules/dispatchRouter';
+import processDesignRouter from './modules/processDesignRouter';
 import logMonitoringRouter from './modules/logMonitoringRouter';
 import serverNodeRouter from './modules/serverNodeRouter';
 import safetyRouter from './modules/safetyRouter';
@@ -79,6 +80,7 @@ export const asyncRoutes = [
     ruleConfigRouter,
     taskConfigRouter,
     dispatchRouter,
+    processDesignRouter,
     logMonitoringRouter,
     serverNodeRouter,
     safetyRouter,
