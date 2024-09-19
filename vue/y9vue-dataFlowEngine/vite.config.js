@@ -142,9 +142,6 @@ export default (serve) => {
         optimizeDeps: {
             //流程设计引入
             include: ['element-plus/dist/locale/zh-cn.mjs', 'bpmn-js/lib/Modeler', 'bpmn-js-token-simulation']
-        },
-        define: {
-            __VUE_PROD_DEVTOOLS__: true
         }
     });
 };

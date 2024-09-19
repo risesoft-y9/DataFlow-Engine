@@ -91,6 +91,7 @@
     import axios from 'axios';
     import { useBpmnStore } from '@/store/modules/bpmnStore';
     import { isReactive, toRaw } from 'vue';
+    import { parseXmlEvent } from './parseProcessXml';
     export default {
         name: 'MyProcessDesigner',
         componentName: 'MyProcessDesigner',
@@ -365,31 +366,13 @@
             },
 
             async saveModel() {
-                const { xml } = await this.bpmnModeler.saveXML({ format: true });
-                let formData = new FormData();
-                let file = new Blob([xml], { type: 'text/xml' }, 'activiti.xml');
-                formData.append('file', file);
-                let config = {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                };
                 const loading = ElLoading.service({ lock: true, text: '正在处理中', background: 'rgba(0, 0, 0, 0.3)' });
-                let url =
-                    import.meta.env.VUE_APP_PROCESS_CONTEXT +
-                    'vue/processModel/saveModelXml?access_token=' +
-                    y9_storage.getObjectItem(settings.siteTokenKey, 'access_token');
-                axios
-                    .post(url, formData, config)
-                    .then((res) => {
-                        this.$emit('saveModelXml');
-                        loading.close();
-                        ElMessage({ type: res.data.success ? 'success' : 'error', message: res.data.msg, offset: 65 });
-                    })
-                    .catch((err) => {
-                        loading.close();
-                        ElMessage({ type: 'error', message: '发生异常', offset: 65 });
-                    });
+                loading.close();
+                const { xml } = await this.bpmnModeler.saveXML({ format: true });
+                // 1、从xml解析出流程定义信息
+                let result = new parseXmlEvent(xml).start();
+                let formData = new FormData();
+                formData.append('xml', xml);
             },
 
             deployModel() {
