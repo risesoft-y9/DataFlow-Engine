@@ -54,6 +54,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.jodd</groupId>
             <artifactId>jodd-http</artifactId>
         </dependency>
