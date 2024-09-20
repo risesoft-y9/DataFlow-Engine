@@ -23,7 +23,6 @@ export class parseXmlEvent {
     public findEnd = false;
     public checkError = false;
     public errorInfo = '';
-    public countNode = 1;
     constructor(xml: String) {
         // 使用DOMParser解析XML字符串;
         let parser = new DOMParser();
@@ -264,5 +263,6 @@ export class parseXmlEvent {
             }
         }
         console.log(this.result);
+        return this.result;
     }
 }

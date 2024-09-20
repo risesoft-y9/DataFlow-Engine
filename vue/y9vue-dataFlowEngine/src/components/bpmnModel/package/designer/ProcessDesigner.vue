@@ -158,6 +158,7 @@
                 previewType: 'xml',
                 recoverable: false,
                 revocable: false,
+
                 cmOptions: {
                     mode: 'xml', // 语言模式
                     theme: 'monokai', // 主题
@@ -367,12 +368,13 @@
 
             async saveModel() {
                 const loading = ElLoading.service({ lock: true, text: '正在处理中', background: 'rgba(0, 0, 0, 0.3)' });
-                loading.close();
-                const { xml } = await this.bpmnModeler.saveXML({ format: true });
+
                 // 1、从xml解析出流程定义信息
+                const { xml } = await this.bpmnModeler.saveXML({ format: true });
                 let result = new parseXmlEvent(xml).start();
                 let formData = new FormData();
                 formData.append('xml', xml);
+                loading.close();
             },
 
             deployModel() {

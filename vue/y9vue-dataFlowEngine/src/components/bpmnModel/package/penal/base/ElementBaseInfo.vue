@@ -11,26 +11,85 @@
                     @change="updateBaseInfo('id')"
                 />
             </el-form-item>
-            <el-form-item label="绑定任务" v-show="elementBaseInfo.$type === 'bpmn:UserTask'">
-                <!-- <el-input v-model="elementBaseInfo.name" clearable @change="updateBaseInfo('name')" /> -->
-                <el-select v-model="taskId" placeholder="Select" filterable style="width: 240px">
-                    <el-option
-                        v-for="item in taskOptions"
-                        :key="item.taskName"
-                        :label="item.taskName"
-                        :value="item.taskId"
+            <div v-show="elementBaseInfo.$type === 'bpmn:UserTask'">
+                <el-form-item label="绑定任务">
+                    <!-- <el-input v-model="elementBaseInfo.name" clearable @change="updateBaseInfo('name')" /> -->
+                    <el-select
+                        v-model="taskId"
+                        placeholder="Select"
+                        filterable
+                        style="width: 240px"
+                        ref="taskSelectRef"
+                    >
+                        <el-option
+                            v-for="item in taskOptions"
+                            :key="item.taskId"
+                            :label="item.taskName"
+                            :value="'' + item.taskId"
+                        />
+                    </el-select>
+                </el-form-item>
+                <!-- <el-form-item label="任务过滤参数"></el-form-item> -->
+                <div
+                    style="
+                        margin-bottom: 25px;
+                        font-size: 14px;
+                        font-weight: bolder;
+                        line-height: 17px;
+                        display: flex;
+                        align-items: center;
+                    "
+                    ><i class="ri-find-replace-line" style="font-size: 17px; margin: 0 8px 0 -8px"></i>任务过滤参数</div
+                >
+                <el-form-item label="环境">
+                    <el-radio-group v-model="environment" @change="changeEnvironment">
+                        <el-radio border v-for="item in bpmnStore.getEnvironmentResult" :value="item.id">{{
+                            item.id
+                        }}</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="速度的类型">
+                    <el-radio-group v-model="dispatchType" @change="changeDispatchType">
+                        <el-radio border value="cron">cron</el-radio>
+                        <el-radio border value="固定速度">固定速度</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="任务名称搜索">
+                    <el-input
+                        v-model="taskName"
+                        @change="changeTaskName"
+                        style="width: 240px"
+                        placeholder="Please input"
                     />
-                </el-select>
-            </el-form-item>
+                </el-form-item>
+                <el-form-item label="任务类型">
+                    <el-tree-select
+                        node-key="id"
+                        clearable
+                        check-strictly
+                        :props="jobTypeProps"
+                        v-model="jobType"
+                        :data="bpmnStore.getJobTypeResult"
+                        @change="changeJobType"
+                    />
+                </el-form-item>
+                <div style="display: flex; justify-content: end">
+                    <el-button type="primary" @click="searchByParams">查询条件结果</el-button>
+                </div>
+            </div>
         </el-form>
     </div>
 </template>
 <script lang="ts" setup>
     import { forEach } from 'lodash';
-    import { ref, defineProps, nextTick, toRefs, onMounted, watch, reactive } from 'vue';
+    import { ref, defineProps, nextTick, toRefs, onMounted, watch, reactive, watchEffect } from 'vue';
     import { useBpmnStore } from '@/store/modules/bpmnStore';
+    import { templateRef } from '@vueuse/core';
 
     const bpmnStore = useBpmnStore();
+    bpmnStore.setEnvironmentResult();
+    bpmnStore.setJobTypeResult();
+    bpmnStore.setSearchResult();
     const bpmnModelerXML = ref('');
     const props = defineProps({
         businessObject: Object,
@@ -46,24 +105,75 @@
         elementBaseInfo: {},
         bpmnElement: null
     });
+    // 绑定任务的 id
     const taskId = ref('');
-    const taskOptions = reactive([
-        {
-            taskName: '任务-1',
-            taskId: 'id-1'
-        },
-        {
-            taskName: '任务-2',
-            taskId: 'id-2'
-        },
-        {
-            taskName: '任务-3',
-            taskId: 'id-3'
+    // 环境参数
+    const environment = ref('Public');
+    const changeEnvironment = () => {
+        bpmnStore.setTaskApiParams({
+            environment: environment.value
+        });
+    };
+    // 速度的类型参数
+    const dispatchType = ref('');
+    const changeDispatchType = () => {
+        bpmnStore.setTaskApiParams({
+            dispatchType: dispatchType.value
+        });
+    };
+    // 任务名称参数
+    const taskName = ref('');
+    const changeTaskName = () => {
+        bpmnStore.setTaskApiParams({
+            name: taskName.value
+        });
+    };
+    // 任务类型参数
+    const jobType = ref('');
+    const jobTypeProps = {
+        children: 'children',
+        label: 'name'
+    };
+    const changeJobType = () => {
+        bpmnStore.setTaskApiParams({
+            jobType: jobType.value
+        });
+    };
+    const taskOptions = ref(bpmnStore.taskResult);
+    watch(
+        () => bpmnStore.taskResult,
+        () => {
+            taskOptions.value = bpmnStore.taskResult;
         }
-    ]);
+    );
+    // 查询条件结果
+    const taskSelectRef = ref();
+    const searchByParams = async () => {
+        const loading = ElLoading.service({ lock: true, text: '正在查询中', background: 'rgba(0, 0, 0, 0.3)' });
+        await bpmnStore.setSearchResult();
+        loading.close();
+        nextTick(() => {
+            // console.log(taskSelectRef.value);
+            taskSelectRef.value?.toggleMenu();
+        });
+    };
+
+    // const taskOptions = reactive([
+    //     {
+    //         taskName: '任务-1',
+    //         taskId: 'id-1'
+    //     },
+    //     {
+    //         taskName: '任务-2',
+    //         taskId: 'id-2'
+    //     },
+    //     {
+    //         taskName: '任务-3',
+    //         taskId: 'id-3'
+    //     }
+    // ]);
     watch(taskId, (newVal) => {
-        console.log(elementBaseInfo);
-        taskOptions.map((item, index) => {
+        taskOptions.value.map((item, index) => {
             if (item.taskId === newVal) {
                 elementBaseInfo.value.name = item.taskName;
                 elementBaseInfo.value.taskId = item.taskId;
