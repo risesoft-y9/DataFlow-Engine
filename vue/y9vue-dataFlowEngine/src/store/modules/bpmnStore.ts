@@ -76,8 +76,9 @@ export const useBpmnStore = defineStore('useBpmnStore', {
             while (!all) {
                 try {
                     let res = await getDataSearch(this.taskApiParams);
+                    // taskId 字符串类型，否则 el-select 会有回显的小 bug
                     res.data.content.map((item) => {
-                        item.taskId = item.id;
+                        item.taskId = '' + item.id;
                         item.taskName = item.name;
                     });
                     this.taskResult = [...this.taskResult, ...res.data.content];

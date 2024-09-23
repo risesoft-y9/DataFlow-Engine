@@ -25,6 +25,7 @@ export class parseXmlEvent {
     public errorInfo = '';
     constructor(xml: String) {
         // 使用DOMParser解析XML字符串;
+        // console.log(JSON.stringify(xml));
         let parser = new DOMParser();
         this.xmlDoc = parser.parseFromString(xml, 'text/xml');
         this.checkStartNode();

@@ -52,6 +52,7 @@
     import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
     import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css';
     import { getModelXml } from '@/api/processAdmin/processModel';
+    import modelXml from './testModelXmlData.json';
 
     const props = defineProps({
         editId: String
@@ -95,7 +96,8 @@
 
     onMounted(async () => {
         if (props.editId != '') {
-            let res = await getModelXml(props.editId);
+            // let res = await getModelXml(props.editId);
+            let res = modelXml;
             if (res.success) {
                 xmlString.value = res.data.xml;
                 processId.value = res.data.key;

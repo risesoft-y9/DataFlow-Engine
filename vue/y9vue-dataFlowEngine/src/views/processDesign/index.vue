@@ -31,9 +31,9 @@
             <el-button class="global-btn-second" size="small" @click="editModel(row)"
                 ><i class="ri-edit-line" title="编辑" />编辑
             </el-button>
-            <el-button class="global-btn-second" size="small" @click="deploy(row)"
+            <!-- <el-button class="global-btn-second" size="small" @click="deploy(row)"
                 ><i class="ri-database-2-line" title="部署" />部署
-            </el-button>
+            </el-button> -->
             <el-button class="global-btn-second" size="small" @click="exportModel(row)"
                 ><i class="ri-download-line" title="导出" />导出
             </el-button>
@@ -59,6 +59,7 @@
     import axios from 'axios';
     import { deleteModel, deployModel, getModelList, importModel } from '@/api/processAdmin/processModel';
     import Y9BpmnModel from './bpmnModel.vue';
+    import modelListData from './testModelListData.json';
 
     const tableData = ref([]);
     const formRef = ref<FormInstance>();
@@ -115,11 +116,12 @@
     });
 
     async function getTableList() {
-        getModelList().then((res) => {
-            if (res.success) {
-                modelTableConfig.value.tableData = res.data;
-            }
-        });
+        // getModelList().then((res) => {
+        //     if (res.success) {
+        //         modelTableConfig.value.tableData = res.data;
+        //     }
+        // });
+        modelTableConfig.value.tableData = modelListData.data;
     }
 
     function addModel() {
