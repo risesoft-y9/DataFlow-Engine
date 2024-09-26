@@ -29,6 +29,16 @@
                         />
                     </el-select>
                 </el-form-item>
+                <el-form-item label="执行节点">
+                    <el-select v-model="executNode" placeholder="Select" filterable @change="changeExecutNode">
+                        <el-option
+                            v-for="item in bpmnStore.getExecutNode"
+                            :key="item.instanceId"
+                            :label="item.instanceId"
+                            :value="'' + item.instanceId"
+                        />
+                    </el-select>
+                </el-form-item>
                 <!-- <el-form-item label="任务过滤参数"></el-form-item> -->
                 <div
                     style="
@@ -39,28 +49,34 @@
                         display: flex;
                         align-items: center;
                     "
-                    ><i class="ri-find-replace-line" style="font-size: 17px; margin: 0 8px 0 -8px"></i>任务过滤参数</div
+                    ><i class="ri-find-replace-line" style="font-size: 17px; margin: 0 8px 0 -8px"></i>任务搜索条件</div
                 >
-                <el-form-item label="环境">
-                    <el-radio-group v-model="environment" @change="changeEnvironment">
-                        <el-radio border v-for="item in bpmnStore.getEnvironmentResult" :value="item.id">{{
-                            item.id
-                        }}</el-radio>
-                    </el-radio-group>
-                </el-form-item>
-                <el-form-item label="速度的类型">
-                    <el-radio-group v-model="dispatchType" @change="changeDispatchType">
-                        <el-radio border value="cron">cron</el-radio>
-                        <el-radio border value="固定速度">固定速度</el-radio>
-                    </el-radio-group>
-                </el-form-item>
-                <el-form-item label="任务名称搜索">
-                    <el-input
-                        v-model="taskName"
-                        @change="changeTaskName"
+                <el-form-item label="执行环境">
+                    <el-select
+                        v-model="environment"
+                        placeholder="Select"
+                        filterable
                         style="width: 240px"
-                        placeholder="Please input"
-                    />
+                        @change="changeEnvironment"
+                    >
+                        <el-option
+                            v-for="item in bpmnStore.getEnvironmentResult"
+                            :key="item.id"
+                            :label="item.id"
+                            :value="'' + item.id"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="速度类型">
+                    <el-select
+                        v-model="dispatchType"
+                        placeholder="Select"
+                        style="width: 240px"
+                        @change="changeDispatchType"
+                    >
+                        <el-option value="cron">cron</el-option>
+                        <el-option value="固定速度">固定速度</el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="任务类型">
                     <el-tree-select
@@ -73,11 +89,28 @@
                         @change="changeJobType"
                     />
                 </el-form-item>
-                <div style="display: flex; justify-content: end">
+                <el-form-item label="任务搜索">
+                    <el-input
+                        v-model="taskName"
+                        @change="changeTaskName"
+                        style="width: 240px"
+                        placeholder="Please input"
+                    />
+                </el-form-item>
+                <div style="display: flex; justify-content: center">
                     <el-button type="primary" @click="searchByParams">查询条件结果</el-button>
                 </div>
             </div>
         </el-form>
+        <br />
+        <!-- 表格 -->
+        <y9Table
+            v-if="showTable"
+            :config="tableConfig"
+            @on-curr-page-change="onCurrentChange"
+            @on-page-size-change="onPageSizeChange"
+        >
+        </y9Table>
     </div>
 </template>
 <script lang="ts" setup>
@@ -85,11 +118,11 @@
     import { ref, defineProps, nextTick, toRefs, onMounted, watch, reactive, watchEffect } from 'vue';
     import { useBpmnStore } from '@/store/modules/bpmnStore';
     import { templateRef } from '@vueuse/core';
+    import { useI18n } from 'vue-i18n';
+    const { t } = useI18n();
 
     const bpmnStore = useBpmnStore();
-    bpmnStore.setEnvironmentResult();
-    bpmnStore.setJobTypeResult();
-    bpmnStore.setSearchResult();
+    bpmnStore.setInitData();
     const bpmnModelerXML = ref('');
     const props = defineProps({
         businessObject: Object,
@@ -101,12 +134,77 @@
         },
         updateId: Boolean
     });
+    // 表格配置
+    let showTable = ref(false);
+    onMounted(() => {
+        showTable.value = true;
+    });
+    let tableConfig = ref({
+        pageConfig: {
+            currentPage: 1,
+            pageSize: 15,
+            total: 0,
+            pageSizeOpts: [10, 15, 30, 60, 120, 240]
+        },
+        loading: false,
+        // border: false,
+        // headerBackground: true,
+        columns: [
+            {
+                type: 'index',
+                width: 60,
+                fixed: 'left',
+                title: computed(() => t('序号'))
+            },
+            {
+                title: computed(() => t('任务名称')),
+                key: 'name'
+            }
+        ],
+        tableData: []
+    });
+    // 分页操作
+    function onCurrentChange(currPage) {
+        tableConfig.value.pageConfig.currentPage = currPage;
+        bpmnStore.setTaskApiParams({
+            pageNo: currPage
+        });
+        initTableData();
+    }
+    function onPageSizeChange(pageSize) {
+        tableConfig.value.pageConfig.pageSize = pageSize;
+        initTableData();
+    }
+    // init 数据
+    async function initTableData() {
+        tableConfig.value.loading = true;
+        let res = await getDataSearch(bpmnStore.getTaskApiParams);
+        if (res.code == 0) {
+            // 对返回的接口数据进行赋值与处理
+            tableConfig.value.tableData = res.data.content;
+            tableConfig.value.pageConfig.total = res.data.total;
+        } else {
+            tableConfig.value.tableData = [];
+            tableConfig.value.pageConfig.total = 0;
+            ElNotification({
+                title: '提示',
+                message: res?.msg,
+                type: 'error',
+                duration: 2000,
+                offset: 80
+            });
+        }
+        // 请求接口
+        tableConfig.value.loading = false;
+    }
     const data = reactive({
         elementBaseInfo: {},
         bpmnElement: null
     });
     // 绑定任务的 id
     const taskId = ref('');
+    // 执行节点
+    const executNode = ref('');
     // 环境参数
     const environment = ref('Public');
     const changeEnvironment = () => {
@@ -179,8 +277,14 @@
                 elementBaseInfo.value.taskId = item.taskId;
                 updateBaseInfo('taskId');
                 updateBaseInfo('name');
-                // 绑定一个任务后，删除该任务选项
-                // taskOptions.splice(index, 1);
+            }
+        });
+    });
+    watch(executNode, (newVal) => {
+        bpmnStore.getExecutNode.map((item, index) => {
+            if (item.instanceId === newVal) {
+                elementBaseInfo.value.executNode = executNode.value;
+                updateBaseInfo('executNode');
             }
         });
     });
@@ -202,6 +306,11 @@
                         taskId.value = item.getAttribute('taskId');
                     } else {
                         taskId.value = '';
+                    }
+                    if (item.getAttribute('executNode')) {
+                        executNode.value = item.getAttribute('executNode');
+                    } else {
+                        executNode.value = '';
                     }
                 }
             });

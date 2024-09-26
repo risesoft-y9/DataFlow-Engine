@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import { createNonNullChain, isJSDocNullableType } from 'typescript';
 import { isReactive, reactive, toRaw } from 'vue';
 import { getDataSearch, getEnvironmentAll } from '@/api/dispatch';
+import { getServicesList } from '@/api/serverNode/index';
 import { getFindAll } from '@/api/taskConfig';
 import { setTreeData } from '@/utils/object';
 
@@ -18,9 +19,11 @@ export const useBpmnStore = defineStore('useBpmnStore', {
                 name: '', // 可选 - 任务名字
                 jobType: '' // 可选 - 业务分类
             },
+            executNode: [], // 执行节点
             taskResult: [], // 所有任务结果
             environmentResult: [], // 所有环境
-            jobTypeResult: [] // 所有业务分类
+            jobTypeResult: [], // 所有业务分类
+            taskResultTotal: 0 // 所有任务总数
         };
     },
     getters: {
@@ -38,6 +41,9 @@ export const useBpmnStore = defineStore('useBpmnStore', {
         },
         getJobTypeResult() {
             return this.jobTypeResult;
+        },
+        getExecutNode() {
+            return this.executNode;
         }
     },
     actions: {
@@ -50,10 +56,31 @@ export const useBpmnStore = defineStore('useBpmnStore', {
         setSearchApiParams(params: any) {
             this.taskApiParams = params;
         },
+        async setInitData() {
+            try {
+                await new Promise.all([
+                    this.setExecutNode(),
+                    this.setEnvironmentResult(),
+                    this.setJobTypeResult(),
+                    this.setSearchResult()
+                ]);
+            } catch (error) {
+                return error;
+            }
+        },
+        async setExecutNode() {
+            try {
+                let res = await getServicesList();
+                this.executNode = res.data;
+            } catch (error) {
+                return error;
+            }
+        },
         async setEnvironmentResult() {
             try {
                 let res = await getEnvironmentAll();
                 this.environmentResult = res.data;
+                this.taskResultTotal = res.data.total;
             } catch (error) {
                 return error;
             }

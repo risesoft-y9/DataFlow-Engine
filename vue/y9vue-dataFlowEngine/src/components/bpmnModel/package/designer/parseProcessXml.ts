@@ -195,6 +195,7 @@ export class parseXmlEvent {
         info.id = node.getAttribute('id');
         info.name = node.getAttribute('name');
         info.taskId = node.getAttribute('taskId');
+        info.executNode = node.getAttribute('executNode');
         let outgoingArray = [];
         Array.from(node.children).forEach((item) => {
             if (item.tagName == this.outgoingTagName) {
