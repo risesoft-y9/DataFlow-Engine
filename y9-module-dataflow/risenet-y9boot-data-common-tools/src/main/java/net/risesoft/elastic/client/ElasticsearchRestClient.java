@@ -171,11 +171,22 @@ public class ElasticsearchRestClient {
      * @return
      * @throws Exception
      */
-    public int getCount(String indexName) throws Exception {
-    	String data = HttpClientEsUtil.httpGet(url + "/" + indexName + "/_count", username, password);
+    @SuppressWarnings("unchecked")
+	public int getCount(String indexName, String query) throws Exception {
+    	String data = HttpClientEsUtil.httpPost(query, url + "/" + indexName + "/_search", username, password);
     	if(!data.equals("failed")) {
     		Map<String, Object> map = Y9JsonUtil.readHashMap(data);
-    		return (int)map.get("count");
+    		Integer total = 0;
+    		Map<String, Object> hits = (Map<String, Object>) map.get("hits");
+    		if(hits != null) {
+    			try {
+					total = (Integer) hits.get("total");
+				} catch (Exception e) {
+					Map<String, Object> totalMap = (Map<String, Object>) hits.get("total");
+					total = (Integer) totalMap.get("value");
+				}
+    		}
+    		return total;
     	}else {
     		throw new Exception("获取索引表数据量失败");
     	}		

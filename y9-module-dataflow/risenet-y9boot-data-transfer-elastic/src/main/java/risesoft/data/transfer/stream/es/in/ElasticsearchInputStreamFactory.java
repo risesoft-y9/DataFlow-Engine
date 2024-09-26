@@ -108,7 +108,7 @@ public class ElasticsearchInputStreamFactory implements DataInputStreamFactory {
 		// 获取表数量
 		int count = 0;
 		try {
-			count = elasticsearchRestClient.getCount(indexName);
+			count = elasticsearchRestClient.getCount(indexName, query);
 		} catch (Exception e) {
 			throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "elastic数量查询-执行报错", e);
 		}
@@ -198,10 +198,10 @@ public class ElasticsearchInputStreamFactory implements DataInputStreamFactory {
         	throw new TransferException(CommonErrorCode.CONFIG_ERROR, "无数据，无法切分");  
         }  
         List<Map<String, Integer>> listMap = new ArrayList<Map<String,Integer>>();
-        Map<String, Integer> result = new HashMap<String, Integer>();
         int chunkSize = count / parts; // 计算每份的平均大小  
         int remainder = count % parts; // 计算余数  
-        for (int i = 0; i < parts; i++) {  
+        for (int i = 0; i < parts; i++) {
+        	Map<String, Integer> result = new HashMap<String, Integer>();
             int start = i * chunkSize;  
             int end = (i == parts - 1) ? count : start + chunkSize; // 最后一份可能包含余数  
             if (remainder > 0) {  
