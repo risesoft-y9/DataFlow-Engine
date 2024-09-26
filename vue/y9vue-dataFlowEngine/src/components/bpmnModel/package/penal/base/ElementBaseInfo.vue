@@ -57,6 +57,7 @@
                 </el-form-item>
                 <el-form-item label="速度类型">
                     <el-select v-model="dispatchType" placeholder="Select" @change="changeDispatchType">
+                        <el-option value="">空选项</el-option>
                         <el-option value="cron">cron</el-option>
                         <el-option value="固定速度">固定速度</el-option>
                     </el-select>
@@ -116,14 +117,10 @@
         },
         updateId: Boolean
     });
-    // 表格配置
-    onMounted(() => {
-        initTableData();
-    });
     let tableConfig = ref({
         pageConfig: {
             currentPage: 1,
-            pageSize: 15,
+            pageSize: 5,
             total: 0,
             pageSizeOpts: [10, 15, 30, 60, 120, 240]
         },
@@ -144,6 +141,11 @@
         ],
         tableData: []
     });
+    // 表格配置
+    onMounted(() => {
+        tableConfig.value.pageConfig.pageSize = bpmnStore.getTaskApiParams.pageSize;
+        initTableData();
+    });
     // 分页操作
     function onCurrentChange(currPage) {
         tableConfig.value.pageConfig.currentPage = currPage;
@@ -154,6 +156,9 @@
     }
     function onPageSizeChange(pageSize) {
         tableConfig.value.pageConfig.pageSize = pageSize;
+        bpmnStore.setTaskApiParams({
+            pageSize: pageSize
+        });
         initTableData();
     }
     function onCellDblClick(row, column, cell, event) {
@@ -238,6 +243,8 @@
             // console.log(taskSelectRef.value);
             taskSelectRef.value?.toggleMenu();
         });
+        tableConfig.value.pageConfig.currentPage = 1;
+        initTableData();
     };
 
     // const taskOptions = reactive([

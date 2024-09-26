@@ -14,7 +14,7 @@ export const useBpmnStore = defineStore('useBpmnStore', {
             taskApiParams: {
                 environment: 'Public', // 必须 - 任务的环境
                 pageNo: 1, // 必须 - 页码
-                pageSize: 20, // 必须 - 每页显示数量
+                pageSize: 15, // 必须 - 每页显示数量
                 dispatchType: '', // 可选 - 速度的类型 cron\固定速度
                 name: '', // 可选 - 任务名字
                 jobType: '' // 可选 - 业务分类
@@ -88,7 +88,18 @@ export const useBpmnStore = defineStore('useBpmnStore', {
         async setJobTypeResult() {
             try {
                 let res = await getFindAll();
-                this.jobTypeResult = setTreeData(res.data);
+                // 空选项
+                let temp_1 = setTreeData([
+                    {
+                        createTime: '',
+                        id: '',
+                        name: '空选项',
+                        parentId: '0',
+                        updateTime: ''
+                    }
+                ]);
+                let temp_2 = setTreeData(res.data);
+                this.jobTypeResult = [...temp_1, ...temp_2];
             } catch (error) {
                 return error;
             }
