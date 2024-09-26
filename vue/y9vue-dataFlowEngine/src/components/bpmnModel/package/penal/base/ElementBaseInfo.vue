@@ -14,13 +14,7 @@
             <div v-show="elementBaseInfo.$type === 'bpmn:UserTask'">
                 <el-form-item label="绑定任务">
                     <!-- <el-input v-model="elementBaseInfo.name" clearable @change="updateBaseInfo('name')" /> -->
-                    <el-select
-                        v-model="taskId"
-                        placeholder="Select"
-                        filterable
-                        style="width: 240px"
-                        ref="taskSelectRef"
-                    >
+                    <el-select v-model="taskId" placeholder="Select" filterable ref="taskSelectRef">
                         <el-option
                             v-for="item in taskOptions"
                             :key="item.taskId"
@@ -42,7 +36,7 @@
                 <!-- <el-form-item label="任务过滤参数"></el-form-item> -->
                 <div
                     style="
-                        margin-bottom: 25px;
+                        margin: 15px 0 15px 0;
                         font-size: 14px;
                         font-weight: bolder;
                         line-height: 17px;
@@ -52,13 +46,7 @@
                     ><i class="ri-find-replace-line" style="font-size: 17px; margin: 0 8px 0 -8px"></i>任务搜索条件</div
                 >
                 <el-form-item label="执行环境">
-                    <el-select
-                        v-model="environment"
-                        placeholder="Select"
-                        filterable
-                        style="width: 240px"
-                        @change="changeEnvironment"
-                    >
+                    <el-select v-model="environment" placeholder="Select" filterable @change="changeEnvironment">
                         <el-option
                             v-for="item in bpmnStore.getEnvironmentResult"
                             :key="item.id"
@@ -68,12 +56,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="速度类型">
-                    <el-select
-                        v-model="dispatchType"
-                        placeholder="Select"
-                        style="width: 240px"
-                        @change="changeDispatchType"
-                    >
+                    <el-select v-model="dispatchType" placeholder="Select" @change="changeDispatchType">
                         <el-option value="cron">cron</el-option>
                         <el-option value="固定速度">固定速度</el-option>
                     </el-select>
@@ -90,27 +73,23 @@
                     />
                 </el-form-item>
                 <el-form-item label="任务搜索">
-                    <el-input
-                        v-model="taskName"
-                        @change="changeTaskName"
-                        style="width: 240px"
-                        placeholder="Please input"
-                    />
+                    <el-input v-model="taskName" @change="changeTaskName" placeholder="Please input" />
                 </el-form-item>
-                <div style="display: flex; justify-content: center">
+                <div style="display: flex; justify-content: center; margin: 25px 0">
                     <el-button type="primary" @click="searchByParams">查询条件结果</el-button>
                 </div>
             </div>
         </el-form>
-        <br />
         <!-- 表格 -->
-        <y9Table
-            v-if="showTable"
-            :config="tableConfig"
-            @on-curr-page-change="onCurrentChange"
-            @on-page-size-change="onPageSizeChange"
-        >
-        </y9Table>
+        <div v-show="elementBaseInfo.$type === 'bpmn:UserTask'">
+            <y9Table
+                :config="tableConfig"
+                @on-curr-page-change="onCurrentChange"
+                @on-page-size-change="onPageSizeChange"
+                @cell-dblclick="onCellDblClick"
+            >
+            </y9Table>
+        </div>
     </div>
 </template>
 <script lang="ts" setup>
@@ -119,11 +98,14 @@
     import { useBpmnStore } from '@/store/modules/bpmnStore';
     import { templateRef } from '@vueuse/core';
     import { useI18n } from 'vue-i18n';
+    import { getDataSearch } from '@/api/dispatch';
     const { t } = useI18n();
 
     const bpmnStore = useBpmnStore();
     bpmnStore.setInitData();
     const bpmnModelerXML = ref('');
+    // 绑定任务的 id
+    const taskId = ref('');
     const props = defineProps({
         businessObject: Object,
         type: String,
@@ -135,9 +117,8 @@
         updateId: Boolean
     });
     // 表格配置
-    let showTable = ref(false);
     onMounted(() => {
-        showTable.value = true;
+        initTableData();
     });
     let tableConfig = ref({
         pageConfig: {
@@ -175,6 +156,10 @@
         tableConfig.value.pageConfig.pageSize = pageSize;
         initTableData();
     }
+    function onCellDblClick(row, column, cell, event) {
+        // console.log(row, column, cell, event);
+        taskId.value = '' + row?.id;
+    }
     // init 数据
     async function initTableData() {
         tableConfig.value.loading = true;
@@ -201,8 +186,7 @@
         elementBaseInfo: {},
         bpmnElement: null
     });
-    // 绑定任务的 id
-    const taskId = ref('');
+
     // 执行节点
     const executNode = ref('');
     // 环境参数
@@ -423,3 +407,9 @@
         window.bpmnInstances.modeling.updateProperties(window?.bpmnInstances?.bpmnElement, attrObj);
     }
 </script>
+
+<style lang="scss" scoped>
+    .y9-dialog-overlay .y9-dialog .y9-dialog-body .y9-dialog-content .el-form-item {
+        margin-bottom: 10px;
+    }
+</style>
