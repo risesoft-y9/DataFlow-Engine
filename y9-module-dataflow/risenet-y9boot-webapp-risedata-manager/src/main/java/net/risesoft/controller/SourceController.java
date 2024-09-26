@@ -159,7 +159,7 @@ public class SourceController {
 	    		ElasticsearchRestClient elasticsearchRestClient = new ElasticsearchRestClient(source.getUrl(), 
 	    				source.getUsername(), source.getPassword());
 	    		try {
-	    			map.put("dataNum", elasticsearchRestClient.getCount(record.getName()));
+	    			map.put("dataNum", elasticsearchRestClient.getCount(record.getName(), "{}"));
 				} catch (Exception e) {
 					map.put("dataNum", e.getMessage());
 				}
