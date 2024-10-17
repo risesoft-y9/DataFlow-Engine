@@ -108,7 +108,12 @@ public class ElasticsearchInputStreamFactory implements DataInputStreamFactory {
 		// 获取表数量
 		int count = 0;
 		try {
-			count = elasticsearchRestClient.getCount(indexName, query);
+			String queryJson = "{";
+			if(StringUtils.isNotBlank(query)) {
+				queryJson += "\"query\":" + query;
+			}
+			queryJson += "}";
+			count = elasticsearchRestClient.getCount(indexName, queryJson);
 		} catch (Exception e) {
 			throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "elastic数量查询-执行报错", e);
 		}
