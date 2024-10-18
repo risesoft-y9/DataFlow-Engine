@@ -63,7 +63,7 @@ export const constantRoutes: Array<any> = [
         meta: {
             title: '接口在线测试'
         },
-        component: () => import('@/views/test/apiTest.vue')
+        component: () => import('@/views/test/index.vue')
     }
 ];
 
