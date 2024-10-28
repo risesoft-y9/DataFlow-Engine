@@ -11,6 +11,7 @@ import { setupStore } from '@/store';
 import 'animate.css';
 import 'normalize.css'; // 样式初始化
 import 'remixicon/fonts/remixicon.css';
+import 'jsoneditor/dist/jsoneditor.min.css';
 import { createApp } from 'vue';
 import sso from 'y9plugin-sso';
 import App from './App.vue';
@@ -21,6 +22,7 @@ import i18n from './language';
 import y9pluginComponents from 'y9plugin-components'; //有生云公共组件库
 import y9_zhCn from 'y9plugin-components/src/language/zh-cn'; //默认的y9组件插件中文包
 import y9_en from 'y9plugin-components/src/language/en'; //默认的y9组件插件英文包
+
 import { useSettingStore } from '@/store/modules/settingStore';
 import MyPD from './components/bpmnModel/package/index.js';
 import './components/bpmnModel/package/theme/index.scss';
