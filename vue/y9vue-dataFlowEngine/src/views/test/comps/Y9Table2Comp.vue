@@ -17,6 +17,8 @@
         }
     });
 
+    const emits = defineEmits(['onAdd', 'onDelete', 'onEdit']);
+
     const selectAll = () => {
         isSelectAll.value = !isSelectAll.value;
         if (isSelectAll.value) {
@@ -42,8 +44,8 @@
     // );
     const addRowFunc = (e) => {
         props.itemList.push({
-            headerKey: '',
-            headerParam: ''
+            Key: '',
+            Param: ''
         });
         count.value += 1;
         nextTick(() => {
@@ -53,17 +55,20 @@
                     .scrollTo(0, document.getElementById(Y9Table2Body_Id.value).scrollHeight);
             }
         });
+        emits('onAdd');
     };
     const deleteRowFunc = (index: number) => {
-        props.itemList.splice(index, 1);
+        const item = props.itemList.splice(index, 1);
+        console.log('delete', item);
+        emits('onDelete');
     };
     const selectItemChange = (index: number) => {
         props.itemList[index]['isSelect'] = !props.itemList[index]['isSelect'];
     };
     const isBlankCheck = (index) => {
         const i = index;
-        if (props.itemList[i].headerKey) {
-            if (props.itemList[i].headerParam) {
+        if (props.itemList[i].Key) {
+            if (props.itemList[i].Param) {
                 props.itemList[i]['isSelect'] = true;
             } else {
                 props.itemList[i]['isSelect'] = false;
@@ -71,6 +76,7 @@
         } else {
             props.itemList[i]['isSelect'] = false;
         }
+        emits('onEdit');
         count.value += 1;
     };
 </script>
@@ -94,16 +100,16 @@
                 /></span>
                 <span
                     ><el-input
-                        v-model="itemList[index]['headerKey']"
+                        v-model="itemList[index]['Key']"
                         placeholder="Please input"
-                        :value="item.headerKey"
+                        :value="item.Key"
                         @input="isBlankCheck(index)"
                 /></span>
                 <span
                     ><el-input
-                        v-model="itemList[index]['headerParam']"
+                        v-model="itemList[index]['Param']"
                         placeholder="Please input"
-                        :value="item.headerParam"
+                        :value="item.Param"
                         @input="isBlankCheck(index)"
                 /></span>
                 <span>

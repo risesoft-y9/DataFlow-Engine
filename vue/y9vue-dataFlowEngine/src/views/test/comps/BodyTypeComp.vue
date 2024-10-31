@@ -2,6 +2,10 @@
     import JSONEditor from 'jsoneditor';
     import Y9Table2Comp from './Y9Table2Comp.vue';
     import { watch } from 'vue';
+    import type { UploadInstance } from 'element-plus';
+
+    const uploadRef = ref<UploadInstance>();
+
     const props = defineProps({
         type: {
             type: Number,
@@ -12,8 +16,20 @@
             default() {
                 return [];
             }
+        },
+        ApiForm: {
+            type: Object,
+            default() {
+                return {};
+            }
         }
     });
+    const bodyType = ref(props.type);
+    watch(bodyType, (value) => {
+        emits('onRadioChange', value);
+    });
+
+    const emits = defineEmits(['onAdd', 'onDelete', 'onEdit', 'onRadioChange']);
 
     watch(
         () => props.type,
@@ -22,6 +38,57 @@
         }
     );
 
+    function onDeleteItem() {
+        emits('onDelete');
+    }
+    function onEditItem() {
+        emits('onEdit');
+    }
+
+    const bodyTypeJsonContainerHeight = ref(196);
+    const bodyTypeJsonContainer = ref(null);
+    const editor = ref(null);
+
+    function initBodyTypeJsonContainer() {
+        if (editor.value) {
+            return null;
+        }
+        bodyTypeJsonContainer.value = document.getElementById('body-type-json-container');
+        /**
+         * C.VALID_OPTIONS = [
+         *      "ajv", "schema", "schemaRefs", "templates", "ace", "theme",
+         *      "autocomplete", "onChange", "onChangeJSON", "onChangeText", "onExpand",
+         *      "onEditable", "onError", "onEvent", "onModeChange", "onNodeName",
+         *      "onValidate", "onCreateMenu", "onSelectionChange", "onTextSelectionChange",
+         *      "onClassName", "onFocus", "onBlur", "colorPicker", "onColorPicker",
+         *      "timestampTag", "timestampFormat", "escapeUnicode", "history", "search",
+         *      "mode", "modes", "name", "indentation", "sortObjectKeys", "navigationBar",
+         *      "statusBar", "mainMenuBar", "languages", "language", "enableSort", "enableTransform",
+         *      "limitDragging", "maxVisibleChilds", "onValidationError", "modalAnchor", "popupAnchor",
+         *      "createQuery", "executeQuery", "queryDescription", "allowSchemaSuggestions", "showErrorTable"
+         * ],
+         */
+        const options = {
+            selectionStyle: 'tree',
+            mode: 'code',
+            statusBar: false,
+            mainMenuBar: false,
+            showErrorTable: false,
+            onChangeText() {
+                console.log(editor.value.get());
+            }
+        };
+        editor.value = new JSONEditor(bodyTypeJsonContainer.value, options);
+
+        // set json
+        editor.value.set();
+
+        document.querySelector('#body-type-json-container .jsoneditor').style.height =
+            bodyTypeJsonContainerHeight.value + 'px';
+        console.log(editor.value);
+        // get json
+        // const updatedJson = editor.value.get();
+    }
     function init(value) {
         switch (value) {
             case 3:
@@ -35,44 +102,24 @@
                 break;
         }
     }
-
-    const bodyTypeJsonContainerHeight = ref(196);
-    const bodyTypeJsonContainer = ref(null);
-    const editor = ref(null);
-    function initBodyTypeJsonContainer() {
-        if (editor.value) {
-            return null;
-        }
-        bodyTypeJsonContainer.value = document.getElementById('body-type-json-container');
-        const options = {
-            selectionStyle: 'tree',
-            mode: 'code',
-            statusBar: false,
-            mainMenuBar: false,
-            onChangeText() {
-                console.log('json changed');
-            }
-        };
-        editor.value = new JSONEditor(bodyTypeJsonContainer.value, options);
-
-        // set json
-        editor.value.set();
-
-        document.querySelector('#body-type-json-container .jsoneditor').style.height =
-            bodyTypeJsonContainerHeight.value + 'px';
-        // console.log(editor.value);
-        // get json
-        // const updatedJson = editor.value.get();
-    }
     onMounted(() => {
         init(props.type);
     });
 </script>
 <template>
     <div>
+        <el-radio-group v-model="bodyType">
+            <el-radio :value="1">none</el-radio>
+            <el-radio :value="2">form-data</el-radio>
+            <el-radio :value="3">json</el-radio>
+            <el-radio :value="4">xml</el-radio>
+            <el-radio :value="5">html</el-radio>
+            <el-radio :value="6">javascript</el-radio>
+            <el-radio :value="7">binary</el-radio>
+        </el-radio-group>
         <div v-show="type == 1" class="body-type-none"></div>
         <div v-show="type == 2" class="body-type-form-data">
-            <Y9Table2Comp :itemList="itemList" />
+            <Y9Table2Comp key="bodyTypeFormData" :itemList="itemList" @on-delete="onDeleteItem" @on-edit="onEditItem" />
         </div>
         <div v-show="type == 3 || type == 4 || type == 5 || type == 6" class="body-type-json">
             <div id="body-type-json-container"></div>
@@ -81,10 +128,13 @@
             <div class="upload-file-item"></div>
             <div class="upload-area-button">
                 <el-upload
+                    ref="uploadRef"
                     class="upload-api-test"
                     drag
-                    action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+                    :action="ApiForm.url"
+                    :method="ApiForm.method"
                     multiple
+                    :auto-upload="false"
                 >
                     <div
                         ><el-icon class="el-icon--upload"><upload-filled /></el-icon
@@ -122,6 +172,9 @@
         width: 100%;
         height: v-bind('bodyTypeJsonContainerHeight + 4 + "px"');
         overflow: hidden;
+        .el-upload-list {
+            top: v-bind('-(bodyTypeJsonContainerHeight + 4) + "px"');
+        }
     }
 </style>
 <style>

@@ -1,12 +1,15 @@
 <script setup lang="ts">
-    import { inject, onMounted, reactive, watch } from 'vue';
+    import { inject, nextTick, onMounted, reactive, watch } from 'vue';
     import { Search } from '@element-plus/icons-vue';
     import { useSettingStore } from '@/store/modules/settingStore';
     import Y9Table2Comp from './comps/Y9Table2Comp.vue';
     import BodyTypeComp from './comps/BodyTypeComp.vue';
     import JSONEditor from 'jsoneditor';
-    import { randomString } from '@/utils/index';
+    import { randomString, debounce } from '@/utils/index';
     import ZanWuShiJu from '@/assets/images/dataflowEnginePro/暂无数据 (2).png';
+    import { NumberLiteralType } from 'typescript';
+    import { setActivePinia } from 'pinia';
+    import { cloneDeep } from 'lodash';
 
     //
     const settingStore = useSettingStore();
@@ -24,36 +27,104 @@
     const sizeObjInfo = inject('sizeObjInfo');
     const pageHeaderFontSize = ref(sizeObjInfo.extraLargeFont);
     const defaultAcitonIcons = { edit: true, add: false, remove: true, preview: false };
+    const currentId = ref('');
+    const hightlightNode = ref(null);
+
+    const templateTreeDataItem = {
+        name: '接口模版',
+        id: '1',
+        ApiForm: {
+            name: '接口模版',
+            method: 'GET',
+            url: '',
+            header: [
+                {
+                    isSelect: true,
+                    Key: 'Access-Control-Request-Method',
+                    Param: 'keep-alive'
+                }
+            ],
+            query: [
+                {
+                    isSelect: false,
+                    Key: '',
+                    Param: ''
+                }
+            ],
+            body: {
+                type: 1,
+                1: null,
+                2: [
+                    {
+                        isSelect: false,
+                        headerKey: '',
+                        headerParam: ''
+                    }
+                ],
+                3: null,
+                4: null,
+                5: null,
+                6: null,
+                7: null
+            }
+        }
+    };
     let treeData = ref([
         {
-            name: '北京有生博大有限公司',
-            id: '1'
-        },
-        {
-            name: '有生集团',
-            id: '2'
+            name: '接口1',
+            id: '1',
+            ApiForm: {
+                name: '接口1',
+                method: 'POST',
+                url: 'http://localhost:8091/api/restful/post/1',
+                header: [
+                    {
+                        isSelect: true,
+                        Key: 'Access-Control-Request-Method',
+                        Param: 'keep-alive'
+                    },
+                    {
+                        isSelect: true,
+                        Key: 'content-type',
+                        Param: 'application/json'
+                    }
+                ],
+                query: [
+                    {
+                        isSelect: false,
+                        Key: '',
+                        Param: ''
+                    }
+                ],
+                body: {
+                    type: 1,
+                    1: null,
+                    2: [
+                        {
+                            isSelect: false,
+                            headerKey: '',
+                            headerParam: ''
+                        }
+                    ],
+                    3: null,
+                    4: null,
+                    5: null,
+                    6: null,
+                    7: null
+                }
+            }
         }
     ]);
-    //点击编辑icon
-    const onTreeEditIcon = (node) => {
-        console.log('编辑icon被点击了', node);
-    };
-    //点击删除icon
-    const onTreeRemoveIcon = (node) => {
-        y9TreeDefaultActiveRef.value.remove(node);
-        console.log('删除icon被点击了', node);
-    };
+    const treeDataSearchKey = ref('');
 
-    const ApiForm = reactive({
-        name: '',
-        method: 'GET',
-        url: '',
-        header: {},
-        query: null,
-        body: null
-    });
+    const ApiForm = reactive({});
+    /**
+     * body.type
+     * 1、none 2、form-data 3、json 4、xml 5、html 6、javascript 7、binary
+     */
+
     const bodyType = ref(1);
-    const RequestActiveName = ref('Header');
+    const RequestActiveName = ref('Query');
     const ResultActiveName = ref('实时响应');
     const RequestTabPane = reactive({
         headerTitle: 'Header',
@@ -68,56 +139,11 @@
     });
 
     //
-    const headerItemList = reactive([
-        {
-            isSelect: true,
-            headerKey: 'Access-Control-Request-Method',
-            headerParam: 'keep-alive'
-        }
-    ]);
-    const queryItemList = reactive([
-        {
-            isSelect: false,
-            headerKey: '',
-            headerParam: ''
-        }
-    ]);
-    const bodyFormDataItemList = reactive([
-        {
-            isSelect: true,
-            headerKey: 'Access-Control-Request-Method',
-            headerParam: 'keep-alive'
-        }
-    ]);
-    const resposeRequestItemList = reactive([
-        {
-            key: 'Access-Control-Request-Method',
-            value: '-'
-        },
-        {
-            key: 'Accept',
-            value: '*/*'
-        },
-        {
-            key: 'User-Agent',
-            value: 'PostmanRuntime-ApipostRuntime/1.1.0'
-        }
-    ]);
-
-    const resposeResposeItemList = reactive([
-        {
-            key: 'Access-Control-Request-Method',
-            value: '-'
-        },
-        {
-            key: 'Accept',
-            value: '*/*'
-        },
-        {
-            key: 'User-Agent',
-            value: 'PostmanRuntime-ApipostRuntime/1.1.0'
-        }
-    ]);
+    const headerItemList = reactive([]);
+    const queryItemList = reactive([]);
+    const bodyFormDataItemList = reactive([]);
+    const resposeRequestItemList = reactive([]);
+    const resposeResposeItemList = reactive([]);
 
     let cookieTableConfig = ref({
         headerBackground: true,
@@ -164,6 +190,134 @@
             // }
         ]
     });
+
+    function onDeleteItem() {
+        console.log('onDeleteItem');
+        ApiForm.header = cloneDeep(headerItemList);
+        ApiForm.query = cloneDeep(queryItemList);
+        ApiForm.body['2'] = cloneDeep(bodyFormDataItemList);
+        ApiFormChange();
+    }
+    function onEditItem() {
+        console.log('onEditItem');
+        ApiForm.header = cloneDeep(headerItemList);
+        ApiForm.query = cloneDeep(queryItemList);
+        ApiForm.body['2'] = cloneDeep(bodyFormDataItemList);
+        ApiFormChange();
+    }
+    function setApiFormData(itemData) {
+        currentId.value = itemData.id;
+        function clearArray(array) {
+            while (array.length) {
+                array.pop();
+            }
+        }
+        function pushAll(array, data) {
+            for (let i = 0; i < data.length; i++) {
+                array.push(data[i]);
+            }
+        }
+        Object.assign(ApiForm, itemData.ApiForm);
+        clearArray(headerItemList);
+        clearArray(queryItemList);
+        clearArray(bodyFormDataItemList);
+        pushAll(headerItemList, itemData.ApiForm.header);
+        pushAll(queryItemList, itemData.ApiForm.query);
+        pushAll(bodyFormDataItemList, itemData.ApiForm.body['2']);
+        bodyType.value = Number(itemData.ApiForm.body['type']);
+        if (bodyType.value > 1) {
+            RequestActiveName.value = 'Body';
+        } else {
+            RequestActiveName.value = 'Query';
+        }
+
+        if (document.getElementsByClassName('active-node').length) {
+            hightlightNode.value = document.getElementsByClassName('active-node')[0];
+        }
+    }
+
+    function treeDataFilter() {
+        if (treeDataSearchKey.value) {
+            return treeData.value.filter((item: any) => {
+                return item.name.indexOf(treeDataSearchKey.value) > -1;
+            });
+        } else {
+            return treeData.value;
+        }
+    }
+
+    // 点击新建按钮
+    const newApiTest = () => {
+        templateTreeDataItem.id = treeData.value.length + 1 + '';
+        let clonetemplateData = cloneDeep(templateTreeDataItem);
+        treeData.value.push(clonetemplateData);
+        nextTick(() => {
+            removeActiveNode();
+            let array = Array.from(document.getElementsByClassName('y9-tree-item'));
+            let length = array.length;
+            if (length) {
+                array[length - 1].classList.add('active-node');
+                hightlightNode.value = array[length - 1];
+                setApiFormData(templateTreeDataItem);
+            }
+        });
+    };
+    function removeActiveNode() {
+        let array = Array.from(document.getElementsByClassName('y9-tree-item'));
+        let length = array.length;
+        array.forEach((item, index) => {
+            item.classList.remove('active-node');
+        });
+    }
+    // 点击树节点
+    const onTreeNodeClick = (node) => {
+        // console.log('被点击了', node);
+        removeActiveNode();
+        setApiFormData(node);
+        nextTick(() => {
+            hightlightNode.value = document.getElementsByClassName('active-node')[0];
+        });
+    };
+    //点击编辑icon
+    const onTreeEditIcon = (node) => {
+        console.log('编辑icon被点击了', node);
+    };
+    //点击删除icon
+    const onTreeRemoveIcon = (node) => {
+        y9TreeDefaultActiveRef.value.remove(node);
+        console.log('删除icon被点击了', node);
+    };
+
+    // 改变api配置数据
+    function ApiFormChange() {
+        if (ApiForm.name && ApiForm.name.indexOf(' ') > -1) {
+            ApiForm.name = ApiForm.name.trim();
+        }
+
+        if (treeData.value.length) {
+            treeData.value.map((item) => {
+                if (item.id == currentId.value) {
+                    item.name = ApiForm.name;
+                    Object.assign(item.ApiForm, ApiForm);
+                    console.log(item);
+                }
+            });
+            nextTick(() => {
+                hightlightNode.value.classList.add('active-node');
+            });
+        } else {
+            ElMessageBox.alert('左侧列表没有接口数据，请先点击新增', '操作提示', {
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+    // 选择body类型
+    function setBodyType(value) {
+        ApiForm.body['type'] = Number(value);
+        bodyType.value = Number(value);
+        ApiFormChange();
+    }
+
     //
     const jsonContainer = ref(null);
     function initJsonContainer() {
@@ -180,23 +334,36 @@
         const editor = new JSONEditor(jsonContainer.value, options);
 
         // set json
-        const initialJson = {
-            Array: [1, 2, 3],
-            Boolean: true,
-            Null: null,
-            Number: 123,
-            Object: { a: 'b', c: 'd' },
-            String: 'Hello World'
-        };
-        editor.set(initialJson);
+        // const initialJson = {
+        //     Array: [1, 2, 3],
+        //     Boolean: true,
+        //     Null: null,
+        //     Number: 123,
+        //     Object: { a: 'b', c: 'd' },
+        //     String: 'Hello World'
+        // };
+        // editor.set(initialJson);
+        editor.set();
 
         document.querySelector('#json-container .jsoneditor').style.height = '66vh';
         // console.log(editor);
         // get json
         // const updatedJson = editor.get();
     }
-    onMounted(() => {
+    function initTreeDataHightlightItem() {
+        if (document.getElementsByClassName('y9-tree-item').length) {
+            document.getElementsByClassName('y9-tree-item')[0].classList.add('active-node');
+            setApiFormData(treeData.value[0]);
+        } else {
+            setApiFormData(templateTreeDataItem);
+        }
+    }
+    function init() {
+        initTreeDataHightlightItem();
         initJsonContainer();
+    }
+    onMounted(() => {
+        init();
     });
 </script>
 <template>
@@ -207,37 +374,43 @@
                 <y9Card title="我是标题">
                     <template #header>
                         <el-button>刷新</el-button>
-                        <el-input v-model="input1" placeholder="请输入关键词/URL" :prefix-icon="Search" />
-                        <el-button type="primary">新建</el-button>
+                        <el-input
+                            v-model="treeDataSearchKey"
+                            @blur="treeDataFilter"
+                            placeholder="请输入关键词/URL"
+                            :prefix-icon="Search"
+                        />
+                        <el-button type="primary" @click="newApiTest">新建</el-button>
                     </template>
                     <y9Tree
-                        :data="treeData"
+                        :data="treeDataFilter()"
                         :defaultAcitonIcons="defaultAcitonIcons"
                         @edit-icon="onTreeEditIcon"
                         @remove-icon="onTreeRemoveIcon"
+                        @node-click="onTreeNodeClick"
                     ></y9Tree>
                 </y9Card>
             </el-aside>
             <el-main>
                 <div>
                     <div class="mainHeader">
-                        <span>新建接口</span>
-                        <span><i class="ri-map-pin-line"></i>新建接口</span>
+                        <span>{{ ApiForm.name }}</span>
+                        <span><i class="ri-map-pin-line"></i>{{ ApiForm.name }}</span>
                     </div>
                     <div class="mainContainer">
                         <el-form v-model="ApiForm">
                             <el-form-item label="接口名称">
-                                <el-input v-model="ApiForm.name"></el-input>
+                                <el-input v-model="ApiForm.name" @input="ApiFormChange"></el-input>
                             </el-form-item>
                             <el-form-item label="请求方法">
-                                <el-select v-model="ApiForm.method" placeholder="GET">
+                                <el-select v-model="ApiForm.method" placeholder="GET" @change="ApiFormChange">
                                     <el-option label="GET" value="GET" />
                                     <el-option label="POST" value="POST" />
                                     <el-option label="DELETE" value="DELETE" />
                                 </el-select>
                             </el-form-item>
                             <el-form-item label="请求地址">
-                                <el-input v-model="ApiForm.url"></el-input>
+                                <el-input v-model="ApiForm.url" @input="ApiFormChange"></el-input>
                             </el-form-item>
                             <el-form-item>
                                 <el-tabs class="apiTest_el_tabs" v-model="RequestActiveName" @tab-click="handleClick">
@@ -248,7 +421,12 @@
                                                 <span>（2）</span>
                                             </div>
                                         </template>
-                                        <Y9Table2Comp :itemList="headerItemList"></Y9Table2Comp>
+                                        <Y9Table2Comp
+                                            key="header"
+                                            :itemList="headerItemList"
+                                            @on-delete="onDeleteItem"
+                                            @on-edit="onEditItem"
+                                        ></Y9Table2Comp>
                                     </el-tab-pane>
                                     <el-tab-pane name="Query">
                                         <template #label>
@@ -257,7 +435,12 @@
                                                 <span>（2）</span>
                                             </div>
                                         </template>
-                                        <Y9Table2Comp :itemList="queryItemList"></Y9Table2Comp>
+                                        <Y9Table2Comp
+                                            key="query"
+                                            :itemList="queryItemList"
+                                            @on-delete="onDeleteItem"
+                                            @on-edit="onEditItem"
+                                        ></Y9Table2Comp>
                                     </el-tab-pane>
                                     <el-tab-pane name="Body">
                                         <template #label>
@@ -267,18 +450,13 @@
                                             </div>
                                         </template>
                                         <div class="body-content">
-                                            <el-radio-group v-model="bodyType">
-                                                <el-radio :value="1">none</el-radio>
-                                                <el-radio :value="2">form-data</el-radio>
-                                                <el-radio :value="3">json</el-radio>
-                                                <el-radio :value="4">xml</el-radio>
-                                                <el-radio :value="5">html</el-radio>
-                                                <el-radio :value="6">javascript</el-radio>
-                                                <el-radio :value="7">binary</el-radio>
-                                            </el-radio-group>
                                             <BodyTypeComp
+                                                key="bodyTypeComp"
                                                 :type="bodyType"
                                                 :itemList="bodyFormDataItemList"
+                                                @on-delete="onDeleteItem"
+                                                @on-edit="onEditItem"
+                                                @on-radio-change="setBodyType"
                                             ></BodyTypeComp>
                                         </div>
                                     </el-tab-pane>
@@ -528,6 +706,11 @@
         border: thin solid rgb(236, 238, 245);
         height: auto;
         min-height: 20vh;
+        .ace-jsoneditor .ace_gutter {
+            background: var(--el-bg-color);
+            border-right: thin solid rgb(236, 238, 245);
+            color: #c0c0c0;
+        }
     }
     .apiTest_el_tabs div.el-tabs__nav-wrap::after {
         height: 1px;
