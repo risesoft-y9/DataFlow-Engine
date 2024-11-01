@@ -2,10 +2,12 @@ package net.risesoft.security;
 
 import net.risedata.rpc.provide.context.RPCRequestContext;
 import net.risesoft.exceptions.TokenException;
+import net.risesoft.model.user.UserInfo;
 import net.risesoft.security.RPCRequestFilter;
 import net.risesoft.security.SecurityConfig;
 import net.risesoft.util.IpUtils;
 import net.risesoft.util.PattenUtil;
+import net.risesoft.y9.Y9LoginUserHolder;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.security.model.Role;
 import net.risesoft.security.pojo.DataUser;
@@ -276,6 +278,12 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 		threadLocal.set(token);
 		TOKEN_SECURITY_MAP.put(token, concurrentSecurity);
 		TOKEN_TIME_MAP.put(token, System.currentTimeMillis());
+		
+		UserInfo userInfo = new UserInfo();
+		userInfo.setPersonId(userToken.getId());
+    	userInfo.setName(userToken.getUserName());
+		Y9LoginUserHolder.setUserInfo(userInfo);
+		Y9LoginUserHolder.setPersonId(userToken.getId());
 	}
 
 	private void throwError(Y9Result<?> result, ServletRequest request, ServletResponse response) throws IOException {
