@@ -8,7 +8,7 @@ import net.risesoft.api.job.log.LogAnalyseService;
 import net.risesoft.api.persistence.job.JobLogService;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.api.persistence.model.log.LogAnalyse;
-import net.risesoft.api.security.ConcurrentSecurity;
+import net.risesoft.security.ConcurrentSecurity;
 import net.risesoft.controller.BaseController;
 import net.risesoft.pojo.Y9Result;
 

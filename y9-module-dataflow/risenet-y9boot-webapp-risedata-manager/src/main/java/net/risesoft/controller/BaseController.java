@@ -2,9 +2,9 @@ package net.risesoft.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import net.risesoft.api.exceptions.ServiceOperationException;
-import net.risesoft.api.security.ConcurrentSecurity;
-import net.risesoft.api.security.SecurityManager;
+import net.risesoft.exceptions.ServiceOperationException;
+import net.risesoft.security.ConcurrentSecurity;
+import net.risesoft.security.SecurityManager;
 
 public class BaseController {
 

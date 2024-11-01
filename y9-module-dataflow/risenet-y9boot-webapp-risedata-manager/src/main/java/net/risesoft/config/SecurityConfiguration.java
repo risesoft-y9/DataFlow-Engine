@@ -3,9 +3,9 @@ package net.risesoft.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import net.risesoft.api.security.SecurityConfig;
-import net.risesoft.api.security.checks.HasSecurityManager;
-import net.risesoft.api.security.checks.HasUserManager;
+import net.risesoft.security.SecurityConfig;
+import net.risesoft.security.checks.HasSecurityManager;
+import net.risesoft.security.checks.HasUserManager;
 
 import java.util.Arrays;
 

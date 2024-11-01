@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import net.risesoft.api.security.ConcurrentSecurity;
-import net.risesoft.api.security.SecurityManager;
+import net.risesoft.security.ConcurrentSecurity;
+import net.risesoft.security.SecurityManager;
 import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.service.DataMappingService;

@@ -3,6 +3,8 @@ package net.risesoft.api.security;
 
 import java.util.List;
 
+import net.risesoft.security.ConcurrentSecurity;
+
 /**
  * @Description :
  * @ClassName DoJurisdiction

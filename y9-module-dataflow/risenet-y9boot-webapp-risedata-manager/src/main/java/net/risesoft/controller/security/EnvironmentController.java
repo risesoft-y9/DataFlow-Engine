@@ -1,10 +1,10 @@
 package net.risesoft.controller.security;
 
 import net.risesoft.api.aop.CheckResult;
-import net.risesoft.api.persistence.model.security.Environment;
-import net.risesoft.api.persistence.security.EnvironmentService;
-import net.risesoft.api.security.ConcurrentSecurity;
-import net.risesoft.api.security.SecurityManager;
+import net.risesoft.security.ConcurrentSecurity;
+import net.risesoft.security.SecurityManager;
+import net.risesoft.security.model.Environment;
+import net.risesoft.security.service.EnvironmentService;
 import net.risesoft.pojo.Y9Result;
 
 import java.util.List;

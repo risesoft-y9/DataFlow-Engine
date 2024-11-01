@@ -2,7 +2,7 @@ package net.risesoft.api;
 
 import net.risedata.register.rpc.RegisterAPI;
 import net.risedata.rpc.consumer.annotation.API;
-import net.risedata.rpc.consumer.annotation.RPCClinet;
+import net.risedata.rpc.consumer.annotation.RPCClient;
 
 import net.risesoft.model.Config;
 
@@ -13,7 +13,7 @@ import net.risesoft.model.Config;
  * @date 2024年2月21日
  * @author lb
  */
-@RPCClinet(name = "config", managerName = RegisterAPI.MANAGER_NAME)
+@RPCClient(name = "config", managerName = RegisterAPI.MANAGER_NAME)
 public interface ConfigApi {
 	/**
 	 * 根据jobId 返回配置

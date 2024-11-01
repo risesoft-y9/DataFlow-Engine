@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import net.risesoft.api.persistence.job.JobService;
-import net.risesoft.api.security.ConcurrentSecurity;
-import net.risesoft.api.security.SecurityManager;
+import net.risesoft.security.ConcurrentSecurity;
+import net.risesoft.security.SecurityManager;
 import net.risesoft.log.LogLevelEnum;
 import net.risesoft.log.OperationTypeEnum;
 import net.risesoft.log.annotation.RiseLog;
@@ -76,7 +76,7 @@ public class TaskController {
 		row.put("name", task.getName());
 		row.put("description", task.getDescription());
 		row.put("businessId", task.getBusinessId());
-		row.put("business", dataBusinessService.getById(task.getBusinessId()).getName());
+		row.put("business", dataBusinessService.getNameById(task.getBusinessId()));
 		row.put("createTime", task.getCreateTime());
 		row.put("user", task.getUserName());
 		int count = jobService.findCountJobByArgs(task.getId());

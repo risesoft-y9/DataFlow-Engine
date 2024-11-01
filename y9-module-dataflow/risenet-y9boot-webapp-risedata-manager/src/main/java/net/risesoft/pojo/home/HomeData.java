@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.risesoft.api.persistence.model.security.Environment;
+import net.risesoft.security.model.Environment;
 import net.risesoft.util.home.QueryTimeRangeCacheUtil;
 
 public class HomeData {

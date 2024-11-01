@@ -3,9 +3,9 @@ package net.risesoft.controller.security;
 import net.risedata.jdbc.search.LPageable;
 import net.risesoft.api.aop.CheckHttpForArgs;
 import net.risesoft.api.aop.CheckResult;
-import net.risesoft.api.persistence.model.security.NetworkWhiteList;
-import net.risesoft.api.persistence.security.NetworkWhiteListService;
 import net.risesoft.pojo.Y9Result;
+import net.risesoft.security.model.NetworkWhiteList;
+import net.risesoft.security.service.NetworkWhiteListService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
