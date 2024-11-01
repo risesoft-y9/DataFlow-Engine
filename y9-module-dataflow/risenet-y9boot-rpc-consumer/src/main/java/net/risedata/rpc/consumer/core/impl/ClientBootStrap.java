@@ -10,25 +10,12 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import net.risedata.rpc.coder.MsgDecoder;
 import net.risedata.rpc.coder.MsgEncoder;
-import net.risedata.rpc.consumer.config.ConsumerApplication;
-import net.risedata.rpc.consumer.core.Connection;
-import net.risedata.rpc.consumer.core.ConnectionManager;
-import net.risedata.rpc.consumer.core.ConnectionPool;
 import net.risedata.rpc.consumer.core.HostAndPortConnection;
-import net.risedata.rpc.consumer.listener.ConnectionListener;
-import net.risedata.rpc.consumer.task.ManagerAndIpAndPortTask;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 
 /**
  * 客户端的 启动器一般只启动一个
  */
-public class ClinetBootStrap {
+public class ClientBootStrap {
     Bootstrap bootstrap;
     private NioEventLoopGroup group;
 
@@ -40,7 +27,7 @@ public class ClinetBootStrap {
 
     }
 
-    public ClinetBootStrap() {
+    public ClientBootStrap() {
         this.bootstrap = new Bootstrap();
 
     }

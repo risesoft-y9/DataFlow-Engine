@@ -3,13 +3,10 @@ package net.risedata.rpc.consumer.core.impl;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import net.risedata.rpc.consumer.exceptions.RpcException;
 import net.risedata.rpc.model.Msg;
-import net.risedata.rpc.provide.config.Application;
 import net.risedata.rpc.utils.KeyLock;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

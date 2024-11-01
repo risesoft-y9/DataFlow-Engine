@@ -3,7 +3,7 @@ package net.risedata.rpc.consumer.config;
 import net.risedata.rpc.Task.ScheduleTask;
 import net.risedata.rpc.consumer.config.model.Managers;
 import net.risedata.rpc.consumer.controller.ConnectionStatus;
-import net.risedata.rpc.consumer.core.impl.ClinetBootStrap;
+import net.risedata.rpc.consumer.core.impl.ClientBootStrap;
 import net.risedata.rpc.consumer.factory.ClientBeanFactory;
 import net.risedata.rpc.consumer.factory.ConnectionManagerFactory;
 import net.risedata.rpc.consumer.invoke.impl.ForBooleanTrueInvokeHandle;
@@ -43,7 +43,7 @@ public class ConsumerApplication implements ApplicationListener {
     public static RPCExecutorService EXECUTOR_SERVICE;
 
 
-    private ClinetBootStrap clinetBootStrap;
+    private ClientBootStrap clinetBootStrap;
 
     @Bean
     public ClientBeanFactory getClinetBeanFactory() {
@@ -61,11 +61,11 @@ public class ConsumerApplication implements ApplicationListener {
         return new LoadingConfig();
     }
 
-    @ConditionalOnMissingBean(ClinetBootStrap.class)
+    @ConditionalOnMissingBean(ClientBootStrap.class)
     @Bean
-    public ClinetBootStrap getClinetBootStrap() {
+    public ClientBootStrap getClinetBootStrap() {
 
-        return new ClinetBootStrap();
+        return new ClientBootStrap();
     }
 
     @Bean
@@ -121,7 +121,7 @@ public class ConsumerApplication implements ApplicationListener {
             }
             IdUtils.refresh();
             LOGGER.info("start scheduleTask");
-            clinetBootStrap = applicationContext.getBean(ClinetBootStrap.class);
+            clinetBootStrap = applicationContext.getBean(ClientBootStrap.class);
             scheduleTask = applicationContext.getBean(ScheduleTask.class);
             EXECUTOR_SERVICE = applicationContext.getBean(RPCExecutorService.class);
         } else if (event instanceof ContextClosedEvent) {

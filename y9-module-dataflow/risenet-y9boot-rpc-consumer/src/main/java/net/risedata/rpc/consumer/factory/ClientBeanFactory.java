@@ -1,7 +1,7 @@
 package net.risedata.rpc.consumer.factory;
 
 import net.risedata.rpc.annotation.RPCScan;
-import net.risedata.rpc.consumer.annotation.RPCClinet;
+import net.risedata.rpc.consumer.annotation.RPCClient;
 import net.risedata.rpc.consumer.config.ConsumerApplication;
 import net.risedata.rpc.consumer.config.LoadingConfig;
 import net.risedata.rpc.consumer.core.BasedConnectionManager;
@@ -18,8 +18,6 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -33,14 +31,14 @@ import java.util.*;
  * @Author lb176
  * @Date 2021/4/29==15:11
  */
-public class ClinetBeanFactory implements BeanFactoryPostProcessor, ApplicationContextAware {
+public class ClientBeanFactory implements BeanFactoryPostProcessor, ApplicationContextAware {
     public static Map<Class, ProxyInvoke> invokeMap;
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         List<Class> rpcClass = getRPCClinetedClass(ConsumerApplication.applicationContext);
         Application.logger.info(" proxy  add " + rpcClass.size());
-        RPCClinet rpcClinet;
+        RPCClient rpcClinet;
         ProxyInvoke proxyInvoke;
         Object proxy;
         DefaultListableBeanFactory factory = (DefaultListableBeanFactory) ConsumerApplication.applicationContext.getAutowireCapableBeanFactory();
@@ -56,7 +54,7 @@ public class ClinetBeanFactory implements BeanFactoryPostProcessor, ApplicationC
             }
         }
         for (Class type : rpcClass) {
-            rpcClinet = AnnotationUtils.findAnnotation(type, RPCClinet.class);
+            rpcClinet = AnnotationUtils.findAnnotation(type, RPCClient.class);
             apiName = StringUtils.isEmpty(rpcClinet.name()) ? type.getName() : ConsumerUtils.getValue(rpcClinet.name());
             proxyInvoke = new ProxyInvoke(apiName);
             proxy = ProxyFactory.getProxy(new Class[]{type}, proxyInvoke);
@@ -127,7 +125,7 @@ public class ClinetBeanFactory implements BeanFactoryPostProcessor, ApplicationC
         boolean isRpcClinet = false;
         for (int i = 0; i < scanClass.size(); i++) {
             isInterface = !scanClass.get(i).isInterface();
-            isRpcClinet = AnnotationUtils.findAnnotation(scanClass.get(i), RPCClinet.class) == null;
+            isRpcClinet = AnnotationUtils.findAnnotation(scanClass.get(i), RPCClient.class) == null;
             if (isInterface || isRpcClinet) {
                 scanClass.remove(i);
                 i--;

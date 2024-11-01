@@ -30,7 +30,7 @@ public class HostAndPortConnectionManager implements ConnectionManager {
     protected int port;
     protected int id;
     protected ConnectionPool pool;
-    protected ClinetBootStrap bootstrap;
+    protected ClientBootStrap bootstrap;
     protected LinkedConnectionListener listener;
     private ScheduleTask scheduleTask;
     private boolean isStop;
@@ -40,7 +40,7 @@ public class HostAndPortConnectionManager implements ConnectionManager {
         this.pool = new DefaultConnectionPool();
     }
 
-    public HostAndPortConnectionManager(ClinetBootStrap bootstrap) {
+    public HostAndPortConnectionManager(ClientBootStrap bootstrap) {
         this(null, 0, bootstrap);
     }
 
@@ -57,7 +57,7 @@ public class HostAndPortConnectionManager implements ConnectionManager {
      *
      * @param port 端口
      */
-    public HostAndPortConnectionManager(String host, int port, ClinetBootStrap bootStrap) {
+    public HostAndPortConnectionManager(String host, int port, ClientBootStrap bootStrap) {
         this();
         this.host = host;
         this.port = port;
@@ -67,14 +67,14 @@ public class HostAndPortConnectionManager implements ConnectionManager {
         this.isStop = false;
     }
 
-    public HostAndPortConnectionManager(ClinetBootStrap bootstrap, ScheduleTask scheduleTask) {
+    public HostAndPortConnectionManager(ClientBootStrap bootstrap, ScheduleTask scheduleTask) {
         this();
         this.bootstrap = bootstrap;
         this.scheduleTask = scheduleTask;
         iniListener();
     }
 
-    public void setBootstrap(ClinetBootStrap bootstrap) {
+    public void setBootstrap(ClientBootStrap bootstrap) {
         this.bootstrap = bootstrap;
         iniListener();
     }

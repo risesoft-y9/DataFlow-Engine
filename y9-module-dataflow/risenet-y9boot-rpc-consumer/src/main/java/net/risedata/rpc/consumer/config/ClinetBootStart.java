@@ -2,7 +2,7 @@ package net.risedata.rpc.consumer.config;
 
 import net.risedata.rpc.Task.ScheduleTask;
 import net.risedata.rpc.consumer.core.ConnectionManager;
-import net.risedata.rpc.consumer.core.impl.ClinetBootStrap;
+import net.risedata.rpc.consumer.core.impl.ClientBootStrap;
 import net.risedata.rpc.consumer.core.impl.HostAndPortConnectionManager;
 
 /**
@@ -12,11 +12,11 @@ import net.risedata.rpc.consumer.core.impl.HostAndPortConnectionManager;
  */
 public class ClinetBootStart {
 
-    private static ClinetBootStrap clinetBootStrap;
+    private static ClientBootStrap clinetBootStrap;
     private static ScheduleTask scheduleTask;
 
     public static void initConfig() {
-        clinetBootStrap = new ClinetBootStrap();
+        clinetBootStrap = new ClientBootStrap();
         clinetBootStrap.start(10);
         scheduleTask = new ScheduleTask(5000L);
         scheduleTask.start();

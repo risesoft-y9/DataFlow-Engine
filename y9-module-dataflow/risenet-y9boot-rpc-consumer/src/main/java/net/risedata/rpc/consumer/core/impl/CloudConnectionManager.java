@@ -1,6 +1,5 @@
 package net.risedata.rpc.consumer.core.impl;
 
-
 import io.netty.channel.ChannelFuture;
 import net.risedata.rpc.consumer.config.ConsumerApplication;
 import net.risedata.rpc.consumer.core.Connection;
@@ -13,7 +12,6 @@ import net.risedata.rpc.provide.config.Application;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
-import javax.sound.midi.Soundbank;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +46,7 @@ public class CloudConnectionManager extends HostAndPortConnectionManager {
         super();
     }
 
-    public CloudConnectionManager(ClinetBootStrap bootstrap, DiscoveryClient discovery) {
+    public CloudConnectionManager(ClientBootStrap bootstrap, DiscoveryClient discovery) {
         super(null, 0, bootstrap);
         if (discovery == null) {
             throw new NullPointerException(" discovery is null");

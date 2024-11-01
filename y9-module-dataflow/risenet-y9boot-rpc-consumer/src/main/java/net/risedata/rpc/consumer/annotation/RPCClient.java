@@ -15,7 +15,7 @@ import java.lang.annotation.*;
 @Documented
 @Indexed
 @Target(ElementType.TYPE)
-public @interface RPCClinet {
+public @interface RPCClient {
     /**
      * 配置提供此服务的服务端ip 端口
      * 注意: 可以是纯ip 端口的 则为 rpc:127.0.0.1:8888
