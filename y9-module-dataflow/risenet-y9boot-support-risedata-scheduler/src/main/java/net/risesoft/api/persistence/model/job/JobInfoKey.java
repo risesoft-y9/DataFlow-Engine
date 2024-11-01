@@ -1,7 +1,5 @@
 package net.risesoft.api.persistence.model.job;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import javax.persistence.*;
 
 import org.hibernate.annotations.Comment;

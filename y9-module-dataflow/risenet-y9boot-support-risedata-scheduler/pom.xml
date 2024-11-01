@@ -60,21 +60,28 @@
             <artifactId>risenet-y9boot-beta-client</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>net.risesoft</groupId>
+            <artifactId>risenet-y9boot-support-risedata-jpa-repository</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        <!-- 登录与权限：用数字底座的登录权限依赖y9kernel包，独立使用自身的功能依赖risedata包 -->
+        <dependency>
+            <groupId>net.risesoft</groupId>
+            <artifactId>risenet-y9boot-support-risedata-security</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
+            <groupId>net.risesoft</groupId>
+            <artifactId>risenet-y9boot-support-y9kernel-security</artifactId>
+            <version>${project.version}</version>
         </dependency> -->
+        
         <!-- 邮箱 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>net.risesoft</groupId>
-            <artifactId>risenet-y9boot-starter-jpa-public</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>

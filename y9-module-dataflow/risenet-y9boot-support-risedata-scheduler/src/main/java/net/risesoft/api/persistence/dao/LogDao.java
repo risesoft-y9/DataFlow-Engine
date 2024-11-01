@@ -14,12 +14,7 @@ import net.risedata.jdbc.repository.Repository;
  */
 public interface LogDao extends Repository {
 
-
-
-
     @Modify("delete from Y9_DATASERVICE_JOB where CREATE_DATE < ?")
     Integer clear(Date date);
-
-
 
 }

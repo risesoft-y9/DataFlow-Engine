@@ -2,17 +2,13 @@ package net.risesoft.api.persistence.model.job;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import net.risedata.jdbc.annotations.join.Join;
 import net.risedata.jdbc.annotations.operation.Operate;
-import net.risedata.jdbc.annotations.order.Asc;
 import net.risedata.jdbc.annotations.order.Desc;
 import net.risedata.jdbc.operation.Operates;
 
 import org.hibernate.annotations.Comment;
-import org.springframework.core.annotation.Order;
 
 import javax.persistence.*;
-import java.util.Date;
 
 /**
  * @Description : 调度日志

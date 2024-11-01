@@ -16,8 +16,8 @@ import net.risesoft.api.message.impl.DefaultMessageService;
 import net.risesoft.api.message.impl.EmailServiceExecutor;
 import net.risesoft.api.persistence.iservice.IServiceService;
 import net.risesoft.api.persistence.iservice.impl.DataBaseIServiceService;
-import net.risesoft.api.persistence.security.DefaultSecurityManager;
 import net.risesoft.api.watch.WatchManager;
+import net.risesoft.security.DefaultSecurityManager;
 
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -36,13 +36,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @RPCScan({ "net.risesoft.api.api" })
 @Configuration
 @Configurable
-@EnableRepository("net.risesoft.api.persistence.dao")
+@EnableRepository({"net.risesoft.api.persistence.dao", "net.risesoft.security.dao"})
 @ComponentScans(value = {
 		@ComponentScan({ "net.risesoft.api.persistence.**", "net.risesoft.api.aop", "net.risesoft.api.config.**",
-				"net.risesoft.api.job.**", "net.risesoft.api.security.**"  }),
+				"net.risesoft.api.job.**", "net.risesoft.api.security.**", "net.risesoft.security.**" }),
 		@ComponentScan(value = { "net.risedata.**" }) })
 @EnableScheduling
-//@EnableWebFlux
 public class ServerAutoConfig {
 
 	@Bean
@@ -51,6 +50,7 @@ public class ServerAutoConfig {
 		return new RegisterApi();
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Bean(name = "securityManager")
 	public FilterRegistrationBean filterRegistration(DefaultSecurityManager securityManager) {
 		FilterRegistrationBean registrationBean = new FilterRegistrationBean(securityManager);

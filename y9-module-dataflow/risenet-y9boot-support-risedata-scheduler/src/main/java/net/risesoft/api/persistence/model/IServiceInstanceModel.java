@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import net.risedata.register.model.WatchProperties;
+import net.risesoft.security.GetEnvironment;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -19,7 +20,7 @@ import java.util.Map;
 @Entity
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer"})
 @Table(name = "Y9_DATASERVICE_ISERVICE")
-public class IServiceInstanceModel implements Serializable, GetEnvironment ,GetService{
+public class IServiceInstanceModel implements Serializable, GetEnvironment, GetService{
 
     public static Integer TRUE = 1;
 

@@ -4,7 +4,7 @@ import net.risedata.jdbc.commons.LPage;
 import net.risedata.jdbc.search.LPageable;
 import net.risesoft.api.job.JobTask;
 import net.risesoft.api.persistence.model.job.Job;
-import net.risesoft.api.security.ConcurrentSecurity;
+import net.risesoft.security.ConcurrentSecurity;
 
 import java.util.List;
 import java.util.Map;

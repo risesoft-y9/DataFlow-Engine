@@ -4,11 +4,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import net.risedata.jdbc.annotations.operation.Operate;
-import net.risedata.jdbc.annotations.order.Asc;
 import net.risedata.jdbc.annotations.order.Desc;
 import net.risedata.jdbc.operation.Operates;
-import net.risesoft.api.persistence.config.LikeOperation;
-import net.risesoft.api.persistence.model.GetEnvironment;
+import net.risesoft.security.GetEnvironment;
+import net.risesoft.security.LikeOperation;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -24,7 +23,7 @@ import java.util.Date;
 @Entity
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer"})
 @Table(name = "Y9_DATASERVICE_CONFIG_HIS")
-public class ConfigHis implements Serializable , GetEnvironment {
+public class ConfigHis implements Serializable, GetEnvironment {
     @Id
     @Column(name = "ID", length = 100)
     private String id;

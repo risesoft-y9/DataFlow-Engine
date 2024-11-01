@@ -7,7 +7,7 @@ import net.risedata.jdbc.operation.Operation;
 import net.risedata.jdbc.operation.impl.CustomOperation;
 import net.risedata.jdbc.search.LPageable;
 import net.risedata.jdbc.service.impl.AutomaticCrudService;
-import net.risesoft.api.exceptions.ServiceOperationException;
+import net.risesoft.exceptions.ServiceOperationException;
 import net.risesoft.api.persistence.config.ConfigHisService;
 import net.risesoft.api.persistence.config.ConfigService;
 import net.risesoft.api.persistence.dao.ConfigDao;
@@ -15,18 +15,16 @@ import net.risesoft.api.persistence.log.LogService;
 import net.risesoft.api.persistence.model.config.Config;
 import net.risesoft.api.persistence.model.config.ConfigHis;
 import net.risesoft.api.persistence.model.log.Log;
-import net.risesoft.api.security.SecurityManager;
 import net.risesoft.api.utils.AutoIdUtil;
 import net.risesoft.api.utils.PropertiesUtil;
-import net.risesoft.api.utils.SqlUtils;
 import net.risesoft.y9public.entity.DataTaskMakeUpEntity;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSON;
 
@@ -150,7 +148,7 @@ public class ConfigServiceImpl extends AutomaticCrudService<Config, String> impl
 							tempMap.forEach((k, v) -> {
 								if (append) {
 									Object value = result.get(k);
-									if (StringUtils.isEmpty(value)) {
+									if (value == null) {
 										result.put(k, v);
 									} else {
 										value += "," + v;

@@ -32,8 +32,8 @@ import net.risesoft.api.persistence.job.JobLogService;
 import net.risesoft.api.persistence.job.JobService;
 import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
-import net.risesoft.api.security.ConcurrentSecurity;
 import net.risesoft.api.utils.SqlUtils;
+import net.risesoft.security.ConcurrentSecurity;
 
 /**
  * @Description :

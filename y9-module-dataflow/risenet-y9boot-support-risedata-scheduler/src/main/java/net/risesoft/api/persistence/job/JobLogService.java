@@ -9,7 +9,7 @@ import org.springframework.cloud.client.ServiceInstance;
 import net.risedata.jdbc.commons.LPage;
 import net.risedata.jdbc.search.LPageable;
 import net.risesoft.api.persistence.model.job.JobLog;
-import net.risesoft.api.security.ConcurrentSecurity;
+import net.risesoft.security.ConcurrentSecurity;
 
 /**
  * @Description : 调度日志服务

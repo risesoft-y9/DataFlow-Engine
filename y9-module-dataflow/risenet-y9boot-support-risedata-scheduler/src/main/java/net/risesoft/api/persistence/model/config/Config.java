@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import net.risedata.jdbc.annotations.operation.Operate;
 import net.risedata.jdbc.annotations.order.Desc;
 import net.risedata.jdbc.operation.Operates;
-import net.risesoft.api.persistence.config.LikeOperation;
-import net.risesoft.api.persistence.model.GetEnvironment;
+import net.risesoft.security.GetEnvironment;
+import net.risesoft.security.LikeOperation;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -23,7 +23,7 @@ import java.util.Date;
 @Entity
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer"})
 @Table(name = "Y9_DATASERVICE_CONFIG")
-public class Config implements Serializable , GetEnvironment {
+public class Config implements Serializable, GetEnvironment {
     /**
      * 日志类型
      */

@@ -1,6 +1,5 @@
 package net.risesoft.api.persistence.config.impl;
 
-
 import net.risedata.jdbc.commons.LPage;
 import net.risedata.jdbc.search.LPageable;
 import net.risedata.jdbc.service.impl.AutomaticCrudService;
@@ -9,12 +8,9 @@ import net.risesoft.api.persistence.dao.ConfigHisDao;
 import net.risesoft.api.persistence.log.LogService;
 import net.risesoft.api.persistence.model.config.Config;
 import net.risesoft.api.persistence.model.config.ConfigHis;
-import net.risesoft.api.security.SecurityManager;
+import net.risesoft.security.SecurityManager;
 import net.risesoft.api.utils.AutoIdUtil;
-import net.risesoft.api.utils.SqlUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -30,18 +26,13 @@ import java.util.Map;
  * @Version 1.0
  */
 @Service
-
 public class ConfigHisServiceImpl extends AutomaticCrudService<ConfigHis, String> implements ConfigHisService {
-
-
-    private Logger logger = LoggerFactory.getLogger(ConfigHisServiceImpl.class);
 
     @Autowired
     SecurityManager securityManager;
 
     @Override
     public void saveConfig(Config config, String operation) {
-
         ConfigHis his = new ConfigHis();
         his.setId(AutoIdUtil.getRandomId26());
         his.setConfigId(config.getId());
@@ -59,8 +50,7 @@ public class ConfigHisServiceImpl extends AutomaticCrudService<ConfigHis, String
 
     @Override
     public LPage<Map<String,Object>> search(ConfigHis config, LPageable pageable) {
-
-        return   getSearchExecutor().searchForPage(config,"ID id,NAME name,TYPE config_type,GROUP_NAME config_group,ENVIRONMENT environment,UPDATETIME updateTime,OP_NAME opName ,OP_TYPE opType,CONFIG_ID configId"
+        return getSearchExecutor().searchForPage(config,"ID id,NAME name,TYPE config_type,GROUP_NAME config_group,ENVIRONMENT environment,UPDATETIME updateTime,OP_NAME opName ,OP_TYPE opType,CONFIG_ID configId"
                 ,pageable);
     }
 

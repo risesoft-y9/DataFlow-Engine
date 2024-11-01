@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import net.risedata.jdbc.annotations.join.Join;
 import net.risedata.jdbc.annotations.order.Desc;
-import net.risesoft.api.persistence.model.GetEnvironment;
 import net.risesoft.api.persistence.model.GetService;
+import net.risesoft.security.GetEnvironment;
 import net.risesoft.y9public.entity.DataBusinessEntity;
 
 import javax.persistence.Column;
