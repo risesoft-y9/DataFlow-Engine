@@ -76,14 +76,14 @@ export const constantRoutes: Array<any> = [
 ];
 
 // 根据条件显示系统管理菜单
-let loginName = y9_storage.getObjectItem('ssoUserInfo').loginName;
-const systemRouter = import.meta.env.VUE_APP_APPFEATURES == '1' || loginName === 'admin' ? systemManagementRouter : {};
+const systemRouter = import.meta.env.VUE_APP_APPFEATURES == '1' ? systemManagementRouter : {};
+const businessRouter = import.meta.env.VUE_APP_APPFEATURES == '1' ? businessClassifyRouter : {};
 //asyncRoutes需求动态判断权限并动态添加的页面  这里的路由模块顺序也是菜单显示的顺序（位置：src->router->modules）
 export const asyncRoutes = [
     homeRouter,
     dataSourceRouter,
     libraryTableRouter,
-    businessClassifyRouter,
+    businessRouter,
     interfaceRouter,
     ruleConfigRouter,
     taskConfigRouter,
