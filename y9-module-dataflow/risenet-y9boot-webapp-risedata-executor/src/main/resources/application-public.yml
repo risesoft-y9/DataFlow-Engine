@@ -19,5 +19,5 @@ beta:
     #是否监控
       watch: true
       time: 5000 #配置多少秒监控一次
-    serverAddr: http://localhost:7055/risedata
+    serverAddr: http://localhost:7055/risedata/
   servers: rpc:127.0.0.1:7066

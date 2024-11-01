@@ -124,6 +124,11 @@ export default (serve) => {
         css: {
             //流程设计引入
             // css sass  charset 报错
+            preprocessorOptions: {
+                scss: {
+                    silenceDeprecations: ['legacy-js-api', 'color-functions'],
+                },
+            },
             postcss: {
                 plugins: [
                     {
