@@ -14,7 +14,7 @@ import net.risesoft.y9.json.Y9JsonUtil;
 
 public class Y9KernelApiUtil {
 	
-	static String serverUrl = Y9Context.getProperty("y9.service.org.directUrl", "http://localhost:7055/platform");
+	static String serverUrl = Y9Context.getProperty("y9.service.org.directUrl", "https://test-api.youshengyun.com/platform");
 	
 	@SuppressWarnings("unchecked")
 	public static List<Map<String, Object>> getDataCatalogTree(String tenantId, String personId, boolean includeAll) throws Exception {
