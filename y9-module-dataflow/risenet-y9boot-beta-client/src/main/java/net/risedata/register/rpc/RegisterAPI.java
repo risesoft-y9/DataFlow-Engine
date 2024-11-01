@@ -2,7 +2,7 @@ package net.risedata.register.rpc;
 
 import net.risedata.register.service.IServiceInstance;
 import net.risedata.rpc.consumer.annotation.API;
-import net.risedata.rpc.consumer.annotation.RPCClinet;
+import net.risedata.rpc.consumer.annotation.RPCClient;
 import net.risedata.rpc.consumer.result.SyncResult;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
  * @Date 2021/11/26 11:17
  * @Version 1.0
  */
-@RPCClinet(value = {"${beta.servers}"}, name = "register", managerName = RegisterAPI.MANAGER_NAME)
+@RPCClient(value = {"${beta.servers}"}, name = "register", managerName = RegisterAPI.MANAGER_NAME)
 public interface RegisterAPI {
 
     public static final String MANAGER_NAME = "register_rpc_manager";

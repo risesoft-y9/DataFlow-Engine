@@ -1,11 +1,10 @@
 package net.risedata.rpc.consumer.config;
 
-
 import net.risedata.rpc.Task.ScheduleTask;
 import net.risedata.rpc.consumer.config.model.Managers;
 import net.risedata.rpc.consumer.controller.ConnectionStatus;
 import net.risedata.rpc.consumer.core.impl.ClinetBootStrap;
-import net.risedata.rpc.consumer.factory.ClinetBeanFactory;
+import net.risedata.rpc.consumer.factory.ClientBeanFactory;
 import net.risedata.rpc.consumer.factory.ConnectionManagerFactory;
 import net.risedata.rpc.consumer.invoke.impl.ForBooleanTrueInvokeHandle;
 import net.risedata.rpc.consumer.listener.ListenerApplication;
@@ -15,11 +14,8 @@ import net.risedata.rpc.utils.IdUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
@@ -50,8 +46,8 @@ public class ConsumerApplication implements ApplicationListener {
     private ClinetBootStrap clinetBootStrap;
 
     @Bean
-    public ClinetBeanFactory getClinetBeanFactory() {
-        return new ClinetBeanFactory();
+    public ClientBeanFactory getClinetBeanFactory() {
+        return new ClientBeanFactory();
     }
 
 

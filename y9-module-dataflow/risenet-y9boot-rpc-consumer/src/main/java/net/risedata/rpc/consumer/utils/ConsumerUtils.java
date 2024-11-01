@@ -1,7 +1,7 @@
 package net.risedata.rpc.consumer.utils;
 
 import io.netty.util.internal.StringUtil;
-import net.risedata.rpc.consumer.annotation.RPCClinet;
+import net.risedata.rpc.consumer.annotation.RPCClient;
 import net.risedata.rpc.consumer.config.ConsumerApplication;
 
 import org.springframework.util.StringUtils;
@@ -17,8 +17,8 @@ import java.util.regex.Pattern;
 public class ConsumerUtils {
     private static final Pattern URL_MATHS = Pattern.compile("\\$\\{(.*)}");
 
-    public static String getManagerName(Class<?> type, RPCClinet rpcClinet) {
-        return StringUtils.isEmpty(rpcClinet.managerName()) ? type.getName() + "Manager" : ConsumerUtils.getValue(rpcClinet.managerName());
+    public static String getManagerName(Class<?> type, RPCClient rpcClient) {
+        return StringUtils.isEmpty(rpcClient.managerName()) ? type.getName() + "Manager" : ConsumerUtils.getValue(rpcClient.managerName());
     }
 
     public static String getValue(String str) {

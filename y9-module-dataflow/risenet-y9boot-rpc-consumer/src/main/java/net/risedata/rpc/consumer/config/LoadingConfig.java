@@ -3,14 +3,13 @@ package net.risedata.rpc.consumer.config;
 import net.risedata.rpc.Task.Task;
 import net.risedata.rpc.consumer.annotation.API;
 import net.risedata.rpc.consumer.annotation.ManagerListener;
-import net.risedata.rpc.consumer.annotation.RPCClinet;
+import net.risedata.rpc.consumer.annotation.RPCClient;
 import net.risedata.rpc.consumer.core.BasedConnectionManager;
 import net.risedata.rpc.consumer.core.ConnectionManager;
-import net.risedata.rpc.consumer.core.HostAndPortConnection;
-import net.risedata.rpc.consumer.core.impl.ClinetBootStrap;
+import net.risedata.rpc.consumer.core.impl.ClientBootStrap;
 import net.risedata.rpc.consumer.core.impl.CloudConnectionManager;
 import net.risedata.rpc.consumer.core.impl.HostAndPortConnectionManager;
-import net.risedata.rpc.consumer.factory.ClinetBeanFactory;
+import net.risedata.rpc.consumer.factory.ClientBeanFactory;
 import net.risedata.rpc.consumer.factory.ConnectionManagerFactory;
 import net.risedata.rpc.consumer.factory.ReturnValueHandleFactory;
 import net.risedata.rpc.consumer.invoke.InvokeHandle;
@@ -24,16 +23,11 @@ import net.risedata.rpc.exceptions.ConfigException;
 import net.risedata.rpc.factory.ReturnTypeFactory;
 import net.risedata.rpc.provide.config.Application;
 
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
@@ -52,12 +46,11 @@ import java.util.Map;
 @Order(value = 2)
 public class LoadingConfig implements  ApplicationListener<ContextRefreshedEvent> {
 
-
     /**
      * 客户端启动器
      */
     @Autowired
-    private ClinetBootStrap clinetBootStrap;
+    private ClientBootStrap clientBootStrap;
     /**
      * 超时时间默认是1秒
      */
@@ -94,7 +87,7 @@ public class LoadingConfig implements  ApplicationListener<ContextRefreshedEvent
             isInit = true;
             refreshListener(event.getApplicationContext(),true);
             Application.logger.info(" cloud " + (discoveryClient != null));
-            ClinetBeanFactory.invokeMap.forEach(this::registerClinet);
+            ClientBeanFactory.invokeMap.forEach(this::registerClinet);
             ConsumerApplication.scheduleTask.addTask(() -> {
                 connectionConfig.getConfigs().forEach((k, v) -> {
                     BasedConnectionManager connectionManager = ConnectionManagerFactory.getInstance(k);
@@ -117,7 +110,7 @@ public class LoadingConfig implements  ApplicationListener<ContextRefreshedEvent
                 }
             }
             Application.logger.info(" threadSize " + size);
-            clinetBootStrap.start(size);
+            clientBootStrap.start(size);
             ConsumerApplication.scheduleTask.start();
         }
     }
@@ -125,9 +118,9 @@ public class LoadingConfig implements  ApplicationListener<ContextRefreshedEvent
 
     public ConnectionManager getConnectionManager() {
         if (isDiscoveryClient) {
-            return new CloudConnectionManager(clinetBootStrap, discoveryClient);
+            return new CloudConnectionManager(clientBootStrap, discoveryClient);
         } else {
-            return new HostAndPortConnectionManager(clinetBootStrap);
+            return new HostAndPortConnectionManager(clientBootStrap);
         }
     }
 
@@ -149,7 +142,7 @@ public class LoadingConfig implements  ApplicationListener<ContextRefreshedEvent
      */
     private void registerClinet(Class<?> type, ProxyInvoke proxy) {
 
-        RPCClinet rpcClinet = AnnotationUtils.findAnnotation(type, RPCClinet.class);
+        RPCClient rpcClinet = AnnotationUtils.findAnnotation(type, RPCClient.class);
 
         if (rpcClinet != null) {
             String[] addrs = rpcClinet.value();
@@ -224,7 +217,7 @@ public class LoadingConfig implements  ApplicationListener<ContextRefreshedEvent
     public void initConnectionManager(BasedConnectionManager connectionManager) {
         if (connectionManager instanceof HostAndPortConnectionManager) {
             HostAndPortConnectionManager hostManager = ((HostAndPortConnectionManager) connectionManager);
-            hostManager.setBootstrap(clinetBootStrap);
+            hostManager.setBootstrap(clientBootStrap);
             hostManager.setScheduleTask(ConsumerApplication.scheduleTask);
         }
         if (connectionManager instanceof CloudConnectionManager) {
@@ -268,7 +261,7 @@ public class LoadingConfig implements  ApplicationListener<ContextRefreshedEvent
                     }
                     String name = null;
                     for (Class<?> aClass : classes) {
-                        RPCClinet rpcClinet = AnnotationUtils.findAnnotation(aClass, RPCClinet.class);
+                        RPCClient rpcClinet = AnnotationUtils.findAnnotation(aClass, RPCClient.class);
                         name = ConsumerUtils.getManagerName(aClass, rpcClinet);
                         connectionManager = ConnectionManagerFactory.getInstance(name);
                         if (connectionManager == null) {
