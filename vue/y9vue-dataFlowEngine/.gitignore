@@ -1,0 +1,15 @@
+node_modules/
+
+.vscode/
+.project
+.nuxt/
+.output/
+.idea
+.DS_Store
+/y9-vue.iml
+auto-imports.d.ts
+**/pnpm-lock.yaml
+**/package-lock.json
+**/components.d.ts
+**/package-lock.json
+y9vue-dataFlowEngine/
