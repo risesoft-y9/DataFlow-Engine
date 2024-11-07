@@ -13,6 +13,8 @@ import net.risesoft.y9.Y9LoginUserHolder;
 
 import com.alibaba.fastjson.JSON;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class DefaultSecurityManager implements SecurityManager, Filter {
 	
 	/**
@@ -159,8 +162,9 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 		user.setUserName(Y9LoginUserHolder.getUserInfo().getName());
 		user.setAccount(Y9LoginUserHolder.getUserInfo().getLoginName());
 		
+		LOGGER.debug("获取用户["+Y9LoginUserHolder.getUserInfo().getName()+"]权限-开始");
 		// 获取用户的权限
-		boolean userManager = Y9KernelApiUtil.hasRole(Y9LoginUserHolder.getTenantId(), token, "安全管理员");
+		boolean userManager = false;
 		boolean systemManager = Y9KernelApiUtil.hasRole(Y9LoginUserHolder.getTenantId(), token, "系统管理员");
 		// 环境角色
 		List<String> envRoles = new ArrayList<String>();
@@ -177,6 +181,7 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 			throw new Exception("当前用户没有权限，请联系管理员");
 		}
 		List<String> jobTypes = dataCatalogList.stream().map(map -> (String) map.get("id")).collect(Collectors.toList());
+		LOGGER.debug("获取用户["+Y9LoginUserHolder.getUserInfo().getName()+"]权限-结束");
 		
 		ConcurrentSecurity concurrentSecurity = new ConcurrentSecurity(user, jobTypes, envRoles, userManager, systemManager);
 		threadLocal.set(token);

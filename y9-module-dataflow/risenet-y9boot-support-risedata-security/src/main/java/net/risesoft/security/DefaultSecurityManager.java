@@ -284,6 +284,7 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
     	userInfo.setName(userToken.getUserName());
 		Y9LoginUserHolder.setUserInfo(userInfo);
 		Y9LoginUserHolder.setPersonId(userToken.getId());
+		Y9LoginUserHolder.setTenantId("0");
 	}
 
 	private void throwError(Y9Result<?> result, ServletRequest request, ServletResponse response) throws IOException {

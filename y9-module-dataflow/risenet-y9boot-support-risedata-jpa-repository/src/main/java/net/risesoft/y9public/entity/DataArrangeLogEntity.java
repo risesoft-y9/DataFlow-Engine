@@ -3,7 +3,6 @@ package net.risesoft.y9public.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Comment;
@@ -34,9 +33,24 @@ public class DataArrangeLogEntity extends BaseEntity {
 	@Comment(value = "流程ID")
 	private String processId;
 	
-	@Lob
-	@Column(name = "LOGDATA")
-	@Comment(value = "内容日志")
-	private String logData;
+	@Column(name = "JOBID")
+	@Comment(value = "任务ID")
+	private Integer jobId;
+	
+	@Column(name = "JOBNAME", length = 300)
+	@Comment(value = "任务名称")
+	private String jobName;
+	
+	@Column(name = "JOBLOGID", length = 50)
+	@Comment(value = "任务日志ID")
+	private String jobLogId;
+	
+	@Column(name = "ERRORMSG", length = 500)
+	@Comment(value = "任务执行前的校验不通过和报错信息")
+	private String errorMsg;
+	
+	@Column(name = "IDENTIFIER")
+	@Comment(value = "执行标识符")
+	private Integer identifier;
 
 }

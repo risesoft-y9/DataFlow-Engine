@@ -133,6 +133,9 @@ public class SourceController {
 	@GetMapping("/getTableAll")
 	public Y9Page<Map<String, Object>> getTableAll(String baseId, String name, Integer page, Integer size) {
         Page<DataTable> pageList = dataSourceService.findAllTable(baseId, name, page, size);
+        if(pageList == null) {
+        	return Y9Page.success(page, 0, 0, null, "获取数据成功");
+        }
         // 并行解析数据
         List<CompletableFuture<Map<String, Object>>> futures = pageList.stream()  
                 .map(n -> CompletableFuture.supplyAsync(() -> getDataMap(n))) // 创建异步任务  

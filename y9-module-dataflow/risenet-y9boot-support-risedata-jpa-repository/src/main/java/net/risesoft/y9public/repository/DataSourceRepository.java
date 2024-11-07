@@ -8,19 +8,23 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 
 public interface DataSourceRepository extends JpaRepository<DataSourceEntity, String>, JpaSpecificationExecutor<DataSourceEntity> {
 	
-	DataSourceEntity findByBaseName(String baseName);
+	DataSourceEntity findByBaseNameAndTenantId(String baseName, String tenantId);
 	
-	List<DataSourceEntity> findByBaseNameContainingAndBaseType(String baseName, String baseType);
+	List<DataSourceEntity> findByBaseNameContainingAndBaseTypeAndTenantId(String baseName, String baseType, String tenantId);
 	
-	Page<DataSourceEntity> findByBaseNameContaining(String baseName, Pageable pageable);
+	Page<DataSourceEntity> findByBaseNameContainingAndTenantId(String baseName, String tenantId, Pageable pageable);
 	
-	List<DataSourceEntity> findByType(Integer type);
+	List<DataSourceEntity> findByTypeAndTenantId(Integer type, String tenantId);
 	
-	List<DataSourceEntity> findByBaseTypeOrderByCreateTime(String baseType);
+	List<DataSourceEntity> findByBaseTypeAndTenantIdOrderByCreateTime(String baseType, String tenantId);
 	
 	long countByBaseType(String baseType);
+	
+	@Query("select p.id from DataSourceEntity p where p.tenantId = ?1")
+	List<String> findByTenantId(String tenantId);
 	
 }

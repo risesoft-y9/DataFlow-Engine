@@ -39,6 +39,7 @@ import net.risesoft.util.DataConstant;
 import net.risesoft.util.sqlddl.DDL;
 import net.risesoft.util.sqlddl.DbColumn;
 import net.risesoft.util.sqlddl.DbMetaDataUtil;
+import net.risesoft.y9.Y9LoginUserHolder;
 import net.risesoft.y9.json.Y9JsonUtil;
 import net.risesoft.y9public.entity.DataSourceTypeEntity;
 import net.risesoft.y9public.entity.DataSourceEntity;
@@ -76,7 +77,7 @@ public class DataSourceServiceImpl implements DataSourceService {
 		}
 		Pageable pageable = PageRequest.of(page - 1, rows, Sort.by(Sort.Direction.DESC, "createTime"));
 		if (StringUtils.isNotBlank(baseName)) {
-			return datasourceRepository.findByBaseNameContaining(baseName, pageable);
+			return datasourceRepository.findByBaseNameContainingAndTenantId(baseName, Y9LoginUserHolder.getTenantId(), pageable);
 		}
 		return datasourceRepository.findAll(pageable);
 	}
@@ -113,6 +114,7 @@ public class DataSourceServiceImpl implements DataSourceService {
 					entity.setMinIdle(1);
 				}
 			}
+			entity.setTenantId(Y9LoginUserHolder.getTenantId());
 			df = datasourceRepository.save(entity);
 		}
 		return df;
@@ -194,15 +196,15 @@ public class DataSourceServiceImpl implements DataSourceService {
 
 	@Override
 	public DataSourceEntity findByBaseName(String lookupName) {
-		return datasourceRepository.findByBaseName(lookupName);
+		return datasourceRepository.findByBaseNameAndTenantId(lookupName, Y9LoginUserHolder.getTenantId());
 	}
 
 	@Override
 	public List<DataSourceEntity> findAll(Integer type) {
 		if (type != null) {
-			List<DataSourceEntity> list = datasourceRepository.findByType(type);
+			List<DataSourceEntity> list = datasourceRepository.findByTypeAndTenantId(type, Y9LoginUserHolder.getTenantId());
 			if(type == 0) {
-				list.addAll(datasourceRepository.findByBaseTypeOrderByCreateTime(DataConstant.ES));
+				list.addAll(datasourceRepository.findByBaseTypeAndTenantIdOrderByCreateTime(DataConstant.ES, Y9LoginUserHolder.getTenantId()));
 			}
 			return list;
 		}
@@ -215,7 +217,16 @@ public class DataSourceServiceImpl implements DataSourceService {
 			page = 1;
 		}
 		Pageable pageable = PageRequest.of(page - 1, limit, Sort.by(Sort.Direction.DESC, "createTime"));
-		DataTableSpecification spec = new DataTableSpecification(baseId, name);
+		List<String> baseIds = new ArrayList<String>();
+		if(StringUtils.isBlank(baseId)) {
+			baseIds = datasourceRepository.findByTenantId(Y9LoginUserHolder.getTenantId());
+		}else {
+			baseIds.add(baseId);
+		}
+		if(baseIds.size() == 0) {
+			return null;
+		}
+		DataTableSpecification spec = new DataTableSpecification(baseIds, name);
 		return dataTableRepository.findAll(spec, pageable);
 	}
 
@@ -502,7 +513,7 @@ public class DataSourceServiceImpl implements DataSourceService {
 
 	@Override
 	public List<DataSourceEntity> findByBaseType(String baseType) {
-		return datasourceRepository.findByBaseTypeOrderByCreateTime(baseType);
+		return datasourceRepository.findByBaseTypeAndTenantIdOrderByCreateTime(baseType, Y9LoginUserHolder.getTenantId());
 	}
 
 	@Override
@@ -510,8 +521,8 @@ public class DataSourceServiceImpl implements DataSourceService {
 		List<Map<String, Object>> listMap = new ArrayList<Map<String, Object>>();
 		List<DataSourceTypeEntity> list = dataSourceTypeRepository.findAll();
 		for (DataSourceTypeEntity category : list) {
-			List<DataSourceEntity> sourceList = datasourceRepository.findByBaseNameContainingAndBaseType(baseName,
-					category.getName());
+			List<DataSourceEntity> sourceList = datasourceRepository.findByBaseNameContainingAndBaseTypeAndTenantId(baseName,
+					category.getName(), Y9LoginUserHolder.getTenantId());
 			if (sourceList.size() == 0) {
 				continue;
 			}

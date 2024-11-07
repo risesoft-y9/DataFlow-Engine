@@ -17,14 +17,14 @@ public class DataTableSpecification implements Specification<DataTable> {
 
 	private static final long serialVersionUID = -607881482694873340L;
 	
-	private String baseId;
+	private List<String> baseId;
 	private String name;
 	
 	public DataTableSpecification() {
 		super();
 	}
 
-	public DataTableSpecification(String baseId, String name) {
+	public DataTableSpecification(List<String> baseId, String name) {
 		super();
 		this.baseId = baseId;
 		this.name = name;
@@ -35,20 +35,20 @@ public class DataTableSpecification implements Specification<DataTable> {
 		Predicate predicate = cb.conjunction();
 		List<Expression<Boolean>> expressions = predicate.getExpressions();
 
-		if (StringUtils.isNotBlank(baseId)) {
-			expressions.add(cb.equal(root.get("baseId").as(String.class), baseId));
-		}
+		if (baseId != null && baseId.size() > 0) {
+            expressions.add(root.get("baseId").in(baseId));
+        }
 		if (StringUtils.isNotBlank(name)) {
 			expressions.add(cb.like(root.get("name").as(String.class), "%" + name + "%"));
 		}
 		return predicate;
 	}
 
-	public String getBaseId() {
+	public List<String> getBaseId() {
 		return baseId;
 	}
 
-	public void setBaseId(String baseId) {
+	public void setBaseId(List<String> baseId) {
 		this.baseId = baseId;
 	}
 

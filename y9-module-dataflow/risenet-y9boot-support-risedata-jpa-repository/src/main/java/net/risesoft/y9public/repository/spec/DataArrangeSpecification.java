@@ -19,15 +19,17 @@ public class DataArrangeSpecification implements Specification<DataArrangeEntity
 	
 	private String name;
 	private Integer pattern;
+	private String tenantId;
 	
 	public DataArrangeSpecification() {
 		super();
 	}
 
-	public DataArrangeSpecification(String name, Integer pattern) {
+	public DataArrangeSpecification(String name, Integer pattern, String tenantId) {
 		super();
 		this.name = name;
 		this.pattern = pattern;
+		this.tenantId = tenantId;
 	}
 
 	@Override
@@ -40,6 +42,9 @@ public class DataArrangeSpecification implements Specification<DataArrangeEntity
 		}
 		if(pattern != null) {
 			expressions.add(cb.equal(root.get("pattern").as(Integer.class), pattern));
+		}
+		if(StringUtils.isNotBlank(tenantId)) {
+			expressions.add(cb.equal(root.get("tenantId").as(String.class), tenantId));
 		}
 		return predicate;
 	}

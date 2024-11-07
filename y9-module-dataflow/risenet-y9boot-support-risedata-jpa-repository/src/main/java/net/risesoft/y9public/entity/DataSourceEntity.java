@@ -90,5 +90,9 @@ public class DataSourceEntity extends BaseEntity {
 	@Comment(value = "类别，1-其他数据源，0-数据库")
 	@ColumnDefault("0")
 	private Integer type;
+	
+	@Column(name = "TENANTID", length = 50)
+	@Comment(value = "租户ID")
+	private String tenantId;
 
 }

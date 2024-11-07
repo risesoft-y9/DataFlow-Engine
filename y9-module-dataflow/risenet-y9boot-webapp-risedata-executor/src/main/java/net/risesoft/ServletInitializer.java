@@ -33,7 +33,7 @@
 //	@Override
 //	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
 //		setRegisterErrorPageFilter(false);
-//		builder.sources(RiseAdminApplication.class);
+//		builder.sources(RiseActuatorsApplication.class);
 //		return builder;
 //	}
 //}
