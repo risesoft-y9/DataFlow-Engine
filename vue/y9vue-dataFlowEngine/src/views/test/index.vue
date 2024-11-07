@@ -10,7 +10,7 @@
     import { NumberLiteralType } from 'typescript';
     import { setActivePinia } from 'pinia';
     import { cloneDeep } from 'lodash';
-
+    import { initData } from './data';
     //
     const settingStore = useSettingStore();
     const apiTest_el_tabs = ref('apiTest_el_tabs_' + randomString(10));
@@ -27,10 +27,11 @@
     const sizeObjInfo = inject('sizeObjInfo');
     const pageHeaderFontSize = ref(sizeObjInfo.extraLargeFont);
     const currentId = ref('');
-    const currentFolderNode = ref({ name: '' });
+    const activeNode = ref(null);
+    const folderName = ref('');
     const hightlightNode = ref(null);
-    const showFolderPage = ref(false);
-
+    const showFolderPage = ref(true);
+    const currentExpandedKeys = reactive([]);
     const templateTreeDataItem = {
         name: '接口模版',
         id: '1',
@@ -71,150 +72,16 @@
             }
         }
     };
-    let treeData = ref([
-        {
-            name: '文件夹-1',
-            type: 'folder',
-            id: '1',
-            children: [
-                {
-                    name: '示例接口-1',
-                    id: '1-1',
-                    type: 'api',
-                    ApiForm: {
-                        name: '示例接口-1',
-                        method: 'POST',
-                        url: 'http://localhost:8091/api/restful/post/1',
-                        header: [
-                            {
-                                isSelect: true,
-                                Key: 'Access-Control-Request-Method',
-                                Param: 'keep-alive'
-                            },
-                            {
-                                isSelect: true,
-                                Key: 'content-type',
-                                Param: 'application/json'
-                            }
-                        ],
-                        query: [
-                            {
-                                isSelect: false,
-                                Key: '',
-                                Param: ''
-                            }
-                        ],
-                        body: {
-                            type: 1,
-                            1: null,
-                            2: [
-                                {
-                                    isSelect: false,
-                                    headerKey: '',
-                                    headerParam: ''
-                                }
-                            ],
-                            3: null,
-                            4: null,
-                            5: null,
-                            6: null,
-                            7: null
-                        }
-                    }
-                },
-                {
-                    name: '示例接口-2',
-                    id: '1-2',
-                    type: 'api',
-                    ApiForm: {
-                        name: '示例接口-2',
-                        method: 'POST',
-                        url: 'http://localhost:8091/api/restful/post/2',
-                        header: [
-                            {
-                                isSelect: true,
-                                Key: 'Access-Control-Request-Method',
-                                Param: 'keep-alive'
-                            },
-                            {
-                                isSelect: true,
-                                Key: 'content-type',
-                                Param: 'application/json'
-                            }
-                        ],
-                        query: [
-                            {
-                                isSelect: false,
-                                Key: '',
-                                Param: ''
-                            }
-                        ],
-                        body: {
-                            type: 1,
-                            1: null,
-                            2: [
-                                {
-                                    isSelect: false,
-                                    headerKey: '',
-                                    headerParam: ''
-                                }
-                            ],
-                            3: null,
-                            4: null,
-                            5: null,
-                            6: null,
-                            7: null
-                        }
-                    }
-                },
-                {
-                    name: '示例接口-3',
-                    id: '1-3',
-                    type: 'api',
-                    ApiForm: {
-                        name: '示例接口-3',
-                        method: 'POST',
-                        url: 'http://localhost:8091/api/restful/post/1',
-                        header: [
-                            {
-                                isSelect: true,
-                                Key: 'Access-Control-Request-Method',
-                                Param: 'keep-alive'
-                            },
-                            {
-                                isSelect: true,
-                                Key: 'content-type',
-                                Param: 'application/json'
-                            }
-                        ],
-                        query: [
-                            {
-                                isSelect: false,
-                                Key: '',
-                                Param: ''
-                            }
-                        ],
-                        body: {
-                            type: 1,
-                            1: null,
-                            2: [
-                                {
-                                    isSelect: false,
-                                    headerKey: '',
-                                    headerParam: ''
-                                }
-                            ],
-                            3: null,
-                            4: null,
-                            5: null,
-                            6: null,
-                            7: null
-                        }
-                    }
-                }
-            ]
-        }
-    ]);
+    const templateTreeDataFolder = {
+        name: '文件夹-1',
+        type: 'folder',
+        id: '1',
+        children: []
+    };
+    // 初始化树组件数据
+    let treeData = ref([]);
+    treeData.value.push.call(treeData.value, ...initData);
+
     const treeDataSearchKey = ref('');
 
     let ApiForm = reactive({});
@@ -306,19 +173,68 @@
         ApiFormChange();
     }
 
-    function searchByNodeId(nodeId) {
-        function theItorator(array, id) {
-            return array.forEach((item) => {
-                if (item.id == id) {
+    function searchByNodeId(node, operation = 'search') {
+        function theItorator(array, id, operation) {
+            for (let i = 0; i < array.length; i++) {
+                let item = array[i];
+                if (operation == 'search' && item.id == id) {
                     return item;
                 }
-                if (item.children && item.children.length > 0) {
-                    let result = theItorator(item.children, id);
-                    if (result !== undefined) return result;
+                if (operation == 'delete' && item.id == id) {
+                    array.splice(i, 1);
+                    return 'delete操作';
                 }
-            });
+                if (operation == 'addFolder' && item.id == id) {
+                    templateTreeDataFolder.id = `${item.id}-${item.children.length + 1}`;
+                    templateTreeDataFolder.children = [];
+                    let clonetemplateData = cloneDeep(templateTreeDataFolder);
+                    if (item.children.length) {
+                        // 同级节点下，如果有其它的文件夹，插入到其它文件夹之后
+                        for (let j = item.children.length - 1; j >= 0; j--) {
+                            let child = item.children[j];
+                            if (child.type == 'folder') {
+                                item.children[j + 1] = clonetemplateData;
+                                return 'addFolder操作';
+                            } else {
+                                item.children[j + 1] = child;
+                            }
+                            if (j == 0) {
+                                item.children[0] = clonetemplateData;
+                            }
+                        }
+                    } else {
+                        item.children.push(clonetemplateData);
+                        return 'addFolder操作';
+                    }
+                }
+
+                if (operation == 'addApi' && item.id == id) {
+                    if (node.type == 'folder') {
+                        templateTreeDataItem.id = `${item.id}-${item.children.length + 1}`;
+                        item.children.push(cloneDeep(templateTreeDataItem));
+                    }
+                    if (node.type == 'api') {
+                        // 同级节点上的“+”事件，array[0]一定存在
+                        let temp = array[0].id.split('-');
+                        temp[temp.length - 1] = array.length + 1;
+                        templateTreeDataItem.id = temp.join('-');
+                        array.push(cloneDeep(templateTreeDataItem));
+                    }
+                    return 'addApi操作';
+                }
+                if (item.children && item.children.length > 0) {
+                    let res = theItorator(item.children, id, operation);
+                    if (res) {
+                        return res;
+                    } else {
+                        continue;
+                    }
+                }
+            }
         }
-        return theItorator(treeData.value, nodeId);
+
+        let r = theItorator(treeData.value, node.id, operation);
+        return r;
     }
 
     function treeDataFilter() {
@@ -331,21 +247,31 @@
         }
     }
 
-    // 点击新建按钮
-    const newApiTest = () => {
-        templateTreeDataItem.id = treeData.value.length + 1 + '';
-        let clonetemplateData = cloneDeep(templateTreeDataItem);
+    /**
+     * 新建按钮功能：根级节点新建文件夹或API
+     */
+    const createTreeDataRootNode = (value) => {
+        let clonetemplateData = {};
+        if (value == 'folder') {
+            templateTreeDataFolder.id = treeData.value.length + 1 + '';
+            templateTreeDataFolder.children = [cloneDeep(templateTreeDataItem)];
+            templateTreeDataFolder.children[0].id = templateTreeDataFolder.id + '-1';
+            clonetemplateData = cloneDeep(templateTreeDataFolder);
+        } else {
+            templateTreeDataItem.id = treeData.value.length + 1 + '';
+            clonetemplateData = cloneDeep(templateTreeDataItem);
+        }
         treeData.value.push(clonetemplateData);
-        nextTick(() => {
-            removeActiveNode();
-            let array = Array.from(document.getElementsByClassName('y9-tree-item'));
-            let length = array.length;
-            if (length) {
-                array[length - 1].classList.add('active-node');
-                hightlightNode.value = array[length - 1];
-                setApiFormData(templateTreeDataItem);
-            }
-        });
+        // nextTick(() => {
+        //     removeActiveNode();
+        //     let array = Array.from(document.getElementsByClassName('y9-tree-item'));
+        //     let length = array.length;
+        //     if (length) {
+        //         array[length - 1].classList.add('active-node');
+        //         hightlightNode.value = array[length - 1];
+        //         setApiFormData(templateTreeDataItem);
+        //     }
+        // });
     };
     function removeActiveNode() {
         let array = Array.from(document.getElementsByClassName('y9-tree-item'));
@@ -365,6 +291,7 @@
                 array.push(data[i]);
             }
         }
+        // 设置表单数据
         Object.assign(ApiForm, itemData.ApiForm);
         clearArray(headerItemList);
         clearArray(queryItemList);
@@ -373,59 +300,64 @@
         pushAll(queryItemList, itemData.ApiForm.query);
         pushAll(bodyFormDataItemList, itemData.ApiForm.body['2']);
         bodyType.value = Number(itemData.ApiForm.body['type']);
+
         if (bodyType.value > 1) {
             RequestActiveName.value = 'Body';
         } else {
             RequestActiveName.value = 'Query';
         }
-
-        if (document.getElementsByClassName('active-node').length) {
-            hightlightNode.value = document.getElementsByClassName('active-node')[0];
-        }
     }
     // 点击树节点
     const onTreeNodeClick = (node) => {
-        console.log('被点击了', node);
+        // console.log('被点击了', node);
         currentId.value = node.id;
+        if (activeNode.value && activeNode.value.classList.contains('active-node')) {
+            activeNode.value.classList.remove('active-node');
+        }
         if (node.type == 'folder') {
-            currentFolderNode.value = searchByNodeId(currentId.value);
-            console.log(currentFolderNode.value);
+            currentExpandedKeys[0] = node.id;
+            folderName.value = searchByNodeId(node).name;
             showFolderPage.value = true;
         } else {
             showFolderPage.value = false;
-            if (node.children && node.children.length) {
-                setApiFormData(node.children[0]);
-            } else {
-                setApiFormData(templateTreeDataItem);
-            }
+            setApiFormData(node);
         }
-
-        // removeActiveNode();
-        // setApiFormData(node);
-        // nextTick(() => {
-        //     hightlightNode.value = document.getElementsByClassName('active-node')[0];
-        // });
+        nextTick(() => {
+            activeNode.value = document.getElementsByClassName('active-node')[0];
+        });
     };
 
     // 更改文件夹名字
-    function changeFolderName(value) {
-        if (value && value.indexOf(' ') > -1) {
-            value = value.trim();
+    function changeFolderName(name) {
+        if (name && name.indexOf(' ') > -1) {
+            name = name.trim();
         }
-        currentFolderNode.value.name = value;
-        console.log(currentFolderNode.value);
+        folderName.value = name;
+        let node = {
+            id: currentId.value
+        };
+        searchByNodeId(node).name = folderName.value;
     }
     //点击删除icon
     const onTreeRemoveIcon = (node) => {
-        console.log('删除icon被点击了', node);
+        // console.log('删除icon被点击了', node);
+        if (treeData.value.length <= 1) {
+            searchByNodeId(node, 'delete');
+        } else {
+            ElMessageBox.alert('至少保留一个根节点', '操作提示', {
+                confirmButtonText: 'OK'
+            });
+        }
     };
     // 点击添加文件夹icon
     const onTreeAddFolderIcon = (node) => {
-        console.log('点击了添加文件夹', node);
+        // console.log('点击了添加文件夹', node);
+        searchByNodeId(node, 'addFolder');
     };
     // 点击添加API icon
     const onTreeAddApiIcon = (node) => {
         console.log('点击了添加API', node);
+        searchByNodeId(node, 'addApi');
     };
     // 改变api配置数据
     function ApiFormChange() {
@@ -434,15 +366,14 @@
         }
 
         if (treeData.value.length) {
-            treeData.value.map((item) => {
-                if (item.id == currentId.value) {
-                    item.name = ApiForm.name;
-                    Object.assign(item.ApiForm, ApiForm);
-                    console.log(item);
-                }
-            });
+            let item = searchByNodeId({ id: currentId.value });
+            item.name = ApiForm.name;
+            Object.assign(item.ApiForm, ApiForm);
+
             nextTick(() => {
-                hightlightNode.value.classList.add('active-node');
+                if (activeNode.value && document.getElementsByClassName('active-node').length == 0) {
+                    activeNode.value.classList.add('active-node');
+                }
             });
         } else {
             ElMessageBox.alert('左侧列表没有接口数据，请先点击新增', '操作提示', {
@@ -450,10 +381,20 @@
             });
         }
     }
+
+    // 当前节点高亮丢失问题
+    function checkHightlightNodeClass() {}
     // 选择body类型
     function setBodyType(value) {
         ApiForm.body['type'] = Number(value);
         bodyType.value = Number(value);
+        console.log('setBodyType', value);
+        ApiFormChange();
+    }
+
+    function onJsonEditorChange(text) {
+        console.log('json change', bodyType.value);
+        ApiForm.body[bodyType.value] = text;
         ApiFormChange();
     }
 
@@ -489,16 +430,8 @@
         // get json
         // const updatedJson = editor.get();
     }
-    function initTreeDataHightlightItem() {
-        if (document.getElementsByClassName('y9-tree-item').length) {
-            // document.getElementsByClassName('y9-tree-item')[0].classList.add('active-node');
-            setApiFormData(treeData.value[0].children[0]);
-        } else {
-            setApiFormData(templateTreeDataItem);
-        }
-    }
+
     function init() {
-        // initTreeDataHightlightItem();
         setApiFormData(templateTreeDataItem);
         initJsonContainer();
     }
@@ -520,9 +453,22 @@
                             placeholder="请输入关键词/URL"
                             :prefix-icon="Search"
                         />
-                        <el-button type="primary" @click="newApiTest">新建</el-button>
+                        <el-dropdown placement="bottom" @command="createTreeDataRootNode">
+                            <el-button type="primary">新建</el-button>
+                            <template #dropdown>
+                                <el-dropdown-menu>
+                                    <el-dropdown-item command="folder">添加一级目录</el-dropdown-item>
+                                    <el-dropdown-item command="api">添加一级API</el-dropdown-item>
+                                </el-dropdown-menu>
+                            </template>
+                        </el-dropdown>
                     </template>
-                    <y9Tree :data="treeDataFilter()" :expandOnClickNode="true" @node-click="onTreeNodeClick">
+                    <y9Tree
+                        :data="treeDataFilter()"
+                        :expandOnClickNode="true"
+                        :defaultExpandedKeys="currentExpandedKeys"
+                        @node-click="onTreeNodeClick"
+                    >
                         <template #actions="{ item }">
                             <i
                                 class="ri-folder-add-line"
@@ -544,7 +490,7 @@
                     <div class="mainContainer" v-show="showFolderPage">
                         <div class="folder">
                             <span>文件夹</span>
-                            <span><el-input v-model="currentFolderNode.name" @input="changeFolderName" /></span>
+                            <span><el-input v-model="folderName" @input="changeFolderName" /></span>
                         </div>
                     </div>
                     <div class="mainContainer" v-show="!showFolderPage">
@@ -607,6 +553,7 @@
                                                 @on-delete="onDeleteItem"
                                                 @on-edit="onEditItem"
                                                 @on-radio-change="setBodyType"
+                                                @on-json-editor-change="onJsonEditorChange"
                                             ></BodyTypeComp>
                                         </div>
                                     </el-tab-pane>
@@ -741,6 +688,11 @@
                         margin: 0 15px;
                         .el-input__wrapper {
                             border-radius: 20px;
+                        }
+                    }
+                    .el-dropdown {
+                        button.el-button {
+                            color: var(--el-bg-color);
                         }
                     }
                 }

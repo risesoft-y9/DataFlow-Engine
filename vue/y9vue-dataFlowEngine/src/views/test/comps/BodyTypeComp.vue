@@ -3,21 +3,31 @@
     import Y9Table2Comp from './Y9Table2Comp.vue';
     import { watch } from 'vue';
     import type { UploadInstance } from 'element-plus';
+    import { debounce__ } from '@/utils/index';
 
     const uploadRef = ref<UploadInstance>();
 
     const props = defineProps({
         type: {
+            /**
+             * 初始化类型["none", "form-data", "json", "xml", "html", "binary"]
+             */
             type: Number,
             default: 1
         },
         itemList: {
+            /**
+             * form-data 类型下的动态数据
+             */
             type: Array,
             default() {
                 return [];
             }
         },
         ApiForm: {
+            /**
+             * 整个左侧表单数据
+             */
             type: Object,
             default() {
                 return {};
@@ -25,18 +35,12 @@
         }
     });
     const bodyType = ref(props.type);
+
     watch(bodyType, (value) => {
         emits('onRadioChange', value);
     });
 
-    const emits = defineEmits(['onAdd', 'onDelete', 'onEdit', 'onRadioChange']);
-
-    watch(
-        () => props.type,
-        (value) => {
-            init(value);
-        }
-    );
+    const emits = defineEmits(['onAdd', 'onDelete', 'onEdit', 'onRadioChange', 'onJsonEditorChange']);
 
     function onDeleteItem() {
         emits('onDelete');
@@ -45,42 +49,57 @@
         emits('onEdit');
     }
 
+    /**
+     * jsoneditor 配置
+     * Mode: 'code', 'form', 'text', 'tree', 'view', 'preview'
+     * C.VALID_OPTIONS = [
+     *      "ajv", "schema", "schemaRefs", "templates", "ace", "theme",
+     *      "autocomplete", "onChange", "onChangeJSON", "onChangeText", "onExpand",
+     *      "onEditable", "onError", "onEvent", "onModeChange", "onNodeName",
+     *      "onValidate", "onCreateMenu", "onSelectionChange", "onTextSelectionChange",
+     *      "onClassName", "onFocus", "onBlur", "colorPicker", "onColorPicker",
+     *      "timestampTag", "timestampFormat", "escapeUnicode", "history", "search",
+     *      "mode", "modes", "name", "indentation", "sortObjectKeys", "navigationBar",
+     *      "statusBar", "mainMenuBar", "languages", "language", "enableSort", "enableTransform",
+     *      "limitDragging", "maxVisibleChilds", "onValidationError", "modalAnchor", "popupAnchor",
+     *      "createQuery", "executeQuery", "queryDescription", "allowSchemaSuggestions", "showErrorTable"
+     * ],
+     */
     const bodyTypeJsonContainerHeight = ref(196);
     const bodyTypeJsonContainer = ref(null);
     const editor = ref(null);
+    const options = reactive({
+        selectionStyle: 'tree',
+        statusBar: false,
+        mainMenuBar: false,
+        showErrorTable: false,
+        onBlur() {
+            // console.log(editor.value.getText());
+            switch (bodyType.value) {
+                case 3:
+                    emits('onJsonEditorChange', editor.value.get());
+                    break;
+                case 4:
+                case 5:
+                    emits('onJsonEditorChange', editor.value.getText());
+                    break;
+                default:
+                    break;
+            }
+        }
+    });
 
-    function initBodyTypeJsonContainer() {
+    function initBodyTypeJsonContainer(mode = 'code') {
         if (editor.value) {
             return null;
         }
         bodyTypeJsonContainer.value = document.getElementById('body-type-json-container');
-        /**
-         * C.VALID_OPTIONS = [
-         *      "ajv", "schema", "schemaRefs", "templates", "ace", "theme",
-         *      "autocomplete", "onChange", "onChangeJSON", "onChangeText", "onExpand",
-         *      "onEditable", "onError", "onEvent", "onModeChange", "onNodeName",
-         *      "onValidate", "onCreateMenu", "onSelectionChange", "onTextSelectionChange",
-         *      "onClassName", "onFocus", "onBlur", "colorPicker", "onColorPicker",
-         *      "timestampTag", "timestampFormat", "escapeUnicode", "history", "search",
-         *      "mode", "modes", "name", "indentation", "sortObjectKeys", "navigationBar",
-         *      "statusBar", "mainMenuBar", "languages", "language", "enableSort", "enableTransform",
-         *      "limitDragging", "maxVisibleChilds", "onValidationError", "modalAnchor", "popupAnchor",
-         *      "createQuery", "executeQuery", "queryDescription", "allowSchemaSuggestions", "showErrorTable"
-         * ],
-         */
-        const options = {
-            selectionStyle: 'tree',
-            mode: 'code',
-            statusBar: false,
-            mainMenuBar: false,
-            showErrorTable: false,
-            onChangeText() {
-                console.log(editor.value.get());
-            }
-        };
+
         editor.value = new JSONEditor(bodyTypeJsonContainer.value, options);
 
-        // set json
+        // 设置模式
+        editor.value.setMode(mode);
+        // 设置数据
         editor.value.set();
 
         document.querySelector('#body-type-json-container .jsoneditor').style.height =
@@ -94,16 +113,15 @@
             case 3:
             case 4:
             case 5:
-            case 6:
                 initBodyTypeJsonContainer();
                 break;
-
             default:
                 break;
         }
     }
     onMounted(() => {
-        init(props.type);
+        // init(props.type);
+        initBodyTypeJsonContainer();
     });
 </script>
 <template>
@@ -114,7 +132,7 @@
             <el-radio :value="3">json</el-radio>
             <el-radio :value="4">xml</el-radio>
             <el-radio :value="5">html</el-radio>
-            <el-radio :value="6">javascript</el-radio>
+            <!-- <el-radio :value="6">javascript</el-radio> -->
             <el-radio :value="7">binary</el-radio>
         </el-radio-group>
         <div v-show="type == 1" class="body-type-none"></div>
