@@ -58,9 +58,9 @@ export default {
   'Create User Task': '创建用户任务',
   'Create Gateway': '创建网关',
   'Create Exclusive Gateway': '创建互斥网关',
-  'Create Parallel Gateway': '创建并行网关',
-  'Create Inclusive Gateway': '创建相容网关',
-  'Create Complex Gateway': '创建复杂网关',
+  'Create Parallel Gateway': '创建并行（与）网关',
+  'Create Inclusive Gateway': '创建并行（或）网关',
+  'Create Complex Gateway': '创建并行（副）网关',
   'Create Event based Gateway': '创建事件网关',
 
   'Create DataObjectReference': '创建数据对象',

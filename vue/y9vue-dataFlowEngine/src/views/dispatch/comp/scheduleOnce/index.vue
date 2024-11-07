@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {reactive} from "vue";
+import {onMounted, reactive} from "vue";
 import {getServiceByName, sendJob} from "@/api/dispatch";
 import {ElNotification} from "element-plus";
 
@@ -26,11 +26,7 @@ const getData = async () => {
     state.serveList = res.data
   }
 }
-const rules = {
-  jobType: [
-    {required: true, message: '请选择业务分类', trigger: ['blur', 'change']}
-  ],
-}
+
 const startTask = async () => {
   let res = await sendJob({jobId: props.tableRow.id,server:state.form.server})
   if (res) {
@@ -53,8 +49,7 @@ let ruleFormRef = ref()
 <template>
   <el-form
       ref="ruleFormRef"
-      :model="state.form"
-      :rules="rules">
+      :model="state.form">
     <el-descriptions border :column="1">
       <el-descriptions-item label-align="center">
         <template #label>

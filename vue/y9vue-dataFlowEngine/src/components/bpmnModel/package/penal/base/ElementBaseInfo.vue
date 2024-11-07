@@ -50,7 +50,7 @@
                         <el-option
                             v-for="item in bpmnStore.getEnvironmentResult"
                             :key="item.id"
-                            :label="item.id"
+                            :label="item.description"
                             :value="'' + item.id"
                         />
                     </el-select>

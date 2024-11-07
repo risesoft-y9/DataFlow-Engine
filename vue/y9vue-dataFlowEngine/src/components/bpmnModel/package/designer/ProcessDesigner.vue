@@ -16,7 +16,6 @@
                     <el-button :type="headerButtonType" @click="saveModel"
                         ><i class="ri-save-3-line" style="margin-right: 5px"></i>保存
                     </el-button>
-                    <!-- <el-button :type="headerButtonType" @click="deployModel"><i class="ri-database-2-line" style="margin-right: 5px;"></i>部署</el-button> -->
                 </el-button-group>
                 <el-button-group key="stack-control">
                     <el-tooltip effect="light">
@@ -92,6 +91,8 @@
     import { useBpmnStore } from '@/store/modules/bpmnStore';
     import { isReactive, toRaw } from 'vue';
     import { parseXmlEvent } from './parseProcessXml';
+    import { saveXmlData } from '@/api/processAdmin/processModel';
+
     export default {
         name: 'MyProcessDesigner',
         componentName: 'MyProcessDesigner',
@@ -113,6 +114,7 @@
             modelValue: String, // xml 字符串
             processId: String,
             processName: String,
+            rowId: String,
             translations: Object, // 自定义的翻译文件
             options: {
                 type: Object,
@@ -368,17 +370,20 @@
 
             async saveModel() {
                 const loading = ElLoading.service({ lock: true, text: '正在处理中', background: 'rgba(0, 0, 0, 0.3)' });
-
-                // 1、从xml解析出流程定义信息
                 const { xml } = await this.bpmnModeler.saveXML({ format: true });
                 let result = new parseXmlEvent(xml).start();
-                let formData = new FormData();
-                formData.append('xml', xml);
-                loading.close();
-            },
-
-            deployModel() {
-                console.log(this.bpmnModeler.getDefinitions().rootElements[0]);
+                if(result == '' || result == null || result == undefined ) {
+                    loading.close();
+                    return;
+                }
+                saveXmlData({id: this.rowId, xmlData: JSON.stringify(xml), parseData: JSON.stringify(result)}).then((res) => {
+                    loading.close();
+                    if (res.success) {
+                        ElMessage({ type: 'success', message: res.msg, offset: 65 });
+                    } else {
+                        ElMessage({ message: res.msg, type: 'error', offset: 65 });
+                    }
+                });
             },
 
             closeDialog() {

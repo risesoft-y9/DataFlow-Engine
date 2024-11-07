@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2021-04-15 10:16:53
- * @LastEditTime: 2022-08-02 11:11:33
- * @LastEditors: error: git config user.name && git config user.email & please set dead value or install git
- * @Description: In User Settings Edit
- * @FilePath: \workspace-y9boot-9.5-vuee:\workspace-y9boot-9.6-vue\y9vue-kernel-dcat-style\src\api\lib\request.js
- */
 import settings from '@/settings';
 import y9_storage from '@/utils/storage';
 import axios from 'axios'; // 考虑CDN
@@ -82,11 +74,9 @@ function y9Request(baseUrl = '') {
                 const reqUrl = response.config.url.split('?')[0].replace(response.config.baseURL, '');
                 const noVerifyBool = settings.ajaxResponseNoVerifyUrl.includes(reqUrl);
                 switch (code) {
-                    case 40101:
-                    case 40101:
-                    case 40102:
-                    case 40102:
-                    case 401: // 未登陆
+                    case 100: // 未登陆
+                    case 101: // 令牌已失效
+                    case 102: // 校验令牌出问题了
                         if (!noVerifyBool) {
                             ElMessageBox({
                                 title: t('提示'),
@@ -104,7 +94,6 @@ function y9Request(baseUrl = '') {
                                 }
                             });
                         }
-
                         break;
                     case 40300:
                         window.location.href = import.meta.env.VUE_APP_PUBLIC_PATH + '/401';
@@ -114,14 +103,20 @@ function y9Request(baseUrl = '') {
                         break;
                     case 50000:
                         return res;
-                    default:
+                    case 500:
+                    case 401:
+                    //case 403:
                         if (!noVerifyBool) {
-                            //console.error(res.msg);
                             ElMessage({
                                 message: res.msg,
                                 type: 'error',
                                 duration: 1500,
                             });
+                        }
+                        break;
+                    default:
+                        if (!noVerifyBool) {
+                            console.error(res.msg);
                         }
                         break;
                 }

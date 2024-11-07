@@ -129,7 +129,6 @@ const updateForm = (form, data,type) => {
 //获取字段详情
 export const getTableFieldListAll = async (sourceTable,targetTable) => {
     let res;
-    debugger
     if(addTaskForm.tableData.sourceType == 'api') {
         res = await getApiField({apiId: sourceTable});
     }else {

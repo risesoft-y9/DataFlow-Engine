@@ -78,13 +78,15 @@
                 });
 
                 navTo();
+            }else{
+                sessionStorage.clear();
             }
         }
-        ElMessage({
-            message: res.success ? '正在登录中...' : res.msg,
-            type: res.success ? 'success' : 'error',
-            duration: 5000
-        });
+        // ElMessage({
+        //     message: res.success ? '正在登录中...' : res.msg,
+        //     type: res.success ? 'success' : 'error',
+        //     duration: 5000
+        // });
     }
 </script>
 
@@ -245,6 +247,10 @@
                     &::placeholder {
                         color: rgb(227, 227, 227);
                     }
+                }
+                .tips-text {
+                    margin-top: 20px;
+                    color: red;
                 }
             }
         }

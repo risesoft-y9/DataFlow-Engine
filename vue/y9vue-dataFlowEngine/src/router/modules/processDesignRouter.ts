@@ -4,7 +4,7 @@ const processDesignRouter = {
     redirect: '/processDesign',
     name: 'processDesignRouterIndex',
     meta: {
-        title: '调度流程设计',
+        title: '任务编排管理',
         icon: 'ri-shapes-line' //remix 图标 优先级最高
         // elIcon: "House"//element-plus 图标 优先级第二
     },
@@ -14,7 +14,7 @@ const processDesignRouter = {
             component: () => import('@/views/processDesign/index.vue'),
             name: 'processDesign',
             meta: {
-                title: '调度流程设计',
+                title: '任务编排管理',
                 icon: 'ri-shapes-line' //remix 图标 优先级最高
                 // elIcon: "House"//element-plus 图标 优先级第二
             }

@@ -13,8 +13,7 @@
                     open: true
                 }
             }"
-            :processId="processId"
-            :processName="processName"
+            :rowId="props.rowId"
             keyboard
             v-bind="controlForm"
             @closeDialog="closeDialog"
@@ -34,7 +33,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { defineProps, onMounted, reactive } from 'vue';
+    import { defineProps, onMounted, reactive, toRefs } from 'vue';
     // 自定义渲染（隐藏了 label 标签）
     // 自定义元素选中时的弹出菜单（修改 默认任务 为 用户任务）
     import CustomContentPadProvider from '@/components/bpmnModel/package/designer/plugins/content-pad';
@@ -52,10 +51,9 @@
     import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
     import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css';
     import { getModelXml } from '@/api/processAdmin/processModel';
-    import modelXml from './testModelXmlData.json';
 
     const props = defineProps({
-        editId: String
+        rowId: String
     });
     const data = reactive({
         xmlString: '',
@@ -63,8 +61,6 @@
         bpmnModeler: null,
         reloadIndex: 0,
         controlForm: {
-            processId: '',
-            processName: '',
             simulation: true,
             labelEditing: false,
             labelVisible: false,
@@ -76,9 +72,7 @@
         },
         showPanel: false,
         elementObj: {},
-        elementType: '',
-        processId: '',
-        processName: ''
+        elementType: ''
     });
 
     let {
@@ -90,18 +84,15 @@
         elementObj,
         elementType,
         showDesigner,
-        processId,
-        processName
     } = toRefs(data);
 
     onMounted(async () => {
-        if (props.editId != '') {
-            // let res = await getModelXml(props.editId);
-            let res = modelXml;
+        if (props.rowId != '') {
+            let res = await getModelXml(props.rowId);
             if (res.success) {
-                xmlString.value = res.data.xml;
-                processId.value = res.data.key;
-                processName.value = res.data.name;
+                if(res.data != ''){
+                    xmlString.value = JSON.parse(res.data);
+                }
             }
         }
         showDesigner.value = true;

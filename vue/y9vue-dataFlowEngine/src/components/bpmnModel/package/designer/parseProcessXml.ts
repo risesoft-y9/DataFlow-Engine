@@ -7,7 +7,9 @@ export class parseXmlEvent {
     public xmlDoc: Document;
     public startTagName = 'bpmn2:startEvent';
     public endTagName = 'bpmn2:endEvent';
-    public gateweyTagName = 'bpmn2:parallelGateway';
+    public parallelGatewayTagName = 'bpmn2:parallelGateway';// 与网关
+    public complexGatewayTagName = 'bpmn2:complexGateway';// 副网关
+    public inclusiveGatewayTagName = 'bpmn2:inclusiveGateway';// 或网关
     public userTaskTagName = 'bpmn2:userTask';
     public outgoingTagName = 'bpmn2:outgoing';
     public incomingTagName = 'bpmn2:incoming';
@@ -31,7 +33,9 @@ export class parseXmlEvent {
         this.checkStartNode();
         this.checkEndNode();
         this.checkUserTaskNode();
-        this.checkGateweyNode();
+        this.checkGateweyNode(this.parallelGatewayTagName);
+        this.checkGateweyNode(this.complexGatewayTagName);
+        this.checkGateweyNode(this.inclusiveGatewayTagName);
         this.outgoingNodes = Array.from(this.xmlDoc.getElementsByTagName(this.outgoingTagName));
         this.incomingNodes = Array.from(this.xmlDoc.getElementsByTagName(this.incomingTagName));
         this.result = [];
@@ -140,8 +144,8 @@ export class parseXmlEvent {
     /**
      * check
      */
-    public checkGateweyNode() {
-        this.gateweyNodes = Array.from(this.xmlDoc.getElementsByTagName(this.gateweyTagName));
+    public checkGateweyNode(tagName) {
+        this.gateweyNodes = Array.from(this.xmlDoc.getElementsByTagName(tagName));
         // 每个用户任务节点必须有一个incoming和一个outgoing
         this.gateweyNodes.forEach((item, index) => {
             let length = Array.from(item.children).filter((item) => item.tagName == this.outgoingTagName).length;
@@ -174,7 +178,7 @@ export class parseXmlEvent {
     /**
      * 通过 outgoing 获取下一个主节点（开始节点、结束节点、用户节点、并行节点）
      */
-    public getNodeByOutgoing(id) {
+    public getNodeByOutgoing(id, ischeck) {
         let node = null;
         this.incomingNodes.forEach((item) => {
             if (item.innerHTML == id) {
@@ -182,7 +186,7 @@ export class parseXmlEvent {
                 return true;
             }
         });
-        if (node.tagName === this.endTagName) {
+        if (ischeck && (node.tagName === this.endTagName)) {
             this.findEnd = true;
         }
         return node;
@@ -192,25 +196,73 @@ export class parseXmlEvent {
      */
     public parseUserTaskNodeInfo(node) {
         let info = {};
-        info.id = node.getAttribute('id');
+        //info.id = node.getAttribute('id');
         info.name = node.getAttribute('name');
         info.taskId = node.getAttribute('taskId');
         info.executNode = node.getAttribute('executNode');
+        info.gateway = 0;
         let outgoingArray = [];
         Array.from(node.children).forEach((item) => {
             if (item.tagName == this.outgoingTagName) {
                 outgoingArray.push(item.innerHTML);
             }
         });
-        if (outgoingArray.length && outgoingArray.length > 1) {
+        if (outgoingArray.length && outgoingArray.length > 2) {
             this.checkError = true;
-            this.errorInfo = '任务节点有且只有一个出边';
+            this.errorInfo = '任务节点不能有超过2个出边';
             this.logError();
             return false;
         }
-        info.outgoing = outgoingArray[0];
+        outgoingArray.forEach((outgoing) => {
+            node = this.getNodeByOutgoing(outgoing, true);
+            // 判断是否有副网关
+            if (node.tagName == this.complexGatewayTagName) {
+                info.subJobs = this.parseSubNode(node);
+            }else {
+                info.outgoing = outgoing;
+            }
+        });
         return info;
     }
+    /**
+     * 处理副节点
+     * @param node 
+     */
+    public parseSubNode(node) {
+        let subJobs = [];
+        let outgoingArray = this.parseGateweyNodeInfo(node).outgoing;
+        outgoingArray.forEach((outgoing) => {
+            node = this.getNodeByOutgoing(outgoing, true);
+            if (node.tagName != this.userTaskTagName) {
+                this.checkError = true;
+                this.errorInfo = '并行网关的下一个节点必须是任务节点';
+                this.logError();
+                return false;
+            } else {
+                while (node.tagName != this.endTagName) {
+                    let info = {};
+                    //info.id = node.getAttribute('id');
+                    info.name = node.getAttribute('name');
+                    info.taskId = node.getAttribute('taskId');
+                    info.executNode = node.getAttribute('executNode');
+                    subJobs.push(info);
+        
+                    let outgoingArray2 = [];
+                    Array.from(node.children).forEach((item) => {
+                        if (item.tagName == this.outgoingTagName) {
+                            outgoingArray2.push(item.innerHTML);
+                        }
+                    });
+                    node = this.getNodeByOutgoing(outgoingArray2[0], false);
+                }
+            }
+        });
+        return subJobs;
+    }
+    /**
+     * 解析网关节点
+     * @param node 
+     */
     public parseGateweyNodeInfo(node) {
         let info = {};
         info.outgoing = [];
@@ -225,46 +277,71 @@ export class parseXmlEvent {
      * 开始解析
      */
     public start() {
-        let node = this.getNodeByOutgoing(this.startNodeOutgoing);
+        let node = this.getNodeByOutgoing(this.startNodeOutgoing, true);
         // 算法原则：从左到右，从上到下，直到找到结束节点
-        let gateweyRes = [];
+        let gateweyRes = [];// 与网关任务节点
+        let gateweyRes2 = [];// 或网关任务节点
         while (!this.findEnd) {
             let info = {};
             // 任务节点
             if (node.tagName == this.userTaskTagName) {
-                if (gateweyRes.length) {
+                if (gateweyRes.length || gateweyRes2.length) {
                     let res = [];
                     for (let i = 0; i < gateweyRes.length; i++) {
                         const element = gateweyRes[i];
                         info = this.parseUserTaskNodeInfo(element);
+                        info.gateway = 1;
                         res.push(info);
                     }
-                    this.result.push(res);
                     gateweyRes = [];
-                    // 任意一个节点继续去寻找下一个节点
-                    node = this.getNodeByOutgoing(info.outgoing);
+                    for (let i = 0; i < gateweyRes2.length; i++) {
+                        const element = gateweyRes2[i];
+                        info = this.parseUserTaskNodeInfo(element);
+                        info.gateway = 2;
+                        res.push(info);
+                    }
+                    gateweyRes2 = [];
+                    this.result.push(res);
+                    // 寻找下一个节点
+                    node = this.getNodeByOutgoing(info.outgoing, true);
                 } else {
                     info = this.parseUserTaskNodeInfo(node);
                     this.result.push([info]);
-                    node = this.getNodeByOutgoing(info.outgoing);
+                    node = this.getNodeByOutgoing(info.outgoing, true);
                 }
             }
-            // 并行节点
-            if (node.tagName == this.gateweyTagName) {
+            // 与网关节点
+            if (node.tagName == this.parallelGatewayTagName) {
                 let outgoingArray = this.parseGateweyNodeInfo(node).outgoing;
                 outgoingArray.forEach((outgoing) => {
-                    node = this.getNodeByOutgoing(outgoing);
-                    if (node.tagName == this.gateweyTagName) {
+                    node = this.getNodeByOutgoing(outgoing, true);
+                    if (node.tagName != this.userTaskTagName) {
                         this.checkError = true;
-                        this.errorInfo = '并行节点的任意下一个节点必须是任务节点';
+                        this.errorInfo = '网关节点的下一个节点必须是任务节点';
                         this.logError();
+                        return false;
                     } else {
                         gateweyRes.push(node);
                     }
                 });
             }
+            // 或网关节点
+            else if (node.tagName == this.inclusiveGatewayTagName) {
+                let outgoingArray = this.parseGateweyNodeInfo(node).outgoing;
+                outgoingArray.forEach((outgoing) => {
+                    node = this.getNodeByOutgoing(outgoing, true);
+                    if (node.tagName != this.userTaskTagName) {
+                        this.checkError = true;
+                        this.errorInfo = '网关节点的下一个节点必须是任务节点';
+                        this.logError();
+                        return false;
+                    } else {
+                        gateweyRes2.push(node);
+                    }
+                });
+            }
         }
-        console.log(this.result);
+        //console.log(this.result);
         return this.result;
     }
 }

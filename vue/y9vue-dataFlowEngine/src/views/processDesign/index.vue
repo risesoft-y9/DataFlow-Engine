@@ -1,98 +1,130 @@
-<!--
- * @Descripttion:
- * @version:
- * @Author: zhangchongjie
- * @Date: 2022-05-05 11:38:27
- * @LastEditors: mengjuhua
- * @LastEditTime: 2024-07-22 11:18:56
- * @FilePath: \workspace-y9boot-9.5-liantong-vued:\workspace-y9cloud-v9.6\y9-vue\y9vue-itemAdmin\src\views\processModelNew\index.vue
--->
 <template>
-    <y9Table :config="modelTableConfig" :filterConfig="filterConfig">
-        <template #processModel>
-            <el-button class="global-btn-main" style="margin-right: 10px" type="primary" @click="addModel"
-                ><i class="ri-add-line" />新增
-            </el-button>
-            <el-upload
-                :before-upload="beforeAvatarUpload"
-                :http-request="uploadSectionFile"
-                :show-file-list="false"
-                action=""
-                name="file"
-                style="display: inline-block"
-            >
-                <el-button class="global-btn-second"><i class="ri-database-2-line" />导入</el-button>
-                <font style="font-family: 微软雅黑; font-size: 14px; color: red; margin-left: 5px"
-                    >(文件格式.bpmn20.xml)</font
-                >
-            </el-upload>
-        </template>
-        <template #opt_button="{ row, column, index }">
-            <el-button class="global-btn-second" size="small" @click="editModel(row)"
-                ><i class="ri-edit-line" title="编辑" />编辑
-            </el-button>
-            <!-- <el-button class="global-btn-second" size="small" @click="deploy(row)"
-                ><i class="ri-database-2-line" title="部署" />部署
-            </el-button> -->
-            <el-button class="global-btn-second" size="small" @click="exportModel(row)"
-                ><i class="ri-download-line" title="导出" />导出
-            </el-button>
-            <el-button class="global-btn-second" size="small" @click="delModel(row)"
-                ><i class="ri-delete-bin-line" title="删除" />删除
-            </el-button>
-        </template>
-    </y9Table>
+    <el-form ref="formRef" :model="formData" :rules="rules" class="pForm">
+        <y9Table :config="modelTableConfig" :filterConfig="filterConfig">
+            <template #addBtn>
+                <el-input v-model="search" clearable placeholder="输入名称" style="margin-left: 10px" />
+                <el-select v-model="pattern" placeholder="请选择状态" style="margin-left: 10px">
+                    <el-option key="" label="全部" value=""></el-option>
+                    <el-option key="1" label="禁用" value="1"></el-option>
+                    <el-option key="0" label="正常" value="0"></el-option>
+                </el-select>
+                <el-button class="global-btn-main" style="margin-left: 10px" type="primary" @click="getTableList"
+                    ><i class="ri-search-line"></i>搜索
+                </el-button>
+                <el-button class="global-btn-main" type="primary" @click="addInfo"
+                    ><i class="ri-add-line"></i>新增
+                </el-button>
+            </template>
+            <template #name="{ row, column, index }">
+                <el-form-item v-if="editIndex === index" prop="name">
+                    <el-input v-model="formData.name" clearable />
+                </el-form-item>
+                <span v-else>{{ row.name }}</span>
+            </template>
+            <template #content="{ row, column, index }">
+                <el-form-item v-if="editIndex === index" prop="content">
+                    <el-input v-model="formData.content" clearable />
+                </el-form-item>
+                <span v-else>{{ row.content }}</span>
+            </template>
+            <template #pattern="{ row, column, index }">
+                <el-form-item v-if="editIndex === index" prop="pattern">
+                    <el-select v-model="formData.pattern">
+                        <el-option key="1" label="禁用" value="1"></el-option>
+                        <el-option key="0" label="正常" value="0"></el-option>
+                    </el-select>
+                </el-form-item>
+                <span v-else>{{ row.pattern == '1' ? '禁用' : '正常' }}</span>
+            </template>
+            <template #opt_button="{ row, column, index }">
+                <div v-if="editIndex === index">
+                    <el-link type="primary" :underline="false" @click="saveData(formRef)"
+                        ><i class="ri-book-mark-line"></i>保存
+                    </el-link>
+                    <el-link type="primary" :underline="false" @click="cancalData(formRef)"
+                        ><i class="ri-close-line"></i>取消
+                    </el-link>
+                </div>
+                <div v-else>
+                    <el-link type="primary" :underline="false" @click="jobLog(row)"
+                        ><i class="ri-search-eye-line"></i>日志
+                    </el-link>
+                    <el-link type="primary" :underline="false" @click="handleJob(row)"
+                        ><i class="ri-task-line"></i>执行一次
+                    </el-link>
+                    <el-link type="primary" :underline="false" @click="editInfo(row, index)"
+                        ><i class="ri-edit-line"></i>修改
+                    </el-link>
+                    <el-link type="primary" :underline="false" @click="addModel(row)"
+                        ><i class="ri-git-commit-line"></i>流程设计
+                    </el-link>
+                    <el-link type="primary" :underline="false" @click="delInfo(row)"
+                        ><i class="ri-delete-bin-line"></i>删除
+                    </el-link>
+                </div>
+            </template>
+        </y9Table>
+    </el-form>
     <y9Dialog v-model:config="dialogConfig" class="bpmnDialog">
         <Y9BpmnModel
             ref="Y9BpmnModelRef"
-            :editId="editId"
+            :rowId="rowId"
             @closeDialog="dialogConfig.show = false"
             @saveModelXml="saveModelXml"
         />
     </y9Dialog>
+    <y9Dialog v-model:config="logDialogConfig">
+        <logList :arrangeId="arrangeId"></logList>
+    </y9Dialog>
 </template>
 <script lang="ts" setup>
-    import { onMounted, reactive, ref } from 'vue';
-    import { ElLoading, ElMessage, ElMessageBox, FormInstance, UploadProps } from 'element-plus';
+    import { onMounted, reactive, ref, toRefs } from 'vue';
+    import { ElLoading, ElMessage, ElMessageBox, FormInstance, FormRules, UploadProps } from 'element-plus';
     import y9_storage from '@/utils/storage';
     import settings from '@/settings.ts';
     import axios from 'axios';
-    import { deleteModel, deployModel, getModelList, importModel } from '@/api/processAdmin/processModel';
+    import { deleteArrange, executeProcess, getModelList, saveArrange } from '@/api/processAdmin/processModel';
     import Y9BpmnModel from './bpmnModel.vue';
-    import modelListData from './testModelListData.json';
+    import logList from './logList.vue';
+    import { getStoragePageSize } from '@/utils';
 
-    const tableData = ref([]);
     const formRef = ref<FormInstance>();
-    const rules = ref({
-        form_name: [{ required: true, trigger: 'blur', message: '请输入流程名称' }],
-        form_key: [{ required: true, trigger: 'blur', message: '请输入流程定义key' }]
+    const rules = reactive<FormRules>({
+        name: { required: true, message: '请输入名称', trigger: 'blur' }
     });
 
     const data = reactive({
-        model: {},
+        isEmptyData: false,
+        formData: {id: '', name: '', content: '', pattern: ''},
+        isEdit: false,
         modelTableConfig: {
             //人员列表表格配置
             columns: [
                 { title: '序号', type: 'index', width: '60' },
-                { title: '名称', key: 'name' },
-                { title: '流程定义key', key: 'key', width: '200' },
-                { title: '版本', key: 'version', width: '100' },
+                { title: '名称', key: 'name', slot: 'name' },
+                { title: '描述', key: 'content', slot: 'content' },
+                { title: '状态', key: 'pattern', slot: 'pattern', width: '110' },
                 { title: '创建时间', key: 'createTime', width: '180' },
-                { title: '修改时间', key: 'lastUpdateTime', width: '180' },
+                { title: '修改时间', key: 'updateTime', width: '180' },
                 { title: '操作', width: '350', slot: 'opt_button' }
             ],
             border: false,
             headerBackground: true,
             tableData: [],
-            pageConfig: false //取消分页
+            pageConfig: {
+                currentPage: 1,
+                pageSize: getStoragePageSize('engineConfig', 15),
+                total: 0,
+                pageSizeOpts:[10,15,30,60,120,240]
+            }
         },
         filterConfig: {
             //过滤配置
             itemList: [
                 {
                     type: 'slot',
-                    span: 24,
-                    slotName: 'processModel'
+                    span: 12,
+                    slotName: 'addBtn'
                 }
             ]
         },
@@ -106,101 +138,156 @@
             },
             visibleChange: (visible) => {}
         },
-        editId: ''
+        editIndex: '',
+        search: '',
+        pattern: '',
+        rowId: ''
     });
 
-    let { model, filterConfig, modelTableConfig, dialogConfig, editId } = toRefs(data);
+    let { formData, filterConfig, modelTableConfig, dialogConfig, editIndex, isEmptyData, isEdit, search, pattern, rowId } = toRefs(data);
 
     onMounted(() => {
         getTableList();
     });
 
     async function getTableList() {
-        // getModelList().then((res) => {
-        //     if (res.success) {
-        //         modelTableConfig.value.tableData = res.data;
-        //     }
-        // });
-        modelTableConfig.value.tableData = modelListData.data;
-    }
-
-    function addModel() {
-        editId.value = '';
-        model.value = {};
-        Object.assign(dialogConfig.value, {
-            show: true,
-            width: '100%',
-            title: '流程设计',
-            showFooter: false,
-            fullscreen: true,
-            showHeaderFullscreen: false
+        let params = {
+            page: modelTableConfig.value.pageConfig.currentPage,
+            size: modelTableConfig.value.pageConfig.pageSize,
+            name: search.value,
+            pattern: pattern.value
+        };
+        getModelList(params).then((res) => {
+            if (res.success) {
+                modelTableConfig.value.tableData = res.rows;
+                modelTableConfig.value.pageConfig.total = res.total;
+            }
         });
     }
 
-    const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
-        if (rawFile.name.indexOf('.xml') == -1) {
-            ElMessage({ type: 'error', message: '请上传指定格式的文件!', offset: 65 });
-            return false;
+    const addInfo = () => {
+        for (let i = 0; i < modelTableConfig.value.tableData.length; i++) {
+            if (modelTableConfig.value.tableData[i].id == '') {
+                isEmptyData.value = true;
+            }
         }
-        return true;
+        if (!isEmptyData.value) {
+            editIndex.value = 0;
+            modelTableConfig.value.tableData.unshift({
+                id: '',
+                name: '',
+                content: '',
+                pattern: '0'
+            });
+            formData.value.id = '';
+            formData.value.name = '';
+            formData.value.content = '';
+            formData.value.pattern = '0';
+            isEdit.value = false;
+        }
     };
 
-    async function uploadSectionFile(params) {
-        const loading = ElLoading.service({ lock: true, text: '正在处理中', background: 'rgba(0, 0, 0, 0.3)' });
-        let res = await importModel(params);
-        loading.close();
-        ElMessage({ type: res.success ? 'success' : 'error', message: res.msg, offset: 65 });
-        if (res.success) {
-            getTableList();
-        } else {
-            ElMessage({ type: 'error', message: '发生异常', offset: 65 });
+    const editInfo = (rows, index) => {
+        editIndex.value = index;
+        formData.value.id = rows.id;
+        formData.value.name = rows.name;
+        formData.value.content = rows.content;
+        formData.value.pattern = rows.pattern + '';
+        isEdit.value = true;
+        for (let i = 0; i < modelTableConfig.value.tableData.length; i++) {
+            if (modelTableConfig.value.tableData[i].id == '') {
+                modelTableConfig.value.tableData.splice(i, 1);
+            }
         }
-    }
+        isEmptyData.value = false;
+    };
 
-    function deploy(row) {
-        //部署
-        ElMessageBox.confirm('确定部署【' + row.name + '】?', '提示', {
-            confirmButtonText: '确定',
+    const handleJob = (rows) => {
+        ElMessageBox.confirm('您确定要执行【' + rows.name + '】任务吗?', '提示', {
             cancelButtonText: '取消',
+            confirmButtonText: '确定',
             type: 'warning'
         })
-            .then(async () => {
-                const loading = ElLoading.service({ lock: true, text: '正在处理中', background: 'rgba(0, 0, 0, 0.3)' });
-                let res = await deployModel(row.id);
-                ElMessage({ type: res.success ? 'success' : 'error', message: res.msg, offset: 65 });
-                loading.close();
+        .then(() => {
+            executeProcess({ id: rows.id }).then((res) => {
                 if (res.success) {
-                    getTableList();
+                    ElMessage({ type: 'success', message: res.msg, offset: 65 });
+                } else {
+                    ElMessage({ message: res.msg, type: 'error', offset: 65 });
                 }
-            })
-            .catch(() => {
-                ElMessage({ type: 'info', message: '已取消删除', offset: 65 });
             });
-    }
+        })
+        .catch(() => {
+            ElMessage({
+                type: 'info',
+                message: '已取消',
+                offset: 65
+            });
+        });
+    };
 
-    function delModel(row) {
-        ElMessageBox.confirm('是否删除流程设计【' + row.name + '】?', '提示', {
-            confirmButtonText: '确定',
+    const saveData = (refFrom) => {
+        if (!refFrom) return;
+        refFrom.validate((valid) => {
+            if (valid) {
+                const loading = ElLoading.service({ lock: true, text: '正在处理中', background: 'rgba(0, 0, 0, 0.3)' });
+                saveArrange(formData.value).then((res) => {
+                    loading.close();
+                    if (res.success) {
+                        ElMessage({ type: 'success', message: res.msg, offset: 65 });
+                        editIndex.value = '';
+                        isEmptyData.value = false;
+                        getTableList();
+                    } else {
+                        ElMessage({ message: res.msg, type: 'error', offset: 65 });
+                    }
+                });
+            }
+        });
+    };
+
+    const cancalData = (refForm) => {
+        editIndex.value = '';
+        formData.value.name = '';
+        formData.value.content = '';
+        formData.value.pattern = '0';
+        refForm.resetFields();
+        for (let i = 0; i < modelTableConfig.value.tableData.length; i++) {
+            if (modelTableConfig.value.tableData[i].id == '') {
+                modelTableConfig.value.tableData.splice(i, 1);
+            }
+        }
+        isEmptyData.value = false;
+    };
+
+    const delInfo = (rows) => {
+        ElMessageBox.confirm('您确定要删除【' + rows.name + '】吗?', '提示', {
             cancelButtonText: '取消',
+            confirmButtonText: '确定',
             type: 'warning'
         })
-            .then(async () => {
-                const loading = ElLoading.service({ lock: true, text: '正在处理中', background: 'rgba(0, 0, 0, 0.3)' });
-                let res = await deleteModel(row.id);
-                ElMessage({ type: res.success ? 'success' : 'error', message: res.msg, offset: 65 });
-                loading.close();
+        .then(() => {
+            deleteArrange({ id: rows.id }).then((res) => {
                 if (res.success) {
+                    ElMessage({ type: 'success', message: res.msg, offset: 65 });
+                    editIndex.value = '';
                     getTableList();
+                } else {
+                    ElMessage({ message: res.msg, type: 'error', offset: 65 });
                 }
-            })
-            .catch(() => {
-                ElMessage({ type: 'info', message: '已取消删除', offset: 65 });
             });
-    }
+        })
+        .catch(() => {
+            ElMessage({
+                type: 'info',
+                message: '已取消删除',
+                offset: 65
+            });
+        });
+    };
 
-    function editModel(row) {
-        //编辑
-        editId.value = row.id;
+    function addModel(row) {
+        rowId.value = row.id;
         Object.assign(dialogConfig.value, {
             show: true,
             width: '100%',
@@ -211,16 +298,21 @@
         });
     }
 
-    function exportModel(row) {
-        //导出
-        window.open(
-            import.meta.env.VUE_APP_PROCESS_CONTEXT +
-                'vue/processModel/exportModel?modelId=' +
-                row.id +
-                '&access_token=' +
-                y9_storage.getObjectItem(settings.siteTokenKey, 'access_token')
-        );
+    let arrangeId = ref('');//任务编排ID
+
+    function jobLog(row) {
+        logDialogConfig.value.show = true;
+        // 赋值当前id 用于传递给组件 用于接口请求
+        arrangeId.value = row.id;
     }
+
+    // 参数值弹框
+    let logDialogConfig = ref({
+        show: false,
+        title: '日志列表',
+        width: '62%',
+        showFooter: false
+    });
 
     function saveModelXml() {
         getTableList();
@@ -236,5 +328,13 @@
 
     .bpmnDialog .y9-dialog-content {
         padding: 0 !important;
+    }
+
+    .pForm .el-form-item {
+        margin-bottom: 0px !important;
+    }
+
+    .el-link {
+        margin-right: 15px;
     }
 </style>

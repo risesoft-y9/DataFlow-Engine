@@ -169,19 +169,19 @@ F.prototype.getPaletteEntries = function () {
             translate('Create Parallel Gateway')
         ), //Y9++
 
-        // 'create.inclusive-gateway': createAction(
-        //     'bpmn:InclusiveGateway',
-        //     'gateway',
-        //     'bpmn-icon-gateway-or',
-        //     translate('Create Inclusive Gateway')
-        // ), //Y9++
+        'create.inclusive-gateway': createAction(
+            'bpmn:InclusiveGateway',
+            'gateway',
+            'bpmn-icon-gateway-or',
+            translate('Create Inclusive Gateway')
+        ),
 
-        // 'create.complex-gateway': createAction(
-        //     'bpmn:ComplexGateway',
-        //     'gateway',
-        //     'bpmn-icon-gateway-complex',
-        //     translate('Create Complex Gateway')
-        // ), //Y9++
+        'create.complex-gateway': createAction(
+            'bpmn:ComplexGateway',
+            'gateway',
+            'bpmn-icon-gateway-complex',
+            translate('Create Complex Gateway')
+        ),
 
         // 'create.eventBased-gateway': createAction(
         //     'bpmn:EventBasedGateway',

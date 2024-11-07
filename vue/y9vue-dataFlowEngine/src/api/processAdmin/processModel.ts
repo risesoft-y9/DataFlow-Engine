@@ -1,26 +1,47 @@
-/*
- * @Descripttion: 
- * @version: 
- * @Author: zhangchongjie
- * @Date: 2021-05-27 10:54:43
- * @LastEditors: mengjuhua
- * @LastEditTime: 2024-07-22 11:39:44
- * @FilePath: \workspace-y9boot-9.5.x-vue\y9vue-processAdmin\src\api\processAdmin\processModel.js
- */
-
-import Request from "@/api/lib/request4Process";
+import Request from "@/api/lib/request";
 import qs from "qs";
 
 var processAdminRequest = new Request();
-//获取部署列表
-export const getModelList = async () => {
-  const params = {
-    resourceId: ""
-  };
+
+//获取任务编排列表
+export const getModelList = async (params) => {
   return await processAdminRequest({
-    url: "/vue/processModel/getModelList",
+    url: "arrange/searchPage",
     method: 'get',
-    params: params
+    params
+  });
+}
+
+//保存
+export const saveArrange = async (params) => {
+  const data = qs.stringify(params);
+  return await processAdminRequest({
+    url: 'arrange/saveData',
+    method: 'POST',
+    cType: false,
+    data
+  });
+};
+
+//删除
+export const deleteArrange = async (params) => {
+  const data = qs.stringify(params);
+  return await processAdminRequest({
+    url: "arrange/deleteData",
+    method: 'post',
+    cType: false,
+    data
+  });
+}
+
+// 执行流程任务
+export const executeProcess = async (params) => {
+  const data = qs.stringify(params);
+  return await processAdminRequest({
+    url: "arrange/executeProcess",
+    method: 'post',
+    cType: false,
+    data
   });
 }
 
@@ -29,26 +50,34 @@ export const getModelList = async () => {
  */
 export const getModelXml = async (modelId) => {
   const params = {
-    modelId
+    id: modelId
   };
   return await processAdminRequest({
-    url: "/vue/processModel/getModelXml",
+    url: "arrange/getXmlById",
     method: 'get',
     params: params
   });
 }
 
-//删除流程定义
-export const deleteModel = async (modelId) => {
-  const params = {
-    modelId: modelId
-  };
+// 获取日志
+export const getLogList = async (params) => {
   return await processAdminRequest({
-    url: "/vue/processModel/deleteModel",
-    method: 'post',
+    url: "arrange/getLogList",
+    method: 'get',
     params: params
   });
 }
+
+// 保存流程
+export const saveXmlData = async (params) => {
+  const data = qs.stringify(params);
+  return await processAdminRequest({
+    url: 'arrange/saveXml',
+    method: 'POST',
+    cType: false,
+    data
+  });
+};
 
 //创建流程设计
 export const createModel = async (name, key, description) => {

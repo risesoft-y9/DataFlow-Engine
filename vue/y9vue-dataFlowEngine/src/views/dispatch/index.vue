@@ -334,7 +334,7 @@
         ],
         fangDouTime: 0, //防抖时间
         filtersValueCallBack: (filters) => {
-            console.log('过滤值', filters);
+            //console.log('过滤值', filters);
             filterData.value = filters;
         }
     });
