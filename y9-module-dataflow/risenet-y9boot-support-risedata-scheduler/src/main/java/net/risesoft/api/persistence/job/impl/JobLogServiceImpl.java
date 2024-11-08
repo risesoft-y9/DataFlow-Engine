@@ -241,8 +241,7 @@ public class JobLogServiceImpl extends AutomaticCrudService<JobLog, String> impl
 		}
 		return this.getSearchExecutor().searchForPage(job, "ID,DISPATCH_SERVER,DISPATCH_TIME"
 				+ ",END_TIME,JOB_ID,RESULT,STATUS,DISPATCH_SOURCE,(select job_name from Y9_DATASERVICE_JOB where id = job_id) JOB_NAME"
-				+ ",(select name from Y9_DATASERVICE_BUSINESS z where"
-				+ " z.id = (select service_job_type from Y9_DATASERVICE_JOB c where c.id = JobLog.job_id)) JOB_TYPE_NAME",
+				+ ",(select SERVICE_JOB_TYPE from Y9_DATASERVICE_JOB where id = job_id) JOB_TYPE",
 				page, operationBuilder);
 	}
 

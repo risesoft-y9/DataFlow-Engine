@@ -24,12 +24,12 @@ import net.risesoft.pojo.TaskConfigModel;
 import net.risesoft.pojo.TaskCoreModel;
 import net.risesoft.pojo.TaskModel;
 import net.risesoft.pojo.Y9Result;
+import net.risesoft.service.DataBusinessService;
 import net.risesoft.service.DataTaskService;
 import net.risesoft.util.DataServiceUtil;
 import net.risesoft.y9.Y9LoginUserHolder;
 import net.risesoft.y9.json.Y9JsonUtil;
 import net.risesoft.y9.util.Y9BeanUtil;
-import net.risesoft.y9public.entity.DataBusinessEntity;
 import net.risesoft.y9public.entity.DataInterfaceEntity;
 import net.risesoft.y9public.entity.DataInterfaceParamsEntity;
 import net.risesoft.y9public.entity.DataSourceEntity;
@@ -38,7 +38,6 @@ import net.risesoft.y9public.entity.DataTableField;
 import net.risesoft.y9public.entity.DataTaskConfigEntity;
 import net.risesoft.y9public.entity.DataTaskCoreEntity;
 import net.risesoft.y9public.entity.DataTaskEntity;
-import net.risesoft.y9public.repository.DataBusinessRepository;
 import net.risesoft.y9public.repository.DataInterfaceParamsRepository;
 import net.risesoft.y9public.repository.DataInterfaceRepository;
 import net.risesoft.y9public.repository.DataMappingRepository;
@@ -58,7 +57,7 @@ public class DataTaskServiceImpl implements DataTaskService {
 	private final DataTaskRepository dataTaskRepository;
 	private final DataTaskConfigRepository dataTaskConfigRepository;
 	private final DataTaskCoreRepository dataTaskCoreRepository;
-	private final DataBusinessRepository dataBusinessRepository;
+	private final DataBusinessService dataBusinessService;
 	private final DataSourceRepository dataSourceRepository;
 	private final DataTableRepository dataTableRepository;
 	private final DataTableFieldRepository dataTableFieldRepository;
@@ -306,8 +305,7 @@ public class DataTaskServiceImpl implements DataTaskService {
 				map.put("userName", dataTask.getUserName());
 				map.put("createTime", dataTask.getCreateTime());
 				
-				DataBusinessEntity business = dataBusinessRepository.findById(dataTask.getBusinessId()).orElse(null);
-				map.put("business", business.getName());
+				map.put("business", dataBusinessService.getNameById(dataTask.getBusinessId()));
 				
 				DataTaskConfigEntity taskConfig = dataTaskConfigRepository.findByTaskId(dataTask.getId());
 				if(taskConfig.getSourceType().equals("api")) {

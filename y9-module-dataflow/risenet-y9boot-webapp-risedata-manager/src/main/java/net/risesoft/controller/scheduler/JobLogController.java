@@ -1,5 +1,6 @@
 package net.risesoft.controller.scheduler;
 
+import net.risedata.jdbc.commons.LPage;
 import net.risedata.jdbc.commons.utils.DateUtils;
 import net.risedata.jdbc.commons.utils.GroupUtils;
 import net.risedata.jdbc.search.LPageable;
@@ -9,6 +10,7 @@ import net.risesoft.api.persistence.job.JobLogService;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.api.persistence.model.log.LogAnalyse;
 import net.risesoft.security.ConcurrentSecurity;
+import net.risesoft.service.DataBusinessService;
 import net.risesoft.controller.BaseController;
 import net.risesoft.pojo.Y9Result;
 
@@ -21,6 +23,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.text.DateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Description : 任务调度日志控制器
@@ -43,6 +46,9 @@ public class JobLogController extends BaseController {
 
 	@Autowired
 	JobLogService jobLogService;
+	
+	@Autowired
+	private DataBusinessService dataBusinessService;
 
 	/**
 	 * 根据id 获取任务信息
@@ -68,7 +74,12 @@ public class JobLogController extends BaseController {
 		ConcurrentSecurity jurisdiction = null;
 		try {
 			jurisdiction = getSecurityJurisdiction(environment);
-			return Y9Result.success(jobLogService.search(job, page, jurisdiction, jobType, jobIds));
+			LPage<Map<String, Object>> pages = jobLogService.search(job, page, jurisdiction, jobType, jobIds);
+			pages.getContent().stream().map((item) -> {
+				item.put("JOB_TYPE_NAME", dataBusinessService.getNameById((String)item.get("JOB_TYPE")));
+	            return item;
+	        }).collect(Collectors.toList());
+			return Y9Result.success(pages);
 		} catch (Exception e) {
 			return Y9Result.failure(e.getMessage());
 		}

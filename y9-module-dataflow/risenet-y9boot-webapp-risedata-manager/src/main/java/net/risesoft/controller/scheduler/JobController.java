@@ -1,5 +1,6 @@
 package net.risesoft.controller.scheduler;
 
+import net.risedata.jdbc.commons.LPage;
 import net.risedata.jdbc.factory.ObjectBuilderFactory;
 import net.risedata.jdbc.search.LPageable;
 import net.risesoft.api.aop.CheckHttpForArgs;
@@ -12,6 +13,7 @@ import net.risesoft.api.utils.TaskUtils;
 import net.risesoft.controller.BaseController;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.security.ConcurrentSecurity;
+import net.risesoft.service.DataBusinessService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Description : 任务控制器
@@ -39,6 +42,9 @@ public class JobController extends BaseController {
 
 	@Autowired
 	JobService jobService;
+	
+	@Autowired
+	private DataBusinessService dataBusinessService;
 
 	@GetMapping("/searchJob")
 	public Y9Result<Object> searchJob(String environment, Job job) {
@@ -79,7 +85,14 @@ public class JobController extends BaseController {
 		} catch (Exception e) {
 			return Y9Result.failure(e.getMessage());
 		}
-		return Y9Result.success(jobService.search(job, page, jurisdiction));
+		LPage<Job> jobPage = jobService.search(job, page, jurisdiction);
+		jobPage.getContent().stream().map((item) -> {
+			if(StringUtils.isBlank(item.getJobTypeName())) {
+				item.setJobTypeName(dataBusinessService.getNameById(item.getJobType()));
+			}
+            return item;
+        }).collect(Collectors.toList());
+		return Y9Result.success(jobPage);
 	}
 
 	/**
