@@ -44,7 +44,7 @@ public class ParseInstructionFactory implements StartConfiguration{
 				String jsonConfig = config.toJSON();
 				Matcher matcher = p.matcher(jsonConfig);
 				Map<String, Byte> setMap = new HashMap<String, Byte>();
-				while (matcher.find()) {
+				while (matcher.find()) {	
 					if (setMap.containsKey(matcher.group(0))) {
 						continue;
 					}
