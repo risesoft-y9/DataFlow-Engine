@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Description : 本地方法调用
+ * @Description : 本地方法调用type=local,args=beanName&&methodName&&arg1&&arg2
  * @ClassName LocalExecutorAction
  * @Author lb
  * @Date 2024/11/12 11:12
