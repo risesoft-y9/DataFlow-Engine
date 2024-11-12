@@ -14,6 +14,7 @@ import net.risesoft.api.listener.ClientListener;
 import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Description : 本地方法调用type=local,args=beanName&&methodName&&arg1&&arg2
+ * @Description : 本地方法调用type=local,args=arg1&&arg2,source=beanName,methodName
  * @ClassName LocalExecutorAction
  * @Author lb
  * @Date 2024/11/12 11:12
@@ -48,12 +49,13 @@ public class LocalExecutorAction implements ExecutorAction {
 	@Override
 	public Result action(Job job, JobLog jobLog, Map<String, Object> args, ServiceInstance iServiceInstance,
 			JobContext jobContext, DoBalance doBalance) {
-		// args里面的args参数需要为1为bean name 2为方法名 3为参数
 		Object arg = args.get("args");
-		if (arg == null) {
+		if (arg == null || StringUtils.isEmpty(job.getSource())) {
 			throw new RuntimeException("缺失必要的参数!");
 		}
-		String[] strArgs = ((String) arg).split("&&");
+
+		String[] strArgs = job.getSource().split(",");
+		;
 		if (strArgs.length < 2) {
 			throw new RuntimeException("缺失必要的参数!");
 		}
@@ -69,10 +71,14 @@ public class LocalExecutorAction implements ExecutorAction {
 		if (method == null) {
 			throw new RuntimeException(strArgs[1] + " 未找到此方法!");
 		}
+		strArgs = ((String) arg).split("&&");
 		Parameter[] ps = method.getParameters();
 		Object[] invokeArgs = new Object[ps.length];
+		if (strArgs.length!=ps.length) {
+			throw new RuntimeException("参数长度与实际所需长度不一致");
+		}
 		for (int i = 0; i < ps.length; i++) {
-			invokeArgs[i] = new StringToAny(ps[i].getType(), "").apply(strArgs[i + 2]);
+			invokeArgs[i] = new StringToAny(ps[i].getType(), "").apply(strArgs[i]);
 		}
 		Exception exc = null;
 		Object returnValue = null;
