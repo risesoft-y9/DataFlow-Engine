@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * 字符串创建类 #{方法名:参数}
+ * 字符串创建类 #{方法名:参数1%%参数2}
  * 
  * @author lb
  *
