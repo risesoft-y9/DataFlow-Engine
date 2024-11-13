@@ -78,7 +78,11 @@ public class LocalExecutorAction implements ExecutorAction {
 			throw new RuntimeException("参数长度与实际所需长度不一致");
 		}
 		for (int i = 0; i < ps.length; i++) {
-			invokeArgs[i] = new StringToAny(ps[i].getType(), "").apply(strArgs[i]);
+			if(ps[i].getType()==String.class) {
+				invokeArgs[i]=strArgs[i];
+			}else {
+				invokeArgs[i] = new StringToAny(ps[i].getType(), "").apply(strArgs[i]);
+			}
 		}
 		Exception exc = null;
 		Object returnValue = null;
@@ -97,7 +101,7 @@ public class LocalExecutorAction implements ExecutorAction {
 					success.onSuccess(returnValueObject);
 
 				}
-				return this;
+				return this; 
 			}
 
 			@Override
