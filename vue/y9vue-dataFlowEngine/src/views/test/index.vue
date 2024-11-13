@@ -5,13 +5,11 @@
     import Y9Table2Comp from './comps/Y9Table2Comp.vue';
     import BodyTypeComp from './comps/BodyTypeComp.vue';
     import JSONEditor from 'jsoneditor';
-    import { randomString, debounce } from '@/utils/index';
     import ZanWuShiJu from '@/assets/images/dataflowEnginePro/暂无数据 (2).png';
-    import { NumberLiteralType } from 'typescript';
-    import { setActivePinia } from 'pinia';
-    import { cloneDeep } from 'lodash';
-    import { initData } from './data';
-    //
+    import { cloneDeep, forEach, forIn } from 'lodash';
+    import { initData } from './apiUtils';
+    import { randomString } from './apiUtils';
+
     const settingStore = useSettingStore();
     const apiTest_el_tabs = ref('apiTest_el_tabs_' + randomString(10));
     const contentHeight = ref(settingStore.getWindowHeight - 60 - 30 - 30);
@@ -23,6 +21,10 @@
             contentHeight.value = windowHeight - 60 - 30 - 30;
         }
     );
+    const tokenKey = ref('');
+    const tokenValue = ref('');
+    const Authorization = ref(false);
+    const count = ref(0);
     const headerHeight = ref(70);
     const sizeObjInfo = inject('sizeObjInfo');
     const pageHeaderFontSize = ref(sizeObjInfo.extraLargeFont);
@@ -43,8 +45,13 @@
             header: [
                 {
                     isSelect: true,
-                    Key: 'Access-Control-Request-Method',
+                    Key: 'Connection',
                     Param: 'keep-alive'
+                },
+                {
+                    isSelect: true,
+                    Key: 'content-type',
+                    Param: 'application/json'
                 }
             ],
             query: [
@@ -60,8 +67,8 @@
                 2: [
                     {
                         isSelect: false,
-                        headerKey: '',
-                        headerParam: ''
+                        Key: '',
+                        Param: ''
                     }
                 ],
                 3: null,
@@ -180,6 +187,9 @@
                 if (operation == 'search' && item.id == id) {
                     return item;
                 }
+                if (operation == 'searchElementNode') {
+                    console.log(item);
+                }
                 if (operation == 'delete' && item.id == id) {
                     array.splice(i, 1);
                     return 'delete操作';
@@ -294,13 +304,15 @@
         // 设置表单数据
         Object.assign(ApiForm, itemData.ApiForm);
         clearArray(headerItemList);
+        if (Authorization.value) {
+            getToken();
+        }
         clearArray(queryItemList);
         clearArray(bodyFormDataItemList);
         pushAll(headerItemList, itemData.ApiForm.header);
         pushAll(queryItemList, itemData.ApiForm.query);
         pushAll(bodyFormDataItemList, itemData.ApiForm.body['2']);
         bodyType.value = Number(itemData.ApiForm.body['type']);
-
         if (bodyType.value > 1) {
             RequestActiveName.value = 'Body';
         } else {
@@ -311,9 +323,6 @@
     const onTreeNodeClick = (node) => {
         // console.log('被点击了', node);
         currentId.value = node.id;
-        if (activeNode.value && activeNode.value.classList.contains('active-node')) {
-            activeNode.value.classList.remove('active-node');
-        }
         if (node.type == 'folder') {
             currentExpandedKeys[0] = node.id;
             folderName.value = searchByNodeId(node).name;
@@ -321,10 +330,8 @@
         } else {
             showFolderPage.value = false;
             setApiFormData(node);
+            initResposeParams();
         }
-        nextTick(() => {
-            activeNode.value = document.getElementsByClassName('active-node')[0];
-        });
     };
 
     // 更改文件夹名字
@@ -369,12 +376,7 @@
             let item = searchByNodeId({ id: currentId.value });
             item.name = ApiForm.name;
             Object.assign(item.ApiForm, ApiForm);
-
-            nextTick(() => {
-                if (activeNode.value && document.getElementsByClassName('active-node').length == 0) {
-                    activeNode.value.classList.add('active-node');
-                }
-            });
+            count.value++;
         } else {
             ElMessageBox.alert('左侧列表没有接口数据，请先点击新增', '操作提示', {
                 confirmButtonText: 'OK'
@@ -385,20 +387,235 @@
     // 当前节点高亮丢失问题
     function checkHightlightNodeClass() {}
     // 选择body类型
-    function setBodyType(value) {
+    function onRadioChange(value) {
         ApiForm.body['type'] = Number(value);
         bodyType.value = Number(value);
-        console.log('setBodyType', value);
         ApiFormChange();
     }
 
     function onJsonEditorChange(text) {
-        console.log('json change', bodyType.value);
         ApiForm.body[bodyType.value] = text;
         ApiFormChange();
     }
 
+    function initResposeParams() {
+        requstTime.value = 0;
+        statusCode.value = 0;
+        contentLength.value = '0';
+        editor.value.set();
+        while (resposeRequestItemList.length) {
+            resposeRequestItemList.pop();
+        }
+        while (resposeResposeItemList.length) {
+            resposeResposeItemList.pop();
+        }
+        while (cookieTableConfig.value.tableData.length) {
+            cookieTableConfig.value.tableData.pop();
+        }
+    }
+    const requstTime = ref(0);
+    const statusCode = ref(0);
+    const contentLength = ref('0');
+    async function submit() {
+        // console.log(ApiForm);
+        // {
+        //                     isSelect: true,
+        //                     Key: 'Cache-Control',
+        //                     Param: 'public'
+        //                 },
+        //                 {
+        //                     isSelect: true,
+        //                     Key: 'Accept',
+        //                     Param: '*/*'
+        //                 },
+        //                 {
+        //                     isSelect: true,
+        //                     Key: 'Accept-Encoding',
+        //                     Param: 'gzip, deflate, br'
+        //                 },
+        // 1、统一处理请求头的逻辑
+        let req_headers = {};
+        for (let i = 0; i < ApiForm.header.length; i++) {
+            const item = ApiForm.header[i];
+            req_headers[item.Key] = item.Param;
+        }
+        if (!req_headers['Cache-Control']) {
+            req_headers['Cache-Control'] = 'public';
+        }
+        if (!req_headers['Accept']) {
+            req_headers['Accept'] = '*/*';
+        }
+        if (!req_headers['Accept-Encoding']) {
+            req_headers['Accept-Encoding'] = 'gzip, deflate, br';
+        }
+        if (!req_headers['Access-Control-Allow-Credentials']) {
+            req_headers['Access-Control-Allow-Credentials'] = 'true';
+        }
+
+        // 请求标头
+        while (resposeRequestItemList.length) {
+            resposeRequestItemList.pop();
+        }
+        forEach(req_headers, (value, key) => {
+            resposeRequestItemList.push({ key: key, value: value });
+        });
+        // 如果没有自定义请求头，添加默认请求头
+        if (!req_headers['User-Agent']) {
+            resposeRequestItemList.push({ key: 'User-Agent', value: window.navigator.userAgent });
+        }
+        if (!req_headers['Host']) {
+            resposeRequestItemList.push({ key: 'Host', value: window.location['host'] });
+        }
+        if (!req_headers['Origin']) {
+            resposeRequestItemList.push({ key: 'Origin', value: window.location['origin'] });
+        }
+        if (!req_headers['Access-Control-Allow-Credentials']) {
+            resposeRequestItemList.push({ key: 'Access-Control-Allow-Credentials', value: 'true' });
+        }
+
+        // 2、统一处理请求参数的逻辑
+        let data = {},
+            dataStr = '?',
+            hasData = false;
+        function __forArray(array) {
+            for (let i = 0; i < array.length; i++) {
+                const item = array[i];
+                const isSelect = item.isSelect;
+                const Key = item.Key;
+                const Param = item.Param;
+                if (isSelect) {
+                    hasData = true;
+                    data[Key] = Param;
+                    dataStr += `${Key}=${Param}&`;
+                }
+            }
+        }
+        console.log(ApiForm.body.type);
+        switch (ApiForm.body.type) {
+            case 1:
+                // bydyType为none，获取query
+                __forArray(ApiForm.query);
+                break;
+            case 2:
+                // form-data
+                __forArray(ApiForm.body[2]);
+                break;
+            case 3:
+                // 数据可能不是标准的json格式
+                try {
+                    let arr = [];
+                    forIn(JSON.parse(ApiForm.body[3]), (value, key) => {
+                        arr.push({ isSelect: true, Key: key, Param: value });
+                    });
+                    __forArray(arr);
+                } catch (error) {
+                    console.log(error);
+                }
+                break;
+            case 4:
+            case 5:
+                // xml & html
+                // 如果是get方式，采用拼接参数，计算最大支持的长度，如果超过2048，则提示
+                console.log(ApiForm.body[4]);
+                // 如果是post方式，转obj对象，采用body发送
+                break;
+            case 6:
+                // 上传文件
+
+                break;
+            default:
+                break;
+        }
+
+        // 3、统一处理请求体参数的逻辑
+        let EncodingFormatBody = null;
+        switch (ApiForm.method.toUpperCase()) {
+            case 'GET':
+            case 'HEAD':
+                // 如果有参数，GET只支持url拼接参数，不支持请求体body
+                if (dataStr.length > 1) {
+                    dataStr = dataStr.substring(0, dataStr.length - 1);
+                    ApiForm.url = encodeURI(ApiForm.url.split('?')[0] + dataStr);
+                }
+                break;
+            case 'POST':
+            case 'PUT':
+                // 如果有参数，发送body
+                if (hasData) {
+                    // 区分不同响应头的编码要求
+                    if (req_headers['Content-Type'].toLowerCase().include('application/json')) {
+                        EncodingFormatBody = JSON.stringify(data);
+                    } else if (req_headers['Content-Type'].toLowerCase().include('application/x-www-form-urlencoded')) {
+                        // dataStr在上面的代码中，是以?开头，以&结尾，都需要去掉
+                        let bodyStr = dataStr.substring(0, dataStr.length - 1);
+                        EncodingFormatBody = bodyStr.substring(1, bodyStr.length);
+                    } else {
+                        ApiForm.url = encodeURI(ApiForm.url.split('?')[0] + dataStr);
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+
+        // 4、发送请求
+        let t = new Date().getTime();
+        const response = await fetch(ApiForm.url, {
+            method: ApiForm.method,
+            headers: new Headers(req_headers),
+            withCredentials: 'include',
+            body: EncodingFormatBody
+        })
+            .then((response) => {
+                console.log(response);
+                // 响应标头
+                const headers = response.headers;
+                while (resposeResposeItemList.length) {
+                    resposeResposeItemList.pop();
+                }
+                let obj = {};
+                for (let [key, value] of headers.entries()) {
+                    obj[key] = value;
+                    resposeResposeItemList.push({ key: key, value: value });
+                }
+                let cl = obj['content-length'];
+                if (cl < 1024) {
+                    contentLength.value = cl + 'B';
+                } else if (cl >= 1024 && cl < 1024 * 1000) {
+                    contentLength.value = cl / 1024 + 'KB';
+                } else {
+                    console.log(cl);
+                    contentLength.value = cl / 1024 / 1000 + 'MB';
+                }
+
+                // 获取cookie
+                console.log(headers.getSetCookie());
+                while (cookieTableConfig.value.tableData.length) {
+                    cookieTableConfig.value.tableData.pop();
+                }
+                for (let [key, value] of headers.getSetCookie()) {
+                    let obj = {};
+                    // { name: key, value: value,  httpOnly: '', secure: '', path: '',domain: '',expires: '' }
+                    // cookieTableConfig.value.tableData.push(obj);
+                }
+                statusCode.value = response.status;
+
+                // 其他处理逻辑...
+                return response.json();
+            })
+            .then((data) => {
+                console.log(data);
+                editor.value.set(data);
+                requstTime.value = new Date().getTime() - t;
+            })
+            .catch((error) => {
+                console.log(error);
+                editor.value.set(error.toString());
+            });
+    }
+
     //
+    const editor = ref(null);
     const jsonContainer = ref(null);
     function initJsonContainer() {
         jsonContainer.value = document.getElementById('json-container');
@@ -408,10 +625,10 @@
             statusBar: true,
             mainMenuBar: false,
             onChangeText() {
-                console.log('json changed');
+                onJsonEditorChange(editor.value.getText());
             }
         };
-        const editor = new JSONEditor(jsonContainer.value, options);
+        editor.value = new JSONEditor(jsonContainer.value, options);
 
         // set json
         // const initialJson = {
@@ -423,7 +640,7 @@
         //     String: 'Hello World'
         // };
         // editor.set(initialJson);
-        editor.set();
+        editor.value.set();
 
         document.querySelector('#json-container .jsoneditor').style.height = '66vh';
         // console.log(editor);
@@ -431,9 +648,40 @@
         // const updatedJson = editor.get();
     }
 
+    function getToken() {
+        const json = JSON.parse(sessionStorage.getItem(tokenKey.value));
+        tokenValue.value = json.access_token;
+        let find = false;
+        for (let i = 0; i < ApiForm.header.length; i++) {
+            const item = ApiForm.header[i];
+            if (item.Key == 'Authorization') {
+                item.Param = `Bearer ${tokenValue.value}`;
+                find = true;
+            }
+        }
+        if (!find) {
+            ApiForm.header.push({ isSelect: true, Key: 'Authorization', Param: `Bearer ${tokenValue.value}` });
+        }
+    }
+    function autoAddToken() {
+        tokenKey.value = import.meta.env.VUE_APP_SSO_SITETOKEN_KEY;
+
+        if (sessionStorage.getItem(tokenKey.value)) {
+            Authorization.value = true;
+            getToken();
+            window.addEventListener('storage', (e) => {
+                // console.log(e);
+                if (e.key == tokenKey.value) {
+                    getToken();
+                }
+            });
+        }
+    }
+
     function init() {
         setApiFormData(templateTreeDataItem);
         initJsonContainer();
+        autoAddToken();
     }
     onMounted(() => {
         init();
@@ -464,6 +712,7 @@
                         </el-dropdown>
                     </template>
                     <y9Tree
+                        :key="count"
                         :data="treeDataFilter()"
                         :expandOnClickNode="true"
                         :defaultExpandedKeys="currentExpandedKeys"
@@ -503,6 +752,9 @@
                                     <el-option label="GET" value="GET" />
                                     <el-option label="POST" value="POST" />
                                     <el-option label="DELETE" value="DELETE" />
+                                    <el-option label="PUT" value="PUT" />
+                                    <el-option label="HEAD" value="HEAD" />
+                                    <el-option label="OPTIONS" value="OPTIONS" />
                                 </el-select>
                             </el-form-item>
                             <el-form-item label="请求地址">
@@ -514,7 +766,7 @@
                                         <template #label>
                                             <div class="label-title">
                                                 <span>{{ RequestTabPane.headerTitle }}</span>
-                                                <span>（2）</span>
+                                                <span>（{{ ApiForm.header.length }}）</span>
                                             </div>
                                         </template>
                                         <Y9Table2Comp
@@ -528,7 +780,7 @@
                                         <template #label>
                                             <div class="label-title">
                                                 <span>{{ RequestTabPane.queryTitle }}</span>
-                                                <span>（2）</span>
+                                                <span>（{{ ApiForm.query.length }}）</span>
                                             </div>
                                         </template>
                                         <Y9Table2Comp
@@ -542,17 +794,17 @@
                                         <template #label>
                                             <div class="label-title">
                                                 <span>{{ RequestTabPane.bodyTitle }}</span>
-                                                <span>（2）</span>
+                                                <span></span>
                                             </div>
                                         </template>
                                         <div class="body-content">
                                             <BodyTypeComp
-                                                key="bodyTypeComp"
                                                 :type="bodyType"
                                                 :itemList="bodyFormDataItemList"
+                                                :ApiForm="ApiForm"
                                                 @on-delete="onDeleteItem"
                                                 @on-edit="onEditItem"
-                                                @on-radio-change="setBodyType"
+                                                @on-radio-change="onRadioChange"
                                                 @on-json-editor-change="onJsonEditorChange"
                                             ></BodyTypeComp>
                                         </div>
@@ -561,16 +813,23 @@
                             </el-form-item>
                             <el-form-item>
                                 <el-divider>
-                                    <el-button type="primary">发送</el-button>
-                                    <el-button>保存</el-button>
+                                    <el-button type="primary" @click="submit">发送</el-button>
+                                    <!-- <el-button>保存</el-button> -->
                                 </el-divider>
                                 <div class="fixed-status">
                                     <span><i class="ri-global-line"></i>&nbsp; 状态：</span>
-                                    <span>200</span>&nbsp;
+                                    <span>{{ statusCode }}</span
+                                    >&nbsp;
                                     <span>时间：</span>
-                                    <span>10:09:36 &nbsp; 42ms</span> &nbsp;
+                                    <span
+                                        >{{
+                                            `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`
+                                        }}
+                                        &nbsp; {{ requstTime }}ms</span
+                                    >
+                                    &nbsp;
                                     <span>大小：</span>
-                                    <span>0.04kb <i class="ri-arrow-down-circle-fill"></i></span>
+                                    <span>{{ contentLength }} <i class="ri-arrow-down-circle-fill"></i></span>
                                 </div>
                                 <el-tabs
                                     class="apiTest_el_tabs respose-el-tabs"
@@ -581,7 +840,7 @@
                                         <template #label>
                                             <div class="label-title">
                                                 <span>{{ ResultTabPane.responsiveTitle }}</span>
-                                                <span>（2）</span>
+                                                <span></span>
                                             </div>
                                         </template>
                                         <div id="json-container"></div>
@@ -590,7 +849,7 @@
                                         <template #label>
                                             <div class="label-title">
                                                 <span>{{ ResultTabPane.requestTitle }}</span>
-                                                <span>（2）</span>
+                                                <span>（{{ resposeRequestItemList.length }}）</span>
                                             </div>
                                         </template>
                                         <div class="requestTitle-content">
@@ -610,7 +869,7 @@
                                         <template #label>
                                             <div class="label-title">
                                                 <span>{{ ResultTabPane.resultTitle }}</span>
-                                                <span>（2）</span>
+                                                <span>（{{ resposeResposeItemList.length }}）</span>
                                             </div>
                                         </template>
                                         <div class="resultTitle-content">
@@ -630,7 +889,7 @@
                                         <template #label>
                                             <div class="label-title">
                                                 <span>{{ ResultTabPane.cookieTitle }}</span>
-                                                <span>（2）</span>
+                                                <span>（{{ cookieTableConfig.tableData.length }}）</span>
                                             </div>
                                         </template>
                                         <div class="cookieTitle-content">
@@ -748,10 +1007,15 @@
                                         & > div {
                                             width: 100%;
                                             border: rgb(236, 238, 245) solid 1px;
-                                            span {
-                                                padding: 0 15px;
-                                                overflow: scroll;
+                                            .el-row {
+                                                .el-col:first-child {
+                                                    span {
+                                                        padding: 0 15px;
+                                                        overflow: scroll;
+                                                    }
+                                                }
                                             }
+
                                             &:not(:first-child) {
                                                 border-top: none;
                                             }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-    import { randomString } from '@/utils/index';
     import { nextTick, watch } from 'vue';
+    import { randomString } from '../apiUtils';
 
     // 注入 字体对象
     const Y9Table2Body_Id = ref('Y9Table2Body_Id_' + randomString(6));
