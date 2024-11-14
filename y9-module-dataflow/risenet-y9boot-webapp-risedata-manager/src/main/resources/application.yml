@@ -178,7 +178,6 @@ y9:
         oauth2:
             resource:
                 enabled: false
-                saveLogMessage: false
                 saveOnlineMessage: false
                 allowBasicAuthentication: true
                 allowFormEncodedBodyParameter: true
