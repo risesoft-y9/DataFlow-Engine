@@ -1,3 +1,12 @@
+export const randomString = (e) => {
+    var e = e || 32,
+        t = 'ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
+        a = t.length,
+        n = '';
+    for (let i = 0; i < e; i++) n += t.charAt(Math.floor(Math.random() * a));
+    return n;
+};
+
 export const initData = [
     {
         name: '文件夹-1',
@@ -11,11 +20,11 @@ export const initData = [
                 ApiForm: {
                     name: '示例接口-1',
                     method: 'GET',
-                    url: 'http://localhost:8091/api/restful/post/1',
+                    url: 'http://localhost:3000/test',
                     header: [
                         {
                             isSelect: true,
-                            Key: 'Access-Control-Request-Method',
+                            Key: 'Connection',
                             Param: 'keep-alive'
                         },
                         {
@@ -37,8 +46,8 @@ export const initData = [
                         2: [
                             {
                                 isSelect: false,
-                                headerKey: '',
-                                headerParam: ''
+                                Key: '',
+                                Param: ''
                             }
                         ],
                         3: null,
@@ -56,11 +65,11 @@ export const initData = [
                 ApiForm: {
                     name: '示例接口-2',
                     method: 'POST',
-                    url: 'http://localhost:8091/api/restful/post/2',
+                    url: 'http://localhost:3000/test',
                     header: [
                         {
                             isSelect: true,
-                            Key: 'Access-Control-Request-Method',
+                            Key: 'Connection',
                             Param: 'keep-alive'
                         },
                         {
@@ -82,8 +91,8 @@ export const initData = [
                         2: [
                             {
                                 isSelect: false,
-                                headerKey: '',
-                                headerParam: ''
+                                Key: '',
+                                Param: ''
                             }
                         ],
                         3: null,
@@ -101,11 +110,11 @@ export const initData = [
                 ApiForm: {
                     name: '示例接口-3',
                     method: 'DELETE',
-                    url: 'http://localhost:8091/api/restful/post/1',
+                    url: 'http://localhost:3000/test',
                     header: [
                         {
                             isSelect: true,
-                            Key: 'Access-Control-Request-Method',
+                            Key: 'Connection',
                             Param: 'keep-alive'
                         },
                         {
@@ -127,8 +136,8 @@ export const initData = [
                         2: [
                             {
                                 isSelect: false,
-                                headerKey: '',
-                                headerParam: ''
+                                Key: '',
+                                Param: ''
                             }
                         ],
                         3: null,

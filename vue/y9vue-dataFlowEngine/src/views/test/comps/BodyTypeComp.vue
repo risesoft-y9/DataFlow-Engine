@@ -3,11 +3,14 @@
     import Y9Table2Comp from './Y9Table2Comp.vue';
     import { watch } from 'vue';
     import type { UploadInstance } from 'element-plus';
-    import { debounce__ } from '@/utils/index';
 
     const uploadRef = ref<UploadInstance>();
 
     const props = defineProps({
+        key: {
+            type: Number,
+            default: 0
+        },
         type: {
             /**
              * 初始化类型["none", "form-data", "json", "xml", "html", "binary"]
@@ -39,6 +42,28 @@
     watch(bodyType, (value) => {
         emits('onRadioChange', value);
     });
+    watch(
+        () => props.type,
+        (value) => {
+            bodyType.value = Number(value);
+            if (props.ApiForm.body[bodyType.value]) {
+                editor.value.set(props.ApiForm.body[bodyType.value]);
+            } else {
+                editor.value.set();
+            }
+        }
+    );
+    watch(
+        () => props.key,
+        (value) => {
+            console.log(value);
+            if (props.ApiForm.body[bodyType.value]) {
+                editor.value.set(props.ApiForm.body[bodyType.value]);
+            } else {
+                editor.value.set();
+            }
+        }
+    );
 
     const emits = defineEmits(['onAdd', 'onDelete', 'onEdit', 'onRadioChange', 'onJsonEditorChange']);
 
@@ -77,8 +102,8 @@
             // console.log(editor.value.getText());
             switch (bodyType.value) {
                 case 3:
-                    emits('onJsonEditorChange', editor.value.get());
-                    break;
+                // emits('onJsonEditorChange', editor.value.get());
+                // break;
                 case 4:
                 case 5:
                     emits('onJsonEditorChange', editor.value.getText());
@@ -104,7 +129,7 @@
 
         document.querySelector('#body-type-json-container .jsoneditor').style.height =
             bodyTypeJsonContainerHeight.value + 'px';
-        console.log(editor.value);
+        // console.log(editor.value);
         // get json
         // const updatedJson = editor.value.get();
     }
@@ -123,6 +148,9 @@
         // init(props.type);
         initBodyTypeJsonContainer();
     });
+    function onUploadChange(uploadFile, uploadFiles) {
+        console.log(uploadFile, uploadFiles);
+    }
 </script>
 <template>
     <div>
@@ -143,7 +171,6 @@
             <div id="body-type-json-container"></div>
         </div>
         <div v-show="type == 7" class="body-type-binary">
-            <div class="upload-file-item"></div>
             <div class="upload-area-button">
                 <el-upload
                     ref="uploadRef"
@@ -153,6 +180,7 @@
                     :method="ApiForm.method"
                     multiple
                     :auto-upload="false"
+                    :on-change="onUploadChange"
                 >
                     <div
                         ><el-icon class="el-icon--upload"><upload-filled /></el-icon
@@ -188,11 +216,11 @@
         border: solid 1px rgb(236, 238, 245);
         border-radius: 3px;
         width: 100%;
-        height: v-bind('bodyTypeJsonContainerHeight + 4 + "px"');
+        min-height: v-bind('bodyTypeJsonContainerHeight + 4 + "px"');
         overflow: hidden;
-        .el-upload-list {
-            top: v-bind('-(bodyTypeJsonContainerHeight + 4) + "px"');
-        }
+        // .el-upload-list {
+        //     top: v-bind('-(bodyTypeJsonContainerHeight + 4) + "px"') !important;
+        // }
     }
 </style>
 <style>
