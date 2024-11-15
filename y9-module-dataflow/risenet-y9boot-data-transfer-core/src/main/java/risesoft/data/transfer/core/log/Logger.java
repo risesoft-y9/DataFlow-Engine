@@ -8,6 +8,9 @@ package risesoft.data.transfer.core.log;
  * @author lb
  */
 public interface Logger {
+	static final int DEBUG = 1;
+	static final int INFO = 2;
+	static final int ERROR = 3;
 	/**
 	 * 是否接受debug
 	 * 
