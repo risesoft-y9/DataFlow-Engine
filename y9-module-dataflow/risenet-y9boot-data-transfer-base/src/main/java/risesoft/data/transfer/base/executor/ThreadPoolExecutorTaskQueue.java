@@ -129,10 +129,15 @@ public class ThreadPoolExecutorTaskQueue implements ExecutorTaskQueue {
 		if (logger.isDebug()) {
 			logger.debug(source, "start job " + this.linkedQueue.size());
 		}
+		this.isStart = true;
+		if (this.linkedQueue.size() == 0) {
+			executorListener.taskEnd(this);
+			return;
+		}
 		for (int i = 0; i < this.linkedQueue.size(); i++) {
 			this.runJob();
 		}
-		this.isStart = true;
+
 	}
 
 	@Override
