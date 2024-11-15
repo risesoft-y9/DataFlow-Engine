@@ -8,6 +8,11 @@ package risesoft.data.transfer.core.log;
  * @author lb
  */
 public interface Logger {
+
+	static final int DEBUG = 1;
+	static final int INFO = 2;
+	static final int ERROR = 3;
+
 	/**
 	 * 是否接受debug
 	 * 
@@ -34,19 +39,19 @@ public interface Logger {
 	 * 
 	 * @param msg
 	 */
-	void debug(Object source,String msg);
+	void debug(Object source, String msg);
 
 	/**
 	 * 是否接受info
 	 * 
 	 * @param msg
 	 */
-	void info(Object source,String msg);
+	void info(Object source, String msg);
 
 	/**
 	 * 是否接受error
 	 * 
 	 * @param msg
 	 */
-	void error(Object source,String msg);
+	void error(Object source, String msg);
 }
