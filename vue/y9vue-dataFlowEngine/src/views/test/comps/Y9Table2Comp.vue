@@ -31,19 +31,23 @@
             }
         }
         count.value += 1;
+        emits('onEdit');
     };
-    // watch(
-    //     () => props.itemList,
-    //     (val) => {
-    //         console.log(val);
-    //     },
-    //     {
-    //         immediate: true,
-    //         deep: true
-    //     }
-    // );
+    // 修复初始化数据时，第一行值为true，但checkbox选中状态却是未选中的问题
+    watch(
+        () => props.itemList,
+        (val) => {
+            // console.log(val);
+            count.value += 1;
+        },
+        {
+            immediate: true,
+            deep: true
+        }
+    );
     const addRowFunc = (e) => {
         props.itemList.push({
+            isSelect: false,
             Key: '',
             Param: ''
         });
@@ -55,7 +59,6 @@
                     .scrollTo(0, document.getElementById(Y9Table2Body_Id.value).scrollHeight);
             }
         });
-        emits('onAdd');
     };
     const deleteRowFunc = (index: number) => {
         const item = props.itemList.splice(index, 1);
@@ -64,6 +67,8 @@
     };
     const selectItemChange = (index: number) => {
         props.itemList[index]['isSelect'] = !props.itemList[index]['isSelect'];
+        console.log(props.itemList[index]);
+        emits('onEdit');
     };
     const isBlankCheck = (index) => {
         const i = index;

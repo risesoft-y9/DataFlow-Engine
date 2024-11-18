@@ -7,8 +7,7 @@
     import JSONEditor from 'jsoneditor';
     import ZanWuShiJu from '@/assets/images/dataflowEnginePro/暂无数据 (2).png';
     import { cloneDeep, forEach, forIn } from 'lodash';
-    import { initData } from './apiUtils';
-    import { randomString } from './apiUtils';
+    import { randomString, initData } from './apiUtils';
 
     const settingStore = useSettingStore();
     const apiTest_el_tabs = ref('apiTest_el_tabs_' + randomString(10));
@@ -34,6 +33,15 @@
     const hightlightNode = ref(null);
     const showFolderPage = ref(true);
     const currentExpandedKeys = reactive([]);
+    const defaultExpandAll = ref(false);
+    /**
+     *  初始化树组件数据
+     */
+    let treeData = ref([]);
+    treeData.value.push.call(treeData.value, ...initData);
+
+    const treeDataSearchKey = ref('');
+
     const templateTreeDataItem = {
         name: '接口模版',
         id: '1',
@@ -50,7 +58,7 @@
                 },
                 {
                     isSelect: true,
-                    Key: 'content-type',
+                    Key: 'Content-Type',
                     Param: 'application/json'
                 }
             ],
@@ -85,18 +93,12 @@
         id: '1',
         children: []
     };
-    // 初始化树组件数据
-    let treeData = ref([]);
-    treeData.value.push.call(treeData.value, ...initData);
-
-    const treeDataSearchKey = ref('');
 
     let ApiForm = reactive({});
     /**
      * body.type
      * 1、none 2、form-data 3、json 4、xml 5、html 6、javascript 7、binary
      */
-
     const bodyType = ref(1);
     const RequestActiveName = ref('Query');
     const ResultActiveName = ref('实时响应');
@@ -173,10 +175,11 @@
         ApiFormChange();
     }
     function onEditItem() {
-        console.log('onEditItem');
+        // 编辑后，需要把数据赋值回去给ApiForm
         ApiForm.header = cloneDeep(headerItemList);
         ApiForm.query = cloneDeep(queryItemList);
         ApiForm.body['2'] = cloneDeep(bodyFormDataItemList);
+        // ApiForm只要有改变，就会修改左侧对应的item数据
         ApiFormChange();
     }
 
@@ -249,10 +252,35 @@
 
     function treeDataFilter() {
         if (treeDataSearchKey.value) {
-            return treeData.value.filter((item: any) => {
-                return item.name.indexOf(treeDataSearchKey.value) > -1;
-            });
+            // return treeData.value.filter((item: any) => {
+            //     return item.name.indexOf(treeDataSearchKey.value) > -1;
+            // });
+            // 定义一个函数，用于递归地过滤树节点
+            function filterTreeNodes(nodes, filterFunc) {
+                return nodes
+                    .map((node) => {
+                        const children = node.children ? filterTreeNodes(node.children, filterFunc) : [];
+                        // 使用 filterFunc 判断当前节点是否应该保留
+                        const shouldKeep = filterFunc(node);
+                        // 如果节点或其子节点有值，则保留该节点
+                        let k = shouldKeep || children.length > 0 ? { ...node, children } : null;
+                        if (k && !k.children.length) {
+                            delete k.children;
+                        }
+                        return k;
+                    })
+                    .filter(Boolean); // 移除所有 null 值
+            }
+            // 定义一个过滤函数，这里简单地根据节点的 name 属性来过滤
+            const filterFunc = ({ name }) => name.indexOf(treeDataSearchKey.value) > -1;
+
+            // 应用过滤函数
+            const filteredNodes = filterTreeNodes(treeData.value, filterFunc);
+            // 全部节点展开显示
+            defaultExpandAll.value = true;
+            return filteredNodes;
         } else {
+            defaultExpandAll.value = false;
             return treeData.value;
         }
     }
@@ -366,7 +394,7 @@
         console.log('点击了添加API', node);
         searchByNodeId(node, 'addApi');
     };
-    // 改变api配置数据
+    // 改变api配置数据，更新到左侧列表对应的item数据里
     function ApiFormChange() {
         if (ApiForm.name && ApiForm.name.indexOf(' ') > -1) {
             ApiForm.name = ApiForm.name.trim();
@@ -382,6 +410,7 @@
                 confirmButtonText: 'OK'
             });
         }
+        localStorage.setItem('api-utils-treedata', JSON.stringify(treeData.value));
     }
 
     // 当前节点高亮丢失问题
@@ -390,6 +419,11 @@
     function onRadioChange(value) {
         ApiForm.body['type'] = Number(value);
         bodyType.value = Number(value);
+        ApiFormChange();
+    }
+
+    function onUploadChange(files) {
+        ApiForm.body[bodyType.value] = files;
         ApiFormChange();
     }
 
@@ -418,29 +452,11 @@
     const contentLength = ref('0');
     async function submit() {
         // console.log(ApiForm);
-        // {
-        //                     isSelect: true,
-        //                     Key: 'Cache-Control',
-        //                     Param: 'public'
-        //                 },
-        //                 {
-        //                     isSelect: true,
-        //                     Key: 'Accept',
-        //                     Param: '*/*'
-        //                 },
-        //                 {
-        //                     isSelect: true,
-        //                     Key: 'Accept-Encoding',
-        //                     Param: 'gzip, deflate, br'
-        //                 },
         // 1、统一处理请求头的逻辑
         let req_headers = {};
         for (let i = 0; i < ApiForm.header.length; i++) {
             const item = ApiForm.header[i];
             req_headers[item.Key] = item.Param;
-        }
-        if (!req_headers['Cache-Control']) {
-            req_headers['Cache-Control'] = 'public';
         }
         if (!req_headers['Accept']) {
             req_headers['Accept'] = '*/*';
@@ -448,9 +464,15 @@
         if (!req_headers['Accept-Encoding']) {
             req_headers['Accept-Encoding'] = 'gzip, deflate, br';
         }
-        if (!req_headers['Access-Control-Allow-Credentials']) {
-            req_headers['Access-Control-Allow-Credentials'] = 'true';
-        }
+        /**
+         * 不自动配置cookie请求头，否则对于post带参数的请求，会报跨域错误。原因是cors和cookie之间本身有配置上的冲突，增加逻辑处理的复杂性
+         */
+        // if (!req_headers['Cache-Control']) {
+        //     req_headers['Cache-Control'] = 'public';
+        // }
+        // if (!req_headers['Access-Control-Allow-Credentials']) {
+        //     req_headers['Access-Control-Allow-Credentials'] = 'true';
+        // }
 
         // 请求标头
         while (resposeRequestItemList.length) {
@@ -476,21 +498,100 @@
         // 2、统一处理请求参数的逻辑
         let data = {},
             dataStr = '?',
-            hasData = false;
+            hasData = false,
+            formData = new FormData();
         function __forArray(array) {
             for (let i = 0; i < array.length; i++) {
                 const item = array[i];
                 const isSelect = item.isSelect;
                 const Key = item.Key;
                 const Param = item.Param;
+                console.log(isSelect, array);
                 if (isSelect) {
                     hasData = true;
                     data[Key] = Param;
                     dataStr += `${Key}=${Param}&`;
+                    formData.append(Key, Param);
                 }
             }
+            console.log(data, formData);
         }
-        console.log(ApiForm.body.type);
+        function __upload(array) {
+            hasData = true;
+            // 单个文件上传-示例
+            // formData.append('file', array[0].raw);
+            // 多个文件上传 -示例（接口测试工具不做区分，统一采用多文件上传的方式）
+            for (let i = 0; i < array.length; i++) {
+                formData.append('files', array[i].raw);
+            }
+        }
+        function __bodytype_formData__() {
+            if (ApiForm.method.toUpperCase() == 'GET' || ApiForm.method.toUpperCase() == 'HEAD') {
+                return ElMessageBox.alert(`GET & HEAD 方式不使用body传参数`, '操作提示', {
+                    confirmButtonText: 'OK'
+                });
+            }
+            if (req_headers['Content-Type'].toLowerCase().indexOf('multipart/form-data') < 0) {
+                ElMessageBox.alert(`请修改 Content-Type 为 multipart/form-data，否则可能产生跨域错误`, '操作提示', {
+                    confirmButtonText: 'OK'
+                });
+            }
+            // 如果没有自定义边界符，删除让浏览器自动设置
+            if (!req_headers['Content-Type'].toLowerCase().match(/boundary/)) {
+                // 自己添加，node脚本测试拿不到数据
+                // req_headers['Content-Type'] += `;boundary=----${randomString(34)}`;
+                delete req_headers['Content-Type'];
+            }
+            __forArray(ApiForm.body[2]);
+        }
+        function __bodytype_json__() {
+            try {
+                let arr = [];
+                forIn(JSON.parse(ApiForm.body[3]), (value, key) => {
+                    arr.push({ isSelect: true, Key: key, Param: value });
+                });
+                __forArray(arr);
+            } catch (error) {
+                console.log(error);
+                return null; // 返回null，不执行下面的代码
+            }
+        }
+        function __bodytype_xml__() {
+            // console.log(ApiForm.body[4]);
+            if (ApiForm.body[4]) {
+                hasData = true;
+                dataStr += `xml=${ApiForm.body[4]}&`; // & 为了下面的get统一处理这个字符
+                data.xmlStr = ApiForm.body[4];
+            }
+        }
+        function __bodytype_html__() {
+            if (ApiForm.body[5]) {
+                hasData = true;
+                dataStr += `html=${ApiForm.body[5]}&`; // & 为了下面的get统一处理这个字符
+                data.htmlStr = ApiForm.body[5];
+            }
+        }
+        function __bodytype_upload__() {
+            if (ApiForm.method.toUpperCase() != 'POST') {
+                return ElMessageBox.alert(`文件上传的请求方式只能是POST`, '操作提示', {
+                    confirmButtonText: 'OK'
+                });
+            } else if (!ApiForm.body[7].length) {
+                return ElMessageBox.alert(`没有文件可上传`, '操作提示', {
+                    confirmButtonText: 'OK'
+                });
+            } else if (req_headers['Content-Type'].toLowerCase().indexOf('boundary') < 0) {
+                /**
+                 * 数据使用formData处理后，是否设置content-type值都可以，
+                 * 如果设置了，在请求头中content-type没有boundary值时，就删掉自己设置的content-type,浏览器会自动帮我们设置。
+                 */
+                delete req_headers['Content-Type'];
+                __upload(ApiForm.body[7]);
+            } else {
+                __upload(ApiForm.body[7]);
+            }
+        }
+        // console.log(ApiForm.body.type);
         switch (ApiForm.body.type) {
             case 1:
                 // bydyType为none，获取query
@@ -498,32 +599,26 @@
                 break;
             case 2:
                 // form-data
-                __forArray(ApiForm.body[2]);
+                __bodytype_formData__();
                 break;
             case 3:
                 // 数据可能不是标准的json格式
-                try {
-                    let arr = [];
-                    forIn(JSON.parse(ApiForm.body[3]), (value, key) => {
-                        arr.push({ isSelect: true, Key: key, Param: value });
-                    });
-                    __forArray(arr);
-                } catch (error) {
-                    console.log(error);
-                }
+                __bodytype_json__();
                 break;
             case 4:
-            case 5:
-                // xml & html
-                // 如果是get方式，采用拼接参数，计算最大支持的长度，如果超过2048，则提示
-                console.log(ApiForm.body[4]);
-                // 如果是post方式，转obj对象，采用body发送
+                // xml
+                __bodytype_xml__();
                 break;
-            case 6:
-                // 上传文件
-
+            case 5:
+                // html
+                __bodytype_html__();
+                break;
+            case 7:
+                // upload
+                __bodytype_upload__();
                 break;
             default:
+                console.log(ApiForm);
                 break;
         }
 
@@ -533,28 +628,51 @@
             case 'GET':
             case 'HEAD':
                 // 如果有参数，GET只支持url拼接参数，不支持请求体body
-                if (dataStr.length > 1) {
+                if (hasData) {
                     dataStr = dataStr.substring(0, dataStr.length - 1);
                     ApiForm.url = encodeURI(ApiForm.url.split('?')[0] + dataStr);
+                }
+                if (ApiForm.url.lenght >= 2000) {
+                    return ElMessageBox.alert(
+                        '超出浏览器最大url字符长度，请更改post请求或缩减字符参数长度',
+                        '操作提示',
+                        {
+                            confirmButtonText: 'OK'
+                        }
+                    );
                 }
                 break;
             case 'POST':
             case 'PUT':
+            case 'DELETE':
                 // 如果有参数，发送body
                 if (hasData) {
                     // 区分不同响应头的编码要求
-                    if (req_headers['Content-Type'].toLowerCase().include('application/json')) {
-                        EncodingFormatBody = JSON.stringify(data);
-                    } else if (req_headers['Content-Type'].toLowerCase().include('application/x-www-form-urlencoded')) {
+                    if (
+                        req_headers['Content-Type'] &&
+                        req_headers['Content-Type'].toLowerCase().indexOf('application/json') > -1
+                    ) {
+                        // form-data格式
+                        if (ApiForm.body.type == 2) {
+                            EncodingFormatBody = formData;
+                        } else {
+                            EncodingFormatBody = JSON.stringify(data);
+                        }
+                    } else if (
+                        req_headers['Content-Type'] &&
+                        req_headers['Content-Type'].toLowerCase().indexOf('application/x-www-form-urlencoded') > -1
+                    ) {
                         // dataStr在上面的代码中，是以?开头，以&结尾，都需要去掉
                         let bodyStr = dataStr.substring(0, dataStr.length - 1);
                         EncodingFormatBody = bodyStr.substring(1, bodyStr.length);
                     } else {
-                        ApiForm.url = encodeURI(ApiForm.url.split('?')[0] + dataStr);
+                        // 默认表单格式
+                        EncodingFormatBody = formData;
                     }
                 }
                 break;
             default:
+                console.warn('其它请求，自行处理，比如options,patch等');
                 break;
         }
 
@@ -563,7 +681,7 @@
         const response = await fetch(ApiForm.url, {
             method: ApiForm.method,
             headers: new Headers(req_headers),
-            withCredentials: 'include',
+            // withCredentials: 'include',
             body: EncodingFormatBody
         })
             .then((response) => {
@@ -589,7 +707,7 @@
                 }
 
                 // 获取cookie
-                console.log(headers.getSetCookie());
+                console.log(`cookie: ${headers.getSetCookie()}`);
                 while (cookieTableConfig.value.tableData.length) {
                     cookieTableConfig.value.tableData.pop();
                 }
@@ -614,7 +732,7 @@
             });
     }
 
-    //
+    // 实时响应的json编辑器
     const editor = ref(null);
     const jsonContainer = ref(null);
     function initJsonContainer() {
@@ -623,10 +741,10 @@
             selectionStyle: 'tree',
             mode: 'code',
             statusBar: true,
-            mainMenuBar: false,
-            onChangeText() {
-                onJsonEditorChange(editor.value.getText());
-            }
+            mainMenuBar: false
+            // onChangeText() {
+            //     onJsonEditorChange(editor.value.getText());
+            // }
         };
         editor.value = new JSONEditor(jsonContainer.value, options);
 
@@ -678,9 +796,25 @@
         }
     }
 
-    function init() {
+    async function initTreeData() {
+        if (import.meta.env.VUE_APP_API_UTILS_TREEDATA == '1') {
+            // 来源于缓存
+            if (localStorage.getItem('api-utils-treedata')) {
+                let arr = JSON.parse(localStorage.getItem('api-utils-treedata'));
+                Object.assign(treeData.value, arr);
+            }
+        }
+        if (import.meta.env.VUE_APP_API_UTILS_TREEDATA == '2') {
+            // 在apiUtils.ts中开发接口并处理数据格式，这里导入接口，接收数据
+            await getTreeData().then((res) => {
+                Object.assign(treeData.value, res.data);
+            });
+        }
+    }
+    async function init() {
         setApiFormData(templateTreeDataItem);
         initJsonContainer();
+        await initTreeData();
         autoAddToken();
     }
     onMounted(() => {
@@ -716,6 +850,7 @@
                         :data="treeDataFilter()"
                         :expandOnClickNode="true"
                         :defaultExpandedKeys="currentExpandedKeys"
+                        :defaultExpandAll="defaultExpandAll"
                         @node-click="onTreeNodeClick"
                     >
                         <template #actions="{ item }">
@@ -806,6 +941,7 @@
                                                 @on-edit="onEditItem"
                                                 @on-radio-change="onRadioChange"
                                                 @on-json-editor-change="onJsonEditorChange"
+                                                @on-upload-change="onUploadChange"
                                             ></BodyTypeComp>
                                         </div>
                                     </el-tab-pane>
@@ -1087,5 +1223,9 @@
     }
     .apiTest_el_tabs div.el-tabs__nav-wrap::after {
         height: 1px;
+    }
+    /**修复其它项目没有设置唯一类名导致的公共样式影响*/
+    .apiTest_el_tabs.el-tabs--top {
+        flex-direction: column;
     }
 </style>
