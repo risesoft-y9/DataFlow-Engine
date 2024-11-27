@@ -31,13 +31,13 @@ import risesoft.data.transfer.stream.ftp.utils.PattenUtil;
  * @date 2024年3月4日
  * @author lb
  */
-public class FTPFileInfoStreamFactory implements DataInputStreamFactory, DataInputStream {
+public class FTPFileInfoInputStreamFactory implements DataInputStreamFactory, DataInputStream {
 	private Logger logger;
 	private FtpConfig ftpConfig;
 	private String fileNameMatch;
 	private long maxDate = -1;
 
-	public FTPFileInfoStreamFactory(FtpConfig ftpConfig, LoggerFactory loggerFactory) {
+	public FTPFileInfoInputStreamFactory(FtpConfig ftpConfig, LoggerFactory loggerFactory) {
 		this.ftpConfig = ftpConfig;
 		logger = loggerFactory.getLogger(ftpConfig.getName());
 	}

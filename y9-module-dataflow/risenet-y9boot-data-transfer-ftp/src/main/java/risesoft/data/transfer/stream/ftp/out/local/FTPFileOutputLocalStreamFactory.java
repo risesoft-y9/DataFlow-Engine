@@ -32,12 +32,12 @@ import risesoft.data.transfer.stream.ftp.utils.FTPUtils;
  * @date 2024年2月26日
  * @author lb
  */
-public class FTPFileOutPutStreamFactory implements DataOutputStreamFactory {
+public class FTPFileOutputLocalStreamFactory implements DataOutputStreamFactory {
 
 	private Logger logger;
 	private LocalConfig localConfig;
 
-	public FTPFileOutPutStreamFactory(LocalConfig localConfig, LoggerFactory loggerFactory) {
+	public FTPFileOutputLocalStreamFactory(LocalConfig localConfig, LoggerFactory loggerFactory) {
 		logger = loggerFactory.getLogger(localConfig.getName());
 		this.localConfig = localConfig;
 		this.localConfig.setBufferSize(this.localConfig.getBufferSize() * 1024);
