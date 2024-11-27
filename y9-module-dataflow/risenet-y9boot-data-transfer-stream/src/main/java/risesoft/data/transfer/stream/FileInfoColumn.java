@@ -44,6 +44,7 @@ public class FileInfoColumn extends Column {
 		this.size = byteSize;
 		this.path = path;
 		this.lastUpdateTime = lastUpdateTime;
+		this.name=name;
 	}
 
 	public String getName() {
