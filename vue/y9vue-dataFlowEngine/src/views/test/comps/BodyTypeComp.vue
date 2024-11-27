@@ -38,10 +38,11 @@
         }
     });
     const bodyType = ref(props.type);
-
+    // 监听bodyType类型改变
     watch(bodyType, (value) => {
         emits('onRadioChange', value);
     });
+    // 监听bodyType类型回显到组件
     watch(
         () => props.type,
         (value) => {
@@ -53,19 +54,20 @@
             }
         }
     );
-    watch(
-        () => props.key,
-        (value) => {
-            console.log(value);
-            if (props.ApiForm.body[bodyType.value]) {
-                editor.value.set(props.ApiForm.body[bodyType.value]);
-            } else {
-                editor.value.set();
-            }
-        }
-    );
+    //
+    // watch(
+    //     () => props.key,
+    //     (value) => {
+    //         console.log(value);
+    //         if (props.ApiForm.body[bodyType.value]) {
+    //             editor.value.set(props.ApiForm.body[bodyType.value]);
+    //         } else {
+    //             editor.value.set();
+    //         }
+    //     }
+    // );
 
-    const emits = defineEmits(['onAdd', 'onDelete', 'onEdit', 'onRadioChange', 'onJsonEditorChange']);
+    const emits = defineEmits(['onAdd', 'onDelete', 'onEdit', 'onRadioChange', 'onJsonEditorChange', 'onUploadChange']);
 
     function onDeleteItem() {
         emits('onDelete');
@@ -98,18 +100,22 @@
         statusBar: false,
         mainMenuBar: false,
         showErrorTable: false,
-        onBlur() {
-            // console.log(editor.value.getText());
-            switch (bodyType.value) {
-                case 3:
-                // emits('onJsonEditorChange', editor.value.get());
-                // break;
-                case 4:
-                case 5:
-                    emits('onJsonEditorChange', editor.value.getText());
-                    break;
-                default:
-                    break;
+        onChange() {
+            try {
+                // console.log(editor.value.getText());
+                switch (bodyType.value) {
+                    case 3:
+                    // emits('onJsonEditorChange', editor.value.get());
+                    // break;
+                    case 4:
+                    case 5:
+                        emits('onJsonEditorChange', editor.value.getText());
+                        break;
+                    default:
+                        break;
+                }
+            } catch (error) {
+                console.log(error);
             }
         }
     });
@@ -149,7 +155,8 @@
         initBodyTypeJsonContainer();
     });
     function onUploadChange(uploadFile, uploadFiles) {
-        console.log(uploadFile, uploadFiles);
+        console.log(uploadFiles);
+        emits('onUploadChange', uploadFiles);
     }
 </script>
 <template>
