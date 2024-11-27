@@ -17,4 +17,13 @@ public class LocalFileConfig {
 	protected String rootPath;
 	@ConfigField(description = "名字", value = "LocalFile")
 	protected String name;
+
+	public String getRootPath() {
+		return rootPath;
+	}
+
+	public String getName() {
+		return name;
+	}
+
 }

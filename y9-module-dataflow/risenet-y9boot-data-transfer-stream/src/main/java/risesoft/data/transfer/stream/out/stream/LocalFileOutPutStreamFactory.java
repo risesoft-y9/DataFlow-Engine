@@ -61,7 +61,6 @@ public class LocalFileOutPutStreamFactory implements DataOutputStreamFactory {
 						}
 						StreamColumn streamColumn = (StreamColumn) column;
 						String fileOrgPath = localFileConfig.rootPath + streamColumn.getName();
-
 						FileUtils.forceMkdir(new File(fileOrgPath.substring(0, fileOrgPath.lastIndexOf("/") + 1)));
 						RandomAccessFile raf = new RandomAccessFile(fileOrgPath, "rw");
 						FileChannel fileChannel = raf.getChannel().position(streamColumn.getStart());
