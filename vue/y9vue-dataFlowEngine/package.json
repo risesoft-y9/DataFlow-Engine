@@ -50,7 +50,7 @@
         "vue-router": "^4.0.13",
         "vxe-table": "^4.3.5",
         "xe-utils": "^3.5.7",
-        "y9plugin-components": "^3.0.2",
+        "y9plugin-components": "^3.0.4",
         "y9plugin-sso": "^4.1.0",
         "y9plugin-watermark": "^1.2.0"
     },

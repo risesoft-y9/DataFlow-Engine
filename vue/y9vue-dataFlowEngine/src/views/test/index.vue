@@ -23,7 +23,6 @@
     const tokenKey = ref('');
     const tokenValue = ref('');
     const Authorization = ref(false);
-    const count = ref(0);
     const headerHeight = ref(70);
     const sizeObjInfo = inject('sizeObjInfo');
     const pageHeaderFontSize = ref(sizeObjInfo.extraLargeFont);
@@ -300,24 +299,7 @@
             clonetemplateData = cloneDeep(templateTreeDataItem);
         }
         treeData.value.push(clonetemplateData);
-        // nextTick(() => {
-        //     removeActiveNode();
-        //     let array = Array.from(document.getElementsByClassName('y9-tree-item'));
-        //     let length = array.length;
-        //     if (length) {
-        //         array[length - 1].classList.add('active-node');
-        //         hightlightNode.value = array[length - 1];
-        //         setApiFormData(templateTreeDataItem);
-        //     }
-        // });
     };
-    function removeActiveNode() {
-        let array = Array.from(document.getElementsByClassName('y9-tree-item'));
-        let length = array.length;
-        array.forEach((item, index) => {
-            item.classList.remove('active-node');
-        });
-    }
     function setApiFormData(itemData) {
         function clearArray(array) {
             while (array.length) {
@@ -357,7 +339,8 @@
             showFolderPage.value = true;
         } else {
             showFolderPage.value = false;
-            setApiFormData(node);
+            let cn = searchByNodeId(node);
+            setApiFormData(Object.assign(cn, node));
             initResposeParams();
         }
     };
@@ -404,7 +387,6 @@
             let item = searchByNodeId({ id: currentId.value });
             item.name = ApiForm.name;
             Object.assign(item.ApiForm, ApiForm);
-            count.value++;
         } else {
             ElMessageBox.alert('左侧列表没有接口数据，请先点击新增', '操作提示', {
                 confirmButtonText: 'OK'
@@ -846,7 +828,6 @@
                         </el-dropdown>
                     </template>
                     <y9Tree
-                        :key="count"
                         :data="treeDataFilter()"
                         :expandOnClickNode="true"
                         :defaultExpandedKeys="currentExpandedKeys"
