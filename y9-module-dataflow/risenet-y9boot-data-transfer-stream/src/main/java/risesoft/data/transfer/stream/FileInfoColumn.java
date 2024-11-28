@@ -23,7 +23,7 @@ public class FileInfoColumn extends Column {
 	 */
 	private String name;
 	/**
-	 * 目录名: 不含文件名
+	 * 文件完整路径
 	 */
 	private String path;
 	/**
