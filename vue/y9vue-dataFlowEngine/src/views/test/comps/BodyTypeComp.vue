@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import JSONEditor from 'jsoneditor';
     import Y9Table2Comp from './Y9Table2Comp.vue';
-    import { watch } from 'vue';
+    import {nextTick, watch} from 'vue';
     import type { UploadInstance } from 'element-plus';
 
     const uploadRef = ref<UploadInstance>();
@@ -152,7 +152,9 @@
     }
     onMounted(() => {
         // init(props.type);
-        initBodyTypeJsonContainer();
+        nextTick(()=>{
+          initBodyTypeJsonContainer();
+        })
     });
     function onUploadChange(uploadFile, uploadFiles) {
         console.log(uploadFiles);

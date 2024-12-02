@@ -882,7 +882,7 @@
                                         <template #label>
                                             <div class="label-title">
                                                 <span>{{ RequestTabPane.headerTitle }}</span>
-                                                <span>（{{ ApiForm.header.length }}）</span>
+                                                <span>（{{ ApiForm.header?.length }}）</span>
                                             </div>
                                         </template>
                                         <Y9Table2Comp
@@ -896,7 +896,7 @@
                                         <template #label>
                                             <div class="label-title">
                                                 <span>{{ RequestTabPane.queryTitle }}</span>
-                                                <span>（{{ ApiForm.query.length }}）</span>
+                                                <span>（{{ ApiForm.query?.length }}）</span>
                                             </div>
                                         </template>
                                         <Y9Table2Comp
