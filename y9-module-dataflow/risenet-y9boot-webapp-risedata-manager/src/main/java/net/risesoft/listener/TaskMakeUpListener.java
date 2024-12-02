@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.risesoft.api.persistence.config.ConfigService;
 import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.model.RequestModel;
-import net.risesoft.pojo.DateField;
 import net.risesoft.pojo.DifferentField;
 import net.risesoft.pojo.TaskConfigModel;
 import net.risesoft.util.ApiTest;
@@ -56,7 +54,8 @@ public class TaskMakeUpListener {
 	private final DataInterfaceRepository dataInterfaceRepository;
 	private final ConfigService configService;
     
-    @Async
+    @SuppressWarnings("unchecked")
+	@Async
     public void onTaskMakeUp(String taskId, String taskName, TaskConfigModel configModel) {
     	// 先删除旧数据
     	List<DataTaskMakeUpEntity> taskMakeUpList = dataTaskMakeUpRepository.findByTaskId(taskId);
@@ -127,18 +126,15 @@ public class TaskMakeUpListener {
     		}
     	}
     	
+    	// 等待所有任务执行完成再刷新
+    	futures.forEach(CompletableFuture::join);
+    	
+    	Map<String, Object> dmap = new HashMap<String, Object>();
     	// 保存异字段配置
     	DataTaskCoreEntity different = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.PLUGS,
     			DataServiceUtil.DIFFERENT, "field", 1);
     	if(different != null) {
-    		DataTaskMakeUpEntity dataTaskMakeUpEntity = new DataTaskMakeUpEntity();
-        	dataTaskMakeUpEntity.setId(Y9IdGenerator.genId());
-        	dataTaskMakeUpEntity.setTaskId(taskId);
-        	dataTaskMakeUpEntity.setTypeName(DataServiceUtil.PLUGS);
-        	dataTaskMakeUpEntity.setNameValue(DataServiceUtil.DIFFERENTCLASS);
         	List<DifferentField> differentFields = Y9JsonUtil.readList(different.getValue(), DifferentField.class);
-        	Map<String, Object> map = new HashMap<String, Object>();
-        	Map<String, Object> rmap = new HashMap<String, Object>();
         	for(DifferentField field : differentFields) {
         		String sName = "", tName = "";
         		if(configModel.getSourceType().equals("api")) {
@@ -151,17 +147,45 @@ public class TaskMakeUpListener {
         		}else {
         			tName = dataTableFieldRepository.findById(field.getTarget()).orElse(null).getName();
         		}
-        		rmap.put(sName, tName);
+        		dmap.put(sName, tName);
         	}
-        	map.put("renameMap", rmap);
+    	}
+    	
+    	//检查大小写
+    	DataTaskMakeUpEntity makeUpEntity1 = dataTaskMakeUpRepository.findByTaskIdAndTypeNameAndTabIndex(taskId, "job.input", 1);
+    	if(makeUpEntity1 != null) {
+    		Map<String, Object> sourceMap = Y9JsonUtil.readHashMap(makeUpEntity1.getArgsValue());
+    		List<String> sourceColumns = (List<String>) sourceMap.get("column");
+    		
+    		DataTaskMakeUpEntity makeUpEntity2 = dataTaskMakeUpRepository.findByTaskIdAndTypeNameAndTabIndex(taskId, "job.output", 1);
+    		Map<String, Object> targetMap = Y9JsonUtil.readHashMap(makeUpEntity2.getArgsValue());
+    		List<String> targetColumns = (List<String>) targetMap.get("column");
+    		
+            // 忽略大小写筛选相同元素
+            for(String source : sourceColumns) {
+            	for(String target : targetColumns) {
+            		if(source.equalsIgnoreCase(target) && !source.equals(target)) {
+            			dmap.put(source, target);
+            			continue;
+            		}
+            	}
+            }
+    	}
+    	
+    	if(!dmap.isEmpty()) {
+    		DataTaskMakeUpEntity dataTaskMakeUpEntity = new DataTaskMakeUpEntity();
+        	dataTaskMakeUpEntity.setId(Y9IdGenerator.genId());
+        	dataTaskMakeUpEntity.setTaskId(taskId);
+        	dataTaskMakeUpEntity.setTypeName(DataServiceUtil.PLUGS);
+        	dataTaskMakeUpEntity.setNameValue(DataServiceUtil.DIFFERENTCLASS);
+        	Map<String, Object> map = new HashMap<String, Object>();
+        	map.put("renameMap", dmap);
         	dataTaskMakeUpEntity.setArgsValue(Y9JsonUtil.writeValueAsString(map));
         	dataTaskMakeUpEntity.setTabIndex(index);
         	dataTaskMakeUpRepository.save(dataTaskMakeUpEntity);
         	index++;
     	}
     	
-    	// 等待所有任务执行完成再刷新
-    	futures.forEach(CompletableFuture::join);
     	configService.refreshConfig(taskId, taskName);
     	
         LOGGER.debug("任务["+taskId+"]-配置组成更新完成");
