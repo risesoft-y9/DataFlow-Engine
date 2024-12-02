@@ -55,13 +55,6 @@
                         />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="速度类型">
-                    <el-select v-model="dispatchType" placeholder="Select" @change="changeDispatchType">
-                        <el-option value="">空选项</el-option>
-                        <el-option value="cron">cron</el-option>
-                        <el-option value="固定速度">固定速度</el-option>
-                    </el-select>
-                </el-form-item>
                 <el-form-item label="任务类型">
                     <el-tree-select
                         node-key="id"
@@ -201,13 +194,6 @@
             environment: environment.value
         });
     };
-    // 速度的类型参数
-    const dispatchType = ref('');
-    const changeDispatchType = () => {
-        bpmnStore.setTaskApiParams({
-            dispatchType: dispatchType.value
-        });
-    };
     // 任务名称参数
     const taskName = ref('');
     const changeTaskName = () => {
@@ -247,20 +233,6 @@
         initTableData();
     };
 
-    // const taskOptions = reactive([
-    //     {
-    //         taskName: '任务-1',
-    //         taskId: 'id-1'
-    //     },
-    //     {
-    //         taskName: '任务-2',
-    //         taskId: 'id-2'
-    //     },
-    //     {
-    //         taskName: '任务-3',
-    //         taskId: 'id-3'
-    //     }
-    // ]);
     watch(taskId, (newVal) => {
         taskOptions.value.map((item, index) => {
             if (item.taskId === newVal) {

@@ -85,12 +85,21 @@ export const saveTaskTable = async (data) => {
 };
 
 /**
- * mappingId 根据id任务修改使用
+ * 根据id任务修改使用
  * @param params
  */
 export const getDataById = async (params) => {
     return await platformRequest({
         url: 'task/getDataById',
+        method: 'GET',
+        cType: false,
+        params
+    });
+};
+
+export const getSingleTaskById = async (params) => {
+    return await platformRequest({
+        url: 'task/getSingleTaskById',
         method: 'GET',
         cType: false,
         params
@@ -127,3 +136,17 @@ export const getTaskDetails = async (params) => {
     });
 };
 
+/**
+ * 新增单任务
+ * @param params
+ * @returns
+ */
+export const saveSingleTask = async (params) => {
+    const data = qs.stringify(params);
+    return await platformRequest({
+        url: 'task/saveSingleTask',
+        method: 'POST',
+        cType: false,
+        data
+    });
+};

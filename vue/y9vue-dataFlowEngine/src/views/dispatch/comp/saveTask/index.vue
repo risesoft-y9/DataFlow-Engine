@@ -2,13 +2,14 @@
 import tooltips from './comp/tooltips.vue'
 import {globalDataTask} from "@/views/dispatch/comp/saveTask/data";
 import {globalData, taskSetForm} from '@/views/taskConfig/comps/data'
-import {reactive, ref} from "vue";
-import {addTaskForm, addTaskFormRef} from "@/views/taskConfig/comps/data";
+import {onMounted, reactive, ref} from "vue";
 import {getDataFindAll, getEnvironmentAll, saveJob} from "@/api/dispatch";
 import {getFindAll} from "@/api/taskConfig";
 import {setTreeData} from "@/utils/object";
 import veCorn from "./comp/ve-cron/index.vue";
 import newTask from '@/views/taskConfig/comps/newTask.vue';
+import newTask2 from '@/views/taskConfig/comps/newTask2.vue';
+import { ElNotification } from 'element-plus';
 
 const props = defineProps({
   setTaskShow: {
@@ -238,7 +239,6 @@ const saveY9Table = async () => {
 const handleTask = (row) => {
   globalData.row = {};
   globalData.allData = {};
-  let params={}
   if(props.setTaskShow){
     let obj={
       id:globalData.saveForm?.id,
@@ -251,27 +251,44 @@ const handleTask = (row) => {
   }
   globalData.row = row;
   globalData.type = 'edit';
-  taskSetForm.tableData.activeName = '1';
-  taskSetForm.tableData.showSave = true;
-  Object.assign(dialogConfig.value, {
-    show: true,
-    title: '编辑',
-    width: '65%',
-    okText: false,
-    cancelText: false
-  });
+  if(row.taskType == 1) {
+      Object.assign(dialogConfig2.value, {
+        show: true,
+        title: '编辑',
+        width: '65%',
+        okText: false,
+        cancelText: false
+      });
+  }else if(row.taskType == 2) {
+      taskSetForm.tableData.activeName = '1';
+      taskSetForm.tableData.showSave = true;
+      Object.assign(dialogConfig.value, {
+        show: true,
+        title: '编辑',
+        width: '65%',
+        okText: false,
+        cancelText: false
+      });
+  }
 }
 
 // 表单配置
 const dialogConfig = ref({
   show: false
 });
+const dialogConfig2 = ref({
+  show: false
+});
 const close = () => {
   emits('close', 2)
 }
 let jobId = ref('')  //点击的分类id
-const closeTask = () => {
-  dialogConfig.value.show = false
+const closeTask = (type) => {
+  if(type == 1){
+    dialogConfig.value.show = false
+  }else{
+    dialogConfig2.value.show = false
+  }
   getList(jobId.value, '1')
 }
 let ruleFormRef = ref()
@@ -280,7 +297,10 @@ let ruleFormRef = ref()
 <template>
   <!-- 表单 -->
   <y9Dialog v-model:config="dialogConfig">
-    <newTask v-if="dialogConfig.show" @close="closeTask"></newTask>
+    <newTask v-if="dialogConfig.show" @close="closeTask(1)"></newTask>
+  </y9Dialog>
+  <y9Dialog v-model:config="dialogConfig2">
+    <newTask2 v-if="dialogConfig2.show" @close="closeTask(2)"></newTask2>
   </y9Dialog>
   <el-form
       v-loading="loading"

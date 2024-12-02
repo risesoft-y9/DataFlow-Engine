@@ -5,8 +5,8 @@
                 <el-input v-model="search" clearable placeholder="输入名称" style="margin-left: 10px" />
                 <el-select v-model="pattern" placeholder="请选择状态" style="margin-left: 10px">
                     <el-option key="" label="全部" value=""></el-option>
-                    <el-option key="1" label="禁用" value="1"></el-option>
-                    <el-option key="0" label="正常" value="0"></el-option>
+                    <el-option key="0" label="关闭" value="0"></el-option>
+                    <el-option key="1" label="开启" value="1"></el-option>
                 </el-select>
                 <el-button class="global-btn-main" style="margin-left: 10px" type="primary" @click="getTableList"
                     ><i class="ri-search-line"></i>搜索
@@ -27,14 +27,43 @@
                 </el-form-item>
                 <span v-else>{{ row.content }}</span>
             </template>
+            <template #cron="{ row, column, index }">               
+                <el-form-item v-if="editIndex === index" prop="cron" @click="selectTime">
+                    <el-input readonly v-model="formData.cron"></el-input>
+                    <el-popover
+                        :visible="visible"
+                        :width="850"
+                        placement="top">
+                        <div class="corn-popper" v-if="visible">
+                            <veCorn :value="_cron" @change="handleChangeCron" @tabChange="handleTabChange"/>
+                            <div>
+                                <el-table :data="tableDataValue" border style="width: 100%">
+                                    <el-table-column prop="seconds" label="秒" align="center" style="font-weight: bold"/>
+                                    <el-table-column prop="minutes" label="分" align="center"/>
+                                    <el-table-column prop="Hour" label="時" align="center"/>
+                                    <el-table-column prop="day" label="日" align="center"/>
+                                    <el-table-column prop="month" label="月" align="center"/>
+                                    <el-table-column prop="weeks" label="周" align="center"/>
+                                    <el-table-column prop="years" label="年" align="center"/>
+                                </el-table>
+                            </div>
+                        </div>
+                        <div style="text-align: center;margin-top: 15px">
+                            <el-button type="primary" @click="visible=false"><span>取消</span></el-button>
+                            <el-button type="primary" @click="saveCorn"><span>确定</span></el-button>
+                        </div>
+                    </el-popover>
+                </el-form-item>
+                <span v-else>{{ row.cron }}</span>
+            </template>
             <template #pattern="{ row, column, index }">
                 <el-form-item v-if="editIndex === index" prop="pattern">
                     <el-select v-model="formData.pattern">
-                        <el-option key="1" label="禁用" value="1"></el-option>
-                        <el-option key="0" label="正常" value="0"></el-option>
+                        <el-option key="0" label="关闭" value="0"></el-option>
+                        <el-option key="1" label="开启" value="1"></el-option>
                     </el-select>
                 </el-form-item>
-                <span v-else>{{ row.pattern == '1' ? '禁用' : '正常' }}</span>
+                <span v-else>{{ row.pattern == '0' ? '关闭' : '开启' }}</span>
             </template>
             <template #opt_button="{ row, column, index }">
                 <div v-if="editIndex === index">
@@ -79,13 +108,14 @@
 </template>
 <script lang="ts" setup>
     import { onMounted, reactive, ref, toRefs } from 'vue';
-    import { ElLoading, ElMessage, ElMessageBox, FormInstance, FormRules, UploadProps } from 'element-plus';
+    import { ElLoading, ElMessage, ElMessageBox, ElNotification, FormInstance, FormRules, UploadProps } from 'element-plus';
     import y9_storage from '@/utils/storage';
     import settings from '@/settings.ts';
     import axios from 'axios';
     import { deleteArrange, executeProcess, getModelList, saveArrange } from '@/api/processAdmin/processModel';
     import Y9BpmnModel from './bpmnModel.vue';
     import logList from './logList.vue';
+    import veCorn from "../dispatch/comp/saveTask/comp/ve-cron/index.vue";
     import { getStoragePageSize } from '@/utils';
 
     const formRef = ref<FormInstance>();
@@ -95,7 +125,7 @@
 
     const data = reactive({
         isEmptyData: false,
-        formData: {id: '', name: '', content: '', pattern: ''},
+        formData: {id: '', name: '', content: '', pattern: '', cron: '* * * * * ? *'},
         isEdit: false,
         modelTableConfig: {
             //人员列表表格配置
@@ -104,7 +134,7 @@
                 { title: '名称', key: 'name', slot: 'name' },
                 { title: '描述', key: 'content', slot: 'content' },
                 { title: '状态', key: 'pattern', slot: 'pattern', width: '110' },
-                { title: '创建时间', key: 'createTime', width: '180' },
+                { title: '定时表达式', key: 'cron', slot: 'cron', width: '180' },
                 { title: '修改时间', key: 'updateTime', width: '180' },
                 { title: '操作', width: '350', slot: 'opt_button' }
             ],
@@ -177,12 +207,14 @@
                 id: '',
                 name: '',
                 content: '',
-                pattern: '0'
+                pattern: '0',
+                cron: ''
             });
             formData.value.id = '';
             formData.value.name = '';
             formData.value.content = '';
             formData.value.pattern = '0';
+            formData.value.cron = '';
             isEdit.value = false;
         }
     };
@@ -193,6 +225,7 @@
         formData.value.name = rows.name;
         formData.value.content = rows.content;
         formData.value.pattern = rows.pattern + '';
+        formData.value.cron = rows.cron;
         isEdit.value = true;
         for (let i = 0; i < modelTableConfig.value.tableData.length; i++) {
             if (modelTableConfig.value.tableData[i].id == '') {
@@ -251,6 +284,7 @@
         formData.value.name = '';
         formData.value.content = '';
         formData.value.pattern = '0';
+        formData.value.cron = '';
         refForm.resetFields();
         for (let i = 0; i < modelTableConfig.value.tableData.length; i++) {
             if (modelTableConfig.value.tableData[i].id == '') {
@@ -317,6 +351,62 @@
     function saveModelXml() {
         getTableList();
     }
+
+    const visible = ref(false)
+    const _cron = ref("* * * * * ? ")
+    const handleChangeCron = (cron: string) => {
+        _cron.value = cron
+    }
+    const tableDataValue = ref([
+        {id: 1, seconds: '*', minutes: '*', Hour: '*', day: '*', month: '*', weeks: '?', years: ''},
+    ])
+    const handleTabChange = (params) => {
+        for (const key in tableDataValue.value[0]) {
+            if (key == params.type) {
+                tableDataValue.value[0][key] = params.value
+            }
+        }
+    }
+    const selectTime = () => {
+        visible.value = true
+        if(formData.value.cron){
+            let speed = formData.value.cron
+            let speedSplit = speed.split(' ')
+            tableDataValue.value[0].seconds = speedSplit[0]
+            tableDataValue.value[0].minutes = speedSplit[1]
+            tableDataValue.value[0].Hour = speedSplit[2]
+            tableDataValue.value[0].day = speedSplit[3]
+            tableDataValue.value[0].month = speedSplit[4]
+            tableDataValue.value[0].weeks = speedSplit[5]
+            tableDataValue.value[0].years = speedSplit[6]
+            _cron.value = formData.value.cron
+        }
+    }
+    const saveCorn = () => {
+        let cron = _cron.value.split(' ')
+        if (cron[3] === "?" && cron[5] === "?") {
+            ElNotification({
+                title: '错误',
+                message: '日期与星期不可以同时为“不指定”',
+                type: 'error',
+                duration: 2000,
+                offset: 80
+            });
+            return
+        }
+        if (cron[3] !== "?" && cron[5] !== "?") {
+            ElNotification({
+                title: '错误',
+                message: '日期与星期必须有一个为“不指定”',
+                type: 'error',
+                duration: 2000,
+                offset: 80
+            });
+            return;
+        }
+        formData.value.cron = _cron.value
+        visible.value = false
+    }
 </script>
 
 <style lang="scss">
@@ -337,4 +427,14 @@
     .el-link {
         margin-right: 15px;
     }
+
+    .corn-popper {
+        min-height: 450px;
+        padding: 0 30px;
+    }
+
+    // .el-popover.el-popper {
+    //     left: 30% !important;
+    //     top: 120px !important;
+    // }
 </style>

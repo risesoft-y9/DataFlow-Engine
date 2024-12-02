@@ -1,7 +1,4 @@
-import { remove } from 'lodash';
 import { defineStore } from 'pinia';
-import { createNonNullChain, isJSDocNullableType } from 'typescript';
-import { isReactive, reactive, toRaw } from 'vue';
 import { getDataSearch, getEnvironmentAll } from '@/api/dispatch';
 import { getServicesList } from '@/api/serverNode/index';
 import { getFindAll } from '@/api/taskConfig';
@@ -15,9 +12,10 @@ export const useBpmnStore = defineStore('useBpmnStore', {
                 environment: 'Public', // 必须 - 任务的环境
                 pageNo: 1, // 必须 - 页码
                 pageSize: 15, // 必须 - 每页显示数量
-                dispatchType: '', // 可选 - 速度的类型 cron\固定速度
                 name: '', // 可选 - 任务名字
-                jobType: '' // 可选 - 业务分类
+                jobType: '', // 可选 - 业务分类
+                type: 'job', // 任务调度类型
+                status: 0 // 状态，查询未启动定时任务的
             },
             executNode: [], // 执行节点
             taskResult: [], // 所有任务结果

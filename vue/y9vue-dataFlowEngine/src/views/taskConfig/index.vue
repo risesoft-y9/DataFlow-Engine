@@ -22,12 +22,15 @@
       </div>
     </template>
     <template #queryFun>
-      <el-button type="primary" @click="handleClickQuery" class="global-btn-main"
-      ><i class="ri-search-2-line"></i>{{ $t('搜索') }}
+      <el-button type="primary" @click="handleClickQuery" class="global-btn-main">
+        <i class="ri-search-2-line"></i>{{ $t('搜索') }}
       </el-button>
       <div class="right-btn" v-if="!props.tableRow.type">
-        <el-button type="primary" class="global-btn-main" @click="addTask"
-        ><i class="ri-add-line"></i>{{ $t('新增') }}
+        <el-button type="primary" class="global-btn-main" @click="addTask2">
+          <i class="ri-add-line"></i>{{ $t('新建单节点任务') }}
+        </el-button>
+        <el-button type="primary" class="global-btn-main" @click="addTask">
+          <i class="ri-add-line"></i>{{ $t('新建同步任务') }}
         </el-button>
       </div>
     </template>
@@ -51,21 +54,26 @@
   </y9Table>
 
   <!-- 表单 -->
-<div class="j-White">
-  <y9Dialog v-model:config="dialogConfig">
-    <newTask v-if="dialogConfig.show" @close="close"></newTask>
-  </y9Dialog>
-</div>
-<div class="j-White">
-  <y9Dialog v-model:config="dialog">
-    <taskInfo v-if="dialog.show"></taskInfo>
-  </y9Dialog>
-</div>
+  <div class="j-White">
+    <y9Dialog v-model:config="dialogConfig">
+      <newTask v-if="dialogConfig.show" @close="close"></newTask>
+    </y9Dialog>
+  </div>
+  <div class="j-White">
+    <y9Dialog v-model:config="dialogConfig2">
+      <newTask2 v-if="dialogConfig2.show" @close="close"></newTask2>
+    </y9Dialog>
+  </div>
+  <div class="j-White">
+    <y9Dialog v-model:config="dialog">
+      <taskInfo v-if="dialog.show"></taskInfo>
+    </y9Dialog>
+  </div>
   <el-button style="display: none" v-loading.fullscreen.lock="loading"></el-button>
 </template>
 
 <script lang="ts" setup>
-import {ref, onMounted, computed, inject, reactive} from 'vue';
+import {ref, onMounted, computed, inject, reactive, h} from 'vue';
 import {ElMessageBox, ElNotification, ElMessage} from 'element-plus';
 import {useI18n} from 'vue-i18n';
 import {getStoragePageSize} from '@/utils/index';
@@ -74,6 +82,7 @@ import moment from 'moment';
 const {t} = useI18n();
 const fontSizeObj: any = inject('sizeObjInfo');
 import newTask from './comps/newTask.vue';
+import newTask2 from './comps/newTask2.vue';
 import taskInfo from './comps/taskInfo.vue';
 import {deleteDataId, getDataById, getFindAll, getFindPage} from '@/api/taskConfig';
 import {addTaskForm, globalData, taskSetForm} from '@/views/taskConfig/comps/data';
@@ -141,6 +150,18 @@ let tableConfig = ref({
       key: 'status'
     },
     {
+      title: computed(() => t('任务类型')),
+      width: 100,
+      key: 'taskType',
+      render(row) {
+        if(row.taskType == 1) {
+          return h('div', {}, '单任务');
+        } else {
+          return h('div', {}, '同步任务');
+        }
+      }
+    },
+    {
       title: computed(() => t('创建者')),
       width: 100,
       key: 'user'
@@ -195,12 +216,19 @@ let filterConfig = ref({
 const dialogConfig = ref({
   show: false
 });
+const dialogConfig2 = ref({
+  show: false
+});
 const dialog = ref({
   show: false
 });
 
 const close = (type) => {
   if (type == 1) {
+    tableConfig.value.pageConfig.currentPage = 1;
+    initTableData();
+  } else if(type == 2) {
+    dialogConfig2.value.show = false;
     tableConfig.value.pageConfig.currentPage = 1;
     initTableData();
   } else {
@@ -213,15 +241,25 @@ const handle = async (type, row) => {
   globalData.row = row;
   if (type == 1) {
     globalData.type = 'edit';
-    taskSetForm.tableData.activeName = '1';
-    taskSetForm.tableData.showSave = true;
-    Object.assign(dialogConfig.value, {
-      show: true,
-      title: '编辑',
-      width: '65%',
-      okText: false,
-      cancelText: false
-    });
+    if(row.taskType == 1) {
+      Object.assign(dialogConfig2.value, {
+        show: true,
+        title: '编辑',
+        width: '65%',
+        okText: false,
+        cancelText: false
+      });
+    }else if(row.taskType == 2) {
+      taskSetForm.tableData.activeName = '1';
+      taskSetForm.tableData.showSave = true;
+      Object.assign(dialogConfig.value, {
+        show: true,
+        title: '编辑',
+        width: '65%',
+        okText: false,
+        cancelText: false
+      });
+    }
   } else if (type == 2) {
     ElMessageBox.confirm(`${t('是否删除')}【${row.name}】 任务?`, t('提示'), {
       confirmButtonText: t('确定'),
@@ -249,15 +287,27 @@ const handle = async (type, row) => {
           });
         });
   } else {
-    Object.assign(dialog.value, {
-      show: true,
-      title: '详情',
-      width: '65%',
-      okText: false,
-      cancelText: false
-    });
+    if(row.taskType == 1) {
+      globalData.type = 'detail';
+      Object.assign(dialogConfig2.value, {
+        show: true,
+        title: '详情',
+        width: '65%',
+        okText: false,
+        cancelText: false
+      });
+    }else if(row.taskType == 2) {
+      Object.assign(dialog.value, {
+        show: true,
+        title: '详情',
+        width: '65%',
+        okText: false,
+        cancelText: false
+      });
+    }
   }
 };
+
 const addTask = () => {
   globalData.type = 'add';
   globalData.row = {};
@@ -267,12 +317,27 @@ const addTask = () => {
 
   Object.assign(dialogConfig.value, {
     show: true,
-    title: '新增',
+    title: '新增同步任务',
     width: '65%',
     okText: false,
     cancelText: false
   });
 };
+
+const addTask2 = () => {
+  globalData.type = 'add';
+  globalData.row = {};
+  globalData.allData = {};
+  
+  Object.assign(dialogConfig2.value, {
+    show: true,
+    title: '新增单任务',
+    width: '65%',
+    okText: false,
+    cancelText: false
+  });
+};
+
 onMounted(() => {
   getTree(); //获取树形结构
   initTableData();
