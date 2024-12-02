@@ -121,5 +121,8 @@ public interface JobDao extends Repository {
 	@Search("SELECT COUNT(*) FROM Y9_DATASERVICE_JOB  WHERE id IN (select Y9_DATASERVICE_JOB_LOG.JOB_ID FROM Y9_DATASERVICE_JOB_LOG where Y9_DATASERVICE_JOB_LOG.status in (?1) and Y9_DATASERVICE_JOB_LOG.DISPATCH_TIME >=?2  and Y9_DATASERVICE_JOB_LOG.DISPATCH_TIME<=?3) and  Y9_DATASERVICE_JOB.STATUS in(?4)")
 	Integer getActiveTaskCountByTime(List<Integer> logStatus, Long startTime, Long endTime, List<Integer> jobStatus);
 	
+	@Search("select * from Y9_DATASERVICE_JOB where ARGS = ?1 and JOB_TYPE = ?2 and ENVIRONMENT = ?3 and SERVICE_ID = ?4")
+	Job findByArgsAndTypeAndEnvironmentAndServiceId(String args, String type, String environment, String serviceId);
+	
 	
 }

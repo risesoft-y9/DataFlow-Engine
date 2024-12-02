@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Comment;
 
 import lombok.Data;
@@ -44,5 +45,14 @@ public class DataTaskEntity extends BaseEntity {
 	@Column(name = "USERNAME", length = 50)
 	@Comment(value = "创建者")
 	private String userName;
+	
+	@Column(name = "TENANTID", length = 50)
+	@Comment(value = "租户ID")
+	private String tenantId;
+	
+	@Column(name = "TASKTYPE", nullable = false)
+	@Comment(value = "任务类型：1-单节点任务，2-同步任务")
+	@ColumnDefault("2")
+	private Integer taskType;
 
 }

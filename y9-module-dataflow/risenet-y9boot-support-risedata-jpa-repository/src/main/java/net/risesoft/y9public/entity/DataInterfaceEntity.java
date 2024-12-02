@@ -51,5 +51,17 @@ public class DataInterfaceEntity extends BaseEntity {
 	@Comment(value = "接口数据源传输类型：1-输入，0-输出")
 	@ColumnDefault("0")
 	private Integer pattern;
+	
+	@Column(name = "TENANTID", length = 50)
+	@Comment(value = "租户ID")
+	private String tenantId;
+	
+	@Column(name = "USERID", length = 50)
+	@Comment(value = "创建者ID")
+	private String userId;
+	
+	@Column(name = "USERNAME", length = 50)
+	@Comment(value = "创建者")
+	private String userName;
 
 }

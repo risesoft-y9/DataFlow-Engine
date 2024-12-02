@@ -105,7 +105,7 @@ public class IServiceInstanceModel implements Serializable, GetEnvironment, GetS
     @Column(name = "WEIGHT", length = 10)
     private Integer weight;
     /**
-     * 状态
+     * 状态，1-等待   0-正常  2-异常   3-暂停
      */
     @Column(name = "STATUS", length = 1)
     private Integer status;

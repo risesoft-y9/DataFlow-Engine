@@ -94,5 +94,9 @@ public class DataSourceEntity extends BaseEntity {
 	@Column(name = "TENANTID", length = 50)
 	@Comment(value = "租户ID")
 	private String tenantId;
+	
+	@Column(name = "USERID", length = 50)
+	@Comment(value = "创建者ID")
+	private String userId;
 
 }

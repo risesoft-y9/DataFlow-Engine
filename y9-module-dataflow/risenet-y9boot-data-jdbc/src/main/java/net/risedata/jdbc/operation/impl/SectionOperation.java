@@ -1,6 +1,5 @@
 package net.risedata.jdbc.operation.impl;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 

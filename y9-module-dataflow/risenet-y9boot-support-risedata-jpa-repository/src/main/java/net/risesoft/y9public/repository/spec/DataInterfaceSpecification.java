@@ -20,16 +20,18 @@ public class DataInterfaceSpecification implements Specification<DataInterfaceEn
 	private String search;
 	private String requestType;
 	private Integer dataType;
+	private String tenantId;
 	
 	public DataInterfaceSpecification() {
 		super();
 	}
 
-	public DataInterfaceSpecification(String search, String requestType, Integer dataType) {
+	public DataInterfaceSpecification(String search, String requestType, Integer dataType, String tenantId) {
 		super();
 		this.search = search;
 		this.requestType = requestType;
 		this.dataType = dataType;
+		this.tenantId = tenantId;
 	}
 
 	@Override
@@ -46,6 +48,9 @@ public class DataInterfaceSpecification implements Specification<DataInterfaceEn
 		}
 		if(dataType != null) {
 			expressions.add(cb.equal(root.get("dataType").as(Integer.class), dataType));
+		}
+		if(StringUtils.isNotBlank(tenantId)) {
+			expressions.add(cb.equal(root.get("tenantId").as(String.class), tenantId));
 		}
 		return predicate;
 	}

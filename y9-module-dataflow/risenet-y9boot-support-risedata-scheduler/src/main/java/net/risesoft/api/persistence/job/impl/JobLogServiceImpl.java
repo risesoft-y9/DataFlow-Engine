@@ -1,6 +1,8 @@
 package net.risesoft.api.persistence.job.impl;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -365,27 +367,37 @@ public class JobLogServiceImpl extends AutomaticCrudService<JobLog, String> impl
 
 	@Override
 	public LPage<Map<String, Object>> searchByGroup(Date startDate, Date endDate, String environment, LPageable page,
-			String jobName) {
+			String jobName, ConcurrentSecurity jurisdiction) {
 		JobLog jobLog = new JobLog();
 		jobLog.setStatus(JobLog.ERROR);
 		jobLog.setEnvironment(environment);
 
 		return getSearchExecutor().searchForPage(jobLog,
 				"(select job_name from Y9_DATASERVICE_JOB as a2 where a2.id = JobLog.job_id) job_name,job_id,max(dispatch_time) dispatch_time,count(*) count",
-				page, getOperationBuilder(startDate, endDate, jobName), null, true);
+				page, getOperationBuilder(startDate, endDate, jobName, jurisdiction.getJobTypes()), null, true);
 	}
 
-	private OperationBuilder getOperationBuilder(Date startDate, Date endDate, String jobName) {
+	private OperationBuilder getOperationBuilder(Date startDate, Date endDate, String jobName, List<String> jobTypes) {
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			String eDate = sdf.format(endDate) + " 23:59:59";
+			SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			endDate = sdf2.parse(eDate);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 		return OperationBuilderFactory.builder("dispatchTime",
 				new SectionOperation(startDate.getTime(), endDate.getTime()), "id", new CustomOperation((where) -> {
-					boolean flag = false;
-					if (!StringUtils.isEmpty(jobName)) {
-						where.append(" job_id in (select id from Y9_DATASERVICE_JOB where job_name like ?) ");
+					where.append(" JOB_ID in (select ID from Y9_DATASERVICE_JOB where SERVICE_JOB_TYPE in ");
+					SqlUtils.appendIn(jobTypes, where);
+					if(!StringUtils.isEmpty(jobName)) {
+						where.append(" and job_name like ?)");
 						where.add("%" + jobName + "%");
-						flag = true;
+					}else {
+						where.append(")");
 					}
 					where.append(" GROUP BY JOB_ID  ");
-					return flag;
+					return true;
 				}, 99));
 	}
 
@@ -399,7 +411,7 @@ public class JobLogServiceImpl extends AutomaticCrudService<JobLog, String> impl
 						+ "(select status from Y9_DATASERVICE_JOB_log where id= (select max(id) from Y9_DATASERVICE_JOB_log a where a.job_id=JobLog.job_id )) job_end_status,"
 						+ "job_id,max(dispatch_time) dispatch_time,count(*) count,(select log_console from Y9_DATASERVICE_JOB_log "
 						+ "where id= (select max(id) from Y9_DATASERVICE_JOB_log a where a.job_id=JobLog.job_id and a.status =2)  ) log_console",
-				getOperationBuilder(startDate, endDate, jobName), null);
+				getOperationBuilder(startDate, endDate, jobName, null), null);
 
 	}
 

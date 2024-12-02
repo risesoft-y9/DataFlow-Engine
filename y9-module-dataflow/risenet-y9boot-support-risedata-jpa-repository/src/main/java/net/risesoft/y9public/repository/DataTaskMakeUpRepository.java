@@ -11,4 +11,6 @@ public interface DataTaskMakeUpRepository extends JpaRepository<DataTaskMakeUpEn
 	
 	List<DataTaskMakeUpEntity> findByTaskId(String taskId);
 	
+	DataTaskMakeUpEntity findByTaskIdAndTypeNameAndTabIndex(String taskId, String typeName, Integer tabIndex);
+	
 }

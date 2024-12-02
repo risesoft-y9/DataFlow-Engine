@@ -1,16 +1,14 @@
 package net.risesoft.pojo;
 
-import java.util.List;
-
 import lombok.Data;
 
 /**
- * 任务主体信息
+ * 单任务主体信息
  * @author pzx
  *
  */
 @Data
-public class TaskModel {
+public class SingleTaskModel {
 
 	private String id;
 	
@@ -45,38 +43,28 @@ public class TaskModel {
 	private Integer taskType;
 	
 	/**
-	 * 副表
+	 * 数据源id
 	 */
-	private TaskConfigModel taskConfigModel;
+	private String sourceId;
 	
 	/**
-	 * 配置列表
+	 * 数据源类型
 	 */
-	private List<TaskCoreModel> taskCoreList;
+	private String sourceType;
 	
 	/**
-	 * 数据脱敏字段
+	 * 数据源表
 	 */
-	private String maskFields;
+	private String sourceTable;
 	
 	/**
-	 * 数据加密字段
+	 * SQL语句
 	 */
-	private String encrypFields;
+	private String whereSql;
 	
 	/**
-	 * 异字段
+	 * 操作类型
 	 */
-	private List<DifferentField> differentField;
-	
-	/**
-	 * 日期格式
-	 */
-	private List<DateField> dateField;
-	
-	/**
-	 * 数据转换
-	 */
-	private List<ConvertField> convertField;
+	private String writerType;
 
 }

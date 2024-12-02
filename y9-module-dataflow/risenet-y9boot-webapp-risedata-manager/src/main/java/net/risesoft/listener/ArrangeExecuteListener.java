@@ -69,8 +69,8 @@ public class ArrangeExecuteListener {
     	while (status == 0) {
     		try {
     			status = getJobLogStatus(logId);
-    			// 等待60秒再执行
-				Thread.sleep(60000);
+    			// 等待30秒再执行
+				Thread.sleep(30000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

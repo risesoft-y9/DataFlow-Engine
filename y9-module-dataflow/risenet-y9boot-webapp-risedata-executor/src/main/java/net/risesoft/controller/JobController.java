@@ -16,6 +16,7 @@ import net.risedata.rpc.consumer.annotation.Listeners;
 import net.risedata.rpc.utils.IdUtils;
 import net.risesoft.api.ConfigApi;
 import net.risesoft.model.Config;
+import net.risesoft.service.HandleSingleJobService;
 import risesoft.data.transfer.core.Engine;
 import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.listener.JobListener;
@@ -35,10 +36,12 @@ import risesoft.data.transfer.core.util.Configuration;
 @Listeners
 @RestController
 public class JobController {
+	
 	/**
 	 * 执行任务的缓存配置
 	 */
 	private static Map<String, JobContext> JOB_CONTEXT = new ConcurrentHashMap<String, JobContext>();
+	
 	@Resource
 	private ConfigApi configApi;
 
@@ -149,27 +152,37 @@ public class JobController {
 		return result;
 	}
 
-	// 任务是否需要起个名字 也可以
-
 	@Listener("awaitExecutorJobs")
 	public String awaitExecutorJobs(String args) {
 		String[] ids = args.split(",");
 		StringBuilder stringBuilder = new StringBuilder();
 		for (int i = 0; i < ids.length; i++) {
-			System.out.println("获取任务id"+ids[i]);
-			Config config = configApi.getConfig(ids[i]);
-			if (config == null || config.getContent() == null) {
-				throw new RuntimeException("任务" + ids[i] + "不存在配置,这通常的程序问题请联系开发人员!");
-			}
-			System.out.println("执行任务"+config.getContent());
-			ResultJobListener resultJobListener = Engine.start(ids[i], Configuration.from(config.getContent()));
-			if (resultJobListener.isSuccess()) {
-				stringBuilder.append("任务:" + config.getName() + "执行成功\n" + resultJobListener.getMessage());
-			} else {
-				throw new RuntimeException(resultJobListener.getCommunication().getThrowable());
+			System.out.println("获取任务id：" +ids[i]);
+			// 获取任务类型
+			Integer taskType = configApi.taskType(ids[i]);
+			if(taskType == 1) {// 单节点任务
+				Config config = configApi.getSingleConfig(ids[i]);
+				if (config == null || config.getContent() == null) {
+					throw new RuntimeException("任务" + ids[i] + "不存在配置");
+				}
+				// 执行任务
+				String msg = HandleSingleJobService.handle(config);
+				stringBuilder.append("任务:" + config.getName() + "\n" + msg);
+			}else {// 同步任务
+				Config config = configApi.getConfig(ids[i]);
+				if (config == null || config.getContent() == null) {
+					throw new RuntimeException("任务" + ids[i] + "不存在配置,这通常的程序问题请联系开发人员!");
+				}
+				System.out.println("执行任务"+config.getContent());
+				ResultJobListener resultJobListener = Engine.start(ids[i], Configuration.from(config.getContent()));
+				if (resultJobListener.isSuccess()) {
+					stringBuilder.append("任务:" + config.getName() + "执行成功\n" + resultJobListener.getMessage());
+				} else {
+					throw new RuntimeException(resultJobListener.getCommunication().getThrowable());
+				}
 			}
 		}
-		System.out.println("返回" + stringBuilder);
+		System.out.println(stringBuilder);
 		return stringBuilder.toString();
 	}
 

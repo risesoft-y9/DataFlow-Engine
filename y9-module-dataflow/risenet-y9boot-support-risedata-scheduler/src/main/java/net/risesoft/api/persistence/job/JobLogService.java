@@ -170,7 +170,7 @@ public interface JobLogService {
 	boolean killAwaitJob(Integer jobId);
 
 	LPage<Map<String, Object>> searchByGroup(Date startDate, Date endDate, String environment, LPageable page,
-			String jobName);
+			String jobName, ConcurrentSecurity jurisdiction);
 
 	List<Map<String, Object>> searchByGroupLog(Date startDate, Date endDate, String environment, String jobName);
 

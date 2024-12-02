@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.data.domain.Page;
 
+import net.risesoft.pojo.SingleTaskModel;
 import net.risesoft.pojo.TaskModel;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.y9public.entity.DataTaskEntity;
@@ -22,10 +23,17 @@ public interface DataTaskService {
 	Page<DataTaskEntity> findPage(List<String> ids, String name, List<String> businessIds, int page, int rows);
 
 	/**
-	 * 根据ID获取数据
+	 * 根据ID获取同步任务数据
 	 * @return
 	 */
 	TaskModel getById(String id);
+	
+	/**
+	 * 根据id获取单任务信息
+	 * @param id
+	 * @return
+	 */
+	SingleTaskModel getSingleTaskById(String id);
 
 	/**
 	 * 根据id删除任务数据
@@ -78,5 +86,12 @@ public interface DataTaskService {
 	 * @return
 	 */
 	DataTaskEntity findById(String id);
+	
+	/**
+	 * 保存单节点任务
+	 * @param singleTaskModel
+	 * @return
+	 */
+	Y9Result<DataTaskEntity> saveSingleTask(SingleTaskModel singleTaskModel);
 	
 }

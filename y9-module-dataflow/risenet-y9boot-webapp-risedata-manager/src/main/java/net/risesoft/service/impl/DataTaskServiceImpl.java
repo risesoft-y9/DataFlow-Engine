@@ -20,6 +20,7 @@ import net.risesoft.listener.TaskMakeUpListener;
 import net.risesoft.pojo.ConvertField;
 import net.risesoft.pojo.DateField;
 import net.risesoft.pojo.DifferentField;
+import net.risesoft.pojo.SingleTaskModel;
 import net.risesoft.pojo.TaskConfigModel;
 import net.risesoft.pojo.TaskCoreModel;
 import net.risesoft.pojo.TaskModel;
@@ -32,6 +33,7 @@ import net.risesoft.y9.json.Y9JsonUtil;
 import net.risesoft.y9.util.Y9BeanUtil;
 import net.risesoft.y9public.entity.DataInterfaceEntity;
 import net.risesoft.y9public.entity.DataInterfaceParamsEntity;
+import net.risesoft.y9public.entity.DataSingleTaskConfigEntity;
 import net.risesoft.y9public.entity.DataSourceEntity;
 import net.risesoft.y9public.entity.DataTable;
 import net.risesoft.y9public.entity.DataTableField;
@@ -41,6 +43,7 @@ import net.risesoft.y9public.entity.DataTaskEntity;
 import net.risesoft.y9public.repository.DataInterfaceParamsRepository;
 import net.risesoft.y9public.repository.DataInterfaceRepository;
 import net.risesoft.y9public.repository.DataMappingRepository;
+import net.risesoft.y9public.repository.DataSingleTaskConfigRepository;
 import net.risesoft.y9public.repository.DataSourceRepository;
 import net.risesoft.y9public.repository.DataTableFieldRepository;
 import net.risesoft.y9public.repository.DataTableRepository;
@@ -65,6 +68,7 @@ public class DataTaskServiceImpl implements DataTaskService {
 	private final TaskMakeUpListener taskMakeUpListener;
 	private final DataInterfaceParamsRepository dataInterfaceParamsRepository;
 	private final DataInterfaceRepository dataInterfaceRepository;
+	private final DataSingleTaskConfigRepository dataSingleTaskConfigRepository;
 	
 	@Override
 	public Page<DataTaskEntity> findPage(List<String> ids, String name, List<String> businessIds, int page, int rows) {
@@ -127,6 +131,29 @@ public class DataTaskServiceImpl implements DataTaskService {
 		}
 		return taskModel;
 	}
+	
+	@Override
+	public SingleTaskModel getSingleTaskById(String id) {
+		SingleTaskModel singleTaskModel = new SingleTaskModel();
+		DataTaskEntity dataTask = dataTaskRepository.findById(id).orElse(null);
+		if(dataTask != null) {
+			singleTaskModel.setId(dataTask.getId());
+			singleTaskModel.setName(dataTask.getName());
+			singleTaskModel.setDescription(dataTask.getDescription());
+			singleTaskModel.setBusinessId(dataTask.getBusinessId());
+			singleTaskModel.setUserId(dataTask.getUserId());
+			singleTaskModel.setUserName(dataTask.getUserName());
+			singleTaskModel.setTaskType(dataTask.getTaskType());
+			// 获取配置信息
+			DataSingleTaskConfigEntity singleTaskConfigEntity = dataSingleTaskConfigRepository.findById(id).orElse(null);
+			singleTaskModel.setSourceId(singleTaskConfigEntity.getSourceId());
+			singleTaskModel.setSourceTable(singleTaskConfigEntity.getSourceTable());
+			singleTaskModel.setSourceType(singleTaskConfigEntity.getSourceType());
+			singleTaskModel.setWhereSql(singleTaskConfigEntity.getWhereSql());
+			singleTaskModel.setWriterType(singleTaskConfigEntity.getWriterType());
+		}
+		return singleTaskModel;
+	}
 
 	@Override
 	@Transactional(readOnly = false)
@@ -156,6 +183,7 @@ public class DataTaskServiceImpl implements DataTaskService {
 			}
 			entity.setUserId(Y9LoginUserHolder.getPersonId());
 			entity.setUserName(Y9LoginUserHolder.getUserInfo().getName());
+			entity.setTenantId(Y9LoginUserHolder.getTenantId());
 			return Y9Result.success(dataTaskRepository.save(entity), "保存成功");
 		}
 		return Y9Result.failure("数据不能为空");
@@ -177,6 +205,8 @@ public class DataTaskServiceImpl implements DataTaskService {
 		entity.setName(taskModel.getName());
 		entity.setUserId(Y9LoginUserHolder.getPersonId());
 		entity.setUserName(Y9LoginUserHolder.getUserInfo().getName());
+		entity.setTenantId(Y9LoginUserHolder.getTenantId());
+		entity.setTaskType(2);
 		dataTaskRepository.save(entity);
 		
 		// 保存config
@@ -472,6 +502,63 @@ public class DataTaskServiceImpl implements DataTaskService {
 	@Override
 	public DataTaskEntity findById(String id) {
 		return dataTaskRepository.findById(id).orElse(null);
+	}
+
+	@Override
+	public Y9Result<DataTaskEntity> saveSingleTask(SingleTaskModel singleTaskModel) {
+		try {
+			// 保存主体
+			DataTaskEntity entity = null;
+			if (StringUtils.isBlank(singleTaskModel.getId())) {
+				entity = new DataTaskEntity();
+				entity.setId(Y9IdGenerator.genId());
+			}else {
+				entity = dataTaskRepository.findById(singleTaskModel.getId()).orElse(null);
+			}
+			entity.setBusinessId(singleTaskModel.getBusinessId());
+			entity.setDescription(singleTaskModel.getDescription());
+			entity.setName(singleTaskModel.getName());
+			entity.setUserId(Y9LoginUserHolder.getPersonId());
+			entity.setUserName(Y9LoginUserHolder.getUserInfo().getName());
+			entity.setTenantId(Y9LoginUserHolder.getTenantId());
+			entity.setTaskType(1);
+			dataTaskRepository.save(entity);
+			
+			// 保存配置信息
+			DataSingleTaskConfigEntity singleTask = new DataSingleTaskConfigEntity();
+			singleTask.setId(entity.getId());
+			singleTask.setSourceId(singleTaskModel.getSourceId());
+			singleTask.setSourceTable(singleTaskModel.getSourceTable());
+			singleTask.setSourceType(singleTaskModel.getSourceType());
+			singleTask.setWhereSql(singleTaskModel.getWhereSql());
+			singleTask.setWriterType(singleTaskModel.getWriterType());
+			
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("id", singleTaskModel.getSourceType());
+			map.put("name", entity.getName());
+			if(singleTaskModel.getSourceType().equals("api")) {// 接口
+				// 存入执行配置内容
+				map.put("content", singleTaskModel.getWhereSql());
+			}else {// 数据库
+				Map<String, Object> rmap = new HashMap<String, Object>();
+				DataSourceEntity dataSourceEntity = dataSourceRepository.findById(singleTaskModel.getSourceId()).orElse(null);
+				rmap.put("jdbcUrl", dataSourceEntity.getUrl());
+				rmap.put("userName", dataSourceEntity.getUsername());
+				rmap.put("password", dataSourceEntity.getPassword());
+				String tableName = dataTableRepository.findById(singleTaskModel.getSourceTable()).orElse(null).getName();
+				String sql = ("delete".equals(singleTaskModel.getWriterType()) ? "delete from " : "update ") + tableName;
+				rmap.put("sql", sql + " " + singleTaskModel.getWhereSql());
+				// 存入执行配置内容
+				map.put("content", Y9JsonUtil.writeValueAsString(rmap));
+			}
+			singleTask.setConfigData(Y9JsonUtil.writeValueAsString(map));
+			dataSingleTaskConfigRepository.save(singleTask);
+			
+			return Y9Result.success(entity, "保存成功");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return Y9Result.failure("保存失败");
 	}
 
 }

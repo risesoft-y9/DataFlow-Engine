@@ -28,6 +28,7 @@ public class DbMetaDataUtil {
         } catch (ClassNotFoundException e) {
 			log.error(driverClass + "-驱动包不存在");
 		} catch (SQLException e) {
+			e.printStackTrace();
 			log.error(url + "-连接失败");
 		} finally {
 			ReleaseResource(connection, null, null, null);

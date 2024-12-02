@@ -93,12 +93,13 @@ public class JobLogController extends BaseController {
 	@GetMapping("/searchByGroup")
 	public Y9Result<Object> searchByGroup(@RequestParam(required = true) Date startDate,
 			@RequestParam(required = true) Date endDate, String environment, LPageable page, String jobName) {
+		ConcurrentSecurity jurisdiction = null;
 		try {
-			getSecurityJurisdiction(environment);
+			jurisdiction = getSecurityJurisdiction(environment);
 		} catch (Exception e) {
 			return Y9Result.failure(e.getMessage());
 		}
-		return Y9Result.success(jobLogService.searchByGroup(startDate, endDate, environment, page, jobName));
+		return Y9Result.success(jobLogService.searchByGroup(startDate, endDate, environment, page, jobName, jurisdiction));
 	}
 
 	@Autowired

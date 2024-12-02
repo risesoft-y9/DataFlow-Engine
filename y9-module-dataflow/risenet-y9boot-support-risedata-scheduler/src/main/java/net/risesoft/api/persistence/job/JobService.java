@@ -210,4 +210,14 @@ public interface JobService {
 	 *
 	 */
 	Map<String,Integer> getNormalStateTaskNumber(List<Integer> logStatus, Long startTime, Long endTime, List<Integer> jobStatus);
+	
+	/**
+	 * 根据相关字段信息获取实体
+	 * @param args
+	 * @param type
+	 * @param environment
+	 * @param serviceId
+	 * @return
+	 */
+	Job findByArgsAndTypeAndEnvironmentAndServiceId(String args, String type, String environment, String serviceId);
 }

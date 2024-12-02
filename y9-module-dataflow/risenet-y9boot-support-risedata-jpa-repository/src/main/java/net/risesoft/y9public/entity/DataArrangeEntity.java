@@ -41,7 +41,7 @@ public class DataArrangeEntity extends BaseEntity {
 	private String xmlData;
 	
 	@Column(name = "PATTERN", nullable = false)
-	@Comment(value = "状态：1-禁用，0-正常")
+	@Comment(value = "状态：1-开启，0-关闭")
 	@ColumnDefault("0")
 	private Integer pattern;
 	
@@ -56,5 +56,9 @@ public class DataArrangeEntity extends BaseEntity {
 	@Column(name = "TENANTID", length = 50)
 	@Comment(value = "租户ID")
 	private String tenantId;
+	
+	@Column(name = "CRON", length = 50)
+	@Comment(value = "定时表达式")
+	private String cron;
 
 }

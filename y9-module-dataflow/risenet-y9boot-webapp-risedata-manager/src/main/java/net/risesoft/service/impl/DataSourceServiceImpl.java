@@ -115,6 +115,7 @@ public class DataSourceServiceImpl implements DataSourceService {
 				}
 			}
 			entity.setTenantId(Y9LoginUserHolder.getTenantId());
+			entity.setUserId(Y9LoginUserHolder.getPersonId());
 			df = datasourceRepository.save(entity);
 		}
 		return df;

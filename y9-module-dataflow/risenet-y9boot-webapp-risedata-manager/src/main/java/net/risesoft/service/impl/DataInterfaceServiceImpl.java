@@ -16,6 +16,7 @@ import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.service.DataInterfaceService;
 import net.risesoft.util.DataUtils;
+import net.risesoft.y9.Y9LoginUserHolder;
 import net.risesoft.y9.json.Y9JsonUtil;
 import net.risesoft.y9public.entity.DataInterfaceEntity;
 import net.risesoft.y9public.entity.DataInterfaceParamsEntity;
@@ -38,7 +39,7 @@ public class DataInterfaceServiceImpl implements DataInterfaceService {
             page = 1;
         }
         Pageable pageable = PageRequest.of(page - 1, rows, Sort.by(Sort.Direction.ASC, "createTime"));
-        DataInterfaceSpecification spec = new DataInterfaceSpecification(search, requestType, dataType);
+        DataInterfaceSpecification spec = new DataInterfaceSpecification(search, requestType, dataType, Y9LoginUserHolder.getTenantId());
 		return dataInterfaceRepository.findAll(spec, pageable);
 	}
 
@@ -63,6 +64,9 @@ public class DataInterfaceServiceImpl implements DataInterfaceService {
 		if (StringUtils.isBlank(entity.getId())) {
 			entity.setId(Y9IdGenerator.genId());
 		}
+		entity.setTenantId(Y9LoginUserHolder.getTenantId());
+		entity.setUserId(Y9LoginUserHolder.getPersonId());
+		entity.setUserName(Y9LoginUserHolder.getUserInfo().getName());
 		return Y9Result.success(dataInterfaceRepository.save(entity), "保存成功");
 	}
 
@@ -72,6 +76,9 @@ public class DataInterfaceServiceImpl implements DataInterfaceService {
 		if (StringUtils.isBlank(entity.getId())) {
 			entity.setId(Y9IdGenerator.genId());
 		}
+		entity.setTenantId(Y9LoginUserHolder.getTenantId());
+		entity.setUserId(Y9LoginUserHolder.getPersonId());
+		entity.setUserName(Y9LoginUserHolder.getUserInfo().getName());
 		return Y9Result.success(dataInterfaceParamsRepository.save(entity), "保存成功");
 	}
 
@@ -127,7 +134,7 @@ public class DataInterfaceServiceImpl implements DataInterfaceService {
 
 	@Override
 	public List<DataInterfaceEntity> findByPattern(Integer pattern) {
-		return dataInterfaceRepository.findByPattern(pattern);
+		return dataInterfaceRepository.findByPatternAndTenantId(pattern, Y9LoginUserHolder.getTenantId());
 	}
 
 }

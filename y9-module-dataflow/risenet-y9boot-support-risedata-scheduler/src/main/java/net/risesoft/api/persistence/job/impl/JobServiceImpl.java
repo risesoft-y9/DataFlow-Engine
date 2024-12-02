@@ -304,4 +304,10 @@ public class JobServiceImpl extends AutomaticCrudService<Job, Integer> implement
 		result.put("notActive", notActiveCount);
 		return result;
 	}
+
+	@Override
+	public Job findByArgsAndTypeAndEnvironmentAndServiceId(String args, String type, String environment,
+			String serviceId) {
+		return jobDao.findByArgsAndTypeAndEnvironmentAndServiceId(args, type, environment, serviceId);
+	}
 }

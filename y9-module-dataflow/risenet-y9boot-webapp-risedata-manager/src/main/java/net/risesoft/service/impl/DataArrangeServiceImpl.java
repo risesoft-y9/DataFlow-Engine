@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import net.risesoft.api.persistence.job.JobLogService;
+import net.risesoft.api.persistence.job.JobService;
+import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.listener.ArrangeExecuteListener;
@@ -40,6 +42,7 @@ public class DataArrangeServiceImpl implements DataArrangeService {
 	private final JobLogService jobLogService;
 	private final DataArrangeLogRepository dataArrangeLogRepository;
 	private final ArrangeExecuteListener arrangeExecuteListener;
+	private final JobService jobService;
 	
 	@Override
 	public Page<DataArrangeEntity> searchPage(String name, Integer pattern, int page, int rows) {
@@ -77,7 +80,33 @@ public class DataArrangeServiceImpl implements DataArrangeService {
 		entity.setUserId(Y9LoginUserHolder.getPersonId());
 		entity.setUserName(Y9LoginUserHolder.getUserInfo().getName());
 		entity.setTenantId(Y9LoginUserHolder.getTenantId());
-		return Y9Result.success(dataArrangeRepository.save(entity), "保存成功");
+		dataArrangeRepository.save(entity);
+		
+		//保存定时调度信息
+		Job job = jobService.findByArgsAndTypeAndEnvironmentAndServiceId(entity.getId(), "local", "Public", "RISEDATA-MASTER");
+		if(job == null) {
+			job = new Job();
+		}
+		job.setArgs(entity.getId());
+		job.setBlockingStrategy("串行");
+		job.setDispatchMethod("均衡");
+		job.setDispatchType("cron");
+		job.setDescription(entity.getContent());
+		job.setEnvironment("Public");
+		job.setErrorCount(0);
+		job.setJobSource("任务编排");
+		job.setJobType(entity.getUserId());
+		job.setName(entity.getName());
+		job.setServiceId("RISEDATA-MASTER");
+		job.setSource("dataArrangeService,executeProcess");
+		job.setSourceTimeOut(1200);
+		job.setSpeed(entity.getCron());
+		job.setStatus(entity.getPattern());
+		job.setTimeOut(3600);
+		job.setType("local");
+		jobService.saveJob(job);
+		
+		return Y9Result.success(entity, "保存成功");
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

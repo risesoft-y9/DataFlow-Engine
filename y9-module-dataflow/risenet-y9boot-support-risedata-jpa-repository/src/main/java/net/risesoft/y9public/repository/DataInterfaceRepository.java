@@ -9,6 +9,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface DataInterfaceRepository extends JpaRepository<DataInterfaceEntity, String>, JpaSpecificationExecutor<DataInterfaceEntity> {
 	
-	List<DataInterfaceEntity> findByPattern(Integer pattern);
+	List<DataInterfaceEntity> findByPatternAndTenantId(Integer pattern, String tenantId);
 	
 }

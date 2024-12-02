@@ -15,13 +15,29 @@ import net.risesoft.model.Config;
  */
 @RPCClient(name = "config", managerName = RegisterAPI.MANAGER_NAME)
 public interface ConfigApi {
+	
 	/**
-	 * 根据jobId 返回配置
-	 * 
+	 * 根据jobId 返回同步任务配置
 	 * @param jobId
 	 * @return
 	 */
 	@API
 	public Config getConfig(String jobId);
+	
+	/**
+	 * 根据任务id获取任务类型
+	 * @param id
+	 * @return
+	 */
+	@API
+	public Integer taskType(String id);
+	
+	/**
+	 * 获取单任务的配置
+	 * @param id
+	 * @return
+	 */
+	@API
+	public Config getSingleConfig(String id);
 
 }

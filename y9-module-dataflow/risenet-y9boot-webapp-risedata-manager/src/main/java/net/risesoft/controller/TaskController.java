@@ -24,6 +24,7 @@ import net.risesoft.security.SecurityManager;
 import net.risesoft.log.LogLevelEnum;
 import net.risesoft.log.OperationTypeEnum;
 import net.risesoft.log.annotation.RiseLog;
+import net.risesoft.pojo.SingleTaskModel;
 import net.risesoft.pojo.TaskModel;
 import net.risesoft.pojo.Y9Page;
 import net.risesoft.pojo.Y9Result;
@@ -79,6 +80,7 @@ public class TaskController {
 		row.put("business", dataBusinessService.getNameById(task.getBusinessId()));
 		row.put("createTime", task.getCreateTime());
 		row.put("user", task.getUserName());
+		row.put("taskType", task.getTaskType());
 		int count = jobService.findCountJobByArgs(task.getId());
 		if(count == 0) {
 			row.put("status", "未设置调度");
@@ -94,10 +96,16 @@ public class TaskController {
 		return dataTaskService.saveData(entity);
 	}
 	
-	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "根据id获取修改任务信息", logLevel = LogLevelEnum.RSLOG, enable = false)
+	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "根据id获取同步任务信息", logLevel = LogLevelEnum.RSLOG, enable = false)
 	@GetMapping(value = "/getDataById")
 	public Y9Result<TaskModel> getDataById(@RequestParam String id) {
 		return Y9Result.success(dataTaskService.getById(id), "获取成功");
+	}
+	
+	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "根据id获取单任务信息", logLevel = LogLevelEnum.RSLOG, enable = false)
+	@GetMapping(value = "/getSingleTaskById")
+	public Y9Result<SingleTaskModel> getSingleTaskById(@RequestParam String id) {
+		return Y9Result.success(dataTaskService.getSingleTaskById(id), "获取成功");
 	}
 	
 	@RiseLog(operationType = OperationTypeEnum.DELETE, operationName = "删除任务配置", logLevel = LogLevelEnum.RSLOG)
@@ -123,5 +131,11 @@ public class TaskController {
 	@GetMapping(value = "/findAll")
 	public Y9Result<List<DataTaskEntity>> findAll(String businessId) {
 		return Y9Result.success(dataTaskService.findAll(businessId), "获取成功");
+	}
+	
+	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "保存单任务信息", logLevel = LogLevelEnum.RSLOG)
+	@PostMapping(value = "/saveSingleTask")
+	public Y9Result<DataTaskEntity> saveSingleTask(SingleTaskModel singleTaskModel) {
+		return dataTaskService.saveSingleTask(singleTaskModel);
 	}
 }

@@ -54,5 +54,17 @@ public class DataInterfaceParamsEntity extends BaseEntity {
 	@Column(name = "PARENTID", length = 20, nullable = false)
 	@Comment(value = "父节点ID")
 	private String parentId;
+	
+	@Column(name = "TENANTID", length = 50)
+	@Comment(value = "租户ID")
+	private String tenantId;
+	
+	@Column(name = "USERID", length = 50)
+	@Comment(value = "创建者ID")
+	private String userId;
+	
+	@Column(name = "USERNAME", length = 50)
+	@Comment(value = "创建者")
+	private String userName;
 
 }
