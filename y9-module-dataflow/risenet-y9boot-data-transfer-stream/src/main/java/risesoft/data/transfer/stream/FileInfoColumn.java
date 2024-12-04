@@ -119,4 +119,12 @@ public class FileInfoColumn extends Column {
 		return new BigInteger(size + "");
 	}
 
+	public Stream getStream() {
+		return stream;
+	}
+
+	public void setStream(Stream stream) {
+		this.stream = stream;
+	}
+
 }
