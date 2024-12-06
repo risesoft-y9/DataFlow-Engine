@@ -14,7 +14,6 @@ public class ValueUtils {
 
 	public static <T> T getRequired(T value, String message) {
 		if (value == null) {
-			System.out.println(message);
 			throw TransferException.as(CommonErrorCode.CONFIG_ERROR, message);
 		}
 		return value;

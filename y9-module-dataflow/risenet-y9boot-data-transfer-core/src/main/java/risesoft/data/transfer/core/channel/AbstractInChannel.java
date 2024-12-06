@@ -9,9 +9,10 @@ import risesoft.data.transfer.core.statistics.CommunicationTool;
 import risesoft.data.transfer.core.stream.out.RecordOutuptStream;
 
 /**
- * 抽象类处理好 recordOut 的存储
- * 
- * @typeName OutuptStreamOutChannel
+ * 抽象类
+ *  所有输入通道的父类
+ *  包含脏数据收集统计
+ * @typeName AbstractInChannel
  * @date 2023年12月11日
  * @author lb
  */

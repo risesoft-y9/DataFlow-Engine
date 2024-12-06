@@ -9,7 +9,7 @@ import risesoft.data.transfer.core.statistics.CommunicationTool;
 
 /**
  * 核心交换机用于组织交换机
- * 
+ * 所有输入数据的汇集位置,包含流量统计流量统计后将流向下游交换机,下游交换机不要进行流量统计
  * @typeName CoreExchange
  * @date 2023年12月12日
  * @author lb
@@ -28,6 +28,7 @@ public class CoreExchange implements Exchange {
 
 	@Override
 	public synchronized void writer(Record record) {
+		//所有的数据在此处流向交换机
 		communication.increaseCounter(CommunicationTool.READ_SUCCEED_BYTES, record.getByteSize());
 		communication.increaseCounter(CommunicationTool.READ_SUCCEED_RECORDS, 1);
 		exchange.writer(record);
@@ -35,6 +36,7 @@ public class CoreExchange implements Exchange {
 
 	@Override
 	public synchronized void writer(List<Record> record) {
+		//此处
 		communication.increaseCounter(CommunicationTool.READ_SUCCEED_BYTES, CommunicationTool.getRecordSize(record));
 		communication.increaseCounter(CommunicationTool.READ_SUCCEED_RECORDS, record.size());
 		exchange.writer(record);

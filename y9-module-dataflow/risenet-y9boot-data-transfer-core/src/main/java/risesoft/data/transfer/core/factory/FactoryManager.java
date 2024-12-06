@@ -124,6 +124,7 @@ public class FactoryManager {
 			throw e;
 		} catch (Exception e) {
 			e.printStackTrace();
+			
 			throw TransferException.as(new ErrorCode() {
 				@Override
 				public String getDescription() {
@@ -134,7 +135,7 @@ public class FactoryManager {
 				public String getCode() {
 					return null;
 				}
-			}, "在创建实例时报错:" + e.getMessage() + ",实例名:" + name);
+			}, "在创建实例时报错:" +e.getCause().getMessage() + ",实例名:" + name);
 		}
 
 	}

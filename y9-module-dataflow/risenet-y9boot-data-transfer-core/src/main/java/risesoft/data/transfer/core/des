@@ -18,13 +18,13 @@
 	}],		
 	"core":{
 	   "channel":{
-	     "out":{
+	     "output":{
 	        "name":"${通道class}",
 	       "args":{
 	       ...
 	       }
 	     },
-	 	 "in":{
+	 	 "input":{
 	       "name":"${输入交换机class}"
 	         "args":{
 	          ...

@@ -6,6 +6,9 @@ import java.util.Map;
 
 import risesoft.data.transfer.core.Engine;
 import risesoft.data.transfer.core.channel.InChannel;
+import risesoft.data.transfer.core.exception.CommonErrorCode;
+import risesoft.data.transfer.core.exception.ErrorCode;
+import risesoft.data.transfer.core.exception.TransferException;
 import risesoft.data.transfer.core.exchange.Exchange;
 import risesoft.data.transfer.core.executor.ExecutorTaskQueue;
 import risesoft.data.transfer.core.factory.FactoryManager;
@@ -296,14 +299,41 @@ public class JobContext {
 	 * @param e 传递停止的异常信息
 	 * @return
 	 */
-	public boolean stop(Throwable e) {
+	public synchronized boolean stop(Throwable e) {
 		if (this.communication.isFinished()) {
 			return false;
+		}
+		if (this.communication.getState() == State.WAITING) {
+			running();
 		}
 		this.communication.setState(State.KILLED);
 		this.communication.setThrowable(e, true);
 		return Engine.onJobFlush(this);
 
+	}
+
+	/**
+	 * 暂停当前任务 true: 暂停成功 false: 任务已结束暂停失败
+	 * 
+	 * @param message 暂停描述信息会记录到日志中
+	 * @return
+	 */
+	public synchronized boolean await(String message) {
+		if (this.communication.isFinished()) {
+			return false;
+		}
+		this.communication.setState(State.WAITING);
+		logger.info(this, "任务暂停,暂停信息:" + message);
+		return true;
+	}
+
+	/**
+	 * 任务继续如果任务没有暂停则会返回false
+	 * 
+	 * @return
+	 */
+	public synchronized boolean running() {
+		return this.communication.runing();
 	}
 
 	public InChannel getInChannel() {

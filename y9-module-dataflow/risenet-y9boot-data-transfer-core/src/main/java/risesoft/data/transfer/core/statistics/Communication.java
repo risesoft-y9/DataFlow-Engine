@@ -9,6 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
+import risesoft.data.transfer.core.exception.ErrorCode;
+import risesoft.data.transfer.core.exception.FrameworkErrorCode;
+import risesoft.data.transfer.core.exception.TransferException;
 
 /**
  * 一个任务的所有状态存储 全局上下文对象 动作的耗时单独计算
@@ -17,7 +20,7 @@ import org.apache.commons.lang3.Validate;
  * @date 2023年12月4日
  * @author lb
  */
-@SuppressWarnings({"unchecked","rawtypes"})
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class Communication implements Cloneable {
 	/**
 	 * 所有的数值key-value对 *
@@ -76,7 +79,6 @@ public class Communication implements Cloneable {
 	public long getEndTime() {
 		return endTime;
 	}
-
 
 	public Map<String, Number> getCounter() {
 		return this.counter;
@@ -137,10 +139,9 @@ public class Communication implements Cloneable {
 		return message.get(key);
 	}
 
-
 	public synchronized void addMessage(final String key, final String value) {
 		Validate.isTrue(StringUtils.isNotBlank(key), "增加message的key不能为空");
-	
+
 		List valueList = this.message.get(key);
 		if (null == valueList) {
 			valueList = new ArrayList<String>();
@@ -172,12 +173,40 @@ public class Communication implements Cloneable {
 		this.counter.put(key, value);
 	}
 
+	/**
+	 * 增加某个key的数量
+	 * 
+	 * @param key
+	 * @param deltaValue
+	 */
 	public synchronized void increaseCounter(final String key, final long deltaValue) {
-		Validate.isTrue(StringUtils.isNotBlank(key), "增加counter的key不能为空");
-
+		if (this.state == State.WAITING) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				throw TransferException.as(FrameworkErrorCode.RUNTIME_ERROR, "系统休眠时产生异常,异常信息:" + e.getMessage(), e);
+			}
+		}
 		long value = this.getLongCounter(key);
-
 		this.counter.put(key, value + deltaValue);
+	}
+
+	/**
+	 * 启动任务
+	 * 
+	 * @return
+	 */
+	public synchronized boolean runing() {
+		if (this.state == State.WAITING) {
+			this.state = State.RUNNING;
+			try {
+				notifyAll();
+			} catch (Exception e) {
+				throw TransferException.as(FrameworkErrorCode.RUNTIME_ERROR, "任务唤醒时产生异常,异常信息:" + e.getMessage(), e);
+			}
+			return true;
+		}
+		return false;
 	}
 
 	@Override

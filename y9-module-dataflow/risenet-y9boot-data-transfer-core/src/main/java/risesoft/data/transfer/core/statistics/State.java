@@ -14,8 +14,6 @@ public enum State implements EnumVal {
 	WAITING(20),
 	// 执行中
 	RUNNING(30),
-	// 强制关闭中
-	KILLING(40),
 	// 关闭的
 	KILLED(50),
 	// 失败了

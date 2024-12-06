@@ -179,7 +179,7 @@ public class Engine {
 		}
 
 		Communication communication = jobContext.getCommunication();
-		if (communication.getState() == State.FAILED || communication.getState() == State.SUCCEEDED) {
+		if (communication.isFinished()) {
 			shutdown(jobContext);
 			jobContext.setEnd(true);
 			try {
