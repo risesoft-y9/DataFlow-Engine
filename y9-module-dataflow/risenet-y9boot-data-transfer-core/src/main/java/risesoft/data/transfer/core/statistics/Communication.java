@@ -180,6 +180,8 @@ public class Communication implements Cloneable {
 	 * @param deltaValue
 	 */
 	public synchronized void increaseCounter(final String key, final long deltaValue) {
+		long value = this.getLongCounter(key);
+		this.counter.put(key, value + deltaValue);
 		if (this.state == State.WAITING) {
 			try {
 				wait();
@@ -187,8 +189,7 @@ public class Communication implements Cloneable {
 				throw TransferException.as(FrameworkErrorCode.RUNTIME_ERROR, "系统休眠时产生异常,异常信息:" + e.getMessage(), e);
 			}
 		}
-		long value = this.getLongCounter(key);
-		this.counter.put(key, value + deltaValue);
+
 	}
 
 	/**
