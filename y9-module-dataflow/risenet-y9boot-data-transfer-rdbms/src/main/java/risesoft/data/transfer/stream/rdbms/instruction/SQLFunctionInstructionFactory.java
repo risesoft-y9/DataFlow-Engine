@@ -13,8 +13,8 @@ import risesoft.data.transfer.core.util.ConfigurationConst;
 import risesoft.data.transfer.core.util.ValueUtils;
 
 /**
- * 执行sql方法的指令构建工厂
- * 
+ * 执行sql方法的指令构建工厂 
+ *  执行的是查询方法
  * 
  * @typeName SQLFunctionInstructionFactory
  * @date 2024年8月27日

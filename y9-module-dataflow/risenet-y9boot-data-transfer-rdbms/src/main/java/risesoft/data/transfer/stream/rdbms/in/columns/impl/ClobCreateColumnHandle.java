@@ -32,7 +32,7 @@ public class ClobCreateColumnHandle implements CreateColumnHandle {
 	@Override
 	public Column getColumn(ResultSet rs, ResultSetMetaData metaData, int index, String mandatoryEncoding)
 			throws Exception {
-		return new StringColumn(rs.getString(index), metaData.getCatalogName(index));
+		return new StringColumn(rs.getString(index), metaData.getColumnLabel(index));
 	}
 
 }

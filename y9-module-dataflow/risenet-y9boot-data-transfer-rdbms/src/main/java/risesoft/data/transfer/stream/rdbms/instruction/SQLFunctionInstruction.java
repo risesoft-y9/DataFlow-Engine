@@ -13,7 +13,7 @@ import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
 
 /**
  * 方法指令
- * 
+ * 执行数据库语句传入数据库语句执行方法
  * 
  * @typeName SQLFunctionInstruction
  * @date 2024年8月27日
