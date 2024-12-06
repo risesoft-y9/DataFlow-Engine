@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import risesoft.data.transfer.core.Engine;
 import risesoft.data.transfer.core.channel.InChannel;
 import risesoft.data.transfer.core.exchange.Exchange;
 import risesoft.data.transfer.core.executor.ExecutorTaskQueue;
@@ -11,10 +12,12 @@ import risesoft.data.transfer.core.factory.FactoryManager;
 import risesoft.data.transfer.core.handle.DoHandle;
 import risesoft.data.transfer.core.handle.HandleManager;
 import risesoft.data.transfer.core.job.Job;
+import risesoft.data.transfer.core.job.JobEngine;
 import risesoft.data.transfer.core.listener.JobListener;
 import risesoft.data.transfer.core.log.Logger;
 import risesoft.data.transfer.core.log.LoggerFactory;
 import risesoft.data.transfer.core.statistics.Communication;
+import risesoft.data.transfer.core.statistics.State;
 import risesoft.data.transfer.core.util.Configuration;
 
 /**
@@ -285,6 +288,22 @@ public class JobContext {
 	public JobContext setInChannelConfiguration(Configuration inChannelConfiguration) {
 		this.inChannelConfiguration = inChannelConfiguration;
 		return this;
+	}
+
+	/**
+	 * 停止任务
+	 * 
+	 * @param e 传递停止的异常信息
+	 * @return
+	 */
+	public boolean stop(Throwable e) {
+		if (this.communication.isFinished()) {
+			return false;
+		}
+		this.communication.setState(State.KILLED);
+		this.communication.setThrowable(e, true);
+		return Engine.onJobFlush(this);
+
 	}
 
 	public InChannel getInChannel() {

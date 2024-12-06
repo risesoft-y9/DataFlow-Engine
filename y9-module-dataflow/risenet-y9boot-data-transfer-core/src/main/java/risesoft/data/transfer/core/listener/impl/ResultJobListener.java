@@ -1,5 +1,6 @@
 package risesoft.data.transfer.core.listener.impl;
 
+import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.listener.JobListener;
 import risesoft.data.transfer.core.statistics.Communication;
 import risesoft.data.transfer.core.statistics.CommunicationTool;
@@ -20,6 +21,27 @@ public class ResultJobListener implements JobListener {
 	private Communication communication;
 
 	private Object LOCK = new Object();
+
+	private JobContext jobContext;
+
+	/**
+	 * 设置 任务上下文对象，设置之后可以操作一些任务上下文方法
+	 * 
+	 * @param jobContext
+	 */
+	public void setJobContext(JobContext jobContext) {
+
+		this.jobContext = jobContext;
+	}
+
+	/**
+	 * 获取任务执行的上下文对象
+	 * 
+	 * @return
+	 */
+	public JobContext getJobContext() {
+		return this.jobContext;
+	}
 
 	@Override
 	public void end(Communication communication) {

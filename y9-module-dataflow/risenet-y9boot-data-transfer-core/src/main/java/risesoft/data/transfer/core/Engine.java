@@ -95,7 +95,7 @@ public class Engine {
 			jobContext.setName(configuration.getString(JOB_NAME_KEY, Thread.currentThread().getName()));
 			jobContext.setLoggerFactory(loggerFactory);
 			// 加载配置插件
-			Configuration loadedConfiguration = ConfigLoadManager.loadConfig(configuration,jobContext);
+			Configuration loadedConfiguration = ConfigLoadManager.loadConfig(configuration, jobContext);
 			jobContext.putInstance(loadedConfiguration);
 			PlugManager.loadPlug(loadedConfiguration, jobContext);
 			jobContext.doHandle(InitApplicationConfigHandle.class, (handle) -> {
@@ -173,9 +173,9 @@ public class Engine {
 	 * 
 	 * @param jobContext
 	 */
-	public static void onJobFlush(JobContext jobContext) {
+	public static boolean onJobFlush(JobContext jobContext) {
 		if (jobContext.isEnd()) {
-			return;
+			return true;
 		}
 
 		Communication communication = jobContext.getCommunication();
@@ -191,8 +191,9 @@ public class Engine {
 				communication.setThrowable(e);
 			}
 			jobContext.getJobListener().end(communication);
-
+			return true;
 		}
+		return false;
 
 	}
 
