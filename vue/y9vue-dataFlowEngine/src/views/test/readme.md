@@ -39,8 +39,3 @@
         },
         component: () => import('@/views/test/index.vue')
     }
-4、在配置文件中添加一个配置
-    示例：
-    # 接口工具的数据来源（1-local，2-API）
-    VUE_APP_API_UTILS_TREEDATA = '1'
-5、如果有接口，需自行开发，开发接口的文件位置： apiUtils.js，就在test文件夹下

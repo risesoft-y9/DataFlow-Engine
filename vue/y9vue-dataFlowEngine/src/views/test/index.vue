@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { inject, nextTick, onMounted, reactive, watch } from 'vue';
+    import { inject, nextTick, onMounted, reactive, ref, watch } from 'vue';
     import { Search } from '@element-plus/icons-vue';
     import { useSettingStore } from '@/store/modules/settingStore';
     import Y9Table2Comp from './comps/Y9Table2Comp.vue';
@@ -7,7 +7,8 @@
     import JSONEditor from 'jsoneditor';
     import ZanWuShiJu from '@/assets/images/dataflowEnginePro/暂无数据 (2).png';
     import { cloneDeep, forEach, forIn } from 'lodash';
-    import { randomString, initData } from './apiUtils';
+    import { randomString, initData, getTreeData, saveTreeData, removeNode } from './apiUtils';
+    import { ElLoading, ElMessage, ElMessageBox } from 'element-plus';
 
     const settingStore = useSettingStore();
     const apiTest_el_tabs = ref('apiTest_el_tabs_' + randomString(10));
@@ -37,14 +38,16 @@
      *  初始化树组件数据
      */
     let treeData = ref([]);
-    treeData.value.push.call(treeData.value, ...initData);
 
     const treeDataSearchKey = ref('');
 
+    let y9TreeDefaultActiveRef = ref();
+
     const templateTreeDataItem = {
         name: '接口模版',
-        id: '1',
+        id: '',
         type: 'api',
+        parentId: '0',
         ApiForm: {
             name: '接口模版',
             method: 'GET',
@@ -89,7 +92,8 @@
     const templateTreeDataFolder = {
         name: '文件夹-1',
         type: 'folder',
-        id: '1',
+        id: '',
+        parentId: '0',
         children: []
     };
 
@@ -184,23 +188,25 @@
 
     function searchByNodeId(node, operation = 'search') {
         function theItorator(array, id, operation) {
+            if(id == '' && (operation == 'addFolder' || operation == 'addApi')) {
+                ElMessageBox.alert('上级节点需先保存，才能增加下级节点', '操作提示', {
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
             for (let i = 0; i < array.length; i++) {
                 let item = array[i];
                 if (operation == 'search' && item.id == id) {
                     return item;
                 }
-                if (operation == 'searchElementNode') {
-                    console.log(item);
-                }
                 if (operation == 'delete' && item.id == id) {
-                    array.splice(i, 1);
+                    y9TreeDefaultActiveRef.value.remove(item);
                     return 'delete操作';
                 }
                 if (operation == 'addFolder' && item.id == id) {
-                    templateTreeDataFolder.id = `${item.id}-${item.children.length + 1}`;
-                    templateTreeDataFolder.children = [];
+                    templateTreeDataFolder.parentId = id;
                     let clonetemplateData = cloneDeep(templateTreeDataFolder);
-                    if (item.children.length) {
+                    if (item.children && item.children.length) {
                         // 同级节点下，如果有其它的文件夹，插入到其它文件夹之后
                         for (let j = item.children.length - 1; j >= 0; j--) {
                             let child = item.children[j];
@@ -215,6 +221,7 @@
                             }
                         }
                     } else {
+                        item.children = [];
                         item.children.push(clonetemplateData);
                         return 'addFolder操作';
                     }
@@ -222,15 +229,8 @@
 
                 if (operation == 'addApi' && item.id == id) {
                     if (node.type == 'folder') {
-                        templateTreeDataItem.id = `${item.id}-${item.children.length + 1}`;
+                        templateTreeDataItem.parentId = id;
                         item.children.push(cloneDeep(templateTreeDataItem));
-                    }
-                    if (node.type == 'api') {
-                        // 同级节点上的“+”事件，array[0]一定存在
-                        let temp = array[0].id.split('-');
-                        temp[temp.length - 1] = array.length + 1;
-                        templateTreeDataItem.id = temp.join('-');
-                        array.push(cloneDeep(templateTreeDataItem));
                     }
                     return 'addApi操作';
                 }
@@ -249,39 +249,13 @@
         return r;
     }
 
-    function treeDataFilter() {
-        if (treeDataSearchKey.value) {
-            // return treeData.value.filter((item: any) => {
-            //     return item.name.indexOf(treeDataSearchKey.value) > -1;
-            // });
-            // 定义一个函数，用于递归地过滤树节点
-            function filterTreeNodes(nodes, filterFunc) {
-                return nodes
-                    .map((node) => {
-                        const children = node.children ? filterTreeNodes(node.children, filterFunc) : [];
-                        // 使用 filterFunc 判断当前节点是否应该保留
-                        const shouldKeep = filterFunc(node);
-                        // 如果节点或其子节点有值，则保留该节点
-                        let k = shouldKeep || children.length > 0 ? { ...node, children } : null;
-                        if (k && !k.children.length) {
-                            delete k.children;
-                        }
-                        return k;
-                    })
-                    .filter(Boolean); // 移除所有 null 值
-            }
-            // 定义一个过滤函数，这里简单地根据节点的 name 属性来过滤
-            const filterFunc = ({ name }) => name.indexOf(treeDataSearchKey.value) > -1;
+    function searchTree() {
+        y9TreeDefaultActiveRef.value!.filter(treeDataSearchKey.value);
+    }
 
-            // 应用过滤函数
-            const filteredNodes = filterTreeNodes(treeData.value, filterFunc);
-            // 全部节点展开显示
-            defaultExpandAll.value = true;
-            return filteredNodes;
-        } else {
-            defaultExpandAll.value = false;
-            return treeData.value;
-        }
+    const filterNodeMethod = (value,data) => {
+        if(!value) return true
+        return data.name.includes(value)
     }
 
     /**
@@ -290,16 +264,18 @@
     const createTreeDataRootNode = (value) => {
         let clonetemplateData = {};
         if (value == 'folder') {
-            templateTreeDataFolder.id = treeData.value.length + 1 + '';
-            templateTreeDataFolder.children = [cloneDeep(templateTreeDataItem)];
-            templateTreeDataFolder.children[0].id = templateTreeDataFolder.id + '-1';
+            // templateTreeDataFolder.id = treeData.value.length + 1 + '';
+            // templateTreeDataFolder.children = [cloneDeep(templateTreeDataItem)];
+            // templateTreeDataFolder.children[0].id = templateTreeDataFolder.id + '-1';
+            // templateTreeDataFolder.children[0].parentId = templateTreeDataFolder.id;
             clonetemplateData = cloneDeep(templateTreeDataFolder);
         } else {
-            templateTreeDataItem.id = treeData.value.length + 1 + '';
+            //templateTreeDataItem.id = treeData.value.length + 1 + '';
             clonetemplateData = cloneDeep(templateTreeDataItem);
         }
         treeData.value.push(clonetemplateData);
     };
+
     function setApiFormData(itemData) {
         function clearArray(array) {
             while (array.length) {
@@ -331,7 +307,6 @@
     }
     // 点击树节点
     const onTreeNodeClick = (node) => {
-        // console.log('被点击了', node);
         currentId.value = node.id;
         if (node.type == 'folder') {
             currentExpandedKeys[0] = node.id;
@@ -356,25 +331,53 @@
         };
         searchByNodeId(node).name = folderName.value;
     }
+    // 点击保存
+    const onTreeSaveIcon = (node) => {
+        const loading = ElLoading.service({ lock: true, text: '正在处理中', background: 'rgba(0, 0, 0, 0.3)' });
+        saveTreeData(node).then((res) => {
+            loading.close();
+            if(res.success){
+                searchByNodeId(node).id = res.data.id;
+                ElMessage({ type: 'success', message: res.msg, offset: 65 });
+            }else {
+                ElMessage({ message: res.msg, type: 'error', offset: 65 });
+            }
+        });
+    }
     //点击删除icon
     const onTreeRemoveIcon = (node) => {
-        // console.log('删除icon被点击了', node);
-        if (treeData.value.length <= 1) {
-            searchByNodeId(node, 'delete');
-        } else {
-            ElMessageBox.alert('至少保留一个根节点', '操作提示', {
-                confirmButtonText: 'OK'
+        ElMessageBox.confirm('您确定要删除【' + node.name + '】吗?', '提示', {
+            cancelButtonText: '取消',
+            confirmButtonText: '确定',
+            type: 'warning'
+        })
+        .then(() => {
+            removeNode({ id: node.id }).then((res) => {
+                if (res.success) {
+                    let data = res.data;
+                    for (let i = 0; i < data.length; i++) {
+                        searchByNodeId({ id: data[i] }, 'delete');
+                    }
+                    ElMessage({ type: 'success', message: res.msg, offset: 65 });
+                } else {
+                    ElMessage({ message: res.msg, type: 'error', offset: 65 });
+                }
             });
-        }
+        })
+        .catch(() => {
+            ElMessage({
+                type: 'info',
+                message: '已取消删除',
+                offset: 65
+            });
+        });
     };
     // 点击添加文件夹icon
     const onTreeAddFolderIcon = (node) => {
-        // console.log('点击了添加文件夹', node);
         searchByNodeId(node, 'addFolder');
     };
     // 点击添加API icon
     const onTreeAddApiIcon = (node) => {
-        console.log('点击了添加API', node);
         searchByNodeId(node, 'addApi');
     };
     // 改变api配置数据，更新到左侧列表对应的item数据里
@@ -779,19 +782,11 @@
     }
 
     async function initTreeData() {
-        if (import.meta.env.VUE_APP_API_UTILS_TREEDATA == '1') {
-            // 来源于缓存
-            if (localStorage.getItem('api-utils-treedata')) {
-                let arr = JSON.parse(localStorage.getItem('api-utils-treedata'));
-                Object.assign(treeData.value, arr);
+        await getTreeData().then((res) => {
+            if(res.success) {
+                treeData.value = res.data;
             }
-        }
-        if (import.meta.env.VUE_APP_API_UTILS_TREEDATA == '2') {
-            // 在apiUtils.ts中开发接口并处理数据格式，这里导入接口，接收数据
-            await getTreeData().then((res) => {
-                Object.assign(treeData.value, res.data);
-            });
-        }
+        });
     }
     async function init() {
         setApiFormData(templateTreeDataItem);
@@ -810,12 +805,12 @@
             <el-aside width="31%">
                 <y9Card title="我是标题">
                     <template #header>
-                        <el-button>刷新</el-button>
+                        <el-button @click="searchTree()">刷新</el-button>
                         <el-input
                             v-model="treeDataSearchKey"
-                            @blur="treeDataFilter"
-                            placeholder="请输入关键词/URL"
+                            placeholder="请输入接口名称"
                             :prefix-icon="Search"
+                            @keyup.enter="searchTree"
                         />
                         <el-dropdown placement="bottom" @command="createTreeDataRootNode">
                             <el-button type="primary">新建</el-button>
@@ -828,20 +823,29 @@
                         </el-dropdown>
                     </template>
                     <y9Tree
-                        :data="treeDataFilter()"
+                        :data="treeData"
+                        ref="y9TreeDefaultActiveRef"
                         :expandOnClickNode="true"
                         :defaultExpandedKeys="currentExpandedKeys"
                         :defaultExpandAll="defaultExpandAll"
                         @node-click="onTreeNodeClick"
+                        :filterNodeMethod="filterNodeMethod"
                     >
                         <template #actions="{ item }">
                             <i
                                 class="ri-folder-add-line"
                                 v-show="item.type == 'folder'"
                                 @click="onTreeAddFolderIcon(item)"
+                                title="添加子目录"
                             ></i>
-                            <i class="ri-add-large-line" @click="onTreeAddApiIcon(item)"></i>
-                            <i class="ri-delete-bin-line" @click="onTreeRemoveIcon(item)"></i>
+                            <i 
+                                class="ri-add-large-line"
+                                v-show="item.type == 'folder'"
+                                @click="onTreeAddApiIcon(item)"
+                                title="添加接口"
+                            ></i>
+                            <i class="ri-save-line" @click="onTreeSaveIcon(item)" title="保存"></i>
+                            <i class="ri-delete-bin-line" @click="onTreeRemoveIcon(item)" title="删除"></i>
                         </template>
                     </y9Tree>
                 </y9Card>

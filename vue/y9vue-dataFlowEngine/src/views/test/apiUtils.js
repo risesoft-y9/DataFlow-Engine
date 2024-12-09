@@ -1,23 +1,54 @@
+import Request from '@/api/lib/request';
+import qs from 'qs';
+const platformRequest = Request();
+
 /**
  * 获取接口数据
  * 数据格式要求，参考下面的 initData，注意id的格式要求
  */
-export async function getTreeData() {
-    fetch('http://localhost:3000/test').then((res) => {
-        res.json().then((data) => {
-            console.log(data);
-        });
+export const getTreeData = async () => {
+    return await platformRequest({
+        url: 'apionline/getTree',
+        method: 'GET',
+        cType: false
     });
-}
+};
+
+// export async function getTreeData(id) {
+//     fetch(import.meta.env.VUE_APP_CONTEXT + 'apionline/getTree?' + id).then((res) => {
+//         res.json().then((data) => {
+//             console.log(data);
+//         });
+//     });
+// }
 
 /**
- * 保存接口数据
- * 后端自定义是一条一条保存还是整份全部保存，这里只做示例
- * 建议直接保存全部数据，减少繁琐工作，主要考虑该工具的可移植性
+ * 保存数据
  */
-export async function saveTreeData(item) {
-    // 数据格式要求，参考下面的 initData
-}
+export const saveTreeData = async (data) => {
+    return await platformRequest({
+        url: 'apionline/saveData',
+        method: 'POST',
+        JSON: true,
+        data
+    });
+};
+
+/**
+ * 删除节点
+ * @param params
+ * @returns
+ */
+export const removeNode = async (params) => {
+    const data = qs.stringify(params);
+    return await platformRequest({
+        url: 'apionline/deleteData',
+        method: 'POST',
+        cType: false,
+        data
+    });
+};
+
 export const randomString = (e) => {
     var e = e || 32,
         t = 'ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
