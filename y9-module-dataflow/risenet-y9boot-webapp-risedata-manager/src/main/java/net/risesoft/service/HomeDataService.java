@@ -52,7 +52,7 @@ public interface HomeDataService {
 	 *
 	 */
 	DailySchedulingFrequencyInfo getDailySchedulingFrequencyInfo(
-			DailySchedulingFrequencyQueryInfo dailySchedulingFrequencyQueryInfo);
+			DailySchedulingFrequencyQueryInfo dailySchedulingFrequencyQueryInfo, List<String> jobTypes);
 
 	/**
 	 * 获取正常任务状态比例
@@ -76,7 +76,7 @@ public interface HomeDataService {
 	 * @return TaskStateInfo
 	 *
 	 */
-	SchedulingInfo getSchedulingInfo(SchedulingQueryInfo schedulingQueryInfo);
+	SchedulingInfo getSchedulingInfo(SchedulingQueryInfo schedulingQueryInfo, List<String> jobTypes);
 
 	/**
 	 * 获取日志信息成功失败
@@ -88,6 +88,6 @@ public interface HomeDataService {
 	 * @return List<JobLogInfo>
 	 *
 	 */
-	JobLogInfo getJobLogInfo(JobLogQueryInfo jobLogQueryInfo);
+	JobLogInfo getJobLogInfo(JobLogQueryInfo jobLogQueryInfo, List<String> jobTypes);
 
 }

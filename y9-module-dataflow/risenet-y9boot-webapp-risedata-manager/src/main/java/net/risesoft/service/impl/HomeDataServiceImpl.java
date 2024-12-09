@@ -19,7 +19,6 @@ import java.util.stream.Stream;
 import javax.annotation.Resource;
 
 import net.risesoft.util.home.QueryTimeRangeCacheUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +41,8 @@ import net.risesoft.pojo.home.HomeQueryModel.DailySchedulingFrequencyQueryInfo;
 import net.risesoft.pojo.home.HomeQueryModel.JobLogQueryInfo;
 import net.risesoft.pojo.home.HomeQueryModel.SchedulingQueryInfo;
 import net.risesoft.pojo.home.HomeQueryModel.TaskStateQueryInfo;
+import net.risesoft.security.ConcurrentSecurity;
+import net.risesoft.security.SecurityManager;
 import net.risesoft.security.model.Environment;
 import net.risesoft.security.service.EnvironmentService;
 import net.risesoft.service.HomeDataService;
@@ -56,29 +57,24 @@ public class HomeDataServiceImpl implements HomeDataService {
 	@Resource(name = "homeDataExecutor")
 	ThreadPoolTaskExecutor homeDataExecutor;
 
-	JobLogService jobLogService;
+	private final JobLogService jobLogService;
 
-	JobService jobService;
+	private final JobService jobService;
 
-	EnvironmentService environmentService;
-
-	@Autowired
-	public HomeDataServiceImpl(JobLogService jobLogService, JobService jobService, EnvironmentService environmentService) {
-		this.jobLogService = jobLogService;
-		this.jobService = jobService;
-		this.environmentService = environmentService;
-	}
+	private final EnvironmentService environmentService;
+	
+	private final SecurityManager securityManager;
 
 	@Override
 	public Y9Result<HomeData> getHomeDataSync() {
 		HomeData homeData = new HomeData();
 		HomeQueryModel homeQueryModel = new HomeQueryModel();
 		try {
-
+			ConcurrentSecurity security = securityManager.getConcurrentSecurity();
 			CurrentTaskInfo currentTaskInfo = getCurrentTaskInfo(homeQueryModel.getCurrentTaskQueryInfo());
 
 			DailySchedulingFrequencyInfo dailySchedulingFrequencyInfo = getDailySchedulingFrequencyInfo(
-					homeQueryModel.getDailySchedulingFrequencyQueryInfo());
+					homeQueryModel.getDailySchedulingFrequencyQueryInfo(), security.getJobTypes());
 
 			List<Map<String, Object>> TaskStateInfo = getTaskStateInfo(homeQueryModel.getTaskStateQueryInfo());
 
@@ -87,9 +83,9 @@ public class HomeDataServiceImpl implements HomeDataService {
 			homeData.setAllEnvironments(environmentList);
 			homeQueryModel.getSchedulingQueryInfo().setEnvironment(Optional.ofNullable(environmentList)
 					.orElse(Collections.emptyList()).stream().findFirst().map(Environment::getName).orElse(""));
-			SchedulingInfo schedulingInfo = getSchedulingInfo(homeQueryModel.getSchedulingQueryInfo());
+			SchedulingInfo schedulingInfo = getSchedulingInfo(homeQueryModel.getSchedulingQueryInfo(), security.getJobTypes());
 
-			JobLogInfo jobLogInfo = getJobLogInfo(homeQueryModel.getJobLogQueryInfo());
+			JobLogInfo jobLogInfo = getJobLogInfo(homeQueryModel.getJobLogQueryInfo(), security.getJobTypes());
 
 			homeData.setSchedulingInfo(schedulingInfo);
 
@@ -111,13 +107,14 @@ public class HomeDataServiceImpl implements HomeDataService {
 		HomeData homeData = new HomeData();
 		HomeQueryModel homeQueryModel = new HomeQueryModel();
 		try {
+			ConcurrentSecurity security = securityManager.getConcurrentSecurity();
 
 			CompletableFuture<CurrentTaskInfo> currentTaskInfo = createCurrentTaskInfo(
-					homeQueryModel.getCurrentTaskQueryInfo());
+					homeQueryModel.getCurrentTaskQueryInfo(), security.getJobTypes());
 
 			CompletableFuture<DailySchedulingFrequencyInfo> dailySchedulingFrequencyInfo = CompletableFuture
 					.supplyAsync(() -> getDailySchedulingFrequencyInfo(
-							homeQueryModel.getDailySchedulingFrequencyQueryInfo()), homeDataExecutor);
+							homeQueryModel.getDailySchedulingFrequencyQueryInfo(), security.getJobTypes()), homeDataExecutor);
 
 			CompletableFuture<List<Map<String, Object>>> TaskStateInfo = CompletableFuture
 					.supplyAsync(() -> getTaskStateInfo(homeQueryModel.getTaskStateQueryInfo()), homeDataExecutor);
@@ -130,12 +127,12 @@ public class HomeDataServiceImpl implements HomeDataService {
 								.setEnvironment(Optional.ofNullable(data).orElse(Collections.emptyList()).stream()
 										.findFirst().map(Environment::getName).orElse(""));
 					}).thenCompose(data -> CompletableFuture.supplyAsync(
-							() -> getSchedulingInfo(homeQueryModel.getSchedulingQueryInfo()), homeDataExecutor))
+							() -> getSchedulingInfo(homeQueryModel.getSchedulingQueryInfo(), security.getJobTypes()), homeDataExecutor))
 
 					.thenAccept(data -> homeData.setSchedulingInfo(data));
 
 			CompletableFuture<Void> jobLogInfo = CompletableFuture
-					.supplyAsync(() -> getJobLogInfo(homeQueryModel.getJobLogQueryInfo()), homeDataExecutor)
+					.supplyAsync(() -> getJobLogInfo(homeQueryModel.getJobLogQueryInfo(), security.getJobTypes()), homeDataExecutor)
 					.thenAccept(data -> homeData.setJobLogInfo(data));
 
 			CompletableFuture
@@ -156,9 +153,9 @@ public class HomeDataServiceImpl implements HomeDataService {
 
 	@Override
 	public CurrentTaskInfo getCurrentTaskInfo(CurrentTaskQueryInfo currentTaskQueryInfo) {
-
+		ConcurrentSecurity security = securityManager.getConcurrentSecurity();
 		CurrentTaskInfo currentTaskInfo = null;
-		CompletableFuture<CurrentTaskInfo> createCurrentTaskInfo = createCurrentTaskInfo(currentTaskQueryInfo);
+		CompletableFuture<CurrentTaskInfo> createCurrentTaskInfo = createCurrentTaskInfo(currentTaskQueryInfo, security.getJobTypes());
 		try {
 			currentTaskInfo = createCurrentTaskInfo.get();
 		} catch (Exception e) {
@@ -168,7 +165,7 @@ public class HomeDataServiceImpl implements HomeDataService {
 		return currentTaskInfo;
 	}
 
-	public CompletableFuture<CurrentTaskInfo> createCurrentTaskInfo(CurrentTaskQueryInfo currentTaskQueryInfo) {
+	public CompletableFuture<CurrentTaskInfo> createCurrentTaskInfo(CurrentTaskQueryInfo currentTaskQueryInfo, List<String> jobTypes) {
 
 		try {
 			// 全部任务
@@ -176,17 +173,17 @@ public class HomeDataServiceImpl implements HomeDataService {
 			Long endTime = currentTaskQueryInfo.getEndTime();
 			CompletableFuture<Integer> allTasksCF = CompletableFuture.supplyAsync(
 					() -> jobLogService.getExecutedCountByStatusAndTime(
-							Arrays.asList(JobLog.SUCCESS, JobLog.ERROR, JobLog.START), startTime, endTime),
+							Arrays.asList(JobLog.SUCCESS, JobLog.ERROR, JobLog.START), startTime, endTime, jobTypes),
 					homeDataExecutor);
 			// 正在执行
 			CompletableFuture<Integer> executingCF = CompletableFuture.supplyAsync(() -> jobLogService
-							.getExecutedCountByStatusAndTime(Arrays.asList(JobLog.START), startTime, endTime),
+							.getExecutedCountByStatusAndTime(Arrays.asList(JobLog.START), startTime, endTime, jobTypes),
 					homeDataExecutor);
 			// 今日已经执行
 			long[] currentDayTimestamp = DateUtils.getCurrentDayStartAndEndDateTimestamp();
 			CompletableFuture<Integer> executedTodayCF = CompletableFuture.supplyAsync(
 					() -> jobLogService.getExecutedCountByStatusAndTime(Arrays.asList(JobLog.SUCCESS, JobLog.ERROR),
-							currentDayTimestamp[0], currentDayTimestamp[1]),
+							currentDayTimestamp[0], currentDayTimestamp[1], jobTypes),
 					homeDataExecutor);
 			return CompletableFuture.allOf(allTasksCF, executingCF, executedTodayCF).thenApply(v -> {
 				try {
@@ -209,14 +206,14 @@ public class HomeDataServiceImpl implements HomeDataService {
 
 	@Override
 	public DailySchedulingFrequencyInfo getDailySchedulingFrequencyInfo(
-			DailySchedulingFrequencyQueryInfo dailySchedulingFrequencyQueryInfo) {
+			DailySchedulingFrequencyQueryInfo dailySchedulingFrequencyQueryInfo, List<String> jobTypes) {
 
 		DailySchedulingFrequencyInfo result = new DailySchedulingFrequencyInfo();
 		try {
 			Long startTime = dailySchedulingFrequencyQueryInfo.getStartTime();
 			Long endTime = dailySchedulingFrequencyQueryInfo.getEndTime();
 			List<Map<String, Object>> dataList = jobLogService.getExecutedCountGroupByDispatchTime(
-					Arrays.asList(JobLog.SUCCESS, JobLog.ERROR, JobLog.START), startTime, endTime);
+					Arrays.asList(JobLog.SUCCESS, JobLog.ERROR, JobLog.START), startTime, endTime, jobTypes);
 			Map<String, List<String>> resultMap = new HashMap<>();
 
 			for (Map<String, Object> map : dataList) {
@@ -285,7 +282,7 @@ public class HomeDataServiceImpl implements HomeDataService {
 	}
 
 	@Override
-	public SchedulingInfo getSchedulingInfo(SchedulingQueryInfo schedulingQueryInfo) {
+	public SchedulingInfo getSchedulingInfo(SchedulingQueryInfo schedulingQueryInfo, List<String> jobTypes) {
 
 		SchedulingInfo result = null;
 		try {
@@ -300,7 +297,7 @@ public class HomeDataServiceImpl implements HomeDataService {
 			}
 			List<Map<String, Object>> records = jobLogService.getSchedulingInfo(
 					Arrays.asList(JobLog.SUCCESS, JobLog.ERROR, JobLog.START), startTime, endTime,
-					schedulingQueryInfo.getEnvironment());
+					schedulingQueryInfo.getEnvironment(), jobTypes);
 
 			result = convertToSchedulingInfo(records);
 			records = null;
@@ -346,7 +343,7 @@ public class HomeDataServiceImpl implements HomeDataService {
 	}
 
 	@Override
-	public JobLogInfo getJobLogInfo(JobLogQueryInfo jobLogQueryInfo) {
+	public JobLogInfo getJobLogInfo(JobLogQueryInfo jobLogQueryInfo, List<String> jobTypes) {
 
 		JobLogInfo result = null;
 		try {
@@ -354,7 +351,7 @@ public class HomeDataServiceImpl implements HomeDataService {
 			Long endTime = jobLogQueryInfo.getEndTime();
 
 			List<Map<String, Object>> records = jobLogService
-					.getLogGroupInfo(Arrays.asList(JobLog.SUCCESS, JobLog.ERROR), startTime, endTime);
+					.getLogGroupInfo(Arrays.asList(JobLog.SUCCESS, JobLog.ERROR), startTime, endTime, jobTypes);
 
 			result = convertToJobLogInfo(records);
 			records = null;

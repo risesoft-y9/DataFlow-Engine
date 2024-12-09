@@ -177,20 +177,20 @@ public interface JobLogService {
 	/*
 	 * 根据状态 任务执行时间 结束时间 获取 配置的任务数
 	 */
-	Integer getExecutedCountByStatusAndTime(List<Integer> statusList, long start, long end);
+	Integer getExecutedCountByStatusAndTime(List<Integer> statusList, long start, long end, List<String> jobTypes);
 
 	/*
 	 * 根据状态 任务执行时间获取每日执行数量
 	 */
-	List<Map<String, Object>> getExecutedCountGroupByDispatchTime(List<Integer> statusList, long start, long end);
+	List<Map<String, Object>> getExecutedCountGroupByDispatchTime(List<Integer> statusList, long start, long end, List<String> jobTypes);
 
 	/*
 	 * 获取时间范围内 各状态分类情况
 	 */
-	List<Map<String, Object>> getSchedulingInfo(List<Integer> statuslist, Long startTime, Long endTime,String environment);
+	List<Map<String, Object>> getSchedulingInfo(List<Integer> statuslist, Long startTime, Long endTime,String environment, List<String> jobTypes);
 
 	/*
 	 * 根据日期分组获取
 	 */
-	List<Map<String, Object>> getLogGroupInfo(List<Integer> statuslist, Long startTime, Long endTime);
+	List<Map<String, Object>> getLogGroupInfo(List<Integer> statuslist, Long startTime, Long endTime, List<String> jobTypes);
 }

@@ -426,26 +426,25 @@ public class JobLogServiceImpl extends AutomaticCrudService<JobLog, String> impl
 	}
 
 	@Override
-	public Integer getExecutedCountByStatusAndTime(List<Integer> statusList, long start, long end) {
-		// TODO Auto-generated method stub
-		return jobLogDao.getExecutedCountByStatusAndTime(statusList, start, end);
+	public Integer getExecutedCountByStatusAndTime(List<Integer> statusList, long start, long end, List<String> jobTypes) {
+		return jobLogDao.getExecutedCountByStatusAndTime(statusList, start, end, jobTypes);
 	}
 
 	@Override
 	public List<Map<String, Object>> getExecutedCountGroupByDispatchTime(List<Integer> statusList, long start,
-			long end) {
-		return jobLogDao.getExecutedCountGroupByDispatchTime(statusList, start, end);
+			long end, List<String> jobTypes) {
+		return jobLogDao.getExecutedCountGroupByDispatchTime(statusList, start, end, jobTypes);
 	}
 
 	@Override
 	public List<Map<String, Object>> getSchedulingInfo(List<Integer> statuslist, Long startTime, Long endTime,
-			String environment) {
-		return jobLogDao.getSchedulingInfo(statuslist, startTime, endTime, environment);
+			String environment, List<String> jobTypes) {
+		return jobLogDao.getSchedulingInfo(statuslist, startTime, endTime, environment, jobTypes);
 	}
 
 	@Override
-	public List<Map<String, Object>> getLogGroupInfo(List<Integer> statuslist, Long startTime, Long endTime) {
-		return jobLogDao.getLogGroupInfo(statuslist, startTime, endTime);
+	public List<Map<String, Object>> getLogGroupInfo(List<Integer> statuslist, Long startTime, Long endTime, List<String> jobTypes) {
+		return jobLogDao.getLogGroupInfo(statuslist, startTime, endTime, jobTypes);
 	}
 
 }

@@ -22,6 +22,12 @@
             <artifactId>risenet-y9boot-support-risedata-scheduler</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
+        <dependency>
+            <groupId>net.risesoft</groupId>
+            <artifactId>risenet-y9boot-support-api-online</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>net.risesoft</groupId>

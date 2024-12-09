@@ -3,15 +3,25 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>net.risesoft</groupId>
-		<artifactId>y9-module-dataflow</artifactId>
-		<version>${revision}</version>
-	</parent>
+        <groupId>net.risesoft</groupId>
+        <artifactId>y9-module-dataflow</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 	<artifactId>risenet-y9boot-data-transfer-stream-local-file</artifactId>
+	<packaging>jar</packaging>
+    <name>risenet-y9boot-data-transfer-stream-local-file</name>
+    <description>DataFlow Engine transfer stream-local-file</description>
+    
+    <scm>
+        <url>${gitee.url}</url>
+        <connection>${gitee.connection}</connection>
+        <developerConnection>${gitee.developerConnection}</developerConnection>
+    </scm>
+    
 	<dependencies>
 		<dependency>
 			<groupId>cn.hutool</groupId>
-			<version>5.3.1</version>
 			<artifactId>hutool-all</artifactId>
 		</dependency>
 		<dependency>

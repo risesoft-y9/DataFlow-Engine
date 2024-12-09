@@ -167,16 +167,16 @@ public interface JobLogDao extends Repository {
     //force index(idx_status_dis_end) 
     //CREATE INDEX idx_status_dis_end_env USING BTREE ON y9_data.y9_dataservice_job_log (STATUS,DISPATCH_TIME,END_TIME,ENVIRONMENT);
 
-    @Search("select count(*) from( select distinct log_t.JOB_ID from Y9_DATASERVICE_JOB_LOG as log_t where status in (?1) and DISPATCH_TIME >=?2  and END_TIME<=?3 ) as t")
-    Integer getExecutedCountByStatusAndTime(List<Integer> status,Long dispatchTime,Long endTime);
+    @Search("select count(*) from (select distinct log_t.JOB_ID from Y9_DATASERVICE_JOB_LOG as log_t where status in (?1) and DISPATCH_TIME >=?2 and END_TIME<=?3 and JOB_ID in (select ID from Y9_DATASERVICE_JOB where SERVICE_JOB_TYPE in (?4))) as t")
+    Integer getExecutedCountByStatusAndTime(List<Integer> status, Long dispatchTime, Long endTime, List<String> jobTypes);
     
-    @Search("select count(*) as execute_count,DATE_FORMAT(FROM_UNIXTIME(log_t.DISPATCH_TIME/1000),'%Y-%m-%d' ) as execute_start_time from Y9_DATASERVICE_JOB_LOG as log_t where status in (?1) and DISPATCH_TIME>=?2 and DISPATCH_TIME<=?3 GROUP by execute_start_time order by execute_start_time")
-    List<Map<String,Object>> getExecutedCountGroupByDispatchTime(List<Integer> status,Long startTime,Long endTime);
+    @Search("select count(*) as execute_count,DATE_FORMAT(FROM_UNIXTIME(log_t.DISPATCH_TIME/1000),'%Y-%m-%d' ) as execute_start_time from Y9_DATASERVICE_JOB_LOG as log_t where status in (?1) and DISPATCH_TIME>=?2 and DISPATCH_TIME<=?3 and JOB_ID in (select ID from Y9_DATASERVICE_JOB where SERVICE_JOB_TYPE in (?4)) GROUP by execute_start_time order by execute_start_time")
+    List<Map<String,Object>> getExecutedCountGroupByDispatchTime(List<Integer> status, Long startTime, Long endTime, List<String> jobTypes);
 
-    @Search("select status , count(*) as execute_count,DATE_FORMAT(FROM_UNIXTIME(log_t.DISPATCH_TIME/1000),'%Y-%m-%d' ) as execute_start_time from Y9_DATASERVICE_JOB_LOG as log_t where status in (?1) and DISPATCH_TIME >=?2 and DISPATCH_TIME<=?3 and environment=?4 GROUP by execute_start_time ,status ")
-	List<Map<String, Object>> getSchedulingInfo(List<Integer> statuslist, Long startTime, Long endTime,String environment);
+    @Search("select status , count(*) as execute_count,DATE_FORMAT(FROM_UNIXTIME(log_t.DISPATCH_TIME/1000),'%Y-%m-%d' ) as execute_start_time from Y9_DATASERVICE_JOB_LOG as log_t where status in (?1) and DISPATCH_TIME >=?2 and DISPATCH_TIME<=?3 and environment=?4 and JOB_ID in (select ID from Y9_DATASERVICE_JOB where SERVICE_JOB_TYPE in (?5)) GROUP by execute_start_time ,status ")
+	List<Map<String, Object>> getSchedulingInfo(List<Integer> statuslist, Long startTime, Long endTime, String environment, List<String> jobTypes);
 
-    @Search("select DATE_FORMAT(FROM_UNIXTIME(log_t.DISPATCH_TIME / 1000), '%Y-%m-%d') AS execute_start_time, SUM(CASE WHEN STATUS = 1 THEN 1 ELSE 0 END) AS success,SUM(CASE WHEN STATUS = 2 THEN 1 ELSE 0 END) AS failure from Y9_DATASERVICE_JOB_LOG AS log_t where status IN (?1) AND DISPATCH_TIME >= ?2 AND DISPATCH_TIME <= ?3 GROUP by execute_start_time;")
-	List<Map<String, Object>> getLogGroupInfo(List<Integer> statuslist, Long startTime, Long endTime);
+    @Search("select DATE_FORMAT(FROM_UNIXTIME(log_t.DISPATCH_TIME / 1000), '%Y-%m-%d') AS execute_start_time, SUM(CASE WHEN STATUS = 1 THEN 1 ELSE 0 END) AS success,SUM(CASE WHEN STATUS = 2 THEN 1 ELSE 0 END) AS failure from Y9_DATASERVICE_JOB_LOG AS log_t where status IN (?1) AND DISPATCH_TIME >= ?2 AND DISPATCH_TIME <= ?3 and JOB_ID in (select ID from Y9_DATASERVICE_JOB where SERVICE_JOB_TYPE in (?4)) GROUP by execute_start_time;")
+	List<Map<String, Object>> getLogGroupInfo(List<Integer> statuslist, Long startTime, Long endTime, List<String> jobTypes);
     
 }

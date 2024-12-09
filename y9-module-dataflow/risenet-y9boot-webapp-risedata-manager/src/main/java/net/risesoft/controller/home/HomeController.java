@@ -23,6 +23,8 @@ import net.risesoft.pojo.home.HomeQueryModel.CurrentTaskQueryInfo;
 import net.risesoft.pojo.home.HomeQueryModel.DailySchedulingFrequencyQueryInfo;
 import net.risesoft.pojo.home.HomeQueryModel.SchedulingQueryInfo;
 import net.risesoft.pojo.home.HomeQueryModel.TaskStateQueryInfo;
+import net.risesoft.security.ConcurrentSecurity;
+import net.risesoft.security.SecurityManager;
 import net.risesoft.pojo.home.HomeQueryModel.JobLogQueryInfo;
 import net.risesoft.service.HomeDataService;
 
@@ -32,6 +34,7 @@ import net.risesoft.service.HomeDataService;
 public class HomeController {
 
     private final HomeDataService homeDataService;
+    private final SecurityManager securityManager;
 
     @RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "异步获取首页数据", logLevel = LogLevelEnum.RSLOG, enable = false)
     @GetMapping(value = "/getHomeData")
@@ -48,14 +51,16 @@ public class HomeController {
     @RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "获取调度情况数据", logLevel = LogLevelEnum.RSLOG, enable = false)
     @PostMapping(value = "/getSchedulingInfo")
     public Y9Result<SchedulingInfo> getSchedulingInfo(@RequestBody SchedulingQueryInfo schedulingQueryInfo) {
-        return Y9Result.success(homeDataService.getSchedulingInfo(schedulingQueryInfo), "获取调度情况数据");
+    	ConcurrentSecurity security = securityManager.getConcurrentSecurity();
+        return Y9Result.success(homeDataService.getSchedulingInfo(schedulingQueryInfo, security.getJobTypes()), "获取调度情况数据");
     }
 
     @RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "获取每日调度数据", logLevel = LogLevelEnum.RSLOG, enable = false)
     @PostMapping(value = "/getDailySchedulingFrequencyInfo")
     public Y9Result<DailySchedulingFrequencyInfo> getSchedulingInfo(
             @RequestBody DailySchedulingFrequencyQueryInfo dailySchedulingFrequencyQueryInfo) {
-        return Y9Result.success(homeDataService.getDailySchedulingFrequencyInfo(dailySchedulingFrequencyQueryInfo),
+    	ConcurrentSecurity security = securityManager.getConcurrentSecurity();
+        return Y9Result.success(homeDataService.getDailySchedulingFrequencyInfo(dailySchedulingFrequencyQueryInfo, security.getJobTypes()),
                 "获取每日调度数据");
     }
 
@@ -74,6 +79,7 @@ public class HomeController {
     @RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "获取日志信息", logLevel = LogLevelEnum.RSLOG, enable = false)
     @PostMapping(value = "/getJobLogInfo")
     public Y9Result<JobLogInfo> getJobLogInfo(@RequestBody JobLogQueryInfo jobLogQueryInfo) {
-        return Y9Result.success(homeDataService.getJobLogInfo(jobLogQueryInfo), "获取日志信息成功");
+    	ConcurrentSecurity security = securityManager.getConcurrentSecurity();
+        return Y9Result.success(homeDataService.getJobLogInfo(jobLogQueryInfo, security.getJobTypes()), "获取日志信息成功");
     }
 }
