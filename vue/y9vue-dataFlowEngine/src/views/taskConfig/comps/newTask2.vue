@@ -264,7 +264,7 @@ const getDataAll = async () => {
 };
 
 const getDataSource = async () => {
-    let res = await findByTypeList({ type: 0 });
+    let res = await findByTypeList({ type: 1 });
     if (res) {
         let apiData = {
             id: 'api',

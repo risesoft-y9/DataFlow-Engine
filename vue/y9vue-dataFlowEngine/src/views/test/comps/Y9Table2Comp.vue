@@ -1,11 +1,11 @@
 <script setup lang="ts">
-    import { nextTick, watch } from 'vue';
+    import { inject, nextTick, PropType, ref, watch } from 'vue';
     import { randomString } from '../apiUtils';
 
     // 注入 字体对象
     const Y9Table2Body_Id = ref('Y9Table2Body_Id_' + randomString(6));
     const fontSizeObj: any = inject('sizeObjInfo');
-    const Y9Table2BodyHeight = ref(164); // rowHeight=41px
+    const Y9Table2BodyHeight = ref(205); // rowHeight=41px
     const isSelectAll = ref(false);
     const count = ref(0);
     const size = ref('large');

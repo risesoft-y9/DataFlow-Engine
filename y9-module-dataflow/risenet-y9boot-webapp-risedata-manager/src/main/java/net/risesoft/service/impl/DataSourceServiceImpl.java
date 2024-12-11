@@ -201,15 +201,13 @@ public class DataSourceServiceImpl implements DataSourceService {
 	}
 
 	@Override
-	public List<DataSourceEntity> findAll(Integer type) {
-		if (type != null) {
+	public List<DataSourceEntity> findByType(Integer type) {
+		if (type.equals(0)) {
 			List<DataSourceEntity> list = datasourceRepository.findByTypeAndTenantId(type, Y9LoginUserHolder.getTenantId());
-			if(type == 0) {
-				list.addAll(datasourceRepository.findByBaseTypeAndTenantIdOrderByCreateTime(DataConstant.ES, Y9LoginUserHolder.getTenantId()));
-			}
+			list.addAll(datasourceRepository.findByBaseTypeAndTenantIdOrderByCreateTime(DataConstant.ES, Y9LoginUserHolder.getTenantId()));
 			return list;
 		}
-		return datasourceRepository.findAll();
+		return datasourceRepository.findByTenantId(Y9LoginUserHolder.getTenantId());
 	}
 
 	@Override
@@ -220,7 +218,7 @@ public class DataSourceServiceImpl implements DataSourceService {
 		Pageable pageable = PageRequest.of(page - 1, limit, Sort.by(Sort.Direction.DESC, "createTime"));
 		List<String> baseIds = new ArrayList<String>();
 		if(StringUtils.isBlank(baseId)) {
-			baseIds = datasourceRepository.findByTenantId(Y9LoginUserHolder.getTenantId());
+			baseIds = datasourceRepository.findIdByTenantId(Y9LoginUserHolder.getTenantId());
 		}else {
 			baseIds.add(baseId);
 		}

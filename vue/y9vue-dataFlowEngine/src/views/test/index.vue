@@ -34,6 +34,7 @@
     const showFolderPage = ref(true);
     const currentExpandedKeys = reactive([]);
     const defaultExpandAll = ref(false);
+    const isblock = ref(false);
     /**
      *  初始化树组件数据
      */
@@ -262,6 +263,12 @@
      * 新建按钮功能：根级节点新建文件夹或API
      */
     const createTreeDataRootNode = (value) => {
+        if(isblock.value) {
+            ElMessageBox.alert('需先保存上一个节点，才能增加下一个节点', '操作提示', {
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
         let clonetemplateData = {};
         if (value == 'folder') {
             // templateTreeDataFolder.id = treeData.value.length + 1 + '';
@@ -274,6 +281,7 @@
             clonetemplateData = cloneDeep(templateTreeDataItem);
         }
         treeData.value.push(clonetemplateData);
+        isblock.value = true;
     };
 
     function setApiFormData(itemData) {
@@ -336,8 +344,9 @@
         const loading = ElLoading.service({ lock: true, text: '正在处理中', background: 'rgba(0, 0, 0, 0.3)' });
         saveTreeData(node).then((res) => {
             loading.close();
-            if(res.success){
+            if(res.success) {
                 searchByNodeId(node).id = res.data.id;
+                isblock.value = false;
                 ElMessage({ type: 'success', message: res.msg, offset: 65 });
             }else {
                 ElMessage({ message: res.msg, type: 'error', offset: 65 });
@@ -352,17 +361,21 @@
             type: 'warning'
         })
         .then(() => {
-            removeNode({ id: node.id }).then((res) => {
-                if (res.success) {
-                    let data = res.data;
-                    for (let i = 0; i < data.length; i++) {
-                        searchByNodeId({ id: data[i] }, 'delete');
+            if(node.id == '') {
+                searchByNodeId({ id: node.id }, 'delete');
+            }else {
+                removeNode({ id: node.id }).then((res) => {
+                    if (res.success) {
+                        let data = res.data;
+                        for (let i = 0; i < data.length; i++) {
+                            searchByNodeId({ id: data[i] }, 'delete');
+                        }
+                        ElMessage({ type: 'success', message: res.msg, offset: 65 });
+                    } else {
+                        ElMessage({ message: res.msg, type: 'error', offset: 65 });
                     }
-                    ElMessage({ type: 'success', message: res.msg, offset: 65 });
-                } else {
-                    ElMessage({ message: res.msg, type: 'error', offset: 65 });
-                }
-            });
+                });
+            }
         })
         .catch(() => {
             ElMessage({
@@ -816,8 +829,8 @@
                             <el-button type="primary">新建</el-button>
                             <template #dropdown>
                                 <el-dropdown-menu>
-                                    <el-dropdown-item command="folder">添加一级目录</el-dropdown-item>
-                                    <el-dropdown-item command="api">添加一级API</el-dropdown-item>
+                                    <el-dropdown-item command="folder">新建目录</el-dropdown-item>
+                                    <el-dropdown-item command="api">新建API接口</el-dropdown-item>
                                 </el-dropdown-menu>
                             </template>
                         </el-dropdown>

@@ -66,10 +66,10 @@ public interface DataSourceService {
 	List<DataSourceEntity> findByBaseType(String baseType);
 	
 	/**
-	 * 获取所有数据源
+	 * 获取数据源列表：1-获取所有，0-获取非表的数据源
 	 * @return
 	 */
-	List<DataSourceEntity> findAll(Integer type);
+	List<DataSourceEntity> findByType(Integer type);
 	
 	/**
 	 * 搜索数据源

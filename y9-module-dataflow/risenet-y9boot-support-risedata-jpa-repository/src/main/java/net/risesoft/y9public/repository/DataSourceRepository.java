@@ -25,6 +25,8 @@ public interface DataSourceRepository extends JpaRepository<DataSourceEntity, St
 	long countByBaseType(String baseType);
 	
 	@Query("select p.id from DataSourceEntity p where p.tenantId = ?1")
-	List<String> findByTenantId(String tenantId);
+	List<String> findIdByTenantId(String tenantId);
+	
+	List<DataSourceEntity> findByTenantId(String tenantId);
 	
 }

@@ -1,6 +1,7 @@
 import {reactive, ref} from "vue";
 import {getDataTableList} from "@/api/taskConfig";
 import {getTableField, getApiField} from "@/api/libraryTable";
+import { ElMessage } from 'element-plus';
 
 /**
  * 公共类数据
@@ -119,7 +120,7 @@ export const getTableListAll = async (sourceId,targetId) => {
 const updateForm = (form, data,type) => {
     form.tableOptions = data.tableList;
     form.classListOptions = data.classList;
-    if(type=='input'){
+    if(type == 'input'){
         form.tableData.sourceName = data?.classList[0]?.id;
     }else{
         form.tableData.targeName = data?.classList[0]?.id;
@@ -161,6 +162,11 @@ export const radioChange = async (type, baseType) => {
         addTaskForm.tableData.sourceType = baseType;
         await clearFormData(tableSetForm, type);
     } else {
+        if(addTaskForm.tableData.sourceType == 'ftp' && baseType != 'ftp') {
+            addTaskLoading.value = false;
+            ElMessage({ type: 'error', message: 'ftp同步，目的源只能选ftp', offset: 65 });
+            return;
+        }
         addTaskForm.tableData.targetType = baseType;
         await clearFormData(goalTableForm, type);
     }

@@ -480,9 +480,9 @@
                 }
             }
         })
-        if(type != 'ftp') {
+        //if(type != 'ftp') {
             baseFormConfig.value.itemList=JSON.parse(JSON.stringify(baseFormConfig.value.itemLists))
-        }
+        //}
         baseFormConfig.value.rules = baseFormConfig.value.oldRule;
         //显示|隐藏对应的基本信息的字段。
         if (type === 'ftp') {

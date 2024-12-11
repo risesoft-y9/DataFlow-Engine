@@ -81,11 +81,10 @@ public class SourceController {
         return Y9Result.success(list, "获取成功");
     }
 	
-	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "根据类型获取关系型和其它数据源列表", logLevel = LogLevelEnum.RSLOG, enable = false)
+	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "获取数据源列表", logLevel = LogLevelEnum.RSLOG, enable = false)
 	@GetMapping(value = "/findByType")
     public Y9Result<List<DataSourceEntity>> findByType(Integer type) {
-        List<DataSourceEntity> list = dataSourceService.findAll(type);
-        return Y9Result.success(list, "获取成功");
+        return Y9Result.success(dataSourceService.findByType(type), "获取成功");
     }
 	
 	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "搜索数据源列表", logLevel = LogLevelEnum.RSLOG, enable = false)
