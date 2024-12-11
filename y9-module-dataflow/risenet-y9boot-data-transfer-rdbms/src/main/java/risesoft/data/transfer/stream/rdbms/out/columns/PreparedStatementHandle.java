@@ -41,4 +41,9 @@ public interface PreparedStatementHandle {
 	 */
 	void fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, Column column,
 			DataBaseType dataBaseType,Triple<List<String>, List<Integer>, List<String>> resultSetMetaData) throws Exception;
+	/**
+	 * 这个主要用于update 时当目标字段为空时的空值比较,避免因为值为NULL导致无法更新问题
+	 * @return
+	 */
+	String nullValue();
 }

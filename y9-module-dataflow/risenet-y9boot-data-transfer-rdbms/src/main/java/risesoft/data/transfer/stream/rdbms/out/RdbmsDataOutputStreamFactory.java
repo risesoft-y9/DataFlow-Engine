@@ -63,7 +63,7 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 		this.jdbcUrl = ValueUtils.getRequired(configuration.getString("jdbcUrl"), "缺失jdbcUrl");
 		this.password = ValueUtils.getRequired(configuration.getString("password"), "缺失password");
 		this.userName = ValueUtils.getRequired(configuration.getString("userName"), "缺失userName");
-		dataBaseType = DataBaseType.RDBMS;
+		this.dataBaseType = DataBaseType.getDataBaseTypeByJdbcUrl(this.jdbcUrl);
 		this.tableName = ValueUtils.getRequired(configuration.getString("tableName"), "缺失tableName");
 		this.writerType = configuration.getString("writerType", "insert");
 		this.columns = ValueUtils.getRequired(configuration.getList("column", String.class), "缺失列配置");
@@ -188,6 +188,7 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 		first = true;
 		// 拼接or 有一个改变都得update
 		PreparedStatementHandle preparedStatementHandle;
+		String nvl = getNvlFunction();
 		for (String columnHolder : updateField) {
 			if (!first) {
 				sb.append(" or ");
@@ -197,9 +198,11 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 			// 如果是大文本则需要为length
 			preparedStatementHandle = createColumnHandles.get(columnHolder);
 			if (preparedStatementHandle.isBigType()) {
-				sb.append("length(" + columnHolder + ") != length(?)");
+				sb.append("length(" + nvl + "(" + columnHolder + "," + preparedStatementHandle.nullValue() + ")"
+						+ ") != length(" + nvl + "(?," + preparedStatementHandle.nullValue() + "))");
 			} else {
-				sb.append(columnHolder + " != ?");
+				sb.append(nvl + "(" + columnHolder + "," + preparedStatementHandle.nullValue() + ")" + " != " + nvl
+						+ "(?," + preparedStatementHandle.nullValue() + ")");
 			}
 		}
 		sb.append(" WHEN NOT MATCHED THEN ").append("INSERT (")
@@ -214,6 +217,21 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 		this.workSql = sb.toString();
 		if (logger.isInfo()) {
 			logger.info(this, "worksql:" + this.workSql);
+		}
+	}
+
+	/**
+	 * 获取当前数据库的空值判断函数
+	 * 
+	 * @return
+	 */
+	protected String getNvlFunction() {
+		switch (dataBaseType) {
+		case Oracle:
+		case DM:
+			return "NVL";
+		default:
+			return "COALESCE";
 		}
 	}
 

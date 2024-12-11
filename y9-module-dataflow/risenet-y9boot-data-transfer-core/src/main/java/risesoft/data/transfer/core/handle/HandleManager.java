@@ -12,7 +12,7 @@ import risesoft.data.transfer.core.util.ClassTools;
 /**
  * 
  * 执行器管理器
- * 
+ * 管理所有的handle所有需要被使用的执行器都需要注册到其中
  * @typeName HandleManager
  * @date 2023年12月6日
  * @author lb
@@ -51,7 +51,7 @@ public class HandleManager {
 	}
 
 	/**
-	 * 创建上下文并添加
+	 * 创建上下文并添加对应执行器
 	 * 
 	 * @param class1
 	 * @param handle
@@ -134,6 +134,14 @@ public class HandleManager {
 		}
 	}
 
+	/**
+	 * 获取一个插件
+	 * 
+	 * @param <T>
+	 * @param handleType 插件类型
+	 * @param type       插件对象
+	 * @return
+	 */
 	public <T> T getHandle(Class<?> handleType, Class<T> type) {
 		HandleContext handleContext = handles.get(handleType);
 		if (handleContext != null) {

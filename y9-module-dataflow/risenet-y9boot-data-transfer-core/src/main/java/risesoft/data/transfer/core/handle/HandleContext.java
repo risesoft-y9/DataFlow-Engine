@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 上下文
+ * 上下文 用于获取执行器上下文进行快速循环遍历,减少判断带来的性能消耗
+ * 每一个执行器只存储一种handle
  * 
  * @typeName HandleContext
  * @date 2023年12月6日

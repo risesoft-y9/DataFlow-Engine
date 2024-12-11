@@ -231,6 +231,8 @@ public enum DataBaseType {
 				return ClickHouse;
 			case "dm":
 				return DM;
+			case "postgresql":
+				return PostgreSQL;
 			default:
 				return RDBMS;
 			}

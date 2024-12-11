@@ -44,4 +44,9 @@ public class BlobPreparedStatementHandle implements PreparedStatementHandle {
 		}
 	}
 
+	@Override
+	public String nullValue() {
+		return "''";
+	}
+
 }
