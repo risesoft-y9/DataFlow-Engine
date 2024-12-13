@@ -338,6 +338,7 @@ public class DataTaskServiceImpl implements DataTaskService {
 				map.put("business", dataBusinessService.getNameById(dataTask.getBusinessId()));
 				
 				DataTaskConfigEntity taskConfig = dataTaskConfigRepository.findByTaskId(dataTask.getId());
+				map.put("type", taskConfig.getSourceType());
 				if(taskConfig.getSourceType().equals("api")) {
 					map.put("sourceName", "接口");
 					DataInterfaceEntity dataInterfaceEntity = dataInterfaceRepository.findById(taskConfig.getSourceTable()).orElse(null);
@@ -345,27 +346,37 @@ public class DataTaskServiceImpl implements DataTaskService {
 				}else {
 					DataSourceEntity source = dataSourceRepository.findById(taskConfig.getSourceId()).orElse(null);
 					map.put("sourceName", "[" + source.getBaseType() + "]" + source.getBaseName());
-					DataTable sourceTable = dataTableRepository.findById(taskConfig.getSourceTable()).orElse(null);
-					map.put("sourceTable", sourceTable.getCname() + "(" + sourceTable.getName() + ")");
+					if(taskConfig.getSourceType().equals("ftp")) {
+						map.put("sourceTable", taskConfig.getSourceTable());
+					}else {
+						DataTable sourceTable = dataTableRepository.findById(taskConfig.getSourceTable()).orElse(null);
+						map.put("sourceTable", sourceTable.getCname() + "(" + sourceTable.getName() + ")");
+					}
 				}
 				map.put("sourceClass", dataMappingRepository.findById(taskConfig.getSourceName()).orElse(null).getClassName());
 				List<String> sourceCloumn = new ArrayList<String>();
-				String[] sourceCloumns = taskConfig.getSourceCloumn().split(",");
-				for(String field : sourceCloumns) {
-					if(taskConfig.getSourceType().equals("api")) {
-						DataInterfaceParamsEntity dataParamsEntity = dataInterfaceParamsRepository.findById(field).orElse(null);
-						if(dataParamsEntity != null) {
-							sourceCloumn.add(dataParamsEntity.getRemark() + "(" + dataParamsEntity.getParamName() + ")");
-						}
-					}else {
-						DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
-						if(tableField != null) {
-							sourceCloumn.add(tableField.getCname() + "(" + tableField.getName() + ")");
+				if(StringUtils.isNotBlank(taskConfig.getSourceCloumn())) {
+					String[] sourceCloumns = taskConfig.getSourceCloumn().split(",");
+					for(String field : sourceCloumns) {
+						if(taskConfig.getSourceType().equals("api")) {
+							DataInterfaceParamsEntity dataParamsEntity = dataInterfaceParamsRepository.findById(field).orElse(null);
+							if(dataParamsEntity != null) {
+								sourceCloumn.add(dataParamsEntity.getRemark() + "(" + dataParamsEntity.getParamName() + ")");
+							}
+						}else {
+							DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
+							if(tableField != null) {
+								sourceCloumn.add(tableField.getCname() + "(" + tableField.getName() + ")");
+							}
 						}
 					}
 				}
 				map.put("sourceCloumn", sourceCloumn);
-				map.put("fetchSize", taskConfig.getFetchSize());
+				if(taskConfig.getSourceType().equals("ftp")) {
+					map.put("fetchSize", DataServiceUtil.getEncoding(taskConfig.getFetchSize()));
+				}else {
+					map.put("fetchSize", taskConfig.getFetchSize());
+				}
 				map.put("whereSql", taskConfig.getWhereSql());
 				if(StringUtils.isNotBlank(taskConfig.getSplitPk())) {
 					DataTableField tableField = dataTableFieldRepository.findById(taskConfig.getSplitPk()).orElse(null);
@@ -388,22 +399,28 @@ public class DataTaskServiceImpl implements DataTaskService {
 				}else {
 					DataSourceEntity tagert = dataSourceRepository.findById(taskConfig.getTargetId()).orElse(null);
 					map.put("tagertName", "[" + tagert.getBaseType() + "]" + tagert.getBaseName());
-					DataTable tagertTable = dataTableRepository.findById(taskConfig.getTargetTable()).orElse(null);
-					map.put("tagertTable", tagertTable.getCname() + "(" + tagertTable.getName() + ")");
+					if(taskConfig.getTargetType().equals("ftp")) {
+						map.put("tagertTable", taskConfig.getTargetTable());
+					}else {
+						DataTable tagertTable = dataTableRepository.findById(taskConfig.getTargetTable()).orElse(null);
+						map.put("tagertTable", tagertTable.getCname() + "(" + tagertTable.getName() + ")");
+					}
 				}
 				map.put("tagertClass", dataMappingRepository.findById(taskConfig.getTargeName()).orElse(null).getClassName());
 				List<String> targetCloumn = new ArrayList<String>();
-				String[] targetCloumns = taskConfig.getTargetCloumn().split(",");
-				for(String field : targetCloumns) {
-					if(taskConfig.getTargetType().equals("api")) {
-						DataInterfaceParamsEntity dataParamsEntity = dataInterfaceParamsRepository.findById(field).orElse(null);
-						if(dataParamsEntity != null) {
-							targetCloumn.add(dataParamsEntity.getRemark() + "(" + dataParamsEntity.getParamName() + ")");
-						}
-					}else {
-						DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
-						if(tableField != null) {
-							targetCloumn.add(tableField.getCname() + "(" + tableField.getName() + ")");
+				if(StringUtils.isNotBlank(taskConfig.getTargetCloumn())) {
+					String[] targetCloumns = taskConfig.getTargetCloumn().split(",");
+					for(String field : targetCloumns) {
+						if(taskConfig.getTargetType().equals("api")) {
+							DataInterfaceParamsEntity dataParamsEntity = dataInterfaceParamsRepository.findById(field).orElse(null);
+							if(dataParamsEntity != null) {
+								targetCloumn.add(dataParamsEntity.getRemark() + "(" + dataParamsEntity.getParamName() + ")");
+							}
+						}else {
+							DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
+							if(tableField != null) {
+								targetCloumn.add(tableField.getCname() + "(" + tableField.getName() + ")");
+							}
 						}
 					}
 				}
