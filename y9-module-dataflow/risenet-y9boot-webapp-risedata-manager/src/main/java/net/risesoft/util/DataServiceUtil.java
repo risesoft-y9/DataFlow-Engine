@@ -1,5 +1,10 @@
 package net.risesoft.util;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * 任务配置工具类
  * @author pzx
@@ -56,15 +61,6 @@ public class DataServiceUtil {
 	public static final String ENCRYPCLASS = "";
 	
 	/**
-	 * 增量同步
-	 */
-	public static final String BULKSYNC = "bulkSync";
-	/**
-	 * 增量同步执行类
-	 */
-	public static final String BULKSYNCCLASS = "";
-	
-	/**
 	 * 异字段
 	 */
 	public static final String DIFFERENT = "different";
@@ -113,6 +109,45 @@ public class DataServiceUtil {
 				return "日志";
 			default:
 				return name;
+		}
+	}
+	
+	/**
+	 * 根据某个key值对listmap分类
+	 * @param <K>
+	 * @param <V>
+	 * @param maps
+	 * @param classifyKey
+	 * @return
+	 */
+    public static <K, V> Map<V, List<Map<K, V>>> classifyMaps(List<Map<K, V>> maps, String keyName) {  
+        Map<V, List<Map<K, V>>> classified = new HashMap<>();  
+        for (Map<K, V> map : maps) {  
+            V category = map.get(keyName);
+            if (category != null) {  
+                classified.computeIfAbsent(category, k -> new ArrayList<>()).add(map);  
+            }  
+        }  
+        return classified;  
+    }
+    
+    /**
+     * 根据参数获取编码方式
+     * @param num
+     * @return
+     */
+    public static String getEncoding(int num) {
+		switch (num) {
+			case 1:
+				return "ISO-8859-1";
+			case 2:
+				return "GBK";
+			case 3:
+				return "UTF-8";
+			case 4:
+				return "ASCII";
+			default:
+				return "";
 		}
 	}
 }

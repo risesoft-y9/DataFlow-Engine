@@ -152,24 +152,26 @@ public class TaskMakeUpListener {
     	}
     	
     	//检查大小写
-    	DataTaskMakeUpEntity makeUpEntity1 = dataTaskMakeUpRepository.findByTaskIdAndTypeNameAndTabIndex(taskId, "job.input", 1);
-    	if(makeUpEntity1 != null) {
-    		Map<String, Object> sourceMap = Y9JsonUtil.readHashMap(makeUpEntity1.getArgsValue());
-    		List<String> sourceColumns = (List<String>) sourceMap.get("column");
-    		
-    		DataTaskMakeUpEntity makeUpEntity2 = dataTaskMakeUpRepository.findByTaskIdAndTypeNameAndTabIndex(taskId, "job.output", 1);
-    		Map<String, Object> targetMap = Y9JsonUtil.readHashMap(makeUpEntity2.getArgsValue());
-    		List<String> targetColumns = (List<String>) targetMap.get("column");
-    		
-            // 忽略大小写筛选相同元素
-            for(String source : sourceColumns) {
-            	for(String target : targetColumns) {
-            		if(source.equalsIgnoreCase(target) && !source.equals(target)) {
-            			dmap.put(source, target);
-            			continue;
-            		}
-            	}
-            }
+    	if(!configModel.getSourceType().equals("ftp")) {
+    		DataTaskMakeUpEntity makeUpEntity1 = dataTaskMakeUpRepository.findByTaskIdAndTypeNameAndTabIndex(taskId, "job.input", 1);
+        	if(makeUpEntity1 != null) {
+        		Map<String, Object> sourceMap = Y9JsonUtil.readHashMap(makeUpEntity1.getArgsValue());
+        		List<String> sourceColumns = (List<String>) sourceMap.get("column");
+        		
+        		DataTaskMakeUpEntity makeUpEntity2 = dataTaskMakeUpRepository.findByTaskIdAndTypeNameAndTabIndex(taskId, "job.output", 1);
+        		Map<String, Object> targetMap = Y9JsonUtil.readHashMap(makeUpEntity2.getArgsValue());
+        		List<String> targetColumns = (List<String>) targetMap.get("column");
+        		
+                // 忽略大小写筛选相同元素
+                for(String source : sourceColumns) {
+                	for(String target : targetColumns) {
+                		if(source.equalsIgnoreCase(target) && !source.equals(target)) {
+                			dmap.put(source, target);
+                			continue;
+                		}
+                	}
+                }
+        	}
     	}
     	
     	if(!dmap.isEmpty()) {
@@ -279,6 +281,17 @@ public class TaskMakeUpListener {
     		}else {
     			map.put("isPage", false);
     		}
+    	}else if(configModel.getSourceType().equals("ftp")) {
+    		DataSourceEntity dataSourceEntity = dataSourceRepository.findById(configModel.getSourceId()).orElse(null);
+    		String[] url = dataSourceEntity.getUrl().split(":");
+    		map.put("host", url[0]);
+    		map.put("userName", dataSourceEntity.getUsername());
+        	map.put("password", dataSourceEntity.getPassword());
+        	map.put("port", url[1]);
+        	map.put("path", configModel.getSourceTable());
+        	map.put("encoding", DataServiceUtil.getEncoding(configModel.getFetchSize()));
+        	map.put("fileName", configModel.getWhereSql());
+        	map.put("date", configModel.getSplitPk());
     	}else {
     		DataSourceEntity dataSourceEntity = dataSourceRepository.findById(configModel.getSourceId()).orElse(null);
         	map.put("jdbcUrl", dataSourceEntity.getUrl());
@@ -371,6 +384,9 @@ public class TaskMakeUpListener {
     		requestModel.setParams(params);
     		map.put("requestModel", Y9JsonUtil.writeValueAsString(requestModel));
     		map.put("column", column);
+    	}else if(configModel.getTargetType().equals("ftp")) {
+    		map.put("path", configModel.getTargetTable());
+    		map.put("bufferSize", configModel.getTableNumber());
     	}else {
     		DataSourceEntity dataSourceEntity = dataSourceRepository.findById(configModel.getTargetId()).orElse(null);
         	map.put("jdbcUrl", dataSourceEntity.getUrl());
@@ -380,7 +396,7 @@ public class TaskMakeUpListener {
         	DataTable dataTable = dataTableRepository.findById(configModel.getTargetTable()).orElse(null);
         	map.put("tableName", dataTable.getName());
         	
-        	if(configModel.getWriterType().equals("update")) {
+        	if(configModel.getWriterType().equals("update") || configModel.getWriterType().equals("replace")) {
         		String text = "";
         		String[] ids = configModel.getUpdateField().split(",");
     			for(String field : ids) {

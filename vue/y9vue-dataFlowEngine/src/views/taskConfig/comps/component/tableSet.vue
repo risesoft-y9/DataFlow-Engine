@@ -209,6 +209,7 @@ const activeName = ref('1');
                 <template #label>
                     <div>
                         <span v-if="addTaskForm.tableData.sourceType == 'api'">接口名称</span>
+                        <span v-else-if="addTaskForm.tableData.sourceType == 'ftp'">文件目录</span>
                         <span v-else>表名称</span>
                         <span class="y9-required-icon">*</span>
                     </div>
@@ -219,7 +220,7 @@ const activeName = ref('1');
                         v-model="tableSetForm.tableData.sourceTable"
                         class="m-2"
                         placeholder="请选择"
-                        size="small"
+                        v-if="addTaskForm.tableData.sourceType != 'ftp'"
                     >
                         <el-option
                             v-for="item in tableSetForm.tableOptions"
@@ -228,9 +229,14 @@ const activeName = ref('1');
                             :value="item.id"
                         />
                     </el-select>
+                    <el-input
+                        placeholder="填写需要读取的文件目录"
+                        v-model="tableSetForm.tableData.sourceTable"
+                        v-else
+                    ></el-input>
                 </el-form-item>
             </el-descriptions-item>
-            <el-descriptions-item label-align="center" label="字段详情">
+            <el-descriptions-item label-align="center" label="字段详情" v-if="addTaskForm.tableData.sourceType != 'ftp'">
                 <template #label>
                     <div>
                         <span>字段详情</span>
@@ -259,7 +265,6 @@ const activeName = ref('1');
                         class="m-2"
                         value-key="id"
                         placeholder="请选择"
-                        size="small"
                     >
                         <el-option
                             v-for="item in tableSetForm.classListOptions"
@@ -305,6 +310,68 @@ const activeName = ref('1');
                             </div>
                         </el-collapse-item>
                     </el-collapse>
+                </el-descriptions-item>
+            </div>
+            <div v-else-if="addTaskForm.tableData.sourceType == 'ftp'">
+                <el-descriptions-item label-align="center" label="文件名称">
+                    <template #label>
+                        <div>
+                            <span>文件名称</span>
+                        </div>
+                    </template>
+                    <div class="fetch">
+                        <div class="fetch-w">
+                            <el-form-item>
+                                <el-input
+                                    :controls="false"
+                                    v-model="tableSetForm.tableData.whereSql"
+                                />
+                            </el-form-item>
+                        </div>
+                        <div class="tips">模糊查询，只筛查目录下指定名称的文件</div>
+                    </div>
+                </el-descriptions-item>
+                <el-descriptions-item label-align="center" label="文件时间">
+                    <template #label>
+                        <div>
+                            <span>文件时间</span>
+                        </div>
+                    </template>
+                    <div class="fetch">
+                        <div class="fetch-w">
+                            <el-form-item>
+                                <el-input
+                                    :controls="false"
+                                    v-model="tableSetForm.tableData.splitPk"
+                                />
+                            </el-form-item>
+                        </div>
+                        <div class="tips">筛查目录下大于该时间的文件，格式：yyyy-MM-dd HH:mm:ss</div>
+                    </div>
+                </el-descriptions-item>
+                <el-descriptions-item label-align="center" label="编码方式">
+                    <template #label>
+                        <div>
+                            <span>编码方式</span>
+                        </div>
+                    </template>
+                    <div class="fetch">
+                        <div class="fetch-w">
+                            <el-form-item>
+                                <el-select
+                                    clearable
+                                    v-model="tableSetForm.tableData.fetchSize"
+                                    placeholder="请选择"
+                                >
+                                    <el-option label="ISO-8859-1" value="1"></el-option>
+                                    <el-option label="GBK" value="2"></el-option>
+                                    <el-option label="UTF-8" value="3"></el-option>
+                                    <el-option label="ASCII" value="4"></el-option>
+                                </el-select>
+                            </el-form-item>
+                        </div>
+                        <div class="tips">默认值为ISO-8859-1编码</div>
+                    </div>
                 </el-descriptions-item>
             </div>
             <div v-else>
@@ -392,7 +459,6 @@ const activeName = ref('1');
                             class="m-2"
                             value-key="id"
                             placeholder="请选择"
-                            size="small"
                         >
                             <el-option
                                 v-for="item in filteredTableFieldList"
@@ -463,7 +529,7 @@ const activeName = ref('1');
             </div>
         </el-descriptions>
     </el-form>
-    <div class="demo-collapse">
+    <div class="demo-collapse" v-if="addTaskForm.tableData.sourceType != 'ftp'">
         <el-collapse accordion>
             <el-collapse-item>
                 <template #title>

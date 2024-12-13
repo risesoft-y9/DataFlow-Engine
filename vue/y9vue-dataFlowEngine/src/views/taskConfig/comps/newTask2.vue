@@ -279,6 +279,10 @@ const getDataSource = async () => {
 };
 
 const radioChange = async (type, baseType) => {
+    if(baseType == 'ftp') {
+        ElMessage({ type: 'error', message: '单任务暂不支持ftp', offset: 65 });
+        return;
+    }
     addTaskLoading.value = true;
     addTaskForm.tableOptions = [];
     addTaskForm.tableData.sourceTable = '';

@@ -130,7 +130,11 @@ const setOtherData = (ret) => {
         }
         for (const keyKey in tableSetForm.tableData) {
             if (keyKey == key) {
-                tableSetForm.tableData[keyKey] = ret.taskConfigModel[key];
+                if (keyKey == 'fetchSize' && addTaskForm.tableData.sourceType == 'ftp') {
+                    tableSetForm.tableData[keyKey] = ret.taskConfigModel[key] + '';
+                }else {
+                    tableSetForm.tableData[keyKey] = ret.taskConfigModel[key];
+                }
             }
         }
         for (const keyKey in goalTableForm.tableData) {
