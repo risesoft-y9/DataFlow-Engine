@@ -355,6 +355,7 @@ let ruleFormRef = ref(goalTableRef);
                         v-model="goalTableForm.tableData.targetTable"
                         class="m-2"
                         placeholder="请选择"
+                        filterable
                         v-if="addTaskForm.tableData.targetType != 'ftp'"
                     >
                         <el-option
@@ -445,6 +446,7 @@ let ruleFormRef = ref(goalTableRef);
                                     value-key="id"
                                     clearable
                                     placeholder="请选择源头字段"
+                                    filterable
                                     @change="fieldChange(items, 1, `differentField[${index}].target`)"
                                 >
                                     <el-option
@@ -462,6 +464,7 @@ let ruleFormRef = ref(goalTableRef);
                                 <el-select
                                     v-model="items.target"
                                     value-key="id"
+                                    filterable
                                     placeholder="请选择目标字段"
                                     clearable
                                     @change="fieldChange(items, 2, `differentField[${index}].source`)"
@@ -506,6 +509,7 @@ let ruleFormRef = ref(goalTableRef);
                                     v-model="items.fieldName"
                                     value-key="id"
                                     placeholder="请选择转换字段"
+                                    filterable
                                     @change="formatIdChange(items, 1, index)"
                                 >
                                     <el-option
@@ -558,6 +562,7 @@ let ruleFormRef = ref(goalTableRef);
                                     v-model="items.fieldName"
                                     value-key="id"
                                     placeholder="请选择转换字段"
+                                    filterable
                                     @change="dataChange(items, 1, index)"
                                 >
                                     <el-option

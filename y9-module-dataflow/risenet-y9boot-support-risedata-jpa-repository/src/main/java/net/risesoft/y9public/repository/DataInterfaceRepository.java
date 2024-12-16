@@ -11,4 +11,6 @@ public interface DataInterfaceRepository extends JpaRepository<DataInterfaceEnti
 	
 	List<DataInterfaceEntity> findByPatternAndTenantId(Integer pattern, String tenantId);
 	
+	List<DataInterfaceEntity> findByTenantId(String tenantId);
+	
 }

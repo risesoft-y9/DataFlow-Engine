@@ -60,7 +60,7 @@
                 <el-form-item prop="sourceId">
                     <el-radio-group v-model="addTaskForm.tableData.sourceId" :disabled="globalData.type == 'detail' ? true : false">
                         <el-radio
-                            @change="radioChange('input', item.baseType)"
+                            @change="radioChange('', item.baseType)"
                             v-for="item in state.dataSource"
                             :label="item.id"
                         >
@@ -84,7 +84,7 @@
                         v-model="addTaskForm.tableData.sourceTable"
                         class="m-2"
                         placeholder="请选择"
-                        size="small"
+                        filterable
                         :disabled="globalData.type == 'detail' ? true : false"
                     >
                         <el-option
@@ -294,9 +294,6 @@ const radioChange = async (type, baseType) => {
 
 const getTableList = async (type) => {
     let sourceId = addTaskForm.tableData.sourceId;
-    if(sourceId == 'api') {
-        type = 'input';
-    }
     let params = {
         sourceId,
         type

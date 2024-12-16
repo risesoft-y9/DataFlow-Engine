@@ -137,4 +137,9 @@ public class DataInterfaceServiceImpl implements DataInterfaceService {
 		return dataInterfaceRepository.findByPatternAndTenantId(pattern, Y9LoginUserHolder.getTenantId());
 	}
 
+	@Override
+	public List<DataInterfaceEntity> findAll() {
+		return dataInterfaceRepository.findByTenantId(Y9LoginUserHolder.getTenantId());
+	}
+
 }

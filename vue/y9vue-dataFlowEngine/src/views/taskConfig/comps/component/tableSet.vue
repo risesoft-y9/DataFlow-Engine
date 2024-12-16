@@ -220,6 +220,7 @@ const activeName = ref('1');
                         v-model="tableSetForm.tableData.sourceTable"
                         class="m-2"
                         placeholder="请选择"
+                        filterable
                         v-if="addTaskForm.tableData.sourceType != 'ftp'"
                     >
                         <el-option
@@ -459,6 +460,7 @@ const activeName = ref('1');
                             class="m-2"
                             value-key="id"
                             placeholder="请选择"
+                            filterable
                         >
                             <el-option
                                 v-for="item in filteredTableFieldList"

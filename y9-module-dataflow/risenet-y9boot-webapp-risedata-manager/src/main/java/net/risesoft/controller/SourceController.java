@@ -249,7 +249,16 @@ public class SourceController {
 		// 接口源
 		if(sourceId.equals("api")) {
 			List<Map<String, Object>> listMap = new ArrayList<>();
-			List<DataInterfaceEntity> interfaceList = dataInterfaceService.findByPattern(type.equals("input") ? 0 : 1);
+			List<DataInterfaceEntity> interfaceList = null;
+			if(StringUtils.isNotBlank(type)) {
+				// 任务配置里的输入对应接口里的输出，输出对应输入
+				interfaceList = dataInterfaceService.findByPattern(type.equals("input") ? 0 : 1);
+				
+				// 获取执行类
+				map.put("classList", dataMappingService.findByTypeNameAndFuncType("api", type));
+			}else {
+				interfaceList = dataInterfaceService.findAll();
+			}
 			for(DataInterfaceEntity dataInterfaceEntity : interfaceList) {
 				Map<String, Object> rmap = new HashMap<String, Object>();
 				rmap.put("id", dataInterfaceEntity.getId());
@@ -257,7 +266,6 @@ public class SourceController {
 				listMap.add(rmap);
 			}
 			map.put("tableList", listMap);
-			map.put("classList", dataMappingService.findByTypeNameAndFuncType("api", type));
 		}else {
 			DataSourceEntity source = dataSourceService.getDataSourceById(sourceId);
 			if(source == null) {

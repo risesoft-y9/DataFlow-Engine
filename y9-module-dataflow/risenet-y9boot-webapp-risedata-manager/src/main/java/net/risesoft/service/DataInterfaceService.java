@@ -74,4 +74,10 @@ public interface DataInterfaceService {
 	 */
 	List<DataInterfaceEntity> findByPattern(Integer pattern);
 	
+	/**
+	 * 获取所有接口
+	 * @return
+	 */
+	List<DataInterfaceEntity> findAll();
+	
 }
