@@ -27,7 +27,7 @@ public class HandleContext<H> {
 	 * @param handle
 	 * @return
 	 */
-	public boolean contains(H handle) {
+	public boolean contains(Object handle) {
 		return handles.contains(handle);
 
 	}

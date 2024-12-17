@@ -5,22 +5,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import risesoft.data.transfer.core.context.JobContext;
+import risesoft.data.transfer.core.job.JobStartHandle;
 import risesoft.data.transfer.core.record.ColumnDisposeHandle;
 import risesoft.data.transfer.core.record.RecordInHandle;
 import risesoft.data.transfer.core.util.ClassTools;
 
 /**
  * 
- * 执行器管理器
- * 管理所有的handle所有需要被使用的执行器都需要注册到其中
+ * 执行器管理器 管理所有的handle所有需要被使用的执行器都需要注册到其中
+ * 
  * @typeName HandleManager
  * @date 2023年12月6日
  * @author lb
  */
 @SuppressWarnings({ "rawtypes", "unused", "unchecked" })
-public class HandleManager {
+public class HandleManager implements JobStartHandle {
 
 	private Map<Class<?>, HandleContext<? extends Handle>> handles = new HashMap<Class<?>, HandleContext<? extends Handle>>();
+	private HandleContext<HandleChangeHandle> changeContext;
+
+	public HandleManager() {
+		add(this);
+	}
 
 	/**
 	 * 如果这个 不存在则添加存在则跳过
@@ -31,7 +38,13 @@ public class HandleManager {
 		Set<Class<?>> classes = ClassTools.getInterfaceClass(handle.getClass());
 		for (Class<?> class1 : classes) {
 			if (Handle.class.isAssignableFrom(class1)) {
-				HandleContext<?> handleContext = getAndCreateContext(class1);
+				HandleContext handleContext = getAndCreateContext(class1);
+				if (!handleContext.contains(handle)) {
+					handleContext.add(handle);
+					changeContext.handle((h)->{
+						h.doAdd(handle, class1);
+					});
+				}
 			}
 		}
 	}
@@ -46,6 +59,9 @@ public class HandleManager {
 		for (Class<?> class1 : classes) {
 			if (Handle.class.isAssignableFrom(class1)) {
 				createContextAndAdd(class1, handle);
+				changeContext.handle((h)->{
+					h.doAdd(handle, class1);
+				});
 			}
 		}
 	}
@@ -131,6 +147,9 @@ public class HandleManager {
 		HandleContext handleContext = handles.get(classType);
 		if (handleContext != null) {
 			handles.remove(handle);
+			changeContext.handle((h)->{
+				h.doRemove(handle, classType);
+			});
 		}
 	}
 
@@ -148,6 +167,11 @@ public class HandleManager {
 			return (T) handleContext.getHandle(type);
 		}
 		return null;
+	}
+
+	@Override
+	public void onJobStart(JobContext jobContext) {
+		changeContext = getContext(HandleChangeHandle.class);
 	}
 
 }
