@@ -27,6 +27,8 @@ public class FtpConfig extends FTPInfo implements Data {
 	private String fileName;
 	@ConfigField(description = "时间", required = false)
 	private String date;
+	@ConfigField(description = "主动模式",value = "false", required = false)
+	private boolean activeModel;
 
 	public FtpConfig() {
 		super();
@@ -54,6 +56,16 @@ public class FtpConfig extends FTPInfo implements Data {
 
 	public String getFileName() {
 		return fileName;
+	}
+
+	
+	
+	public boolean isActiveModel() {
+		return activeModel;
+	}
+
+	public void setActiveModel(boolean activeModel) {
+		this.activeModel = activeModel;
 	}
 
 	public void setFileName(String fileName) {

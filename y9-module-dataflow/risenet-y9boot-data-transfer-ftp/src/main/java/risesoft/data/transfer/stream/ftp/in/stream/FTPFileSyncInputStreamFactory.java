@@ -1,6 +1,10 @@
-package risesoft.data.transfer.stream.ftp.in.info;
+package risesoft.data.transfer.stream.ftp.in.stream;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
@@ -20,24 +24,68 @@ import risesoft.data.transfer.core.log.LoggerFactory;
 import risesoft.data.transfer.core.record.DefaultRecord;
 import risesoft.data.transfer.core.stream.in.DataInputStream;
 import risesoft.data.transfer.core.stream.in.DataInputStreamFactory;
+import risesoft.data.transfer.stream.FileInfoColumn;
+import risesoft.data.transfer.stream.Stream;
+import risesoft.data.transfer.stream.ftp.in.info.FtpConfig;
 import risesoft.data.transfer.stream.ftp.model.FTPFileInfoColumn;
 import risesoft.data.transfer.stream.ftp.utils.FTPUtils;
 import risesoft.data.transfer.stream.ftp.utils.PattenUtil;
 
 /**
- * 这个类是用于将FTP 的文件信息读取出来打包成一个需要消费的对象
+ * 此类用于将ftp的文件信息读取成流信息
  * 
- * @typeName FTPFileInfoStreamFactory
+ * @typeName FTPFileSyncInputStreamFactory
  * @date 2024年3月4日
  * @author lb
  */
-public class FTPFileInfoInputStreamFactory implements DataInputStreamFactory, DataInputStream {
+public class FTPFileSyncInputStreamFactory implements DataInputStreamFactory {
+
+	class FileSyncInputDataInputStream implements DataInputStream {
+		//这里需要构建一个ftp连接池 ps:一个inputData 可以处理多个数据连接
+		private FTPClient ftpClient;
+
+		FileSyncInputDataInputStream(FtpConfig ftpConfig) {
+			this.ftpClient = FTPUtils.getClient(ftpConfig.getHost(), ftpConfig.getPort(), ftpConfig.getUserName(),
+					ftpConfig.getPassword(), ftpConfig.getEncoding(), ftpConfig.isActiveModel());
+	
+		}
+
+		@Override
+		public void close() throws Exception {
+			try {
+				ftpClient.logout();
+				ftpClient.disconnect();
+			} catch (IOException e) {
+				logger.error(this, "关闭ftp客户端出错" + e.getMessage());
+			}
+		}
+
+		@Override
+		public void read(Data data, InChannel inChannel) {
+			FtpConfig ftpConfig = (FtpConfig) data;
+			try {
+				logger.debug(this, "login");
+				FTPFile ftpFile = getFileByFullPath(ftpClient, ftpConfig.getPath());
+				try {
+					readFiles(ftpFile, ftpClient, ftpConfig.getPath(), inChannel, maxDate, fileNameMatch);
+				} catch (Exception e) {
+					throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "从ftp获取文件列表时出错:" + e.getMessage());
+				}
+				inChannel.flush();
+			} catch (Throwable e) {
+				throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, e.getMessage(), e);
+			}
+
+		}
+
+	}
+
 	private Logger logger;
 	private FtpConfig ftpConfig;
 	private String fileNameMatch;
 	private long maxDate = -1;
 
-	public FTPFileInfoInputStreamFactory(FtpConfig ftpConfig, LoggerFactory loggerFactory) {
+	public FTPFileSyncInputStreamFactory(FtpConfig ftpConfig, LoggerFactory loggerFactory) {
 		this.ftpConfig = ftpConfig;
 		logger = loggerFactory.getLogger(ftpConfig.getName());
 	}
@@ -61,11 +109,12 @@ public class FTPFileInfoInputStreamFactory implements DataInputStreamFactory, Da
 
 	@Override
 	public DataInputStream getStream() {
-		return this;
+		return new FileSyncInputDataInputStream(ftpConfig);
 	}
 
 	@Override
 	public void close() throws Exception {
+
 	}
 
 	@Override
@@ -128,39 +177,35 @@ public class FTPFileInfoInputStreamFactory implements DataInputStreamFactory, Da
 				return;
 			}
 			DefaultRecord defaultRecord = new DefaultRecord();
+			// 这里读取的信息为stream信息对象
 			String fileName = new String(rootFile.getName().getBytes(Charset.forName(FTPUtils.DEFAULT_ENCODING)),
 					"UTF-8");
-			defaultRecord.addColumn(new FTPFileInfoColumn(
-					((rootPath.endsWith("/") ? rootPath : rootPath + "/") + "/" + fileName).replace("//", "/"),
-					Type.STREAM, rootFile.getSize(), fileName, this.ftpConfig));
+			String filePath = ((rootPath.endsWith("/") ? rootPath : rootPath + "/") + "/" + fileName).replace("//",
+					"/");
+			defaultRecord.addColumn(new FileInfoColumn(new Stream() {
+
+				@Override
+				public void writer(OutputStream outputStream) {
+					try {
+						if (!ftpClient.retrieveFile(filePath, outputStream)) {
+							throw TransferException.as(CommonErrorCode.RUNTIME_ERROR,
+									filePath + "文件传输失败,未知原因，可能是FTP已经断开");
+						}
+					} catch (IOException e) {
+						throw TransferException.as(CommonErrorCode.RUNTIME_ERROR,
+								filePath + "文件传输失败,异常信息:" + e.getMessage());
+					}
+
+				}
+
+				@Override
+				public byte[] getBytes() {
+					ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+					writer(outputStream);
+					return outputStream.toByteArray();
+				}
+			}, rootFile.getSize(), fileNameMatch, filePath, rootFile.getTimestamp().getTimeInMillis()));
 			inChannel.writer(defaultRecord);
-		}
-	}
-
-	@Override
-	public void read(Data data, InChannel inChannel) {
-		FtpConfig ftpConfig = (FtpConfig) data;
-		FTPClient ftpClient = FTPUtils.getClient(ftpConfig.getHost(), ftpConfig.getPort(), ftpConfig.getUserName(),
-				ftpConfig.getPassword(), ftpConfig.getEncoding(),ftpConfig.isActiveModel());
-		try {
-			logger.debug(this, "login");
-			FTPFile ftpFile = getFileByFullPath(ftpClient, ftpConfig.getPath());
-			try {
-				readFiles(ftpFile, ftpClient, ftpConfig.getPath(), inChannel, maxDate, fileNameMatch);
-			} catch (Exception e) {
-				throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "从ftp获取文件列表时出错:" + e.getMessage());
-			}
-			inChannel.flush();
-		} catch (Throwable e) {
-			throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, e.getMessage(), e);
-		} finally {
-			try {
-				ftpClient.logout();
-				ftpClient.disconnect();
-			} catch (IOException e) {
-				logger.error(this, "关闭ftp客户端出错" + e.getMessage());
-			}
-
 		}
 	}
 

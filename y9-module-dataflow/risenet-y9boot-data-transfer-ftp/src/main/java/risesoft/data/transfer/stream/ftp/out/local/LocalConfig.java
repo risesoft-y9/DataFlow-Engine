@@ -11,7 +11,7 @@ public class LocalConfig {
 	@ConfigField(description = "日志名字", value = "FTPFileOutLocal")
 	private String name;
 
-	@ConfigField(description = "缓存大小/kb", value = "500")
+	@ConfigField(description = "缓存大小/kb", value = "1024")
 	private int bufferSize;
 	public LocalConfig() {
 		super();

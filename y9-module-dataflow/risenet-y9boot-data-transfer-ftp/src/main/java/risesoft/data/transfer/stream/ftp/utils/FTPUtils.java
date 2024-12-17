@@ -11,7 +11,7 @@ public class FTPUtils {
 
 	public static final String DEFAULT_ENCODING = "ISO-8859-1";
 
-	public static FTPClient getClient(String host, int port, String userName, String password, String encoding) {
+	public static FTPClient getClient(String host, int port, String userName, String password, String encoding,boolean isActiveModel) {
 		try {
 			FTPClient ftpClient = new FTPClient();
 			ftpClient.connect(host, port);
@@ -23,7 +23,11 @@ public class FTPUtils {
 			if (!ftpClient.login(userName, password)) {
 				throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "登录ftp失败!");
 			}
-			ftpClient.enterLocalPassiveMode();
+			if (isActiveModel) {
+				 ftpClient.enterLocalActiveMode();
+			}else {
+				ftpClient.enterLocalPassiveMode();
+			}
 			ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 			
 			return ftpClient;

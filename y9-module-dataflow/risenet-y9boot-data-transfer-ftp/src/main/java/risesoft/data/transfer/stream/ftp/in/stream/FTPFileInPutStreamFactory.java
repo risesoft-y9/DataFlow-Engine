@@ -19,8 +19,8 @@ import risesoft.data.transfer.stream.ftp.utils.FTPUtils;
 /**
  * ftp 文件流传输 这个类是符合标准流引擎传输协议的，
  * 但是对于生产者消费者模型来说这是不适用的，读取过快，和堆积必然会造成内存溢出,如果使用限流一定程度上可以解决溢出问题，但治标不治本 因此此类不推荐使用
- * 期待在后续的业务发展中使用到这个类， 如果您需要使用ftp文件传输请使用{@link FTPFileInfoStreamFactory} 
- *  ps:李博2024-03-04 通过大文件，多种方法测试后得出结论
+ * 期待在后续的业务发展中使用到这个类， 如果您需要使用ftp文件传输请使用{@link FTPFileInfoStreamFactory}
+ * ps:李博2024-03-04 通过大文件，多种方法测试后得出结论 建议使用{@link FTPFileSyncInputStreamFactory类}
  * 
  * @typeName FtpFileInPutStreamFactory
  * @date 2024年2月27日
@@ -44,7 +44,7 @@ public class FTPFileInPutStreamFactory implements DataInputStreamFactory {
 	@Override
 	public DataInputStream getStream() {
 		return new FTPFileInPutStream(FTPUtils.getClient(ftpConfig.host, ftpConfig.port, ftpConfig.userName,
-				ftpConfig.password, ftpConfig.encoding), logger, ftpConfig.buffer);
+				ftpConfig.password, ftpConfig.encoding, ftpConfig.isActiveModel()), logger, ftpConfig.buffer);
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class FTPFileInPutStreamFactory implements DataInputStreamFactory {
 	@Override
 	public List<Data> splitToData(int executorSize) throws Exception {
 		FTPClient ftpClient = FTPUtils.getClient(ftpConfig.host, ftpConfig.port, ftpConfig.userName, ftpConfig.password,
-				ftpConfig.encoding);
+				ftpConfig.encoding, ftpConfig.isActiveModel());
 		try {
 			logger.debug(this, "login");
 

@@ -25,7 +25,17 @@ public class FtpConfig {
 	protected String name;
 	@ConfigField(description = "编码", value = FTPUtils.DEFAULT_ENCODING)
 	protected String encoding;
+	@ConfigField(description = "主动模式",value = "false", required = false)
+	private boolean activeModel;
+	
 
+	public boolean isActiveModel() {
+		return activeModel;
+	}
+
+	public void setActiveModel(boolean activeModel) {
+		this.activeModel = activeModel;
+	}
 	public String getHost() {
 		return host;
 	}

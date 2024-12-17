@@ -1,20 +1,15 @@
-package risesoft.data.transfer.stream.ftp.out.local;
+package risesoft.data.transfer.stream.ftp.out.ftp;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.net.ftp.FTPClient;
 
 import risesoft.data.transfer.core.column.Column;
 import risesoft.data.transfer.core.exception.CommonErrorCode;
 import risesoft.data.transfer.core.exception.TransferException;
-import risesoft.data.transfer.core.factory.annotations.ConfigBean;
-import risesoft.data.transfer.core.factory.annotations.ConfigField;
 import risesoft.data.transfer.core.log.Logger;
 import risesoft.data.transfer.core.log.LoggerFactory;
 import risesoft.data.transfer.core.record.Ack;
@@ -26,21 +21,20 @@ import risesoft.data.transfer.stream.ftp.model.FTPInfo;
 import risesoft.data.transfer.stream.ftp.utils.FTPUtils;
 
 /**
- * ftp 文件输出流 将FTP 的文件信息输出到指定目录的文件
+ * ftp 文件输出流 将FTP 的文件信息输出到指定的ftp服务器
  * 
- * @typeName FtpFileOutPutStreamFactory
+ * @typeName FTPFileOutputFTPStreamFactory
  * @date 2024年2月26日
  * @author lb
  */
-public class FTPFileOutputLocalStreamFactory implements DataOutputStreamFactory {
+public class FTPFileOutputFTPStreamFactory implements DataOutputStreamFactory {
 
 	private Logger logger;
-	private LocalConfig localConfig;
+	private FtpConfig ftpConfig;
 
-	public FTPFileOutputLocalStreamFactory(LocalConfig localConfig, LoggerFactory loggerFactory) {
+	public FTPFileOutputFTPStreamFactory(FtpConfig localConfig, LoggerFactory loggerFactory) {
 		logger = loggerFactory.getLogger(localConfig.getName());
-		this.localConfig = localConfig;
-		this.localConfig.setBufferSize(this.localConfig.getBufferSize() * 1024);
+		this.ftpConfig = localConfig;
 	}
 
 	@Override
@@ -62,14 +56,14 @@ public class FTPFileOutputLocalStreamFactory implements DataOutputStreamFactory 
 						Column column = record.getColumn(i);
 						if (column instanceof FTPFileInfoColumn) {
 							FTPFileInfoColumn ftpFileInfoColumn = (FTPFileInfoColumn) column;
-							FTPClient ftpClient = getFTPClient(ftpFileInfoColumn.getFtpInfo());
-							String file = localConfig.getPath() + ftpFileInfoColumn.getFilePath();
-							FileUtils.forceMkdir(new File(file.substring(0, file.lastIndexOf("/") + 1)));
+							FTPClient sourceFtpClient = getFTPClient(ftpFileInfoColumn.getFtpInfo());
+							FTPClient outFtpClient = getFTPClient(ftpConfig);
+							String file = ftpConfig.getPath() + ftpFileInfoColumn.getFilePath();
 							if (logger.isDebug()) {
 								logger.debug(this, "transfer " + ftpFileInfoColumn.getFilePath() + " to " + file);
 							}
-							if (!ftpClient.retrieveFile(ftpFileInfoColumn.getFilePath(),
-									new FileOutputStream(new File(file)))) {
+							if (!sourceFtpClient.retrieveFile(ftpFileInfoColumn.getFilePath(),
+									outFtpClient.storeFileStream(file))) {
 								throw TransferException.as(CommonErrorCode.RUNTIME_ERROR,
 										ftpFileInfoColumn.getFilePath() + "文件传输失败未知原因!目标文件" + file);
 							}
@@ -132,10 +126,9 @@ public class FTPFileOutputLocalStreamFactory implements DataOutputStreamFactory 
 								+ ftpInfo.getUserName());
 					}
 					ftpClient = FTPUtils.getClient(ftpInfo.getHost(), ftpInfo.getPort(), ftpInfo.getUserName(),
-							ftpInfo.getPassword(), FTPUtils.DEFAULT_ENCODING,ftpInfo.isActiveModel());
-					ftpClient.setBufferSize(localConfig.getBufferSize());
+							ftpInfo.getPassword(), FTPUtils.DEFAULT_ENCODING, ftpInfo.isActiveModel());
+					ftpClient.setBufferSize(ftpConfig.getBufferSize());
 					clientMap.put(key, ftpClient);
-
 				}
 			}
 		}
