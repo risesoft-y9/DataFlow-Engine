@@ -44,6 +44,7 @@ public class JobController {
 	 */
 	private static Map<String, JobContext> JOB_CONTEXT = new ConcurrentHashMap<String, JobContext>();
 
+
 	@Resource
 	private ConfigApi configApi;
 
@@ -239,6 +240,8 @@ public class JobController {
 //		new syncres
 
 		System.out.println(stringBuilder);
+		//执行成功后清除掉
+		JOB_CONTEXT.remove(jobLogId);
 		return stringBuilder.toString();
 	}
 
