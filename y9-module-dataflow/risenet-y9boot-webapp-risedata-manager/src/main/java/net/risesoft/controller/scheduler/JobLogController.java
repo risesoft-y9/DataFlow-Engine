@@ -4,15 +4,19 @@ import net.risedata.jdbc.commons.LPage;
 import net.risedata.jdbc.commons.utils.DateUtils;
 import net.risedata.jdbc.commons.utils.GroupUtils;
 import net.risedata.jdbc.search.LPageable;
+import net.risedata.rpc.consumer.core.Connection;
+import net.risedata.rpc.consumer.factory.ConnectionManagerFactory;
+import net.risedata.rpc.provide.net.ClinetConnection;
 import net.risesoft.api.aop.CheckHttpForArgs;
 import net.risesoft.api.job.log.LogAnalyseService;
 import net.risesoft.api.persistence.job.JobLogService;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.api.persistence.model.log.LogAnalyse;
-import net.risesoft.security.ConcurrentSecurity;
-import net.risesoft.service.DataBusinessService;
 import net.risesoft.controller.BaseController;
 import net.risesoft.pojo.Y9Result;
+import net.risesoft.security.ConcurrentSecurity;
+import net.risesoft.service.DataBusinessService;
+import reactor.core.publisher.Mono;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +25,8 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
+import com.alibaba.fastjson.JSONObject;
+import net.risesoft.api.listener.ClientListener;
 import java.text.DateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -46,7 +52,7 @@ public class JobLogController extends BaseController {
 
 	@Autowired
 	JobLogService jobLogService;
-	
+
 	@Autowired
 	private DataBusinessService dataBusinessService;
 
@@ -59,6 +65,26 @@ public class JobLogController extends BaseController {
 	@GetMapping("getOne")
 	public Y9Result<Object> getOne(String id) {
 		return Y9Result.success(jobLogService.findById(id));
+	}
+
+	@PostMapping("/doOperationByLogId")
+	public Mono<Y9Result<Object>> doOperationByLogId(@RequestBody String body) {
+
+		return Mono.create((mono) -> {
+			JSONObject jsonObject = JSONObject.parseObject(body);
+			ClinetConnection connection = ClientListener.getConnection(jsonObject.getString("instanceId"));
+			if (connection == null) {
+				mono.success(Y9Result.failure("该实例失去连接或不存在!"));
+				return;
+			}
+			connection.pushListener(jsonObject.getString("eventName"), jsonObject.getJSONObject("args"), 10000L)
+					.onError((res, error) -> {
+						mono.success(Y9Result.failure("异常:" + error.getMessage()));
+					}).onSuccess((res) -> {
+						mono.success(Y9Result.success(res));
+					});
+		});
+
 	}
 
 	/**
@@ -76,9 +102,9 @@ public class JobLogController extends BaseController {
 			jurisdiction = getSecurityJurisdiction(environment);
 			LPage<Map<String, Object>> pages = jobLogService.search(job, page, jurisdiction, jobType, jobIds);
 			pages.getContent().stream().map((item) -> {
-				item.put("JOB_TYPE_NAME", dataBusinessService.getNameById((String)item.get("JOB_TYPE")));
-	            return item;
-	        }).collect(Collectors.toList());
+				item.put("JOB_TYPE_NAME", dataBusinessService.getNameById((String) item.get("JOB_TYPE")));
+				return item;
+			}).collect(Collectors.toList());
 			return Y9Result.success(pages);
 		} catch (Exception e) {
 			return Y9Result.failure(e.getMessage());
@@ -99,7 +125,8 @@ public class JobLogController extends BaseController {
 		} catch (Exception e) {
 			return Y9Result.failure(e.getMessage());
 		}
-		return Y9Result.success(jobLogService.searchByGroup(startDate, endDate, environment, page, jobName, jurisdiction));
+		return Y9Result
+				.success(jobLogService.searchByGroup(startDate, endDate, environment, page, jobName, jurisdiction));
 	}
 
 	@Autowired
@@ -133,9 +160,10 @@ public class JobLogController extends BaseController {
 			for (LogAnalyseService analyseService : logAnalyseServices) {
 				// 处理一个就关闭一个
 				size = logAnalyseList.size();
-				analyseService.doAnalyse(jobId, log, jobName2, logAnalyseList,map);
+				analyseService.doAnalyse(jobId, log, jobName2, logAnalyseList, map);
 				if (size == logAnalyseList.size()) {
-					logAnalyseList.add(new LogAnalyse(jobId, jobName2, "其他", log, "未分析的原因",Integer.parseInt( map.get("JOB_END_STATUS").toString())));
+					logAnalyseList.add(new LogAnalyse(jobId, jobName2, "其他", log, "未分析的原因",
+							Integer.parseInt(map.get("JOB_END_STATUS").toString())));
 				}
 			}
 		}
