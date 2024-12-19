@@ -11,7 +11,6 @@ import net.risesoft.y9.configuration.Y9Properties;
 @SpringBootApplication
 @EnableConfigurationProperties(Y9Properties.class)
 @EnableScheduling
-@EnableAsync
 public class RiseAdminApplication {
 	
 	public static void main(String[] args) {
