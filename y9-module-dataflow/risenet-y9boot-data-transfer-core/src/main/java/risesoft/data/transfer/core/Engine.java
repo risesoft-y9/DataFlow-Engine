@@ -58,7 +58,7 @@ public class Engine {
 	 */
 	public static ResultJobListener start(String jobId, Configuration configuration) {
 		ResultJobListener resultJobListener = new ResultJobListener();
-		start(jobId, configuration, resultJobListener, null);
+		resultJobListener.setJobContext(start(jobId, configuration, resultJobListener, null));
 		return resultJobListener;
 	}
 
