@@ -23,7 +23,7 @@ import risesoft.data.transfer.core.util.ClassTools;
 public class HandleManager implements JobStartHandle {
 
 	private Map<Class<?>, HandleContext<? extends Handle>> handles = new HashMap<Class<?>, HandleContext<? extends Handle>>();
-	private HandleContext<HandleChangeHandle> changeContext;
+	private HandleContext<HandleChangeHandle> changeContext =EmptyHandleContext.EMPTY;
 
 	public HandleManager() {
 		add(this);
