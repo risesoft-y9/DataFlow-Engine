@@ -58,6 +58,11 @@ public class PGDataOutputStreamFactory extends RdbmsDataOutputStreamFactory {
 	}
 
 	@Override
+	protected void createReplace(int size) {
+		createUpdate(size);
+	}
+	
+	@Override
 	protected DataOutputStream getUpdateStream() {
 		return new PGUpadateDataOutputStream(DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password), workSql,
 				resultSetMetaData, createColumnHandles, dataBaseType, logger, updateField);

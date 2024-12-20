@@ -113,20 +113,52 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 			}
 		}
 		StringBuilder sb = new StringBuilder();
-		sb.append("update " + tableName).append(" set ");
-		for (int i = 0; i < updateField.size(); i++) {
-			if (i != 0) {
+		sb.append("MERGE INTO " + tableName + " A USING ( SELECT ");
+		boolean first = true;
+		boolean first1 = true;
+		StringBuilder str = new StringBuilder();
+		StringBuilder update = new StringBuilder();
+		for (String columnHolder : idField) {
+			if (!first) {
+				sb.append(",");
+				str.append(" AND ");
+			} else {
+				first = false;
+			}
+			str.append("TMP.").append(columnHolder);
+			sb.append("?");
+			str.append(" = ");
+			sb.append(" AS ");
+			str.append("A.").append(columnHolder);
+			sb.append(columnHolder);
+
+		}
+
+		for (String columnHolder : updateField) {
+			if (!first1) {
+				update.append(",");
+			} else {
+				first1 = false;
+			}
+			update.append(columnHolder);
+			update.append(" = ");
+			update.append("?");
+
+		}
+
+		sb.append(" FROM DUAL ) TMP ON (");
+		sb.append(str);
+		sb.append(" ) WHEN MATCHED THEN UPDATE SET ");
+		sb.append(update);
+		sb.append(" WHEN NOT MATCHED THEN ").append("INSERT (")
+				.append(StringUtils.join(resultSetMetaData.getLeft(), ",")).append(") VALUES(");
+		for (int i = 0; i < size; i++) {
+			sb.append("?");
+			if (i != size - 1) {
 				sb.append(",");
 			}
-			sb.append(updateField.get(i) + " = ? ");
 		}
-		sb.append(" where ");
-		for (int i = 0; i < idField.size(); i++) {
-			if (i != 0) {
-				sb.append(" and ");
-			}
-			sb.append(updateField.get(i) + " = ? ");
-		}
+		sb.append(")");
 		this.workSql = sb.toString();
 		if (logger.isInfo()) {
 			logger.info(this, "worksql:" + this.workSql);

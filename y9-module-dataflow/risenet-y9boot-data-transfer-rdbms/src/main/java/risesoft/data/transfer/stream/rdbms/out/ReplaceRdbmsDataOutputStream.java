@@ -46,15 +46,26 @@ public class ReplaceRdbmsDataOutputStream extends RdbmsDataOutputStream {
 		Map<String, Column> colMap = getRecordMap(record);
 		Column col;
 		PreparedStatementHandle psHandle;
+		// id
+		for (int i = 0; i < idField.size(); i++) {
+			col = ValueUtils.getRequired(colMap.get(idField.get(i)), "不存在的字段" + idField.get(i));
+			psHandle = this.createColumnHandles.get(idField.get(i));
+			psHandle.fillPreparedStatementColumnType(preparedStatement, size, col, dataBaseType, resultSetMetaData);
+			size++;
+		}
+		// 设置值
 		for (int i = 0; i < updateField.size(); i++) {
-			col = ValueUtils.getRequired(colMap.get(updateField.get(i)), "不存在的字段:" + updateField.get(i));
+			col = ValueUtils.getRequired(colMap.get(updateField.get(i)), "不存在的字段" + updateField.get(i));
 			psHandle = this.createColumnHandles.get(updateField.get(i));
 			psHandle.fillPreparedStatementColumnType(preparedStatement, size, col, dataBaseType, resultSetMetaData);
 			size++;
 		}
-		for (int i = 0; i < idField.size(); i++) {
-			col = ValueUtils.getRequired(colMap.get(idField.get(i)), "不存在的字段:" + idField.get(i));
-			psHandle = this.createColumnHandles.get(idField.get(i));
+		
+		// insertall
+		List<String> lefts = resultSetMetaData.getLeft();
+		for (int i = 0; i < lefts.size(); i++) {
+			col = colMap.get(lefts.get(i));
+			psHandle = this.createColumnHandles.get(lefts.get(i));
 			psHandle.fillPreparedStatementColumnType(preparedStatement, size, col, dataBaseType, resultSetMetaData);
 			size++;
 		}

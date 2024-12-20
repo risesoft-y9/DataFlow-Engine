@@ -55,9 +55,14 @@ public class MySqlDataOutputStreamFactory extends RdbmsDataOutputStreamFactory {
 		}
 	}
 
+	protected void createReplace(int size) {
+		createUpdate(size);
+	}
+
 	@Override
 	protected DataOutputStream getUpdateStream() {
-		return new MySqlUpadateDataOutputStream(DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password), workSql, resultSetMetaData, createColumnHandles, dataBaseType, logger);
+		return new MySqlUpadateDataOutputStream(DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password),
+				workSql, resultSetMetaData, createColumnHandles, dataBaseType, logger);
 	}
 
 }
