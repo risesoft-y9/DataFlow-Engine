@@ -256,7 +256,7 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 			} else if (writerType.startsWith("update")) {
 				createUpdate(size);
 			} else if (writerType.startsWith("replace")) {
-				createUpdate(size);
+				createReplace(size);
 			} else {
 				logger.error(this, "未识别的输出类型" + writerType);
 				throw new RuntimeException("未识别的输出类型" + writerType);
