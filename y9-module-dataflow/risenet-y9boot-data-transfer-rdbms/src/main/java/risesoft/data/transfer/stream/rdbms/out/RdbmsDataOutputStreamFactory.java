@@ -120,7 +120,7 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 			}
 			sb.append(updateField.get(i) + " = ? ");
 		}
-		sb.append("where");
+		sb.append(" where ");
 		for (int i = 0; i < idField.size(); i++) {
 			if (i != 0) {
 				sb.append(" and ");
