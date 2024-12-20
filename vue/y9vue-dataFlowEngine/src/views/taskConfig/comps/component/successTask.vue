@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { globalDataTask } from '@/views/dispatch/comp/saveTask/data';
+import {globalData, taskSetForm} from '../data'
 
 const emits = defineEmits(['next', 'top', 'goBack', 'goBackSet', 'setTask', 'close']);
 //去除警告

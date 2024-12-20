@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { reactive, onMounted, inject } from 'vue';
+    import { reactive, onMounted, inject, computed, ref } from 'vue';
     import { useSettingStore } from '@/store/modules/settingStore';
     import { useI18n } from 'vue-i18n';
 
@@ -10,7 +10,8 @@
     import EditorForm from './component/EditorForm.vue';
     import { state, getPage, tableHeight } from '@/views/libraryTable/component/DataSheet/data';
     import { currNode } from '@/views/libraryTable/component';
-    import {buildTable, deleteTableInfo} from '@/api/libraryTable';
+    import { buildTable, deleteTableInfo, getTableJob } from '@/api/libraryTable';
+    import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
 
     const table = reactive({
         // 个人权限 表格的 配置条件
@@ -47,7 +48,7 @@
                 {
                     title: computed(() => t('操作')),
                     fixed: 'right',
-                    width: 220,
+                    width: 280,
                     key: 'operation',
                     slot: 'operation'
                 }
@@ -62,10 +63,24 @@
         getPage();
     });
 
+    const gridData = ref([]);// 关联关系数据
+    // 获取关联关系
+    async function getData(tableId) {
+        gridData.value = [];
+        dialogTableVisible.value = true;
+        let res = await getTableJob({tableId: tableId});
+        if (res.code == 0) {
+            gridData.value = res.data;
+        } else {
+            ElMessage.error(res.msg);
+        }
+    }
+
     const handle = (type, row) => {
-        if (type == 1) {
+        if(type == 4) {
+            getData(row.id);
+        } else if(type == 1) {
             state.row = row;
-            console.log(row, 'row');
             Object.assign(state.dialogConfig, {
                 show: true,
                 okText: false,
@@ -74,14 +89,13 @@
                 // loading: true,
                 title: '字段管理'
             });
-        } else if(type==2){
+        } else if(type == 2) {
             ElMessageBox.confirm(`${t('是否删除')}【${row.name}】 数据表?`, t('提示'), {
                 confirmButtonText: t('确定'),
                 cancelButtonText: t('取消'),
                 type: 'info'
             })
             .then(async () => {
-                console.log(row, 'row');
                 let res = await deleteTableInfo({ id: row.id });
                 if (res) {
                     ElNotification({
@@ -101,7 +115,7 @@
                     offset: 65
                 });
             });
-        }else{
+        } else {
             ElMessageBox.confirm(`确定是否更新库表结构`, t('提示'), {
                 confirmButtonText: t('确定'),
                 cancelButtonText: t('取消'),
@@ -139,9 +153,10 @@
     };
 
     const handleClickQuery = () => {
-        console.log('搜索', state);
         getPage();
     };
+
+    const dialogTableVisible = ref(false);
 </script>
 
 <template>
@@ -165,22 +180,35 @@
             </template>
             <template v-slot:operation="{ row }">
                 <div class="operation">
-                  <div class="fields" @click="handle(3, row)" v-if="row.status==0">
-                    <i class="ri-edit-line"></i>
-                    <span class="text">{{ $t('生成表') }}</span>
-                  </div>
+                    <div class="fields" @click="handle(3, row)" v-if="row.status==0">
+                        <i class="ri-edit-line"></i>
+                        <span class="text">{{ $t('生成表') }}</span>
+                    </div>
+                    <div class="fields" @click="handle(4, row)">
+                        <i class="ri-mastercard-line"></i>
+                        <span class="text">{{ $t('关联关系') }}</span>
+                    </div>
                     <div class="fields" @click="handle(1, row)">
                         <i class="ri-edit-line"></i>
                         <span class="text">{{ $t('字段管理') }}</span>
                     </div>
                     <div class="delete" @click="handle(2, row)">
                         <i class="ri-delete-bin-line"></i>
-                        <span class="text">{{ $t('删除') }}</span></div
-                    >
+                        <span class="text">{{ $t('删除') }}</span>
+                    </div>
                 </div>
             </template>
         </y9Table>
     </y9Card>
+    <el-dialog v-model="dialogTableVisible" title="数据表关联关系" width="1200">
+        <el-table :data="gridData">
+            <el-table-column property="taskName" label="任务名称" width="300" />
+            <el-table-column property="sourceTable" label="源表" width="300" />
+            <el-table-column property="sourceTableNum" label="源表数据量" />
+            <el-table-column property="targetTable" label="目的表" width="300" />
+            <el-table-column property="targetTableNum" label="目的表数据量" />
+        </el-table>
+    </el-dialog>
 </template>
 
 <style scoped lang="scss">

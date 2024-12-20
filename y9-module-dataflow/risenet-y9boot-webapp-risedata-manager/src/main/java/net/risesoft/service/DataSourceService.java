@@ -209,5 +209,12 @@ public interface DataSourceService {
 	 * @return
 	 */
 	Y9Result<List<TypeDefinition>> getFieldTypes(String sourceId);
+	
+	/**
+	 * 获取数据表的任务关系数据
+	 * @param tableId
+	 * @return
+	 */
+	Y9Result<List<Map<String, Object>>> getTableJob(String tableId);
 
 }

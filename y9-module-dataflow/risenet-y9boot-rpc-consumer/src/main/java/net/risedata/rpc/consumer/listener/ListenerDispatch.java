@@ -1,13 +1,9 @@
 package net.risedata.rpc.consumer.listener;
 
-import com.alibaba.fastjson.JSON;
-
 import net.risedata.rpc.consumer.core.impl.ChannelConnection;
 import net.risedata.rpc.consumer.exceptions.ListenerException;
 import net.risedata.rpc.consumer.model.ListenerRequest;
 import net.risedata.rpc.model.ListenerResponse;
-import net.risedata.rpc.model.Request;
-import net.risedata.rpc.model.Response;
 import net.risedata.rpc.utils.LParameter;
 
 import java.util.ArrayList;
@@ -21,8 +17,6 @@ import java.util.List;
  * @Version 1.0
  */
 public class ListenerDispatch {
-
-
 
     public static Object doDispatch(ListenerRequest request) {
 

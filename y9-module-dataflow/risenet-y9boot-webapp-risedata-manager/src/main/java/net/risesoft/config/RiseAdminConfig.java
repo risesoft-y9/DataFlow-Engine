@@ -3,15 +3,12 @@ package net.risesoft.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.DispatcherServlet;
 
 import net.risesoft.converter.EncryptConverter;
 import net.risesoft.y9.Y9Context;
@@ -29,22 +26,17 @@ public class RiseAdminConfig {
 		converter.setSupportedMediaTypes(supportedMediaTypes);
 		return converter;
 	}
-	@Bean
-	public ServletRegistrationBean<DispatcherServlet> dispatcherServlet() {
-	    ServletRegistrationBean<DispatcherServlet> registration = new ServletRegistrationBean<>(new DispatcherServlet());
-	    registration.setAsyncSupported(true);
-	    return registration;
-	}
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@Bean
-	public FilterRegistrationBean checkUserLoginFilter() {
-		FilterRegistrationBean filterBean = new FilterRegistrationBean();
-		filterBean.setFilter(new CheckUserLoginFilter());
-		filterBean.setAsyncSupported(false);
-		filterBean.setOrder(50);
-		filterBean.addUrlPatterns("/api/*");
-		return filterBean;
-	}
+	
+//	@SuppressWarnings({ "rawtypes", "unchecked" })
+//	@Bean
+//	public FilterRegistrationBean checkUserLoginFilter() {
+//		FilterRegistrationBean filterBean = new FilterRegistrationBean();
+//		filterBean.setFilter(new CheckUserLoginFilter());
+//		filterBean.setAsyncSupported(false);
+//		filterBean.setOrder(50);
+//		filterBean.addUrlPatterns("/api/*");
+//		return filterBean;
+//	}
 	
 	@Bean
 	@DependsOn("y9Context")

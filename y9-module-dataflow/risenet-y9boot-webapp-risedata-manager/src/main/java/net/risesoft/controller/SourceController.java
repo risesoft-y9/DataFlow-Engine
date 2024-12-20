@@ -147,29 +147,33 @@ public class SourceController {
 	
 	private Map<String, Object> getDataMap(DataTable record) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("id", record.getId());
-		map.put("name", record.getName());
-		map.put("cname", record.getCname());
-		map.put("baseId", record.getBaseId());
-	    DataSourceEntity source = dataSourceService.getDataSourceById(record.getBaseId());
-	    map.put("baseType", source.getBaseType());
-	    map.put("baseName", source.getBaseName());
-	    if(record.getStatus() == 1) {
-	    	if(source.getType() == 0) {
-	    		map.put("dataNum", DbMetaDataUtil.getTableDataNum(dataSourceService.getDataSource(source.getId()), record.getName()));
-	    	}else if(source.getBaseType().equals(DataConstant.ES)){
-	    		ElasticsearchRestClient elasticsearchRestClient = new ElasticsearchRestClient(source.getUrl(), 
-	    				source.getUsername(), source.getPassword());
-	    		try {
-	    			map.put("dataNum", elasticsearchRestClient.getCount(record.getName(), "{}"));
-				} catch (Exception e) {
-					map.put("dataNum", e.getMessage());
+		try {
+			map.put("id", record.getId());
+			map.put("name", record.getName());
+			map.put("cname", record.getCname());
+			map.put("baseId", record.getBaseId());
+			DataSourceEntity source = dataSourceService.getDataSourceById(record.getBaseId());
+			map.put("baseType", source.getBaseType());
+			map.put("baseName", source.getBaseName());
+			if(record.getStatus() == 1) {
+				if(source.getType() == 0) {
+					map.put("dataNum", DbMetaDataUtil.getTableDataNum(dataSourceService.getDataSource(source.getId()), record.getName()));
+				}else if(source.getBaseType().equals(DataConstant.ES)) {
+					ElasticsearchRestClient elasticsearchRestClient = new ElasticsearchRestClient(source.getUrl(), 
+							source.getUsername(), source.getPassword());
+					try {
+						map.put("dataNum", elasticsearchRestClient.getCount(record.getName(), "{}"));
+					} catch (Exception e) {
+						map.put("dataNum", e.getMessage());
+					}
 				}
-	    	}
-	    }else {
-	    	map.put("dataNum", 0);
-	    }
-	    map.put("status", record.getStatus());
+			}else {
+				map.put("dataNum", 0);
+			}
+			map.put("status", record.getStatus());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	    return map;
 	}
 	
@@ -287,6 +291,11 @@ public class SourceController {
 		return Y9Result.success(true);
 	}
 	
+	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "获取表关联的任务", logLevel = LogLevelEnum.RSLOG, enable = false)
+	@GetMapping(value = "/getTableJob")
+	public Y9Result<List<Map<String, Object>>> getTableJob(String tableId) {
+		return dataSourceService.getTableJob(tableId);
+	}
 	
 	
 	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "表数据列表页", logLevel = LogLevelEnum.RSLOG)

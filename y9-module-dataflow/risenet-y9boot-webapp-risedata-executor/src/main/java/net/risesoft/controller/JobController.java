@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import net.risedata.rpc.consumer.annotation.Listener;
 import net.risedata.rpc.consumer.annotation.Listeners;
-import net.risedata.rpc.consumer.listener.ListenerDispatch;
-import net.risedata.rpc.consumer.result.SyncResult;
 import net.risedata.rpc.utils.IdUtils;
 import net.risesoft.api.ConfigApi;
 import net.risesoft.model.Config;
@@ -43,7 +41,6 @@ public class JobController {
 	 * 执行任务的缓存配置
 	 */
 	private static Map<String, JobContext> JOB_CONTEXT = new ConcurrentHashMap<String, JobContext>();
-
 
 	@Resource
 	private ConfigApi configApi;
@@ -123,6 +120,7 @@ public class JobController {
 		if (jobContext == null) {
 			result.put("success", false);
 			result.put("msg", "任务不存在，或已经失效!");
+			return result;
 		}
 		Communication communication = jobContext.getCommunication();
 		result.put("success", communication.getState() == State.SUCCEEDED);
@@ -146,6 +144,7 @@ public class JobController {
 		if (jobContext == null) {
 			result.put("success", false);
 			result.put("msg", "任务不存在，或已经失效!");
+			return result;
 		}
 		jobContext.stop(new RuntimeException(msg));
 		Communication communication = jobContext.getCommunication();
@@ -170,6 +169,7 @@ public class JobController {
 		if (jobContext == null) {
 			result.put("success", false);
 			result.put("msg", "任务不存在，或已经失效!");
+			return result;
 		}
 		jobContext.await(msg);
 		Communication communication = jobContext.getCommunication();
@@ -179,6 +179,7 @@ public class JobController {
 				: CommunicationTool.getStatistics(communication));
 		return result;
 	}
+	
 	/**
 	 * 启动
 	 * @param jobId
@@ -193,6 +194,7 @@ public class JobController {
 		if (jobContext == null) {
 			result.put("success", false);
 			result.put("msg", "任务不存在，或已经失效!");
+			return result;
 		}
 		jobContext.running();
 		Communication communication = jobContext.getCommunication();
@@ -203,11 +205,14 @@ public class JobController {
 		return result;
 	}
 	
-
-
+	/**
+	 * 加载任务
+	 * @param args
+	 * @param jobLogId
+	 * @return
+	 */
 	@Listener("awaitExecutorJobs")
 	public String awaitExecutorJobs(String args,String jobLogId) {
-
 		String[] ids = args.split(",");
 		StringBuilder stringBuilder = new StringBuilder();
 		for (int i = 0; i < ids.length; i++) {
@@ -237,7 +242,6 @@ public class JobController {
 				}
 			}
 		}
-//		new syncres
 
 		System.out.println(stringBuilder);
 		//执行成功后清除掉

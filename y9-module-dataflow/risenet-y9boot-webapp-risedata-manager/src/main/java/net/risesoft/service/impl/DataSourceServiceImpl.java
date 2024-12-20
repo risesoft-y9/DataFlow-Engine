@@ -45,11 +45,14 @@ import net.risesoft.y9public.entity.DataSourceTypeEntity;
 import net.risesoft.y9public.entity.DataSourceEntity;
 import net.risesoft.y9public.entity.DataTable;
 import net.risesoft.y9public.entity.DataTableField;
+import net.risesoft.y9public.entity.DataTaskConfigEntity;
+import net.risesoft.y9public.entity.DataTaskEntity;
 import net.risesoft.y9public.repository.DataSourceTypeRepository;
 import net.risesoft.y9public.repository.DataSourceRepository;
 import net.risesoft.y9public.repository.DataTableFieldRepository;
 import net.risesoft.y9public.repository.DataTableRepository;
 import net.risesoft.y9public.repository.DataTaskConfigRepository;
+import net.risesoft.y9public.repository.DataTaskRepository;
 import net.risesoft.y9public.repository.spec.DataTableSpecification;
 
 @Service(value = "dataSourceService")
@@ -65,6 +68,8 @@ public class DataSourceServiceImpl implements DataSourceService {
 	private final DataSourceTypeRepository dataSourceTypeRepository;
 	
 	private final DataTaskConfigRepository dataTaskConfigRepository;
+	
+	private final DataTaskRepository dataTaskRepository;
 
 	private ConcurrentMap<String, DataSource> dataSourceMap = new ConcurrentHashMap<>();
 
@@ -796,6 +801,73 @@ public class DataSourceServiceImpl implements DataSourceService {
 			e.printStackTrace();
 		}
 		return Y9Result.failure("提取失败");
+	}
+
+	@Override
+	public Y9Result<List<Map<String, Object>>> getTableJob(String tableId) {
+		List<Map<String, Object>> listMap = new ArrayList<Map<String,Object>>();
+		try {
+			DataTable dataTable = dataTableRepository.findById(tableId).orElse(null);
+			if(dataTable != null) {
+				// 获取任务信息
+				List<DataTaskConfigEntity> dataTaskList = dataTaskConfigRepository.findByTableId(tableId);
+				for(DataTaskConfigEntity taskConfigEntity : dataTaskList) {
+					Map<String, Object> map = new HashMap<String, Object>();
+					DataTaskEntity dataTaskEntity = dataTaskRepository.findById(taskConfigEntity.getTaskId()).orElse(null);
+					map.put("taskName", dataTaskEntity.getName());
+					// 源表信息
+					String sourceTable = dataTable.getName();
+					if(taskConfigEntity.getSourceTable().equals(tableId)) {
+						map.put("sourceTable", dataTable.getName());
+					}else {
+						DataTable dataTable2 = dataTableRepository.findById(taskConfigEntity.getSourceTable()).orElse(null);
+						map.put("sourceTable", dataTable2.getName() + "(" + getDataSourceById(taskConfigEntity.getSourceId()).getBaseName() + ")");
+						sourceTable = dataTable2.getName();
+					}
+					// 获取表数据量
+					if(taskConfigEntity.getSourceType().equals(DataConstant.ES)) {
+						map.put("sourceTableNum", getElasticCount(taskConfigEntity.getSourceId(), sourceTable));
+					}else {
+						map.put("sourceTableNum", getTableDataCount(taskConfigEntity.getSourceId(), sourceTable));
+					}
+					// 目的表信息
+					String targetTable = dataTable.getName();
+					if(taskConfigEntity.getTargetTable().equals(tableId)) {
+						map.put("targetTable", dataTable.getName());
+					}else {
+						DataTable dataTable2 = dataTableRepository.findById(taskConfigEntity.getTargetTable()).orElse(null);
+						map.put("targetTable", dataTable2.getName() + "(" + getDataSourceById(taskConfigEntity.getTargetId()).getBaseName() + ")");
+						
+						targetTable = dataTable2.getName();
+					}
+					// 获取表数据量
+					if(taskConfigEntity.getTargetType().equals(DataConstant.ES)) {
+						map.put("targetTableNum", getElasticCount(taskConfigEntity.getTargetId(), targetTable));
+					}else {
+						map.put("targetTableNum", getTableDataCount(taskConfigEntity.getTargetId(), targetTable));
+					}
+					listMap.add(map);
+				}
+			}
+		} catch (Exception e) {
+			return Y9Result.failure("获取失败：" + e.getMessage());
+		}
+		return Y9Result.success(listMap, "获取成功");
+	}
+	
+	private long getTableDataCount(String sourceId, String tableName) {
+		return DbMetaDataUtil.getTableDataNum(getDataSource(sourceId), tableName);
+	}
+	
+	private long getElasticCount(String sourceId, String tableName) {
+		DataSourceEntity source = getDataSourceById(sourceId);
+		ElasticsearchRestClient elasticsearchRestClient = new ElasticsearchRestClient(source.getUrl(), 
+				source.getUsername(), source.getPassword());
+		try {
+			return elasticsearchRestClient.getCount(tableName, "{}");
+		} catch (Exception e) {
+			return -1;
+		}
 	}
 
 }

@@ -6,6 +6,7 @@ import exchange from './comp/exchange.vue';
 import channel from './comp/channel.vue';
 import plugs from './comp/plugs.vue';
 import { saveTaskTable } from '@/api/taskConfig';
+import { ElNotification } from 'element-plus';
 
 const emits = defineEmits(['next', 'top', 'goBack', 'goBackSet', 'setTask', 'close']);
 //去除警告

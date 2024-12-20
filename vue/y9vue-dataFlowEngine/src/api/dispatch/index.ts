@@ -225,3 +225,16 @@ export const searchByGroupReport = async (params) => {
         params
     });
 };
+
+/**
+ * 对任务执行操作事件
+ * @param data 
+ */
+export const doOperationByLogId = async (data) => {
+    return await platformRequest({
+        url: 'job/log/doOperationByLogId',
+        method: 'POST',
+        JSON: true,
+        data
+    });
+};

@@ -174,3 +174,17 @@ export const getFieldTypes = async (params) => {
         params
     });
 };
+
+/**
+ * 获取表关联关系
+ * @param params
+ * @returns
+ */
+export const getTableJob = async (params) => {
+    return await platformRequest({
+        url: 'source/getTableJob',
+        method: 'GET',
+        cType: false,
+        params
+    });
+};
