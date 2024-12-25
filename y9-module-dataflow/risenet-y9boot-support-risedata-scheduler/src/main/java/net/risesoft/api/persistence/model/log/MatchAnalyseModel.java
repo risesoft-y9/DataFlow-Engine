@@ -20,7 +20,7 @@ import java.io.Serializable;
  */
 @Entity
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer"})
-@Table(name = "Y9_DATASERVICE_LOG_MATCH_ANALYSE")
+@Table(name = "Y9_DATASERVICE_LOG_M_ANALYSE")
 public class MatchAnalyseModel implements Serializable {
 
     /**
