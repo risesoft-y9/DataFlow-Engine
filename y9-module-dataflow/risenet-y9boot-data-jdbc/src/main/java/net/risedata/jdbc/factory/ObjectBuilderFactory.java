@@ -3,6 +3,7 @@ package net.risedata.jdbc.factory;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.risedata.jdbc.config.model.BeanConfig;
+import net.risedata.jdbc.exception.InstanceException;
 import net.risedata.jdbc.utils.ObjectBuilder;
 
 /**
@@ -11,10 +12,6 @@ import net.risedata.jdbc.utils.ObjectBuilder;
  * @author libo 2021年6月17日
  */
 public class ObjectBuilderFactory {
-
-	private static ConcurrentHashMap<Class<?>, ThreadLocal<Object>> BEAN_MAP = new ConcurrentHashMap<>();
-
-	private static Object THREAD_LOCK = new Object();
 
 	/**
 	 * 获取对应的objectBuilder对象
@@ -25,62 +22,13 @@ public class ObjectBuilderFactory {
 	 */
 	public static <T> ObjectBuilder<T> builder(Class<T> objectClass) {
 		BeanConfig bc = BeanConfigFactory.getInstance(objectClass);
-		T value = getInstance(objectClass);
-		return new ObjectBuilder<T>(bc, value);
-	}
-
-	public static <T> ObjectBuilder<T> newBuilder(Class<T> objectClass) {
-		BeanConfig bc = BeanConfigFactory.getInstance(objectClass);
-
 		T value = null;
 		try {
-			value = (T) objectClass.newInstance();
+			value = objectClass.newInstance();
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new InstanceException("构建实例失败!异常信息:" + e.getMessage());
 		}
 		return new ObjectBuilder<T>(bc, value);
-	}
-
-	/***
-	 * 在基于thread local 的单例池中拿到对象 注意是单例的 但是会把单例对象的值设置为空的
-	 * 
-	 * @param <T>
-	 * @param bc
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T getInstance(Class<T> returnClass) {
-		ThreadLocal<Object> threadLocal = getThreadLocal(returnClass);
-		Object value = threadLocal.get();
-		if (value == null) {
-			synchronized (threadLocal) {
-				value = threadLocal.get();
-				if (value == null) {
-					try {
-						value = returnClass.newInstance();
-						
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					threadLocal.set(value);
-				}
-			}
-		}
-		return (T) value;
-	}
-
-	public static ThreadLocal<Object> getThreadLocal(Class<?> classType) {
-		ThreadLocal<Object> threadLocal = BEAN_MAP.get(classType);
-		if (threadLocal == null) {
-			synchronized (THREAD_LOCK) {
-				threadLocal = BEAN_MAP.get(classType);
-				if (threadLocal == null) {
-					threadLocal = new ThreadLocal<>();
-					BEAN_MAP.put(classType, threadLocal);
-				}
-			}
-		}
-		return threadLocal;
 	}
 
 	/**
