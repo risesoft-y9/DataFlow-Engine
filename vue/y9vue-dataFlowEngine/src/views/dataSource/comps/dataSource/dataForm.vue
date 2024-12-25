@@ -41,7 +41,7 @@
 
 <script lang="ts" setup>
     import { pick } from 'lodash';
-    import { inject, ref, watch, computed, onMounted } from 'vue';
+    import { inject, ref, watch, computed, onMounted, h } from 'vue';
     import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
     import { useI18n } from 'vue-i18n';
     import { getDataSourceById, saveDataConnectInfo } from '@/api/dataSource';
@@ -487,7 +487,8 @@
         //显示|隐藏对应的基本信息的字段。
         if (type === 'ftp') {
             if (baseFormConfig.value.itemList[2].prop !== 'runType') {
-                baseFormConfig.value.itemList.splice(5, 1);
+                //baseFormConfig.value.itemList.splice(5, 1);
+                baseFormConfig.value.itemList[5].label = '编码方式';
                 baseFormConfig.value.itemList.splice(2, 1, ...ftpItemList);
             }
         } else if (type === 'elasticsearch') {

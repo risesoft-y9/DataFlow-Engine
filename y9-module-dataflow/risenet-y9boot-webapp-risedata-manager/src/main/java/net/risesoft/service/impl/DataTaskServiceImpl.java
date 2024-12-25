@@ -133,21 +133,44 @@ public class DataTaskServiceImpl implements DataTaskService {
 	}
 	
 	@Override
-	public SingleTaskModel getSingleTaskById(String id) {
+	public SingleTaskModel getSingleTaskById(String id, String type) {
 		SingleTaskModel singleTaskModel = new SingleTaskModel();
 		DataTaskEntity dataTask = dataTaskRepository.findById(id).orElse(null);
 		if(dataTask != null) {
 			singleTaskModel.setId(dataTask.getId());
 			singleTaskModel.setName(dataTask.getName());
 			singleTaskModel.setDescription(dataTask.getDescription());
-			singleTaskModel.setBusinessId(dataTask.getBusinessId());
+			if(type.equals("detail")) {
+				singleTaskModel.setBusinessId(dataBusinessService.getNameById(dataTask.getBusinessId()));
+			}else {
+				singleTaskModel.setBusinessId(dataTask.getBusinessId());
+			}
 			singleTaskModel.setUserId(dataTask.getUserId());
 			singleTaskModel.setUserName(dataTask.getUserName());
 			singleTaskModel.setTaskType(dataTask.getTaskType());
 			// 获取配置信息
 			DataSingleTaskConfigEntity singleTaskConfigEntity = dataSingleTaskConfigRepository.findById(id).orElse(null);
-			singleTaskModel.setSourceId(singleTaskConfigEntity.getSourceId());
-			singleTaskModel.setSourceTable(singleTaskConfigEntity.getSourceTable());
+			if(type.equals("detail")) {
+				if(singleTaskConfigEntity.getSourceType().equals("api")) {
+					singleTaskModel.setSourceId("接口数据源");
+					DataInterfaceEntity dataInterfaceEntity = dataInterfaceRepository.findById(singleTaskConfigEntity.getSourceTable()).orElse(null);
+					if(dataInterfaceEntity != null) {
+						singleTaskModel.setSourceTable(dataInterfaceEntity.getInterfaceName());
+					}
+				}else {
+					DataSourceEntity sourceEntity = dataSourceRepository.findById(singleTaskConfigEntity.getSourceId()).orElse(null);
+					if(sourceEntity != null) {
+						singleTaskModel.setSourceId("[" + sourceEntity.getBaseType() + "]" + sourceEntity.getBaseName());
+					}
+					DataTable dataTable = dataTableRepository.findById(singleTaskConfigEntity.getSourceTable()).orElse(null);
+					if(dataTable != null) {
+						singleTaskModel.setSourceTable(dataTable.getName());
+					}
+				}
+			}else {
+				singleTaskModel.setSourceId(singleTaskConfigEntity.getSourceId());
+				singleTaskModel.setSourceTable(singleTaskConfigEntity.getSourceTable());
+			}
 			singleTaskModel.setSourceType(singleTaskConfigEntity.getSourceType());
 			singleTaskModel.setWhereSql(singleTaskConfigEntity.getWhereSql());
 			singleTaskModel.setWriterType(singleTaskConfigEntity.getWriterType());
@@ -379,11 +402,15 @@ public class DataTaskServiceImpl implements DataTaskService {
 				}
 				map.put("whereSql", taskConfig.getWhereSql());
 				if(StringUtils.isNotBlank(taskConfig.getSplitPk())) {
-					DataTableField tableField = dataTableFieldRepository.findById(taskConfig.getSplitPk()).orElse(null);
-					if(tableField != null) {
-						map.put("splitPk", tableField.getName());
+					if(taskConfig.getSourceType().equals("ftp")) {
+						map.put("splitPk", taskConfig.getSplitPk());
 					}else {
-						map.put("splitPk", "字段获取不到");
+						DataTableField tableField = dataTableFieldRepository.findById(taskConfig.getSplitPk()).orElse(null);
+						if(tableField != null) {
+							map.put("splitPk", tableField.getName());
+						}else {
+							map.put("splitPk", "字段获取不到");
+						}
 					}
 				}else {
 					map.put("splitPk", "");

@@ -104,8 +104,8 @@ public class TaskController {
 	
 	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "根据id获取单任务信息", logLevel = LogLevelEnum.RSLOG, enable = false)
 	@GetMapping(value = "/getSingleTaskById")
-	public Y9Result<SingleTaskModel> getSingleTaskById(@RequestParam String id) {
-		return Y9Result.success(dataTaskService.getSingleTaskById(id), "获取成功");
+	public Y9Result<SingleTaskModel> getSingleTaskById(@RequestParam String id, @RequestParam String type) {
+		return Y9Result.success(dataTaskService.getSingleTaskById(id, type), "获取成功");
 	}
 	
 	@RiseLog(operationType = OperationTypeEnum.DELETE, operationName = "删除任务配置", logLevel = LogLevelEnum.RSLOG)

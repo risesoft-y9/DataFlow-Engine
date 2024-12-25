@@ -148,7 +148,7 @@ public class DataSourceServiceImpl implements DataSourceService {
 		DataSourceEntity df = datasourceRepository.findById(id).orElse(null);
 		DataSourceEntity df1 = dsMap.get(id);
 		boolean modified = false;
-		if (df1 == null) {
+		if (df1 == null || dataSource == null) {
 			modified = true;
 		} else {
 			if (df != null) {

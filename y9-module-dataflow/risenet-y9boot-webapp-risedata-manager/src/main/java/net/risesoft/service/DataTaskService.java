@@ -33,7 +33,7 @@ public interface DataTaskService {
 	 * @param id
 	 * @return
 	 */
-	SingleTaskModel getSingleTaskById(String id);
+	SingleTaskModel getSingleTaskById(String id, String type);
 
 	/**
 	 * 根据id删除任务数据

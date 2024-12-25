@@ -42,6 +42,8 @@ const setInitData = () => {
                 goalTableForm.tableData[key] = [];
             } else if (key == 'targeName') {
                 goalTableForm.tableData[key] = goalTableForm.tableData[key];
+            } else if (key == 'targetTable') {
+                goalTableForm.tableData[key] = goalTableForm.tableData[key];
             } else if (key == 'writerType') {
                 goalTableForm.tableData[key] = 'insert';
             } else if (key == 'differentField') {
@@ -427,7 +429,7 @@ let ruleFormRef = ref(goalTableRef);
                                 />
                             </el-form-item>
                         </div>
-                        <div class="tips">缓存大小/kb，默认500</div>
+                        <div class="tips">缓存大小/kb，默认1024</div>
                     </div>
                 </el-descriptions-item>
             </div>
@@ -623,8 +625,8 @@ let ruleFormRef = ref(goalTableRef);
                         <el-form-item prop="writerType">
                             <el-radio-group v-model="goalTableForm.tableData.writerType" @change="radioChange">
                                 <el-radio :label="'insert'">新增</el-radio>
-                                <el-radio :label="'update'">增量更新（仅更新发生变化的数据，未发生变化的不予更新）</el-radio>
-                                <el-radio :label="'replace'">全量更新（不管有没有发生变化，都更新）</el-radio>
+                                <el-radio :label="'update'">增量更新（仅更新发生变化的数据）</el-radio>
+                                <el-radio :label="'replace'">全量更新（不管有没有变化都更新，mysql和postgresql数据库暂不支持）</el-radio>
                             </el-radio-group>
                         </el-form-item>
                     </el-descriptions-item>

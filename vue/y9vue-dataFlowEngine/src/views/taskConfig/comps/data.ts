@@ -62,7 +62,7 @@ export let goalTableRef = ref()
 export const goalTableForm = reactive({
     tableData: {
         targetCloumn:[],//字段详情
-        targetTable: [],//目的数据表id
+        targetTable: null,//目的数据表id
         targeName: null,//目标执行类
         writerType: 'insert',//输出类型
         differentField: [],//异字段同步
@@ -99,9 +99,9 @@ export const getTableList = async (type) => {
     let res = await getDataTableList(params)
     if (res) {
         if (type == 'input') {
-            updateForm(tableSetForm, res.data,'input');
+            updateForm(tableSetForm, res.data, 'input');
         } else {
-            updateForm(goalTableForm, res.data,'output');
+            updateForm(goalTableForm, res.data, 'output');
         }
     }
 }
@@ -117,12 +117,21 @@ export const getTableListAll = async (sourceId,targetId) => {
         updateForm(goalTableForm,ret.data,'output')
     }
 }
-const updateForm = (form, data,type) => {
-    form.tableOptions = data.tableList;
+const updateForm = (form, data, type) => {
     form.classListOptions = data.classList;
     if(type == 'input'){
+        if(addTaskForm.tableData.sourceType == 'ftp') {
+            form.tableData.sourceTable = data.tableList;
+        }else {
+            form.tableOptions = data.tableList;
+        }
         form.tableData.sourceName = data?.classList[0]?.id;
     }else{
+        if(addTaskForm.tableData.targetType == 'ftp') {
+            form.tableData.targetTable = data.tableList;
+        }else {
+            form.tableOptions = data.tableList;
+        }
         form.tableData.targeName = data?.classList[0]?.id;
     }
 }
@@ -155,26 +164,39 @@ export const getTableFieldListAll = async (sourceTable,targetTable) => {
  * @param baseType 
  */
 export const radioChange = async (type, baseType) => {
-    addTaskLoading.value = true
-    tableSetRef?.value?.resetFields()
-    goalTableRef?.value?.resetFields()
+    addTaskLoading.value = true;
     if (type == 'input') {
+        if(addTaskForm.tableData.targetType == 'ftp' && baseType != 'ftp') {
+            addTaskLoading.value = false;
+            addTaskForm.tableData.sourceId = null;
+            ElMessage({ type: 'error', message: 'ftp同步，只能都选ftp', offset: 65 });
+            return;
+        }
+        tableSetRef?.value?.resetFields();
         addTaskForm.tableData.sourceType = baseType;
         await clearFormData(tableSetForm, type);
     } else {
-        if(addTaskForm.tableData.sourceType == 'ftp' && baseType != 'ftp') {
+        if(addTaskForm.tableData.sourceType == null) {
             addTaskLoading.value = false;
-            ElMessage({ type: 'error', message: 'ftp同步，目的源只能选ftp', offset: 65 });
+            addTaskForm.tableData.targetId = null;
+            ElMessage({ type: 'error', message: '请先选择数据源', offset: 65 });
             return;
         }
+        if((addTaskForm.tableData.sourceType == 'ftp' && baseType != 'ftp') || (addTaskForm.tableData.sourceType != 'ftp' && baseType == 'ftp')) {
+            addTaskLoading.value = false;
+            addTaskForm.tableData.targetId = null;
+            ElMessage({ type: 'error', message: 'ftp同步，只能都选ftp', offset: 65 });
+            return;
+        }
+        goalTableRef?.value?.resetFields();
         addTaskForm.tableData.targetType = baseType;
         await clearFormData(goalTableForm, type);
     }
-    await getTableList(type) //获取表格和执行类
-    addTaskLoading.value = false
+    await getTableList(type); //获取表格和执行类
+    addTaskLoading.value = false;
 }
 
-const clearFormData = (form,type) => {
+const clearFormData = (form, type) => {
     form.tableOptions = [];
     form.tableData.name = null; //清空列表
     form.classListOptions = [];

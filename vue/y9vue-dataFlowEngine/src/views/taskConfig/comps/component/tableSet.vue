@@ -26,6 +26,8 @@ const setInitData = () => {
                 tableSetForm.tableData[key] = [];
             } else if (key == 'sourceName') {
                 tableSetForm.tableData[key] = tableSetForm.tableData[key];
+            } else if (key == 'sourceTable') {
+                tableSetForm.tableData[key] = tableSetForm.tableData[key];
             } else {
                 tableSetForm.tableData[key] = null;
             }
@@ -348,30 +350,6 @@ const activeName = ref('1');
                             </el-form-item>
                         </div>
                         <div class="tips">筛查目录下大于该时间的文件，格式：yyyy-MM-dd HH:mm:ss</div>
-                    </div>
-                </el-descriptions-item>
-                <el-descriptions-item label-align="center" label="编码方式">
-                    <template #label>
-                        <div>
-                            <span>编码方式</span>
-                        </div>
-                    </template>
-                    <div class="fetch">
-                        <div class="fetch-w">
-                            <el-form-item>
-                                <el-select
-                                    clearable
-                                    v-model="tableSetForm.tableData.fetchSize"
-                                    placeholder="请选择"
-                                >
-                                    <el-option label="ISO-8859-1" value="1"></el-option>
-                                    <el-option label="GBK" value="2"></el-option>
-                                    <el-option label="UTF-8" value="3"></el-option>
-                                    <el-option label="ASCII" value="4"></el-option>
-                                </el-select>
-                            </el-form-item>
-                        </div>
-                        <div class="tips">默认值为ISO-8859-1编码</div>
                     </div>
                 </el-descriptions-item>
             </div>

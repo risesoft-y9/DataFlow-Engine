@@ -292,7 +292,7 @@ const handle = async (type, row) => {
             Object.assign(dialogConfig2.value, {
                 show: true,
                 title: '详情',
-                width: '65%',
+                width: '55%',
                 okText: false,
                 cancelText: false
             });

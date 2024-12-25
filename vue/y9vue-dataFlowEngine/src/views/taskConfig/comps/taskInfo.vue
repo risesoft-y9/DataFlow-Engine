@@ -32,7 +32,7 @@ const state = reactive({
                 { label: '切分字段', key: 'splitPk', span: 1, value: '' },
                 { label: '切分模式', key: 'radio', span: 1, value: '' }, //todo
                 { label: '切分数量', key: 'tableNumber', span: 1, value: '' },
-                { label: '外部基础', key: 'splitFactor', span: 1, value: '' },
+                { label: '执行数基数', key: 'splitFactor', span: 1, value: '' },
                 { label: '数据脱敏', key: 'maskFields', span: 1, value: '' },
                 { label: '数据加密', key: 'encrypFields', span: 1, value: '' }
             ]

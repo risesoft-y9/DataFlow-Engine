@@ -12,8 +12,9 @@
                     <el-input
                         placeholder="请输入"
                         v-model="addTaskForm.tableData.name" 
-                        :disabled="globalData.type == 'detail' ? true : false"
+                        v-if="globalData.type != 'detail'"
                     ></el-input>
+                    <span v-else>{{ addTaskForm.tableData.name }}</span>
                 </el-form-item>
             </el-descriptions-item>
             <el-descriptions-item label-align="center">
@@ -30,8 +31,9 @@
                         :props="state.defaultProps"
                         v-model="addTaskForm.tableData.businessId"
                         :data="state.treeData"
-                        :disabled="globalData.type == 'detail' ? true : false"
+                        v-if="globalData.type != 'detail'"
                     />
+                    <span v-else>{{ addTaskForm.tableData.businessId }}</span>
                 </el-form-item>
             </el-descriptions-item>
             <el-descriptions-item label-align="center">
@@ -46,8 +48,9 @@
                         show-word-limit
                         type="textarea"
                         v-model="addTaskForm.tableData.description"
-                        :disabled="globalData.type == 'detail' ? true : false"
+                        v-if="globalData.type != 'detail'"
                     ></el-input>
+                    <span v-else>{{ addTaskForm.tableData.description }}</span>
                 </el-form-item>
             </el-descriptions-item>
             <el-descriptions-item label-align="center">
@@ -58,7 +61,7 @@
                     </div>
                 </template>
                 <el-form-item prop="sourceId">
-                    <el-radio-group v-model="addTaskForm.tableData.sourceId" :disabled="globalData.type == 'detail' ? true : false">
+                    <el-radio-group v-model="addTaskForm.tableData.sourceId" v-if="globalData.type != 'detail'">
                         <el-radio
                             @change="radioChange('', item.baseType)"
                             v-for="item in state.dataSource"
@@ -67,6 +70,7 @@
                             【{{ item.baseType }}】{{ item.baseName }}
                         </el-radio>
                     </el-radio-group>
+                    <span v-else>{{ addTaskForm.tableData.sourceId }}</span>
                 </el-form-item>
             </el-descriptions-item>
 
@@ -85,7 +89,7 @@
                         class="m-2"
                         placeholder="请选择"
                         filterable
-                        :disabled="globalData.type == 'detail' ? true : false"
+                        v-if="globalData.type != 'detail'"
                     >
                         <el-option
                             v-for="item in addTaskForm.tableOptions"
@@ -94,9 +98,10 @@
                             :value="item.id"
                         />
                     </el-select>
+                    <span v-else>{{ addTaskForm.tableData.sourceTable }}</span>
                 </el-form-item>
             </el-descriptions-item>
-            <el-descriptions-item label-align="center" label="字段详情">
+            <el-descriptions-item label-align="center" label="字段详情" v-if="globalData.type != 'detail'">
                 <template #label>
                     <div>
                         <span>字段详情</span>
@@ -125,8 +130,9 @@
                             rows="3"
                             v-model="addTaskForm.tableData.whereSql"
                             style="width: 97%"
-                            :disabled="globalData.type == 'detail' ? true : false"
+                            v-if="globalData.type != 'detail'"
                         ></el-input>
+                        <span v-else>{{ addTaskForm.tableData.whereSql }}</span>
                         <el-icon :size="20" title="自动生成接口参数" @click="addParams()" v-if="globalData.type != 'detail'" style="margin-left: 5px">
                             <Promotion />
                         </el-icon>
@@ -142,10 +148,11 @@
                         </div>
                     </template>
                     <el-form-item prop="writerType">
-                        <el-radio-group v-model="addTaskForm.tableData.writerType" :disabled="globalData.type == 'detail' ? true : false">
+                        <el-radio-group v-model="addTaskForm.tableData.writerType" v-if="globalData.type != 'detail'">
                             <el-radio :label="'delete'">删除</el-radio>
                             <el-radio :label="'update'">更新</el-radio>
                         </el-radio-group>
+                        <span v-else>{{ addTaskForm.tableData.writerType }}</span>
                     </el-form-item>
                 </el-descriptions-item>
                 <el-descriptions-item label-align="center" label="where语句">
@@ -162,10 +169,11 @@
                             type="textarea"
                             rows="3"
                             v-model="addTaskForm.tableData.whereSql"
-                            :disabled="globalData.type == 'detail' ? true : false"
+                            v-if="globalData.type != 'detail'"
                         ></el-input>
+                        <span v-else>{{ addTaskForm.tableData.whereSql }}</span>
                     </el-form-item>
-                    <el-collapse accordion>
+                    <el-collapse accordion v-if="globalData.type != 'detail'">
                         <el-collapse-item>
                             <template #title>
                                 说明<el-icon class="header-icon"><info-filled /></el-icon>
@@ -251,15 +259,17 @@ const getData = async () => {
 };
 
 const getDataAll = async () => {
-    let res = await getSingleTaskById({ id: globalData.row.id });
+    let res = await getSingleTaskById({ id: globalData.row.id, type: globalData.type });
     if (res) {
         let ret = res.data;
 
         addTaskForm.tableData = ret;
 
         //查询表格下拉
-        getTableList('');
-        getTableFieldList(); //获取字段详情
+        if(globalData.type != 'detail') {
+            getTableList('');
+            getTableFieldList(); //获取字段详情
+        }
     }
 };
 

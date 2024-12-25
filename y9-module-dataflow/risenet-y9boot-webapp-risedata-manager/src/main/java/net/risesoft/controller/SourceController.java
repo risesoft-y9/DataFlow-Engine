@@ -275,7 +275,11 @@ public class SourceController {
 			if(source == null) {
 				return Y9Result.failure("数据源不存在");
 			}
-			map.put("tableList", dataSourceService.getTableList(sourceId));
+			if(source.getBaseType().equals("ftp")) {
+				map.put("tableList", source.getDirectory());
+			}else {
+				map.put("tableList", dataSourceService.getTableList(sourceId));
+			}
 			map.put("classList", dataMappingService.findByTypeNameAndFuncType(source.getBaseType(), type));
 		}
 		return Y9Result.success(map, "获取数据成功");
