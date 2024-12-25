@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 import net.risesoft.base.BaseEntity;
 
 @Entity
-@Table(name = "Y9_DATASERVICE_SINGLETASKCONFIG")
-@org.hibernate.annotations.Table(comment = "单任务配置信息表", appliesTo = "Y9_DATASERVICE_SINGLETASKCONFIG")
+@Table(name = "Y9_DATASERVICE_SINGLETASK")
+@org.hibernate.annotations.Table(comment = "单任务配置信息表", appliesTo = "Y9_DATASERVICE_SINGLETASK")
 @NoArgsConstructor
 @Data
 public class DataSingleTaskConfigEntity extends BaseEntity {
