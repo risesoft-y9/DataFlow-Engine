@@ -1,5 +1,7 @@
 package risesoft.data.transfer.stream.rdbms.out;
 
+import java.lang.reflect.Field;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,6 +22,7 @@ import risesoft.data.transfer.core.util.ClassTools;
 import risesoft.data.transfer.core.util.Configuration;
 import risesoft.data.transfer.core.util.ValueUtils;
 import risesoft.data.transfer.stream.rdbms.out.columns.PreparedStatementHandle;
+import risesoft.data.transfer.stream.rdbms.out.columns.PreparedStatementHandleFactory;
 import risesoft.data.transfer.stream.rdbms.utils.DBUtil;
 import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
 
@@ -32,14 +35,24 @@ import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
  */
 public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 
-	private static final List<PreparedStatementHandle> COLUMN_HANDLES;
-
+	private static final List<PreparedStatementHandleFactory> COLUMN_HANDLES;
+	private static final Map<Integer, PreparedStatementHandle> PREPARED_MAP = new HashMap<Integer, PreparedStatementHandle>();
 	public static final byte[] EMPTY_CHAR_ARRAY = new byte[0];
 
 	static {
 		try {
 			COLUMN_HANDLES = ClassTools.getInstancesOfPack("risesoft.data.transfer.stream.rdbms.out.columns.impl",
-					PreparedStatementHandle.class);
+					PreparedStatementHandleFactory.class);
+			Field[] fields = Types.class.getFields();
+			Object value;
+			PreparedStatementHandle preparedStatementHandle;
+			for (Field field : fields) {
+				value = field.get(null);
+				preparedStatementHandle = createHandle((int) value);
+				if (preparedStatementHandle != null) {
+					PREPARED_MAP.put((int) value, preparedStatementHandle);
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new Error("加载数据库处理工厂失败程序错误!");
@@ -83,6 +96,7 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 	 * @param size
 	 */
 	protected void createInsertSql(int size) {
+
 		StringBuilder sb = new StringBuilder("insert into ").append(tableName).append(" (")
 				.append(StringUtils.join(this.resultSetMetaData.getLeft(), ",")).append(") values (");
 		for (int i = 0; i < size; i++) {
@@ -313,13 +327,21 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 	 * @param type
 	 * @return
 	 */
-	private PreparedStatementHandle getHandle(int type) {
-		for (PreparedStatementHandle preparedStatementHandle : COLUMN_HANDLES) {
-			if (preparedStatementHandle.isHandle(type)) {
-				return preparedStatementHandle;
+	private static PreparedStatementHandle createHandle(int type) {
+		for (PreparedStatementHandleFactory preparedStatementHandleFactory : COLUMN_HANDLES) {
+			if (preparedStatementHandleFactory.isHandle(type)) {
+				return preparedStatementHandleFactory.getPreparedStatementHandle(type);
 			}
 		}
-		throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "无法处理的类型:" + type);
+		return null;
+	}
+
+	private static PreparedStatementHandle getHandle(int type) {
+		PreparedStatementHandle preparedStatementHandle = PREPARED_MAP.get(type);
+		if (preparedStatementHandle == null) {
+			throw TransferException.as(FrameworkErrorCode.RUNTIME_ERROR, "无法处理的数据库类型:" + type);
+		}
+		return preparedStatementHandle;
 	}
 
 	/**

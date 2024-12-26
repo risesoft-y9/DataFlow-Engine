@@ -9,6 +9,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import risesoft.data.transfer.core.column.Column;
 import risesoft.data.transfer.stream.rdbms.out.columns.NullCharValuePreparedStatementHandle;
 import risesoft.data.transfer.stream.rdbms.out.columns.PreparedStatementHandle;
+import risesoft.data.transfer.stream.rdbms.out.columns.PreparedStatementHandleFactory;
 import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
 
 /**
@@ -18,7 +19,7 @@ import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
  * @date 2024年1月25日
  * @author lb
  */
-public class StringPreparedStatementHandle extends NullCharValuePreparedStatementHandle implements PreparedStatementHandle {
+public class StringPreparedStatementHandle extends NullCharValuePreparedStatementHandle implements PreparedStatementHandle,PreparedStatementHandleFactory {
 
 	@Override
 	public boolean isHandle(int type) {
@@ -45,6 +46,11 @@ public class StringPreparedStatementHandle extends NullCharValuePreparedStatemen
 			DataBaseType dataBaseType, Triple<List<String>, List<Integer>, List<String>> resultSetMetaData)
 			throws Exception {
 		preparedStatement.setString(columnIndex, column.asString());
+	}
+
+	@Override
+	public PreparedStatementHandle getPreparedStatementHandle(int type) {
+		return this;
 	}
 
 }

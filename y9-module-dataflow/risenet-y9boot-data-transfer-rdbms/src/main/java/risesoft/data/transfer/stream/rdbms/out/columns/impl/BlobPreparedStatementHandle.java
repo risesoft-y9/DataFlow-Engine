@@ -8,7 +8,9 @@ import java.util.List;
 import org.apache.commons.lang3.tuple.Triple;
 
 import risesoft.data.transfer.core.column.Column;
+import risesoft.data.transfer.stream.rdbms.out.columns.NullCharValuePreparedStatementHandle;
 import risesoft.data.transfer.stream.rdbms.out.columns.PreparedStatementHandle;
+import risesoft.data.transfer.stream.rdbms.out.columns.PreparedStatementHandleFactory;
 import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
 
 /**
@@ -18,7 +20,8 @@ import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
  * @date 2024年1月25日
  * @author lb
  */
-public class BlobPreparedStatementHandle implements PreparedStatementHandle {
+public class BlobPreparedStatementHandle extends NullCharValuePreparedStatementHandle
+		implements PreparedStatementHandle, PreparedStatementHandleFactory {
 
 	@Override
 	public boolean isHandle(int type) {
@@ -38,15 +41,15 @@ public class BlobPreparedStatementHandle implements PreparedStatementHandle {
 			throws Exception {
 		byte[] bytes = column.asBytes();
 		if (bytes == null) {
-			preparedStatement.setBytes(columnIndex, bytes);
+			preparedStatement.setNull(columnIndex, Types.BLOB);
 		} else {
 			preparedStatement.setBlob(columnIndex, new ByteArrayInputStream(column.asBytes()));
 		}
 	}
 
 	@Override
-	public String nullValue() {
-		return "''";
+	public PreparedStatementHandle getPreparedStatementHandle(int type) {
+		return this;
 	}
 
 }
