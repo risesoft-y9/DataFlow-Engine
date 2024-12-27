@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,8 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.risesoft.api.persistence.config.ConfigService;
 import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.model.RequestModel;
+import net.risesoft.pojo.DateField;
 import net.risesoft.pojo.DifferentField;
 import net.risesoft.pojo.TaskConfigModel;
+import net.risesoft.thread.Y9DataLocalHolder;
 import net.risesoft.util.ApiTest;
 import net.risesoft.util.DataServiceUtil;
 import net.risesoft.y9.json.Y9JsonUtil;
@@ -124,6 +127,112 @@ public class TaskMakeUpListener {
     			futures.add(CompletableFuture.runAsync(() -> saveCore(taskId, DataServiceUtil.PLUGS, dataTaskCoreEntity, num)));
     			index++;
     		}
+    	}
+    	
+    	// 保存数据加密配置
+    	String encrypClass = Y9DataLocalHolder.getEncrypClass();
+    	if(StringUtils.isNotBlank(encrypClass)) {
+    		DataTaskCoreEntity encryp = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.PLUGS,
+        			DataServiceUtil.ENCRYP, "field", 1);
+        	if(encryp != null) {
+        		DataTaskMakeUpEntity dataTaskMakeUpEntity = null;
+            	String[] names = encryp.getValue().split(",");
+            	for(String name : names) {
+            		dataTaskMakeUpEntity = new DataTaskMakeUpEntity();
+                	dataTaskMakeUpEntity.setId(Y9IdGenerator.genId());
+                	dataTaskMakeUpEntity.setTaskId(taskId);
+                	dataTaskMakeUpEntity.setTypeName(DataServiceUtil.PLUGS);
+                	dataTaskMakeUpEntity.setNameValue(encrypClass);
+                	Map<String, Object> map = new HashMap<String, Object>();
+                	map.put("key", "risesoft");
+                	map.put("field", name);
+                	dataTaskMakeUpEntity.setArgsValue(Y9JsonUtil.writeValueAsString(map));
+                	dataTaskMakeUpEntity.setTabIndex(index);
+                	dataTaskMakeUpRepository.save(dataTaskMakeUpEntity);
+                	index++;
+            	}
+        	}
+    	}
+    	
+    	// 保存数据脱敏配置
+    	String maskClass = Y9DataLocalHolder.getMaskClass();
+    	if(StringUtils.isNotBlank(maskClass)) {
+    		DataTaskCoreEntity mask = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.PLUGS,
+        			DataServiceUtil.MASK, "field", 1);
+        	if(mask != null) {
+        		DataTaskMakeUpEntity dataTaskMakeUpEntity = new DataTaskMakeUpEntity();
+        		dataTaskMakeUpEntity.setId(Y9IdGenerator.genId());
+            	dataTaskMakeUpEntity.setTaskId(taskId);
+            	dataTaskMakeUpEntity.setTypeName(DataServiceUtil.PLUGS);
+            	dataTaskMakeUpEntity.setNameValue(maskClass);
+            	Map<String, Object> map = new HashMap<String, Object>();
+            	map.put("desensitizationFields", mask.getValue().split(","));
+            	dataTaskMakeUpEntity.setArgsValue(Y9JsonUtil.writeValueAsString(map));
+            	dataTaskMakeUpEntity.setTabIndex(index);
+            	dataTaskMakeUpRepository.save(dataTaskMakeUpEntity);
+            	index++;
+        	}
+    	}
+    	
+    	// 保存时间格式配置
+    	String dateClass = Y9DataLocalHolder.getDateClass();
+    	if(StringUtils.isNotBlank(dateClass)) {
+    		DataTaskCoreEntity date = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.PLUGS,
+        			DataServiceUtil.DATE, "format", 1);
+        	if(date != null) {
+        		DataTaskMakeUpEntity dataTaskMakeUpEntity = null;
+            	List<DateField> dateFields = Y9JsonUtil.readList(date.getValue(), DateField.class);
+            	for(DateField dateField : dateFields) {
+            		dataTaskMakeUpEntity = new DataTaskMakeUpEntity();
+                	dataTaskMakeUpEntity.setId(Y9IdGenerator.genId());
+                	dataTaskMakeUpEntity.setTaskId(taskId);
+                	dataTaskMakeUpEntity.setTypeName(DataServiceUtil.PLUGS);
+                	dataTaskMakeUpEntity.setNameValue(dateClass);
+                	Map<String, Object> map = new HashMap<String, Object>();
+                	map.put("format", dateField.getFormat());
+                	if(configModel.getSourceType().equals("api")) {
+                		map.put("field", dataInterfaceParamsRepository.findById(dateField.getFieldName()).orElse(null).getParamName());
+                	}else {
+                		map.put("field", dataTableFieldRepository.findById(dateField.getFieldName()).orElse(null).getName());
+                	}
+                	dataTaskMakeUpEntity.setArgsValue(Y9JsonUtil.writeValueAsString(map));
+                	dataTaskMakeUpEntity.setTabIndex(index);
+                	dataTaskMakeUpRepository.save(dataTaskMakeUpEntity);
+                	index++;
+            	}
+        	}
+    	}
+    	
+    	// 保存数据转换配置
+    	String convertClass = Y9DataLocalHolder.getConvertClass();
+    	if(StringUtils.isNotBlank(convertClass)) {
+    		DataTaskCoreEntity convert = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.PLUGS,
+        			DataServiceUtil.CONVERT, "field", 1);
+        	if(convert != null) {
+            	Map<Object, List<Map<String, Object>>> classifiedMaps = DataServiceUtil.classifyMaps(Y9JsonUtil.readListOfMap(convert.getValue()), "fieldName");
+            	for (Entry<Object, List<Map<String, Object>>> entry : classifiedMaps.entrySet()) {
+            		Map<String, Object> map = new HashMap<String, Object>();
+                	DataTaskMakeUpEntity dataTaskMakeUpEntity = new DataTaskMakeUpEntity();
+                	dataTaskMakeUpEntity.setId(Y9IdGenerator.genId());
+                	dataTaskMakeUpEntity.setTaskId(taskId);
+                	dataTaskMakeUpEntity.setTypeName(DataServiceUtil.PLUGS);
+                	dataTaskMakeUpEntity.setNameValue(convertClass);
+                	if(configModel.getSourceType().equals("api")) {
+                		map.put("field", dataInterfaceParamsRepository.findById((String)entry.getKey()).orElse(null).getParamName());
+                	}else {
+                		map.put("field", dataTableFieldRepository.findById((String)entry.getKey()).orElse(null).getName());
+                	}
+            		Map<String, Object> rmap = new HashMap<String, Object>();
+            		entry.getValue().forEach(data -> {
+                    	rmap.put((String)data.get("oldData"), data.get("newData"));
+                    });
+                    map.put("transferMapping", rmap);
+                    dataTaskMakeUpEntity.setArgsValue(Y9JsonUtil.writeValueAsString(map));
+                	dataTaskMakeUpEntity.setTabIndex(index);
+                	dataTaskMakeUpRepository.save(dataTaskMakeUpEntity);
+            		index++;
+            	}
+        	}
     	}
     	
     	// 等待所有任务执行完成再刷新
@@ -288,8 +397,9 @@ public class TaskMakeUpListener {
     		map.put("userName", dataSourceEntity.getUsername());
         	map.put("password", dataSourceEntity.getPassword());
         	map.put("port", url[1]);
+        	map.put("activeModel", dataSourceEntity.getRunType().equals(1) ? false : true);
         	map.put("path", configModel.getSourceTable());
-        	map.put("encoding", DataServiceUtil.getEncoding(configModel.getFetchSize()));
+        	map.put("encoding", dataSourceEntity.getBaseSchema());
         	map.put("fileName", configModel.getWhereSql());
         	map.put("date", configModel.getSplitPk());
     	}else {
@@ -385,6 +495,15 @@ public class TaskMakeUpListener {
     		map.put("requestModel", Y9JsonUtil.writeValueAsString(requestModel));
     		map.put("column", column);
     	}else if(configModel.getTargetType().equals("ftp")) {
+    		DataSourceEntity dataSourceEntity = dataSourceRepository.findById(configModel.getTargetId()).orElse(null);
+    		String[] url = dataSourceEntity.getUrl().split(":");
+    		map.put("host", url[0]);
+    		map.put("userName", dataSourceEntity.getUsername());
+        	map.put("password", dataSourceEntity.getPassword());
+        	map.put("port", url[1]);
+        	map.put("encoding", dataSourceEntity.getBaseSchema());
+        	map.put("activeModel", dataSourceEntity.getRunType().equals(1) ? false : true);
+        	
     		map.put("path", configModel.getTargetTable());
     		map.put("bufferSize", configModel.getTableNumber());
     	}else {

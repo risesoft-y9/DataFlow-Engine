@@ -1,9 +1,6 @@
 package net.risesoft.api.job.actions.dispatch;
 
-import net.risedata.register.service.IServiceInstance;
 import net.risesoft.api.job.JobContext;
-import net.risesoft.api.job.TaskExecutorService;
-import net.risesoft.api.job.actions.JobAction;
 import net.risesoft.api.job.actions.dispatch.executor.DoBalance;
 import net.risesoft.api.job.actions.dispatch.executor.Result;
 import net.risesoft.api.persistence.model.job.Job;
@@ -12,7 +9,6 @@ import net.risesoft.api.persistence.model.job.JobLog;
 import org.springframework.cloud.client.ServiceInstance;
 
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 
 /**
  * @Description : 调度执行器

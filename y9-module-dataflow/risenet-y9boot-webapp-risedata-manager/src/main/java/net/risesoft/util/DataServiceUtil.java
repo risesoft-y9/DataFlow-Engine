@@ -46,19 +46,11 @@ public class DataServiceUtil {
 	 * 数据脱敏
 	 */
 	public static final String MASK = "mask";
-	/**
-	 * 数据脱密执行类
-	 */
-	public static final String MASKCLASS = "";
 	
 	/**
 	 * 数据加密
 	 */
 	public static final String ENCRYP = "encryp";
-	/**
-	 * 数据加密执行类
-	 */
-	public static final String ENCRYPCLASS = "";
 	
 	/**
 	 * 异字段
@@ -73,19 +65,11 @@ public class DataServiceUtil {
 	 * 时间格式
 	 */
 	public static final String DATE = "date";
-	/**
-	 * 时间格式执行类
-	 */
-	public static final String DATECLASS = "";
 	
 	/**
 	 * 数据转换
 	 */
 	public static final String CONVERT = "convert";
-	/**
-	 * 数据转换执行类
-	 */
-	public static final String CONVERTCLASS = "";
 	
 	/**
 	 * 输出

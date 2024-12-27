@@ -626,7 +626,7 @@ let ruleFormRef = ref(goalTableRef);
                             <el-radio-group v-model="goalTableForm.tableData.writerType" @change="radioChange">
                                 <el-radio :label="'insert'">新增</el-radio>
                                 <el-radio :label="'update'">增量更新（仅更新发生变化的数据）</el-radio>
-                                <el-radio :label="'replace'">全量更新（不管有没有变化都更新，mysql和postgresql数据库暂不支持）</el-radio>
+                                <el-radio :label="'replace'">全量更新（不管有没有变化都更新）</el-radio>
                             </el-radio-group>
                         </el-form-item>
                     </el-descriptions-item>

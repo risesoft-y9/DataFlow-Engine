@@ -4,9 +4,6 @@ import net.risedata.jdbc.commons.LPage;
 import net.risedata.jdbc.commons.utils.DateUtils;
 import net.risedata.jdbc.commons.utils.GroupUtils;
 import net.risedata.jdbc.search.LPageable;
-import net.risedata.rpc.consumer.core.Connection;
-import net.risedata.rpc.consumer.factory.ConnectionManagerFactory;
-import net.risedata.rpc.provide.net.ClinetConnection;
 import net.risesoft.api.aop.CheckHttpForArgs;
 import net.risesoft.api.job.log.LogAnalyseService;
 import net.risesoft.api.persistence.job.JobLogService;
@@ -16,7 +13,7 @@ import net.risesoft.controller.BaseController;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.security.ConcurrentSecurity;
 import net.risesoft.service.DataBusinessService;
-import reactor.core.publisher.Mono;
+import net.risesoft.service.JobDoActionService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +22,6 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
-import com.alibaba.fastjson.JSONObject;
-import net.risesoft.api.listener.ClientListener;
 import java.text.DateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,6 +36,7 @@ import java.util.stream.Collectors;
 @RestController()
 @RequestMapping("/api/rest/job/log")
 public class JobLogController extends BaseController {
+	
 	@InitBinder
 	public void initBinder(WebDataBinder binder, WebRequest request) {
 		// 转换日期
@@ -51,10 +47,13 @@ public class JobLogController extends BaseController {
 	}
 
 	@Autowired
-	JobLogService jobLogService;
+	private JobLogService jobLogService;
 
 	@Autowired
 	private DataBusinessService dataBusinessService;
+	
+	@Autowired
+	private JobDoActionService jobDoActionService;
 
 	/**
 	 * 根据id 获取任务信息
@@ -66,25 +65,15 @@ public class JobLogController extends BaseController {
 	public Y9Result<Object> getOne(String id) {
 		return Y9Result.success(jobLogService.findById(id));
 	}
-
+	
+	/**
+	 * 对任务执行操作事件
+	 * @param body
+	 * @return
+	 */
 	@PostMapping("/doOperationByLogId")
-	public Mono<Y9Result<Object>> doOperationByLogId(@RequestBody String body) {
-
-		return Mono.create((mono) -> {
-			JSONObject jsonObject = JSONObject.parseObject(body);
-			ClinetConnection connection = ClientListener.getConnection(jsonObject.getString("instanceId"));
-			if (connection == null) {
-				mono.success(Y9Result.failure("该实例失去连接或不存在!"));
-				return;
-			}
-			connection.pushListener(jsonObject.getString("eventName"), jsonObject.getJSONObject("args"), 10000L)
-					.onError((res, error) -> {
-						mono.success(Y9Result.failure("异常:" + error.getMessage()));
-					}).onSuccess((res) -> {
-						mono.success(Y9Result.success(res));
-					});
-		});
-
+	public Y9Result<String> doOperationByLogId(@RequestBody String body) {
+		return jobDoActionService.doAction(body);
 	}
 
 	/**

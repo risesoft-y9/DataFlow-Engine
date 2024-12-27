@@ -7,14 +7,9 @@ import net.risesoft.api.job.actions.JobAction;
 import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.api.utils.LResult;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,13 +19,8 @@ import java.util.Map;
  * @Date 2022/9/13 16:46
  * @Version 1.0
  */
-
-/**
- * 阻塞任务分发器
- */
 @Component
 public class BlockActionManager implements JobAction {
-
 
     @Autowired
     Map<String, BlockJobAction> blockJobActionMap;
@@ -43,6 +33,5 @@ public class BlockActionManager implements JobAction {
         }
         throw new JobException("未知的阻塞策略" + job.getBlockingStrategy());
     }
-
 
 }

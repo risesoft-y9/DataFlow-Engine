@@ -3,19 +3,18 @@ package net.risesoft.api.job.actions.start;
 import net.risesoft.api.job.JobContext;
 import net.risesoft.api.job.TaskExecutorService;
 import net.risesoft.api.job.actions.JobAction;
-import net.risesoft.api.job.actions.dispatch.executor.Result;
 import net.risesoft.api.persistence.job.JobService;
 import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.api.utils.LResult;
 import net.risesoft.api.utils.ResultUtils;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**

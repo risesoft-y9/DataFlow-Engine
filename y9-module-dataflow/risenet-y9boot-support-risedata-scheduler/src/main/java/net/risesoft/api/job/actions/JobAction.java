@@ -1,9 +1,7 @@
 package net.risesoft.api.job.actions;
 
-
 import net.risesoft.api.job.JobContext;
 import net.risesoft.api.job.TaskExecutorService;
-import net.risesoft.api.job.actions.dispatch.executor.Result;
 import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.api.utils.LResult;
@@ -16,6 +14,7 @@ import net.risesoft.api.utils.LResult;
  * @Version 1.0
  */
 public interface JobAction {
+	
     /**
      * 执行步骤
      * @param job 任务
