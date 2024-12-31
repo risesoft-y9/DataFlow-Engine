@@ -1,10 +1,13 @@
 package risesoft.data.transfer.core.factory;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +42,8 @@ public class BeanFactory {
 	 * @param configuration
 	 * @return
 	 */
-	public static <T> T getInstance(Class<T> instanceClass, Configuration configuration) {
+	public static <T> T getInstance(Class<T> instanceClass, Configuration configuration,
+			Map<Class<?>, Object> instanceMap) {
 		ConfigCache configCache = getCache(instanceClass);
 		if (configCache != null) {
 			try {
@@ -48,13 +52,11 @@ public class BeanFactory {
 				String strValue;
 				for (ConfigFieldCache fieldCache : configCache.fields) {
 
-					value = configuration
-							.get(fieldCache.configField.path().equals(StringUtils.EMPTY) ? fieldCache.field.getName()
-									: fieldCache.configField.path(), fieldCache.field.getType());
+					value = configuration.get(fieldCache.configField.path().equals(StringUtils.EMPTY) ? fieldCache.name
+							: fieldCache.configField.path(), fieldCache.type);
 					if (value == null) {
 						if (fieldCache.configField.value() != StringUtils.EMPTY) {
-							value = ValueCastHandleFactory.castValue(fieldCache.configField.value(),
-									fieldCache.field.getType());
+							value = ValueCastHandleFactory.castValue(fieldCache.configField.value(), fieldCache.type);
 						} else if (fieldCache.configField.required()) {
 							throw new RuntimeException("缺失必要的配置:" + fieldCache.configField.description());
 						}
@@ -67,7 +69,7 @@ public class BeanFactory {
 										+ fieldCache.configField.description() + " 可选值为:" + fieldCache.options);
 							}
 						}
-						fieldCache.field.set(instanceObject, value);
+						fieldCache.setValue.set(instanceObject, value, instanceMap, configuration);
 					}
 				}
 				return instanceClass.cast(instanceObject);
@@ -79,7 +81,7 @@ public class BeanFactory {
 	}
 
 	public static Object getParameterValue(Configuration configuration, ConfigParameter configField, String name,
-			Class<?> type) {
+			Class<?> type, Map<Class<?>, Object> insMap) {
 		Object value;
 		String strValue;
 		value = configuration.get(configField.path().equals(StringUtils.EMPTY) ? name : configField.path(), type);
@@ -116,15 +118,42 @@ public class BeanFactory {
 			configCache.fields = new ArrayList<BeanFactory.ConfigFieldCache>();
 			List<Field> fields = FieldUtils.getFields(instanceClass);
 			ConfigField configField;
+			String methodName;
+			Method setMethod;
+			Method[] methods = instanceClass.getMethods();
+
 			for (Field field : fields) {
 				configField = field.getAnnotation(ConfigField.class);
 				if (configField != null) {
-					field.setAccessible(true);
-					configCache.fields.add(new ConfigFieldCache(configField, field));
+					methodName = "set" + capitalizeFirstLetter(field.getName());
+					setMethod = null;
+					for (Method method : methods) {
+						if (method.getName().equals(methodName)) {
+							setMethod = method;
+							break;
+						}
+					}
+					if (setMethod != null) {
+						configCache.fields.add(new ConfigFieldCache(configField, field.getType(),
+								new MethodSetValue(setMethod), field.getName()));
+					} else {
+
+						configCache.fields.add(new ConfigFieldCache(configField, field.getType(),
+								new FiledSetValue(field), field.getName()));
+					}
 				}
 			}
 		}
 		return configCache;
+	}
+
+	private static String capitalizeFirstLetter(String str) {
+
+		char firstChar = Character.toUpperCase(str.charAt(0));
+
+		String remainingStr = str.substring(1);
+
+		return firstChar + remainingStr;
 	}
 
 	/**
@@ -137,6 +166,59 @@ public class BeanFactory {
 	static class ConfigCache {
 
 		private List<ConfigFieldCache> fields;
+
+	}
+
+	static class FiledSetValue implements SetValue {
+
+		private Field field;
+
+		public FiledSetValue(Field field) {
+			this.field = field;
+		}
+
+		@Override
+		public void set(Object source, Object valueObject, Map<Class<?>, Object> insMap, Configuration configuration)
+				throws Exception {
+			try {
+				field.set(source, valueObject);
+			} catch (Exception e) {
+				throw e;
+			}
+		}
+
+	}
+
+	static class MethodSetValue implements SetValue {
+
+		private Method method;
+
+		private Parameter[] parameters;
+
+		public MethodSetValue(Method method) {
+			this.method = method;
+			this.parameters = this.method.getParameters();
+		}
+
+		@Override
+		public void set(Object source, Object valueObject, Map<Class<?>, Object> insMap, Configuration configuration)
+				throws Exception {
+			try {
+				if (parameters.length > 1) {
+					Object[] parameterValues = new Object[parameters.length];
+					parameterValues[0] = valueObject;
+					for (int i = 1; i < parameterValues.length; i++) {
+						parameterValues[i] = DefaultCreateInstanceFactory.getOjbect(parameters[i].getType(),
+								parameters[i].getAnnotation(ConfigParameter.class), configuration, insMap,
+								parameters[i].getName());
+					}
+					method.invoke(source, parameterValues);
+				}
+				method.invoke(source, valueObject);
+			} catch (Exception e) {
+				throw e;
+			}
+		}
 
 	}
 
@@ -153,14 +235,20 @@ public class BeanFactory {
 		/**
 		 * 字段源
 		 */
-		private Field field;
+		private SetValue setValue;
 
 		private HashSet<String> options;
 
-		public ConfigFieldCache(ConfigField configField, Field field) {
+		private String name;
+
+		private Class<?> type;
+
+		public ConfigFieldCache(ConfigField configField, Class<?> type, SetValue setValue, String name) {
 			super();
 			this.configField = configField;
-			this.field = field;
+			this.type = type;
+			this.setValue = setValue;
+			this.name = name;
 			if (configField.options().length > 0) {
 				options = new HashSet<String>();
 				options.addAll(Arrays.asList(configField.options()));

@@ -6,9 +6,6 @@ import java.util.Map;
 
 import risesoft.data.transfer.core.Engine;
 import risesoft.data.transfer.core.channel.InChannel;
-import risesoft.data.transfer.core.exception.CommonErrorCode;
-import risesoft.data.transfer.core.exception.ErrorCode;
-import risesoft.data.transfer.core.exception.TransferException;
 import risesoft.data.transfer.core.exchange.Exchange;
 import risesoft.data.transfer.core.executor.ExecutorTaskQueue;
 import risesoft.data.transfer.core.factory.FactoryManager;
@@ -96,12 +93,19 @@ public class JobContext {
 	 * 默认日志
 	 */
 	private Logger logger;
-
+	/**
+	 * 任务名
+	 */
 	private String name;
 
 	private Map<String, Object> contextMap;
+	/**
+	 * 全局配置文件
+	 */
+	private Configuration configuration;
 
-	public JobContext(Communication communication, String jobId, HandleManager handles, JobListener jobListener) {
+	public JobContext(Communication communication, String jobId, HandleManager handles, JobListener jobListener,
+			Configuration configuration) {
 		super();
 		this.communication = communication;
 		this.jobId = jobId;
@@ -110,6 +114,7 @@ public class JobContext {
 		this.instanceMap = new HashMap<Class<?>, Object>();
 		this.contextMap = new HashMap<String, Object>();
 		this.jobListener = jobListener;
+		this.communication = communication;
 		putInstance(this);
 		putInstance(handles);
 		putInstance(communication);
@@ -194,6 +199,12 @@ public class JobContext {
 	public Map<Class<?>, Object> getInstanceMap() {
 		return this.instanceMap;
 	}
+
+	public Configuration getConfiguration() {
+		return configuration;
+	}
+
+
 
 	/**
 	 * 已实例的类追加实例

@@ -85,7 +85,7 @@ public class Engine {
 	 */
 	public static JobContext start(String jobId, Configuration configuration, JobListener jobListener,
 			LoggerFactory loggerFactory) {
-		JobContext jobContext = new JobContext(new Communication(), jobId, new HandleManager(), jobListener);
+		JobContext jobContext = new JobContext(new Communication(), jobId, new HandleManager(), jobListener,configuration);
 		try {
 			// 输出通道连接输出器
 			if (loggerFactory == null) {

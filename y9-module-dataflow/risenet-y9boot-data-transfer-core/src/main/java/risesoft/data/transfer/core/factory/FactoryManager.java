@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.exception.ErrorCode;
 import risesoft.data.transfer.core.exception.TransferException;
 import risesoft.data.transfer.core.util.Configuration;

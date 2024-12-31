@@ -3,6 +3,7 @@ package risesoft.data.transfer.core.factory;
 import java.util.Map;
 
 
+
 /**
  * 类工厂实际获取实例
  * @typeName FactoryManager
@@ -17,6 +18,6 @@ public interface InstanceFactory {
 	 * @param cla  需要转换的类
 	 * @return
 	 */
-    <T> T getInstance(String name,Class<T> cla,Map<Class<?>, Object> instanceMap) throws Exception;
+    <T> T getInstance(String name,Class<T> cla,Map<Class<?>, Object>  instanceMap) throws Exception;
 
 }
