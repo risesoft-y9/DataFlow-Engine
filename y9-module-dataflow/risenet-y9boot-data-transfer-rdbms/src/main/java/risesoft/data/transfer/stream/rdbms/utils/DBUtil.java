@@ -191,7 +191,30 @@ public final class DBUtil {
 			return true;
 		return false;
 	}
-
+	/**
+     * 从ResultSet中获取所有的值，并返回一个List<Map<String, Object>>结构
+     *
+     * @param rs ResultSet对象
+     * @return 包含所有行数据的List<Map<String, Object>>
+     * @throws SQLException 如果发生数据库访问错误
+     */
+    public static List<Map<String, Object>> getResultSetAsList(ResultSet rs) throws SQLException {
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
+ 
+        while (rs.next()) {
+            Map<String, Object> rowMap = new HashMap<>();
+            for (int i = 1; i <= columnCount; i++) {
+                String columnName = metaData.getColumnName(i);
+                Object columnValue = rs.getObject(i); // 使用getObject可以处理任何数据类型
+                rowMap.put(columnName, columnValue);
+            }
+            resultList.add(rowMap);
+        }
+ 
+        return resultList;
+    }
 	public static boolean checkInsertPrivilege(DataBaseType dataBaseType, String jdbcURL, String userName,
 			String password, List<String> tableList) {
 		Connection connection = connect(dataBaseType, jdbcURL, userName, password);
