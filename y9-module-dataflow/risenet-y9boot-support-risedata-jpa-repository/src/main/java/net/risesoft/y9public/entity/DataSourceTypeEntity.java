@@ -31,7 +31,7 @@ public class DataSourceTypeEntity extends BaseEntity {
 	@Comment(value = "名称")
 	private String name;
 	
-	@Column(name = "DRIVER", nullable = false)
+	@Column(name = "DRIVER")
 	@Comment(value = "驱动")
 	private String driver;
 	

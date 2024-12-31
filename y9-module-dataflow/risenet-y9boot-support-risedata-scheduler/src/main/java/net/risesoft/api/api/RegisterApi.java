@@ -13,6 +13,7 @@ import net.risesoft.api.watch.WatchManager;
 import net.risesoft.security.model.Environment;
 import net.risesoft.security.model.NetworkWhiteList;
 import net.risesoft.security.SecurityManager;
+import net.risesoft.security.dao.EnvironmentDao;
 import net.risesoft.security.service.EnvironmentService;
 import net.risesoft.security.service.NetworkWhiteListService;
 import net.risesoft.util.PattenUtil;
@@ -80,6 +81,9 @@ public class RegisterApi {
 
 	@Autowired
 	NetworkWhiteListService networkWhiteListService;
+	
+	@Autowired
+	private EnvironmentDao environmentDao;
 
 	private boolean check(String environment, IServiceInstanceModel iServiceInstance, String ip) {
 		return checkeOfIp(environment, ip, iServiceInstance);
@@ -115,6 +119,11 @@ public class RegisterApi {
 			serviceInstance.setRegisterTime(System.currentTimeMillis());
 		}
 		
+		if (environmentDao.hasPublic() == 0) {
+			environmentDao.create("Public", "Public", "默认环境");
+			environmentDao.create("dev", "dev", "测试环境");
+		}
+		
 		environmentService.getEnvironmentByName(serviceInstance.getEnvironment());
 		return iServiceService.saveModel(serviceInstance);
 	}
@@ -132,16 +141,14 @@ public class RegisterApi {
 					.getHostString());
 		}
 		String ip = securityManager.getConcurrentIp();
-		if (serviceInstance.getEnvironment() == null) {
+		if (StringUtils.isBlank(serviceInstance.getEnvironment())) {
 			serviceInstance.setEnvironment(Environment.PUBLIC);
 		}
 		if (!check(serviceInstance.getEnvironment(), serviceInstance, ip)) {
 			throw new RegisterException("no security");
 		}
 		serviceInstance.setCustom(false);
-		if (StringUtils.isEmpty(serviceInstance.getEnvironment())) {
-			serviceInstance.setEnvironment(Environment.PUBLIC);
-		}
+		
 		rpcRequestContext.getConcurrentConnection().setAttribute(INSTANCE_ENVIRONMENT_NAME,
 				serviceInstance.getEnvironment());
 		rpcRequestContext.getConcurrentConnection().setAttribute(CONNECTION_INSTANCE_NAME,

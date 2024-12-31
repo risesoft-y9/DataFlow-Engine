@@ -13,19 +13,17 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.druid.DbType;
 import com.alibaba.druid.pool.DruidDataSource;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.risesoft.security.dao.EnvironmentDao;
 import net.risesoft.y9public.repository.DataMappingRepository;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class OnApplicationReady implements ApplicationListener<ApplicationReadyEvent> {
-	
-	private final EnvironmentDao environmentDao;
 	
 	private final DataMappingRepository dataMappingRepository;
 	
@@ -34,10 +32,6 @@ public class OnApplicationReady implements ApplicationListener<ApplicationReadyE
   
 	@Override
 	public void onApplicationEvent(ApplicationReadyEvent event) {
-		if (environmentDao.hasPublic() == 0) {
-			environmentDao.create("Public", "Public", "默认环境");
-			environmentDao.create("dev", "dev", "测试环境");
-		}
 		if(dataMappingRepository.count() == 0) {
 			initSql();
 		}
@@ -49,7 +43,11 @@ public class OnApplicationReady implements ApplicationListener<ApplicationReadyE
     	try {
         	DruidDataSource dds = (DruidDataSource) jdbcTemplate4Public.getDataSource();
             conn = dds.getConnection();
-            String path = this.getClass().getClassLoader().getResource("/sql/data-mysql.sql").getPath();
+            String dbType = dds.getDbType();
+            String path = this.getClass().getClassLoader().getResource("/sql/data.sql").getPath();
+            if(DbType.mysql.equals(dbType)) {
+            	path = this.getClass().getClassLoader().getResource("/sql/data-mysql.sql").getPath();
+            }
             FileSystemResource rc = new FileSystemResource(path);
             EncodedResource er = new EncodedResource(rc, "UTF-8");
             ScriptUtils.executeSqlScript(conn, er);
