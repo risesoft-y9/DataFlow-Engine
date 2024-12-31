@@ -36,7 +36,7 @@ import java.util.*;
  */
 
 @Listeners
-@RestController
+@RestController(value = "register")
 @RPCServer(name = "register", enableRequest = true)
 public class RegisterApi {
 	/**
@@ -82,8 +82,6 @@ public class RegisterApi {
 	@Autowired
 	NetworkWhiteListService networkWhiteListService;
 	
-	@Autowired
-	private EnvironmentDao environmentDao;
 
 	private boolean check(String environment, IServiceInstanceModel iServiceInstance, String ip) {
 		return checkeOfIp(environment, ip, iServiceInstance);
@@ -119,10 +117,7 @@ public class RegisterApi {
 			serviceInstance.setRegisterTime(System.currentTimeMillis());
 		}
 		
-		if (environmentDao.hasPublic() == 0) {
-			environmentDao.create("Public", "Public", "默认环境");
-			environmentDao.create("dev", "dev", "测试环境");
-		}
+	
 		
 		environmentService.getEnvironmentByName(serviceInstance.getEnvironment());
 		return iServiceService.saveModel(serviceInstance);
