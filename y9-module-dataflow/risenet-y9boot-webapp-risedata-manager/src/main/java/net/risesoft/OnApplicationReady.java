@@ -3,13 +3,10 @@ package net.risesoft;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.support.EncodedResource;
@@ -22,19 +19,18 @@ import com.alibaba.druid.pool.DruidDataSource;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.risesoft.security.dao.EnvironmentDao;
 import net.risesoft.y9public.repository.DataMappingRepository;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class OnApplicationReady implements ApplicationContextAware, ApplicationListener<ApplicationReadyEvent> {
+public class OnApplicationReady implements ApplicationListener<ApplicationReadyEvent> {
 
 	private final DataMappingRepository dataMappingRepository;
 
 	@Resource(name = "jdbcTemplate4Public")
 	private JdbcTemplate jdbcTemplate4Public;
-
+	
 	@Override
 	public void onApplicationEvent(ApplicationReadyEvent event) {
 		if (dataMappingRepository.count() == 0) {
@@ -68,16 +64,14 @@ public class OnApplicationReady implements ApplicationContextAware, ApplicationL
 			}
 		}
 	}
-
-	@Autowired
-	private EnvironmentDao environmentDao;
-
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-
-		if (environmentDao.hasPublic() == 0) {
-			environmentDao.create("Public", "Public", "默认环境");
-			environmentDao.create("dev", "dev", "测试环境");
+	
+	@PostConstruct
+	public void init() {
+		Integer count = jdbcTemplate4Public.queryForObject("select count(*) from Y9_DATASERVICE_ENVIRONMENT where name='Public'", Integer.class);
+		if (count == null || count == 0) {
+			jdbcTemplate4Public.update("INSERT INTO Y9_DATASERVICE_ENVIRONMENT (ID, NAME, DESCRIPTION) VALUES (?, ?, ?)", "Public", "Public", "默认环境");
+			jdbcTemplate4Public.update("INSERT INTO Y9_DATASERVICE_ENVIRONMENT (ID, NAME, DESCRIPTION) VALUES (?, ?, ?)", "dev", "dev", "测试环境");
+			LOGGER.info("init environment finish");
 		}
 	}
 

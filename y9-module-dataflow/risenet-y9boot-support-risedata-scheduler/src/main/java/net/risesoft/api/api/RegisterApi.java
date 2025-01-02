@@ -13,7 +13,6 @@ import net.risesoft.api.watch.WatchManager;
 import net.risesoft.security.model.Environment;
 import net.risesoft.security.model.NetworkWhiteList;
 import net.risesoft.security.SecurityManager;
-import net.risesoft.security.dao.EnvironmentDao;
 import net.risesoft.security.service.EnvironmentService;
 import net.risesoft.security.service.NetworkWhiteListService;
 import net.risesoft.util.PattenUtil;
@@ -116,8 +115,6 @@ public class RegisterApi {
 		if (serviceInstance.getRegisterTime() == null || serviceInstance.getRegisterTime() == 0) {
 			serviceInstance.setRegisterTime(System.currentTimeMillis());
 		}
-		
-	
 		
 		environmentService.getEnvironmentByName(serviceInstance.getEnvironment());
 		return iServiceService.saveModel(serviceInstance);
