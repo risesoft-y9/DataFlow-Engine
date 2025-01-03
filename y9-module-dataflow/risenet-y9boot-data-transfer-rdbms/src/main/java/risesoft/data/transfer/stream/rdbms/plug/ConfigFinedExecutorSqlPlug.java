@@ -26,7 +26,7 @@ public class ConfigFinedExecutorSqlPlug extends ExecutorSql {
 		@ConfigField(required = false, value = "0", description = "目标源索引")
 		private Integer index;
 
-		@ConfigField(required = false, value = "out", description = "目标源", options = { "out", "in" })
+		@ConfigField(required = false, value = "output", description = "目标源", options = { "output", "input" })
 		private String source;
 
 		public String getSql() {

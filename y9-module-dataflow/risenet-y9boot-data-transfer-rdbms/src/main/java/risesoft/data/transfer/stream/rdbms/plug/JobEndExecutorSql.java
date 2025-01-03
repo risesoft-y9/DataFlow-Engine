@@ -4,9 +4,9 @@ import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.job.JobEndHandle;
 
 /**
- * 任务启动执行sql
+ * 任务结束执行sql 无论任务是否成功和失败都会执行
  * 
- * @typeName JobStartExecutorSql
+ * @typeName JobEndExecutorSql
  * @date 2024年12月31日
  * @author lb
  */
