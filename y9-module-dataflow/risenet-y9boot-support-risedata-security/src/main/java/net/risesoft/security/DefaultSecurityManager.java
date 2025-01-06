@@ -18,7 +18,11 @@ import net.risesoft.y9public.repository.DataBusinessRepository;
 import com.alibaba.fastjson.JSON;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.PatternMatchUtils;
@@ -40,8 +44,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Version 1.0
  */
 @Service
-public class DefaultSecurityManager implements SecurityManager, Filter {
-	
+public class DefaultSecurityManager implements SecurityManager, Filter, ApplicationContextAware {
+
 	/**
 	 * 存放着 当前线程上的token 信息
 	 */
@@ -138,7 +142,8 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 		if (current != null) {
 			return ((InetSocketAddress) current.getConcurrentConnection().getRemoteAddress()).getHostString();
 		} else {
-			HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest();
+			HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+					.getRequest();
 			return IpUtils.getIPAddress(request);
 		}
 	}
@@ -177,7 +182,7 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 	 */
 	@Autowired(required = false)
 	private List<SecurityConfig> securityConfigs;
-	
+
 	/**
 	 * rpc 和注册相关http 跳过
 	 */
@@ -186,13 +191,16 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 	 * getToken 接口放开
 	 */
 	public String[] excludeEndUrls = { "getToken", "/register/", "getTestData", "saveTestData" };
- 
+
+	@Value("${server.servlet.context-path:}")
+	private String baseContext;
+
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		try {
 			HttpServletRequest request1 = ((HttpServletRequest) request);
-			//检查token
+			// 检查token
 			String token = request1.getHeader(TOKEN_KEY);
 			String url = request1.getRequestURI();
 			if (StringUtils.isEmpty(token)) {
@@ -219,7 +227,8 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 					if (PattenUtil.hasMatch(securityConfig.getWhiteList(), url)) {
 						continue;
 					}
-					if (!securityConfig.getSecurityCheck().check(securityConfig, getConcurrentSecurity(), url, request1)) {
+					if (!securityConfig.getSecurityCheck().check(securityConfig, getConcurrentSecurity(), url,
+							request1)) {
 						throwError(noPermission, request, response);
 						return;
 					}
@@ -234,7 +243,7 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 			threadLocal.remove();
 		}
 	}
-	
+
 	@Autowired
 	private DataBusinessRepository dataBusinessRepository;
 
@@ -243,14 +252,14 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 		net.risesoft.security.model.DataUser userToken = tokenService.getUserByToken(token);
 		// 获取用户的权限
 		List<Role> roles = roleService.getRolesByUser(userToken.getId());
-		if(roles.size() == 0) {
+		if (roles.size() == 0) {
 			throw new Exception("当前用户没有权限，请联系管理员");
 		}
 		DataUser user = new DataUser();
 		user.setId(userToken.getId());
 		user.setAccount(userToken.getAccount());
 		user.setUserName(userToken.getUserName());
-		
+
 		List<String> environments = new ArrayList<String>();
 		List<String> jobTypes = new ArrayList<String>();
 		boolean systemManager = false;
@@ -262,7 +271,7 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 			if (StringUtils.isNotBlank(role.getJobTypes())) {
 				String[] ids = role.getJobTypes().split(",");
 				jobTypes.addAll(Arrays.asList(ids));
-				for(String id : ids) {
+				for (String id : ids) {
 					jobTypes.addAll(dataBusinessRepository.findByParentId(id));
 				}
 			}
@@ -273,15 +282,16 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 				userManager = true;
 			}
 		}
-		
-		ConcurrentSecurity concurrentSecurity = new ConcurrentSecurity(user, jobTypes, environments, userManager, systemManager);
+
+		ConcurrentSecurity concurrentSecurity = new ConcurrentSecurity(user, jobTypes, environments, userManager,
+				systemManager);
 		threadLocal.set(token);
 		TOKEN_SECURITY_MAP.put(token, concurrentSecurity);
 		TOKEN_TIME_MAP.put(token, System.currentTimeMillis());
-		
+
 		UserInfo userInfo = new UserInfo();
 		userInfo.setPersonId(userToken.getId());
-    	userInfo.setName(userToken.getUserName());
+		userInfo.setName(userToken.getUserName());
 		Y9LoginUserHolder.setUserInfo(userInfo);
 		Y9LoginUserHolder.setPersonId(userToken.getId());
 		Y9LoginUserHolder.setTenantId("0");
@@ -300,8 +310,20 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 
 	@Override
 	public String getToken() {
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+				.getRequest();
 		return request.getHeader(TOKEN_KEY);
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		if (!StringUtils.isEmpty(baseContext)) {
+			for (int i = 0; i < excludeStartUrls.length; i++) {
+				excludeStartUrls[i] = baseContext + excludeStartUrls[i];
+				System.out.println(excludeStartUrls[i]);
+			}
+		}
+	
 	}
 
 }
