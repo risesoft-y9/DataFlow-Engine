@@ -91,6 +91,14 @@ public class DataServiceUtil {
 				return "脏数据处理";
 			case "printLog":
 				return "日志";
+			case "sql1":
+				return "前置SQL";
+			case "sql2":
+				return "后置SQL";
+			case "sql3":
+				return "后置成功SQL";
+			case "sql4":
+				return "后置失败SQL";
 			default:
 				return name;
 		}

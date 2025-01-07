@@ -21,6 +21,8 @@ public class DataConstant {
 	
 	public static final String FTP = "ftp";
 	
+	public static final String SQLSERVER = "sqlserver";
+	
 	public static String getDirver(String type) {
 		switch (type) {
 			case MYSQL:
@@ -33,6 +35,8 @@ public class DataConstant {
 				return "com.kingbase8.Driver";
 			case DM:
 				return "dm.jdbc.driver.DmDriver";
+			case SQLSERVER:
+				return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 			default:
 				return "";
 		}

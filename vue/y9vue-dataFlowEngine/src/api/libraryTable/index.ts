@@ -103,6 +103,20 @@ export const ExtractTableInfo = async (params) => {
 };
 
 /**
+ * 复制表信息
+ * @param params
+ * @returns
+ */
+export const copyTableInfo = async (params) => {
+    return await platformRequest({
+        url: 'source/copyTable',
+        method: 'POST',
+        cType: false,
+        params
+    });
+};
+
+/**
  * 删除表信息
  * @param params
  * @returns

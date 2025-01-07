@@ -73,6 +73,7 @@
         { label: 'postgresql', value: 'postgresql' },
         { label: 'kingbase', value: 'kingbase' },
         { label: 'dm', value: 'dm' },
+        { label: 'sqlserver', value: 'sqlserver' },
         { label: 'ftp', value: 'ftp' },
         { label: 'elasticsearch', value: 'elasticsearch' },
         { label: 'api', value: 'api' }
@@ -84,7 +85,11 @@
         { label: '输出(output)', value: 'output' },
         { label: '数据闸口(exchange)', value: 'exchange' },
         { label: '日志(printLog)', value: 'printLog' },
-        { label: '脏数据(dirtyData)', value: 'dirtyData' }
+        { label: '脏数据(dirtyData)', value: 'dirtyData' },
+        { label: '前置SQL', value: 'sql1' },
+        { label: '后置SQL', value: 'sql2' },
+        { label: '后置成功SQL', value: 'sql3' },
+        { label: '后置失败SQL', value: 'sql4' }
     ];
 
     // 搜索的filter条件变量
@@ -121,7 +126,11 @@
             {
                 title: computed(() => t('功能类型')),
                 key: 'funcType',
-                width: 100
+                width: 120,
+                render: (row) => {
+                    const firstMap = funcTypeList.filter(item => item.value === row.funcType)[0];
+                    return firstMap.label;
+                }
             },
             {
                 title: computed(() => t('描述')),

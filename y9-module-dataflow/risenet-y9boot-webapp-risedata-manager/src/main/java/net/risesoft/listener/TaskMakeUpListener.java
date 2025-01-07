@@ -109,20 +109,9 @@ public class TaskMakeUpListener {
     	
     	// 保存其它配置
     	int index = 1;
-    	List<DataTaskCoreEntity> printLogs = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyName(taskId, DataServiceUtil.PLUGS,
-    			DataServiceUtil.PRINTLOG, "name");
-    	if(printLogs != null && printLogs.size() > 0) {
-    		for(DataTaskCoreEntity dataTaskCoreEntity : printLogs) {
-    			int num = index;
-    			futures.add(CompletableFuture.runAsync(() -> saveCore(taskId, DataServiceUtil.PLUGS, dataTaskCoreEntity, num)));
-    			index++;
-    		}
-    	}
-    	
-    	List<DataTaskCoreEntity> dirtyDatas = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyName(taskId, DataServiceUtil.PLUGS,
-    			DataServiceUtil.DIRTYDATA, "name");
-    	if(dirtyDatas != null && dirtyDatas.size() > 0) {
-    		for(DataTaskCoreEntity dataTaskCoreEntity : dirtyDatas) {
+    	List<DataTaskCoreEntity> plugs = dataTaskCoreRepository.findByTaskIdAndTypeNameAndKeyNameAndArgsIdIsNotNull(taskId, DataServiceUtil.PLUGS, "name");
+    	if(plugs != null && plugs.size() > 0) {
+    		for(DataTaskCoreEntity dataTaskCoreEntity : plugs) {
     			int num = index;
     			futures.add(CompletableFuture.runAsync(() -> saveCore(taskId, DataServiceUtil.PLUGS, dataTaskCoreEntity, num)));
     			index++;
@@ -311,7 +300,7 @@ public class TaskMakeUpListener {
         	dataTaskMakeUpEntity.setNameValue(dataTaskCoreEntity.getValue());
         	
         	List<DataTaskCoreEntity> taskCoreList = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndSequence(taskId, 
-        			dataTaskCoreEntity.getTypeName(), dataTaskCoreEntity.getDataType(), tabIndex);
+        			dataTaskCoreEntity.getTypeName(), dataTaskCoreEntity.getDataType(), dataTaskCoreEntity.getSequence());
         	Map<String, Object> map = new HashMap<String, Object>();
         	List<String> upNameList = new ArrayList<String>();
         	for(DataTaskCoreEntity taskCore : taskCoreList) {

@@ -1,5 +1,5 @@
 import { reactive, ref } from 'vue';
-import { getPage } from '@/views/libraryTable/component/DataSheet/data';
+import { state, getPage } from '@/views/libraryTable/component/DataSheet/data';
 import { getDataSourceByType, getDataSourceType, searchDataSource } from "@/api/dataSource";
 export const currNode = ref({});
 
@@ -28,6 +28,7 @@ export const onDeleteTree = (data) => {
 export const onNodeClick = async (currTreeNode) => {
     if(currTreeNode.$level == 2) {
         currNode.value = currTreeNode;
+        state.copyBtn = true;
         getPage();
     }
 };

@@ -196,6 +196,16 @@ public class SourceController {
 		return Y9Result.failure("不支持的类型");
 	}
 	
+	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "复制表", logLevel = LogLevelEnum.RSLOG)
+	@PostMapping("/copyTable")
+    public Y9Result<String> copyTable(@RequestParam String baseId, @RequestParam String tableName, @RequestParam String id) {
+		DataSourceEntity dataSourceEntity = dataSourceService.getDataSourceById(id);
+		if(dataSourceEntity.getType() == 0) {
+			return dataSourceService.copyTable(baseId, tableName, id);
+		}
+		return Y9Result.failure("不支持的类型");
+	}
+	
 	@RiseLog(operationType = OperationTypeEnum.DELETE, operationName = "删除表信息", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/deleteTable")
 	public Y9Result<String> deleteTable(@RequestParam String id) {

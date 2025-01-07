@@ -341,7 +341,6 @@ public class DataSourceServiceImpl implements DataSourceService {
 						String columnName = columns.getString("REMARKS");// 获得字段中文名
 						String type_name = columns.getString("TYPE_NAME");// 获得字段类型名称
 						int dataType = columns.getInt("DATA_TYPE"); // 对应的java.sql.Types类型
-						int columnSize = columns.getInt("COLUMN_SIZE");// 列大小
 						String decimalDigits = columns.getString("DECIMAL_DIGITS");// 小数位数
 						
 						DataTableField field = dataTableFieldRepository.findByTableIdAndName(table.getId(), column_name);
@@ -364,10 +363,16 @@ public class DataSourceServiceImpl implements DataSourceService {
 						field.setFieldType(type_name);
 						field.setTypeNum(dataType);
 						field.setTableId(table.getId());
-						if (StringUtils.isNotBlank(decimalDigits)) {
-							field.setFieldLength(columnSize + "," + decimalDigits);
-						} else {
-							field.setFieldLength(columnSize + "");
+						if(type_name.equals("LONGTEXT") || type_name.equals("DATETIME") || type_name.equals("DATE") 
+								|| type_name.equals("TIMESTAMP")) {
+							field.setFieldLength("");
+						}else {
+							int columnSize = columns.getInt("COLUMN_SIZE");// 列大小
+							if (StringUtils.isNotBlank(decimalDigits)) {
+								field.setFieldLength(columnSize + "," + decimalDigits);
+							} else {
+								field.setFieldLength(columnSize + "");
+							}
 						}
 						field.setIsState(true);
 						dataTableFieldRepository.save(field);
@@ -380,6 +385,7 @@ public class DataSourceServiceImpl implements DataSourceService {
 			return Y9Result.successMsg("提取成功");
 		} catch (Exception e) {
 			e.printStackTrace();
+			return Y9Result.failure("提取失败：" + e.getMessage());
 		} finally {
 			if (tables != null) {
 				try {
@@ -410,7 +416,6 @@ public class DataSourceServiceImpl implements DataSourceService {
 				}
 			}
 		}
-		return Y9Result.failure("提取失败");
 	}
 
 	@Override
@@ -867,6 +872,29 @@ public class DataSourceServiceImpl implements DataSourceService {
 			return elasticsearchRestClient.getCount(tableName, "{}");
 		} catch (Exception e) {
 			return -1;
+		}
+	}
+
+	@Override
+	public Y9Result<String> copyTable(String baseId, String tableName, String id) {
+		try {
+			DataTable table = dataTableRepository.findByBaseIdAndName(baseId, tableName);
+			if (table != null) {
+				DataSource dataSource = getDataSource(id);
+				// 查询表字段信息
+				List<DataTableField> fieldList = dataTableFieldRepository.findByTableIdOrderByDisplayOrderAsc(table.getId());
+				// 生成建表字段列表
+				List<DbColumn> columnList = getDbColumn(fieldList);
+				// 建表
+				DDL.addTableColumn(dataSource, table.getName(), table.getCname(), Y9JsonUtil.writeValueAsString(columnList));
+				// 提取表
+				extractTable(id, tableName, getDataSourceById(id));
+				return Y9Result.successMsg("复制表成功");
+			}
+			return Y9Result.failure("表信息不存在，只能复制已提取的表");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Y9Result.failure("复制表失败：" + e.getMessage());
 		}
 	}
 

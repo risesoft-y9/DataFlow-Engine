@@ -8,6 +8,7 @@
     const fontSizeObj: any = inject('sizeObjInfo');
     // 调整表格高度适应屏幕
     import EditorForm from './component/EditorForm.vue';
+    import CopyTable from './copyTable.vue';
     import { state, getPage, tableHeight } from '@/views/libraryTable/component/DataSheet/data';
     import { currNode } from '@/views/libraryTable/component';
     import { buildTable, deleteTableInfo, getTableJob } from '@/api/libraryTable';
@@ -157,11 +158,24 @@
     };
 
     const dialogTableVisible = ref(false);
+
+    const copyTablePage = () => {
+        Object.assign(state.copyTabledialogConfig, {
+            show: true,
+            okText: false,
+            cancelText: false,
+            width: '55%',
+            title: "复制表",
+        })
+    }
 </script>
 
 <template>
     <y9Dialog v-model:config="state.dialogConfig">
         <EditorForm :type="'edit'" :row="state.row"></EditorForm>
+    </y9Dialog>
+    <y9Dialog v-model:config="state.copyTabledialogConfig">
+        <CopyTable></CopyTable>
     </y9Dialog>
     <y9Card :title="currNode.cname ? currNode.cname : $t('库表结构管理')">
         <y9Table
@@ -176,6 +190,9 @@
             <template v-slot:bnts>
                 <el-button type="primary" @click="handleClickQuery" class="global-btn-main"
                     ><i class="ri-search-2-line"></i>{{ $t('搜索') }}
+                </el-button>
+                <el-button type="primary" @click="copyTablePage" class="global-btn-main" v-if="state.copyBtn"
+                    ><i class="ri-file-copy-2-line"></i>{{ $t('复制表') }}
                 </el-button>
             </template>
             <template v-slot:operation="{ row }">

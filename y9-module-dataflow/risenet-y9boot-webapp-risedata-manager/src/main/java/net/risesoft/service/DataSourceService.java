@@ -114,6 +114,15 @@ public interface DataSourceService {
 	Y9Result<String> extractIndex(String baseId, String tableName, DataSourceEntity dataSourceEntity);
 	
 	/**
+	 * 复制表
+	 * @param baseId 拷贝目标数据库id
+	 * @param tableName 表名称
+	 * @param id 需要创建的数据库id
+	 * @return
+	 */
+	Y9Result<String> copyTable(String baseId, String tableName, String id);
+	
+	/**
 	 * 获取数据源分类列表
 	 * @return
 	 */

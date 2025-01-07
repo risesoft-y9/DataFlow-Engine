@@ -62,7 +62,8 @@
         oracle: 'oracle.jdbc.OracleDriver',
         postgresql: 'org.postgresql.Driver',
         kingbase: 'com.kingbase8.Driver',
-        dm: 'dm.jdbc.driver.DmDriver'
+        dm: 'dm.jdbc.driver.DmDriver',
+        sqlserver: 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
     };
 
     // 数据库
@@ -71,7 +72,8 @@
         { label: 'oracle', value: 'oracle' },
         { label: 'postgresql', value: 'postgresql' },
         { label: 'kingbase', value: 'kingbase' },
-        { label: 'dm', value: 'dm' }
+        { label: 'dm', value: 'dm' },
+        { label: 'sqlserver', value: 'sqlserver' }
     ];
 
     // 其他数据库

@@ -22,4 +22,6 @@ public interface DataTaskCoreRepository extends JpaRepository<DataTaskCoreEntity
 	
 	long countByArgsId(String argsId);
 	
+	List<DataTaskCoreEntity> findByTaskIdAndTypeNameAndKeyNameAndArgsIdIsNotNull(String taskId, String typeName, String keyName);
+	
 }

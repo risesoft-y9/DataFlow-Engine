@@ -8,8 +8,12 @@ export const state = reactive({
     dialogConfig: {
         show: false
     },
+    copyTabledialogConfig: {
+        show: false
+    },
     row: {},
     loading: false,
+    copyBtn: false,
     // 过滤 数值
     currSearchValue: {},
     //  表格的过滤 条件
