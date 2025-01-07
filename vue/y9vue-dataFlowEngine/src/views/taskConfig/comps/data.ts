@@ -166,7 +166,9 @@ export const getTableFieldListAll = async (sourceTable,targetTable) => {
 export const radioChange = async (type, baseType) => {
     addTaskLoading.value = true;
     if (type == 'input') {
-        if(addTaskForm.tableData.targetType == 'ftp' && baseType != 'ftp') {
+        addTaskForm.tableData.sourceType = null;
+        if(addTaskForm.tableData.targetType != null && ((addTaskForm.tableData.targetType == 'ftp' && baseType != 'ftp') 
+            || (addTaskForm.tableData.targetType != 'ftp' && baseType == 'ftp'))) {
             addTaskLoading.value = false;
             addTaskForm.tableData.sourceId = null;
             ElMessage({ type: 'error', message: 'ftp同步，只能都选ftp', offset: 65 });
@@ -176,6 +178,7 @@ export const radioChange = async (type, baseType) => {
         addTaskForm.tableData.sourceType = baseType;
         await clearFormData(tableSetForm, type);
     } else {
+        addTaskForm.tableData.targetType = null;
         if(addTaskForm.tableData.sourceType == null) {
             addTaskLoading.value = false;
             addTaskForm.tableData.targetId = null;

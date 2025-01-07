@@ -129,6 +129,9 @@
                 width: 120,
                 render: (row) => {
                     const firstMap = funcTypeList.filter(item => item.value === row.funcType)[0];
+                    if(firstMap == null) {
+                        return row.funcType;
+                    }
                     return firstMap.label;
                 }
             },
@@ -380,6 +383,8 @@
                 label: computed(() => t('功能类型')),
                 required: true,
                 props: {
+                    filterable: true,
+                    allowCreate: true,
                     options: funcTypeList?.filter((item) => item.value !== '')
                 }
             },

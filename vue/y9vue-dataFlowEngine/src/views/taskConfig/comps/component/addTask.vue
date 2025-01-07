@@ -179,6 +179,17 @@ const getTree = async () => {
     }
 };
 
+function handleSelectChange(val) {
+    let obj = state.dataSource.find(function(i) {
+        if(val == 'input') {
+            return i.id === addTaskForm.tableData.sourceId;
+        }else {
+            return i.id === addTaskForm.tableData.targetId;
+        }
+    });
+    radioChange(val, obj.baseType);
+}
+
 const rules = {
     name: [{ required: true, message: '请输入任务名称', trigger: ['blur', 'change'] }],
     businessId: [{ required: true, message: '请选择业务分类', trigger: ['blur', 'change'] }],
@@ -242,7 +253,21 @@ let ruleFormRef = ref(addTaskFormRef);
                     </div>
                 </template>
                 <el-form-item prop="sourceId">
-                    <el-radio-group v-model="addTaskForm.tableData.sourceId">
+                    <el-select
+                        @change="handleSelectChange('input')"
+                        v-model="addTaskForm.tableData.sourceId"
+                        class="m-2"
+                        placeholder="请选择数据源"
+                        filterable
+                    >
+                        <el-option
+                            v-for="item in state.dataSource"
+                            :key="item.id"
+                            :label="'【' + item.baseType + '】' + item.baseName"
+                            :value="item.id"
+                        />
+                    </el-select>
+                    <!-- <el-radio-group v-model="addTaskForm.tableData.sourceId">
                         <el-radio
                             @change="radioChange('input', item.baseType)"
                             v-for="item in state.dataSource"
@@ -250,7 +275,7 @@ let ruleFormRef = ref(addTaskFormRef);
                         >
                             【{{ item.baseType }}】{{ item.baseName }}
                         </el-radio>
-                    </el-radio-group>
+                    </el-radio-group> -->
                 </el-form-item>
             </el-descriptions-item>
             <el-descriptions-item label-align="center">
@@ -261,7 +286,21 @@ let ruleFormRef = ref(addTaskFormRef);
                     </div>
                 </template>
                 <el-form-item prop="targetId">
-                    <el-radio-group v-model="addTaskForm.tableData.targetId">
+                    <el-select
+                        @change="handleSelectChange('output')"
+                        v-model="addTaskForm.tableData.targetId"
+                        class="m-2"
+                        placeholder="请选择目的源"
+                        filterable
+                    >
+                        <el-option
+                            v-for="item in state.dataSource"
+                            :key="item.id"
+                            :label="'【' + item.baseType + '】' + item.baseName"
+                            :value="item.id"
+                        />
+                    </el-select>
+                    <!-- <el-radio-group v-model="addTaskForm.tableData.targetId">
                         <el-radio
                             @change="radioChange('output', item.baseType)"
                             v-for="item in state.dataSource"
@@ -269,7 +308,7 @@ let ruleFormRef = ref(addTaskFormRef);
                         >
                             【{{ item.baseType }}】{{ item.baseName }}
                         </el-radio>
-                    </el-radio-group>
+                    </el-radio-group> -->
                 </el-form-item>
             </el-descriptions-item>
         </el-descriptions>
