@@ -116,13 +116,13 @@ public class DbMetaDataUtil {
     	Connection connection = null;
     	ResultSet tables = null;
 		try {
-			//加载驱动
+			// 加载驱动
 			Class.forName(driverClass);
-			//获得数据库连接
+			// 获得数据库连接
 			connection = DriverManager.getConnection(url, userName, passWord);
-			//获得元数据
+			// 获得元数据
 			DatabaseMetaData metaData = connection.getMetaData();
-			//获得表信息
+			// 获得表信息
 			schema = StringUtils.isBlank(schema)?null:schema;
 			String dialect = metaData.getDatabaseProductName().toLowerCase();
 			if ("mysql".equals(dialect) || "microsoft".equals(dialect)) {
@@ -131,14 +131,19 @@ public class DbMetaDataUtil {
 				tables = metaData.getTables(null, schema, null, new String[] { "TABLE", "VIEW" });
 			}
 			while (tables.next()) {
-			    //获得表名
+			    // 获得表名
 			    String table_name = tables.getString("TABLE_NAME");
+			    // 获取表所属schema
+			    String table_schema = tables.getString("TABLE_SCHEM");
+			    if(StringUtils.isNotBlank(table_schema) && !table_schema.equals(connection.getSchema())) {
+			    	table_name = table_schema + "." + table_name;
+			    }
 			    list.add(table_name);
 			}
 		} catch (ClassNotFoundException e) {
 			log.error(driverClass + "-驱动包不存在");
 		} catch (SQLException e) {
-			log.error(url + "-连接失败");
+			log.error(url + "-连接失败：" + e.getMessage());
 		} finally {
 			ReleaseResource(connection, null, tables, null);
 		}

@@ -302,8 +302,16 @@ public class DataSourceServiceImpl implements DataSourceService {
 			connection = DriverManager.getConnection(dataSourceEntity.getUrl(), props);
 			// 获得元数据
 			DatabaseMetaData metaData = connection.getMetaData();
-			//获取模式
+			// 获取模式
 			String schema = StringUtils.isBlank(dataSourceEntity.getBaseSchema()) ? null : dataSourceEntity.getBaseSchema();
+			// 判断表名称是否携带所属schema
+			String name = tableName;// 先存储原数据
+			if(tableName.indexOf(".") != -1) {
+				String[] tableNames = tableName.split("\\.");
+				schema = tableNames[0].toUpperCase();
+				tableName = tableNames[1].toUpperCase();
+			}
+			// 获取数据库类型
 			String dialect = metaData.getDatabaseProductName().toLowerCase();
 			if ("mysql".equals(dialect) || "microsoft".equals(dialect)) {
 				tables = metaData.getTables(connection.getCatalog(), null, tableName, new String[] { "TABLE", "VIEW" });
@@ -312,13 +320,13 @@ public class DataSourceServiceImpl implements DataSourceService {
 			}
 			while (tables.next()) {
 				if (tables.getString("TABLE_NAME").equals(tableName)) {
-					DataTable table = dataTableRepository.findByBaseIdAndName(baseId, tableName);
+					DataTable table = dataTableRepository.findByBaseIdAndName(baseId, name);
 					if(table == null) {
 						table = new DataTable();
 						table.setId(Y9IdGenerator.genId());
 					}
 					table.setBaseId(baseId);
-					table.setName(tableName);
+					table.setName(name);
 					if (StringUtils.isNotBlank(tables.getString("REMARKS"))) {
 						table.setCname(tables.getString("REMARKS"));
 					} else {
@@ -380,9 +388,11 @@ public class DataSourceServiceImpl implements DataSourceService {
 					}
 					table.setTableCount(count);
 					dataTableRepository.save(table);
+					
+					return Y9Result.successMsg("提取成功");
 				}
 			}
-			return Y9Result.successMsg("提取成功");
+			return Y9Result.failure("查无此表");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Y9Result.failure("提取失败：" + e.getMessage());
