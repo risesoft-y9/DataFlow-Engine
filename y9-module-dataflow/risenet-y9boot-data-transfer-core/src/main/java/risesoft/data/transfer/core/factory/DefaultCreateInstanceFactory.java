@@ -31,34 +31,13 @@ public class DefaultCreateInstanceFactory implements InstanceFactory {
 		Configuration configuration = (Configuration) instanceMap.get(Configuration.class);
 		for (int i = 0; i < instanceClasses.length; i++) {
 			ConfigParameter configField = constructor.getParameters()[i].getAnnotation(ConfigParameter.class);
-			instanceObjects[i] = getOjbect(instanceClasses[i], configField, configuration, instanceMap,
+			instanceObjects[i] =BeanFactory.getOjbect(instanceClasses[i], configField, configuration, instanceMap,
 					constructor.getParameters()[i].getName());
 
 		}
 		return cla.cast(constructor.newInstance(instanceObjects));
 	}
 
-	/**
-	 * 获取对象
-	 * 
-	 * @param type          需要获取的类型
-	 * @param parameter     parameter对象
-	 * @param configuration 配置信息
-	 * @param instanceMap   实例map
-	 * @param name          参数名字
-	 * @return
-	 */
-	public static Object getOjbect(Class<?> type, ConfigParameter parameter, Configuration configuration,
-			Map<Class<?>, Object> instanceMap, String name) {
-		Object object = instanceMap.get(type);
-		if (object == null) {
-			if (parameter != null) {
-				object = BeanFactory.getParameterValue(configuration, parameter, name, type, instanceMap);
-			} else {
-				object = BeanFactory.getInstance(type, configuration, instanceMap);
-			}
-		}
-		return object;
-	}
+
 
 }

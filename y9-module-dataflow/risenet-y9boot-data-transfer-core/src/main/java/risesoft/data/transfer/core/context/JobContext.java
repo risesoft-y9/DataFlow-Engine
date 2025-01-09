@@ -115,6 +115,7 @@ public class JobContext {
 		this.contextMap = new HashMap<String, Object>();
 		this.jobListener = jobListener;
 		this.communication = communication;
+		this.configuration=configuration;
 		putInstance(this);
 		putInstance(handles);
 		putInstance(communication);

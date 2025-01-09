@@ -2,6 +2,7 @@ package risesoft.data.transfer.stream.rdbms.plug;
 
 import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.job.JobEndHandle;
+import risesoft.data.transfer.core.plug.Plug;
 
 /**
  * 任务结束执行sql 无论任务是否成功和失败都会执行
@@ -10,7 +11,7 @@ import risesoft.data.transfer.core.job.JobEndHandle;
  * @date 2024年12月31日
  * @author lb
  */
-public class JobEndExecutorSql extends ConfigFinedExecutorSqlPlug implements JobEndHandle {
+public class JobEndExecutorSql extends ConfigFinedExecutorSqlPlug implements JobEndHandle,Plug {
 
 	public JobEndExecutorSql(ExecutorConfig config, JobContext jobContext) {
 		super(config, jobContext);
@@ -26,6 +27,11 @@ public class JobEndExecutorSql extends ConfigFinedExecutorSqlPlug implements Job
 			super.config.getLog().debug(this, "job start executor sql result:" + result);
 		}
 
+	}
+
+	@Override
+	public boolean register(JobContext jobContext) {
+		return true;
 	}
 
 }

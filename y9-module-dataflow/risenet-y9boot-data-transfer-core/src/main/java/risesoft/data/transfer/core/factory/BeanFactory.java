@@ -1,5 +1,6 @@
 package risesoft.data.transfer.core.factory;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -13,6 +14,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import risesoft.data.transfer.core.exception.CommonErrorCode;
+import risesoft.data.transfer.core.exception.ErrorCode;
 import risesoft.data.transfer.core.exception.TransferException;
 import risesoft.data.transfer.core.factory.annotations.ConfigBean;
 import risesoft.data.transfer.core.factory.annotations.ConfigField;
@@ -47,7 +49,14 @@ public class BeanFactory {
 		ConfigCache configCache = getCache(instanceClass);
 		if (configCache != null) {
 			try {
-				Object instanceObject = instanceClass.newInstance();
+				ConfigConstructor constructor = configCache.constructor;
+				Object[] args = new Object[constructor.parameters.length];
+				Parameter[] parameters = constructor.parameters;
+				for (int i = 0; i < parameters.length; i++) {
+					args[i] = getParameterValue(configuration, parameters[i].getAnnotation(ConfigParameter.class), parameters[i].getName(), instanceClass,
+							instanceMap);
+				}
+				Object instanceObject = constructor.constructor.newInstance(args);
 				Object value;
 				String strValue;
 				for (ConfigFieldCache fieldCache : configCache.fields) {
@@ -80,6 +89,16 @@ public class BeanFactory {
 		return null;
 	}
 
+	/**
+	 * 获取参数值
+	 * 
+	 * @param configuration
+	 * @param configField
+	 * @param name
+	 * @param type
+	 * @param insMap
+	 * @return
+	 */
 	public static Object getParameterValue(Configuration configuration, ConfigParameter configField, String name,
 			Class<?> type, Map<Class<?>, Object> insMap) {
 		Object value;
@@ -111,6 +130,29 @@ public class BeanFactory {
 		return value;
 	}
 
+	/**
+	 * 获取对象
+	 * 
+	 * @param type          需要获取的类型
+	 * @param parameter     parameter对象
+	 * @param configuration 配置信息
+	 * @param instanceMap   实例map
+	 * @param name          参数名字
+	 * @return
+	 */
+	public static Object getOjbect(Class<?> type, ConfigParameter parameter, Configuration configuration,
+			Map<Class<?>, Object> instanceMap, String name) {
+		Object object = instanceMap.get(type);
+		if (object == null) {
+			if (parameter != null) {
+				object = BeanFactory.getParameterValue(configuration, parameter, name, type, instanceMap);
+			} else {
+				object = BeanFactory.getInstance(type, configuration, instanceMap);
+			}
+		}
+		return object;
+	}
+
 	private static ConfigCache getCache(Class<?> instanceClass) {
 		ConfigCache configCache = CACHE.get(instanceClass);
 		if (configCache == null && instanceClass.getAnnotation(ConfigBean.class) != null) {
@@ -121,7 +163,13 @@ public class BeanFactory {
 			String methodName;
 			Method setMethod;
 			Method[] methods = instanceClass.getMethods();
-
+			if (instanceClass.getConstructors().length==0) {
+				throw TransferException.as(CommonErrorCode.CONFIG_ERROR, instanceClass+" 不存在构造函数!");
+			}
+			Constructor<?> constructors = instanceClass.getConstructors()[0];
+			constructors.setAccessible(true);
+			Parameter[] parameters = constructors.getParameters();
+			configCache.constructor = new ConfigConstructor(constructors, parameters);
 			for (Field field : fields) {
 				configField = field.getAnnotation(ConfigField.class);
 				if (configField != null) {
@@ -134,10 +182,11 @@ public class BeanFactory {
 						}
 					}
 					if (setMethod != null) {
+						setMethod.setAccessible(true);
 						configCache.fields.add(new ConfigFieldCache(configField, field.getType(),
 								new MethodSetValue(setMethod), field.getName()));
 					} else {
-
+						field.setAccessible(true);
 						configCache.fields.add(new ConfigFieldCache(configField, field.getType(),
 								new FiledSetValue(field), field.getName()));
 					}
@@ -166,6 +215,8 @@ public class BeanFactory {
 	static class ConfigCache {
 
 		private List<ConfigFieldCache> fields;
+
+		private ConfigConstructor constructor;
 
 	}
 
@@ -208,16 +259,31 @@ public class BeanFactory {
 					Object[] parameterValues = new Object[parameters.length];
 					parameterValues[0] = valueObject;
 					for (int i = 1; i < parameterValues.length; i++) {
-						parameterValues[i] = DefaultCreateInstanceFactory.getOjbect(parameters[i].getType(),
+						parameterValues[i] = getOjbect(parameters[i].getType(),
 								parameters[i].getAnnotation(ConfigParameter.class), configuration, insMap,
 								parameters[i].getName());
 					}
 					method.invoke(source, parameterValues);
+					return;
 				}
 				method.invoke(source, valueObject);
 			} catch (Exception e) {
 				throw e;
 			}
+		}
+
+	}
+
+	static class ConfigConstructor {
+
+		private Constructor<?> constructor;
+
+		private Parameter[] parameters;
+
+		public ConfigConstructor(Constructor<?> constructor, Parameter[] parameters) {
+			super();
+			this.constructor = constructor;
+			this.parameters = parameters;
 		}
 
 	}

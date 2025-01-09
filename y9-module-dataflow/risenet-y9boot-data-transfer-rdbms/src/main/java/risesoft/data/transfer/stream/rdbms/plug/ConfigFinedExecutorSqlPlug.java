@@ -18,7 +18,7 @@ import risesoft.data.transfer.core.util.ConfigurationConst;
 public class ConfigFinedExecutorSqlPlug extends ExecutorSql {
 
 	@ConfigBean
-	class ExecutorConfig extends LogConfig {
+	static class ExecutorConfig extends LogConfig {
 
 		@ConfigField(required = true, description = "sql")
 		private String sql;
@@ -32,6 +32,12 @@ public class ConfigFinedExecutorSqlPlug extends ExecutorSql {
 		public String getSql() {
 			return sql;
 		}
+
+		public ExecutorConfig() {
+			super();
+		}
+		
+		
 	}
 
 	protected ExecutorConfig config;
@@ -45,6 +51,7 @@ public class ConfigFinedExecutorSqlPlug extends ExecutorSql {
 		this.jdbcUrl = configuration.getString("jdbcUrl");
 		this.jdbcUserName = configuration.getString("userName");
 		this.config = config;
+		this.sql=config.sql;
 		if (config.getLog().isDebug()) {
 			config.getLog().debug(this, "find configuration:" + configuration);
 		}

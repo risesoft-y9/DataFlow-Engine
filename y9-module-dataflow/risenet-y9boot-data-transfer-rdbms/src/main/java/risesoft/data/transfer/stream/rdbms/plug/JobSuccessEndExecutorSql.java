@@ -1,6 +1,7 @@
 package risesoft.data.transfer.stream.rdbms.plug;
 
 import risesoft.data.transfer.core.context.JobContext;
+import risesoft.data.transfer.core.plug.Plug;
 import risesoft.data.transfer.core.statistics.State;
 
 /**
@@ -10,7 +11,7 @@ import risesoft.data.transfer.core.statistics.State;
  * @date 2024年12月31日
  * @author lb
  */
-public class JobSuccessEndExecutorSql extends JobEndExecutorSql {
+public class JobSuccessEndExecutorSql extends JobEndExecutorSql implements Plug{
 
 	public JobSuccessEndExecutorSql(ExecutorConfig config, JobContext jobContext) {
 		super(config, jobContext);
@@ -21,6 +22,11 @@ public class JobSuccessEndExecutorSql extends JobEndExecutorSql {
 		if (jobContext.getCommunication().getState()==State.SUCCEEDED) {
 			super.onJobEnd(jobContext);
 		}
+	}
+
+	@Override
+	public boolean register(JobContext jobContext) {
+		return true;
 	}
 
 }

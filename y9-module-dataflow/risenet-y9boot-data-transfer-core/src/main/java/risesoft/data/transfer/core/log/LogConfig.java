@@ -21,7 +21,7 @@ public class LogConfig {
 	 */
 	protected Logger log;
 
-	@ConfigField(required = false)
+	@ConfigField(required = false,description = "日志名")
 	protected String logName;
 
 	public String getLogName() {
