@@ -215,128 +215,132 @@ public class DataTaskServiceImpl implements DataTaskService {
 	@Override
 	@Transactional(readOnly = false)
 	public Y9Result<DataTaskEntity> save(TaskModel taskModel) {
-		// 保存主体
-		DataTaskEntity entity = null;
-		if (StringUtils.isBlank(taskModel.getId())) {
-			entity = new DataTaskEntity();
-			entity.setId(Y9IdGenerator.genId());
-		}else {
-			entity = dataTaskRepository.findById(taskModel.getId()).orElse(null);
-		}
-		entity.setBusinessId(taskModel.getBusinessId());
-		entity.setDescription(taskModel.getDescription());
-		entity.setName(taskModel.getName());
-		entity.setUserId(Y9LoginUserHolder.getPersonId());
-		entity.setUserName(Y9LoginUserHolder.getUserInfo().getName());
-		entity.setTenantId(Y9LoginUserHolder.getTenantId());
-		entity.setTaskType(2);
-		dataTaskRepository.save(entity);
-		
-		// 保存config
-		TaskConfigModel configModel = taskModel.getTaskConfigModel();
-		if(configModel != null) {
-			if(StringUtils.isBlank(configModel.getId())) {
-				configModel.setId(Y9IdGenerator.genId());
-				configModel.setTaskId(entity.getId());
+		try {
+			// 保存主体
+			DataTaskEntity entity = null;
+			if (StringUtils.isBlank(taskModel.getId())) {
+				entity = new DataTaskEntity();
+				entity.setId(Y9IdGenerator.genId());
+			}else {
+				entity = dataTaskRepository.findById(taskModel.getId()).orElse(null);
 			}
-			DataTaskConfigEntity configEntity = new DataTaskConfigEntity();
-			Y9BeanUtil.copyProperties(configModel, configEntity);
-			dataTaskConfigRepository.save(configEntity);
-		}
-		
-		// 保存core，先删后加
-		List<DataTaskCoreEntity> taskCoreList = dataTaskCoreRepository.findByTaskId(entity.getId());
-		if(taskCoreList != null && taskCoreList.size() > 0) {
-			dataTaskCoreRepository.deleteAll(taskCoreList);
-		}
-		List<TaskCoreModel> coreList = taskModel.getTaskCoreList();
-		if(coreList != null && coreList.size() > 0) {
-			DataTaskCoreEntity coreEntity = null;
-			for(TaskCoreModel coreModel : coreList) {
-				if(StringUtils.isBlank(coreModel.getId())) {
-					coreModel.setId(Y9IdGenerator.genId());
-					coreModel.setTaskId(entity.getId());
+			entity.setBusinessId(taskModel.getBusinessId());
+			entity.setDescription(taskModel.getDescription());
+			entity.setName(taskModel.getName());
+			entity.setUserId(Y9LoginUserHolder.getPersonId());
+			entity.setUserName(Y9LoginUserHolder.getUserInfo().getName());
+			entity.setTenantId(Y9LoginUserHolder.getTenantId());
+			entity.setTaskType(2);
+			dataTaskRepository.save(entity);
+			
+			// 保存config
+			TaskConfigModel configModel = taskModel.getTaskConfigModel();
+			if(configModel != null) {
+				if(StringUtils.isBlank(configModel.getId())) {
+					configModel.setId(Y9IdGenerator.genId());
+					configModel.setTaskId(entity.getId());
 				}
-				coreEntity = new DataTaskCoreEntity();
-				Y9BeanUtil.copyProperties(coreModel, coreEntity);
-				dataTaskCoreRepository.save(coreEntity);
+				DataTaskConfigEntity configEntity = new DataTaskConfigEntity();
+				Y9BeanUtil.copyProperties(configModel, configEntity);
+				dataTaskConfigRepository.save(configEntity);
 			}
+			
+			// 保存core，先删后加
+			List<DataTaskCoreEntity> taskCoreList = dataTaskCoreRepository.findByTaskId(entity.getId());
+			if(taskCoreList != null && taskCoreList.size() > 0) {
+				dataTaskCoreRepository.deleteAll(taskCoreList);
+			}
+			List<TaskCoreModel> coreList = taskModel.getTaskCoreList();
+			if(coreList != null && coreList.size() > 0) {
+				DataTaskCoreEntity coreEntity = null;
+				for(TaskCoreModel coreModel : coreList) {
+					if(StringUtils.isBlank(coreModel.getId())) {
+						coreModel.setId(Y9IdGenerator.genId());
+						coreModel.setTaskId(entity.getId());
+					}
+					coreEntity = new DataTaskCoreEntity();
+					Y9BeanUtil.copyProperties(coreModel, coreEntity);
+					dataTaskCoreRepository.save(coreEntity);
+				}
+			}
+			
+			// 数据脱敏字段
+			String maskFields = taskModel.getMaskFields();
+			if(StringUtils.isNotBlank(maskFields)) {
+				DataTaskCoreEntity taskCore = new DataTaskCoreEntity();
+				taskCore.setId(DataServiceUtil.MASK + "-" + entity.getId());
+				taskCore.setTaskId(entity.getId());
+				taskCore.setTypeName("plugs");
+				taskCore.setKeyName("field");
+				taskCore.setDataType(DataServiceUtil.MASK);
+				taskCore.setValue(maskFields);
+				taskCore.setSequence(1);
+				dataTaskCoreRepository.save(taskCore);
+			}
+			
+			// 数据加密字段
+			String encrypFields = taskModel.getEncrypFields();
+			if(StringUtils.isNotBlank(encrypFields)) {
+				DataTaskCoreEntity taskCore = new DataTaskCoreEntity();
+				taskCore.setId(DataServiceUtil.ENCRYP + "-" + entity.getId());
+				taskCore.setTaskId(entity.getId());
+				taskCore.setTypeName("plugs");
+				taskCore.setKeyName("field");
+				taskCore.setDataType(DataServiceUtil.ENCRYP);
+				taskCore.setValue(encrypFields);
+				taskCore.setSequence(1);
+				dataTaskCoreRepository.save(taskCore);
+			}
+			
+			// 日期格式
+			List<DateField> dateField = taskModel.getDateField();
+			if(dateField != null && dateField.size() > 0) {
+				DataTaskCoreEntity taskCore = new DataTaskCoreEntity();
+				taskCore.setId(DataServiceUtil.DATE + "-" + entity.getId());
+				taskCore.setTaskId(entity.getId());
+				taskCore.setTypeName("plugs");
+				taskCore.setKeyName("format");
+				taskCore.setDataType(DataServiceUtil.DATE);
+				taskCore.setValue(Y9JsonUtil.writeValueAsString(dateField));
+				taskCore.setSequence(1);
+				dataTaskCoreRepository.save(taskCore);
+			}
+			
+			// 异字段
+			List<DifferentField> differentField = taskModel.getDifferentField();
+			if(differentField != null && differentField.size() > 0) {
+				DataTaskCoreEntity taskCore = new DataTaskCoreEntity();
+				taskCore.setId(DataServiceUtil.DIFFERENT + "-" + entity.getId());
+				taskCore.setTaskId(entity.getId());
+				taskCore.setTypeName("plugs");
+				taskCore.setKeyName("field");
+				taskCore.setDataType(DataServiceUtil.DIFFERENT);
+				taskCore.setValue(Y9JsonUtil.writeValueAsString(differentField));
+				taskCore.setSequence(1);
+				dataTaskCoreRepository.save(taskCore);
+			}
+			
+			// 数据转换
+			List<ConvertField> convertField = taskModel.getConvertField();
+			if(convertField != null && convertField.size() > 0) {
+				DataTaskCoreEntity taskCore = new DataTaskCoreEntity();
+				taskCore.setId(DataServiceUtil.CONVERT + "-" + entity.getId());
+				taskCore.setTaskId(entity.getId());
+				taskCore.setTypeName("plugs");
+				taskCore.setKeyName("field");
+				taskCore.setDataType(DataServiceUtil.CONVERT);
+				taskCore.setValue(Y9JsonUtil.writeValueAsString(convertField));
+				taskCore.setSequence(1);
+				dataTaskCoreRepository.save(taskCore);
+			}
+			
+			taskMakeUpListener.onTaskMakeUp(entity.getId(), entity.getName(), configModel);
+			LOGGER.debug("任务["+entity.getId()+"]-配置保存成功");
+			
+			return Y9Result.success(entity, "保存成功");
+		} catch (Exception e) {
+			return Y9Result.failure("保存失败：" + e.getMessage());
 		}
-		
-		// 数据脱敏字段
-		String maskFields = taskModel.getMaskFields();
-		if(StringUtils.isNotBlank(maskFields)) {
-			DataTaskCoreEntity taskCore = new DataTaskCoreEntity();
-			taskCore.setId(DataServiceUtil.MASK + "-" + entity.getId());
-			taskCore.setTaskId(entity.getId());
-			taskCore.setTypeName("plugs");
-			taskCore.setKeyName("field");
-			taskCore.setDataType(DataServiceUtil.MASK);
-			taskCore.setValue(maskFields);
-			taskCore.setSequence(1);
-			dataTaskCoreRepository.save(taskCore);
-		}
-		
-		// 数据加密字段
-		String encrypFields = taskModel.getEncrypFields();
-		if(StringUtils.isNotBlank(encrypFields)) {
-			DataTaskCoreEntity taskCore = new DataTaskCoreEntity();
-			taskCore.setId(DataServiceUtil.ENCRYP + "-" + entity.getId());
-			taskCore.setTaskId(entity.getId());
-			taskCore.setTypeName("plugs");
-			taskCore.setKeyName("field");
-			taskCore.setDataType(DataServiceUtil.ENCRYP);
-			taskCore.setValue(encrypFields);
-			taskCore.setSequence(1);
-			dataTaskCoreRepository.save(taskCore);
-		}
-		
-		// 日期格式
-		List<DateField> dateField = taskModel.getDateField();
-		if(dateField != null && dateField.size() > 0) {
-			DataTaskCoreEntity taskCore = new DataTaskCoreEntity();
-			taskCore.setId(DataServiceUtil.DATE + "-" + entity.getId());
-			taskCore.setTaskId(entity.getId());
-			taskCore.setTypeName("plugs");
-			taskCore.setKeyName("format");
-			taskCore.setDataType(DataServiceUtil.DATE);
-			taskCore.setValue(Y9JsonUtil.writeValueAsString(dateField));
-			taskCore.setSequence(1);
-			dataTaskCoreRepository.save(taskCore);
-		}
-		
-		// 异字段
-		List<DifferentField> differentField = taskModel.getDifferentField();
-		if(differentField != null && differentField.size() > 0) {
-			DataTaskCoreEntity taskCore = new DataTaskCoreEntity();
-			taskCore.setId(DataServiceUtil.DIFFERENT + "-" + entity.getId());
-			taskCore.setTaskId(entity.getId());
-			taskCore.setTypeName("plugs");
-			taskCore.setKeyName("field");
-			taskCore.setDataType(DataServiceUtil.DIFFERENT);
-			taskCore.setValue(Y9JsonUtil.writeValueAsString(differentField));
-			taskCore.setSequence(1);
-			dataTaskCoreRepository.save(taskCore);
-		}
-		
-		// 数据转换
-		List<ConvertField> convertField = taskModel.getConvertField();
-		if(convertField != null && convertField.size() > 0) {
-			DataTaskCoreEntity taskCore = new DataTaskCoreEntity();
-			taskCore.setId(DataServiceUtil.CONVERT + "-" + entity.getId());
-			taskCore.setTaskId(entity.getId());
-			taskCore.setTypeName("plugs");
-			taskCore.setKeyName("field");
-			taskCore.setDataType(DataServiceUtil.CONVERT);
-			taskCore.setValue(Y9JsonUtil.writeValueAsString(convertField));
-			taskCore.setSequence(1);
-			dataTaskCoreRepository.save(taskCore);
-		}
-		
-		taskMakeUpListener.onTaskMakeUp(entity.getId(), entity.getName(), configModel);
-		LOGGER.debug("任务["+entity.getId()+"]-配置保存成功");
-		
-		return Y9Result.success(entity, "保存成功");
 	}
 
 	@Override

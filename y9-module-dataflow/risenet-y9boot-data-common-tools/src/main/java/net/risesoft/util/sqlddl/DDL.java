@@ -1,116 +1,116 @@
 package net.risesoft.util.sqlddl;
 
-import javax.sql.DataSource;
+import java.sql.Connection;
 
 public class DDL {
 	
 	/**
 	 * 修改表字段
-	 * @param dataSource
+	 * @param connection
 	 * @param tableName
 	 * @param jsonDbColumns
 	 * @throws Exception
 	 */
-	public static void alterTableColumn(DataSource dataSource, String tableName, String jsonDbColumns) throws Exception {
-		String dbType = DbMetaDataUtil.getDatabaseDialectName(dataSource);
+	public static void alterTableColumn(Connection connection, String tableName, String jsonDbColumns) throws Exception {
+		String dbType = DbMetaDataUtil.getDatabaseDialectName(connection, false);
 		if (dbType.equalsIgnoreCase("mysql")) {
-			DDLmysql.alterTableColumn(dataSource, tableName, jsonDbColumns);
+			DDLmysql.alterTableColumn(connection, tableName, jsonDbColumns);
 		} else if (dbType.equalsIgnoreCase("oracle")) {
-			DDLoracle.alterTableColumn(dataSource, tableName, jsonDbColumns);
+			DDLoracle.alterTableColumn(connection, tableName, jsonDbColumns);
 		} else if (dbType.equalsIgnoreCase("dm")) {
-			DDLdm.alterTableColumn(dataSource, tableName, jsonDbColumns);
+			DDLdm.alterTableColumn(connection, tableName, jsonDbColumns);
 		}else if (dbType.equalsIgnoreCase("kingbase")) {
-			DDLkingbase.alterTableColumn(dataSource, tableName, jsonDbColumns);
+			DDLkingbase.alterTableColumn(connection, tableName, jsonDbColumns);
 		}else if (dbType.equalsIgnoreCase("postgresql")) {
-			DDLpg.alterTableColumn(dataSource, tableName, jsonDbColumns);
+			DDLpg.alterTableColumn(connection, tableName, jsonDbColumns);
 		}
 	}
 
 	/**
 	 * 建表
-	 * @param dataSource
+	 * @param connection
 	 * @param tableName
 	 * @param tableCName
 	 * @param jsonDbColumns
 	 * @throws Exception
 	 */
-	public static void addTableColumn(DataSource dataSource, String tableName, String tableCName, String jsonDbColumns) throws Exception {
-		String dbType = DbMetaDataUtil.getDatabaseDialectName(dataSource);
+	public static void addTableColumn(Connection connection, String tableName, String tableCName, String jsonDbColumns) throws Exception {
+		String dbType = DbMetaDataUtil.getDatabaseDialectName(connection, false);
 		if (dbType.equalsIgnoreCase("mysql")) {
-			DDLmysql.addTableColumn(dataSource, tableName, tableCName, jsonDbColumns);
+			DDLmysql.addTableColumn(connection, tableName, tableCName, jsonDbColumns);
 		} else if (dbType.equalsIgnoreCase("oracle")) {
-			DDLoracle.addTableColumn(dataSource, tableName, tableCName, jsonDbColumns);
+			DDLoracle.addTableColumn(connection, tableName, tableCName, jsonDbColumns);
 		} else if (dbType.equalsIgnoreCase("dm")) {
-			DDLdm.addTableColumn(dataSource, tableName, tableCName, jsonDbColumns);
+			DDLdm.addTableColumn(connection, tableName, tableCName, jsonDbColumns);
 		} else if (dbType.equalsIgnoreCase("kingbase")) {
-			DDLkingbase.addTableColumn(dataSource, tableName, tableCName, jsonDbColumns);
+			DDLkingbase.addTableColumn(connection, tableName, tableCName, jsonDbColumns);
 		} else if (dbType.equalsIgnoreCase("postgresql")) {
-			DDLpg.addTableColumn(dataSource, tableName, tableCName, jsonDbColumns);
+			DDLpg.addTableColumn(connection, tableName, tableCName, jsonDbColumns);
 		}
 	}
 
 	/**
 	 * 重命名表名称
-	 * @param dataSource
+	 * @param connection
 	 * @param tableNameOld
 	 * @param tableNameNew
 	 * @throws Exception
 	 */
-	public static void renameTable(DataSource dataSource, String tableNameOld, String tableNameNew) throws Exception {
-		String dbType = DbMetaDataUtil.getDatabaseDialectName(dataSource);
+	public static void renameTable(Connection connection, String tableNameOld, String tableNameNew) throws Exception {
+		String dbType = DbMetaDataUtil.getDatabaseDialectName(connection, false);
 		if (dbType.equalsIgnoreCase("mysql")) {
-			DDLmysql.renameTable(dataSource, tableNameOld, tableNameNew);
+			DDLmysql.renameTable(connection, tableNameOld, tableNameNew);
 		} else if (dbType.equalsIgnoreCase("oracle")) {
-			DDLoracle.renameTable(dataSource, tableNameOld, tableNameNew);
+			DDLoracle.renameTable(connection, tableNameOld, tableNameNew);
 		} else if (dbType.equalsIgnoreCase("dm")) {
-			DDLdm.renameTable(dataSource, tableNameOld, tableNameNew);
+			DDLdm.renameTable(connection, tableNameOld, tableNameNew);
 		} else if (dbType.equalsIgnoreCase("kingbase")) {
-			DDLkingbase.renameTable(dataSource, tableNameOld, tableNameNew);
+			DDLkingbase.renameTable(connection, tableNameOld, tableNameNew);
 		} else if (dbType.equalsIgnoreCase("postgresql")) {
-			DDLpg.renameTable(dataSource, tableNameOld, tableNameNew);
+			DDLpg.renameTable(connection, tableNameOld, tableNameNew);
 		}
 	}
 
 	/**
 	 * 删除表
-	 * @param dataSource
+	 * @param connection
 	 * @param tableName
 	 * @throws Exception
 	 */
-	public static void dropTable(DataSource dataSource, String tableName) throws Exception {
-		String dbType = DbMetaDataUtil.getDatabaseDialectName(dataSource);
+	public static void dropTable(Connection connection, String tableName) throws Exception {
+		String dbType = DbMetaDataUtil.getDatabaseDialectName(connection, false);
 		if (dbType.equalsIgnoreCase("mysql")) {
-			DDLmysql.dropTable(dataSource, tableName);
+			DDLmysql.dropTable(connection, tableName);
 		} else if (dbType.equalsIgnoreCase("oracle")) {
-			DDLoracle.dropTable(dataSource, tableName);
+			DDLoracle.dropTable(connection, tableName);
 		} else if (dbType.equalsIgnoreCase("dm")) {
-			DDLdm.dropTable(dataSource, tableName);
+			DDLdm.dropTable(connection, tableName);
 		} else if (dbType.equalsIgnoreCase("kingbase")) {
-			DDLkingbase.dropTable(dataSource, tableName);
+			DDLkingbase.dropTable(connection, tableName);
 		} else if (dbType.equalsIgnoreCase("postgresql")) {
-			DDLpg.dropTable(dataSource, tableName);
+			DDLpg.dropTable(connection, tableName);
 		}
 	}
 
 	/**
 	 * 删除表字段
-	 * @param dataSource
+	 * @param connection
 	 * @param tableName
 	 * @param columnName
 	 * @throws Exception
 	 */
-	public static void dropTableColumn(DataSource dataSource, String tableName, String columnName) throws Exception {
-		String dbType = DbMetaDataUtil.getDatabaseDialectName(dataSource);
+	public static void dropTableColumn(Connection connection, String tableName, String columnName) throws Exception {
+		String dbType = DbMetaDataUtil.getDatabaseDialectName(connection, false);
 		if (dbType.equalsIgnoreCase("mysql")) {
-			DDLmysql.dropTableColumn(dataSource, tableName, columnName);
+			DDLmysql.dropTableColumn(connection, tableName, columnName);
 		} else if (dbType.equalsIgnoreCase("oracle")) {
-			DDLoracle.dropTableColumn(dataSource, tableName, columnName);
+			DDLoracle.dropTableColumn(connection, tableName, columnName);
 		} else if (dbType.equalsIgnoreCase("dm")) {
-			DDLdm.dropTableColumn(dataSource, tableName, columnName);
+			DDLdm.dropTableColumn(connection, tableName, columnName);
 		} else if (dbType.equalsIgnoreCase("kingbase")) {
-			DDLkingbase.dropTableColumn(dataSource, tableName, columnName);
+			DDLkingbase.dropTableColumn(connection, tableName, columnName);
 		} else if (dbType.equalsIgnoreCase("postgresql")) {
-			DDLpg.dropTableColumn(dataSource, tableName, columnName);
+			DDLpg.dropTableColumn(connection, tableName, columnName);
 		}
 	}
 	

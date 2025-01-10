@@ -9,15 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +38,6 @@ import net.risesoft.service.DataSourceService;
 import net.risesoft.util.DataConstant;
 import net.risesoft.util.sqlddl.DbColumn;
 import net.risesoft.util.sqlddl.DbMetaDataUtil;
-import net.risesoft.util.sqlddl.SqlPaginationUtil;
 import net.risesoft.y9.json.Y9JsonUtil;
 import net.risesoft.y9.util.base64.Y9Base64Util;
 import net.risesoft.y9public.entity.DataSourceTypeEntity;
@@ -157,7 +152,8 @@ public class SourceController {
 			map.put("baseName", source.getBaseName());
 			if(record.getStatus() == 1) {
 				if(source.getType() == 0) {
-					map.put("dataNum", DbMetaDataUtil.getTableDataNum(dataSourceService.getDataSource(source.getId()), record.getName()));
+					map.put("dataNum", DbMetaDataUtil.getTableDataNum(DbMetaDataUtil.get(source.getDriver(), source.getUsername(), 
+							source.getPassword(), source.getUrl()), record.getName()));
 				}else if(source.getBaseType().equals(DataConstant.ES)) {
 					ElasticsearchRestClient elasticsearchRestClient = new ElasticsearchRestClient(source.getUrl(), 
 							source.getUsername(), source.getPassword());
@@ -415,52 +411,6 @@ public class SourceController {
 		return dbColumnList;
 	}
 
-	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "获取表数据", logLevel = LogLevelEnum.RSLOG)
-	@RequestMapping(value = "/getTableData")
-	public Map<String, Object> getTableData(String id, String search, String sourceId, String tableName, int page, int limit) {
-		Map<String, Object> ret_map = new HashMap<String, Object>();
-		Long totalCount = 0L;
-		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
-		try {
-			if(StringUtils.isNotBlank(sourceId) && StringUtils.isNotBlank(tableName)) {
-				DataSource dataSource = dataSourceService.getDataSource(sourceId);
-				boolean t = DbMetaDataUtil.checkTableExist(dataSource, tableName);
-				if(t) {
-					// 处理查询字段
-					String wheresql = "";
-					if(StringUtils.isNotBlank(search)) {
-						wheresql = " WHERE";
-						Map<String, Object> map = Y9JsonUtil.readHashMap(search);
-						// 获取key的集合
-						Set<String> keySet = map.keySet();
-						// 遍历key集合，获取value
-						for (String key : keySet) {
-							String value = (String) map.get(key);
-							if(StringUtils.isBlank(value)) {
-								continue;
-							}
-//							if(key.equals("YXY_UPDATEDTIME")) {
-//								String[] date = value.split(" - ");
-//								wheresql += (wheresql.equals(" WHERE")?"":"  AND") + (" " + key + " >= TO_DATE('" + date[0] + "','yyyy-mm-dd hh24:mi:ss')") + 
-//										" AND " + (key + " <= TO_DATE('" + date[1] + "','yyyy-mm-dd hh24:mi:ss')");
-//							}
-						}
-					}
-					JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-					totalCount = jdbcTemplate.queryForObject("select count(*) from " + tableName + wheresql, Long.class);
-					items = jdbcTemplate.queryForList(SqlPaginationUtil.generatePagedSql(dataSource, "select * from " + tableName + wheresql 
-							+ " ORDER BY YXY_UPDATEDTIME DESC NULLS LAST", (page - 1) * limit, limit));
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		ret_map.put("count", totalCount);
-		ret_map.put("data", items);
-		ret_map.put("code", 0);
-		return ret_map;
-	}
-	
 	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "获取数据源可选字段类型、长度、以及对应的types", logLevel = LogLevelEnum.RSLOG, enable = false)
 	@GetMapping(value = "/getFieldTypes")
 	public Y9Result<List<TypeDefinition>> getFieldTypes(String sourceId) {

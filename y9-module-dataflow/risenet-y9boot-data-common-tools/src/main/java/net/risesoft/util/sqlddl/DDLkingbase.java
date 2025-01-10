@@ -2,9 +2,10 @@ package net.risesoft.util.sqlddl;
 
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import net.risesoft.y9.json.Y9JsonUtil;
-import org.apache.commons.lang3.StringUtils;
 
-import javax.sql.DataSource;
+import java.sql.Connection;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class DDLkingbase {
 
@@ -16,9 +17,9 @@ public class DDLkingbase {
 	 * @param jsonDbColumns
 	 * @throws Exception
 	 */
-	public static void addTableColumn(DataSource dataSource, String tableName, String tableCName, String jsonDbColumns) throws Exception {
+	public static void addTableColumn(Connection connection, String tableName, String tableCName, String jsonDbColumns) throws Exception {
 		DbColumn[] dbcs = Y9JsonUtil.objectMapper.readValue(jsonDbColumns, TypeFactory.defaultInstance().constructArrayType(DbColumn.class));
-		if (DbMetaDataUtil.checkTableExist(dataSource, tableName)) {
+		if (DbMetaDataUtil.checkTableExist(connection, tableName, false)) {
 			for (DbColumn dbc : dbcs) {
 				String columnName = dbc.getColumn_name();
 				String DDL = "ALTER TABLE " + tableName;
@@ -49,14 +50,14 @@ public class DDLkingbase {
 					DDL += " SET NOT NULL;";
 				}
 
-				DbMetaDataUtil.executeDDL(dataSource, DDL);
+				DbMetaDataUtil.executeDDL(connection, DDL);
 				if (StringUtils.isNotBlank(dbc.getComment())) {
-					DbMetaDataUtil.executeDDL(dataSource, "COMMENT ON COLUMN " + tableName.trim().toUpperCase() + "."
+					DbMetaDataUtil.executeDDL(connection, "COMMENT ON COLUMN " + tableName.trim().toUpperCase() + "."
 							+ dbc.getColumn_name().trim().toUpperCase() + " IS '" + dbc.getComment() + "'");
 				}
 
 				if (dbc.getIsCreateIndex() && !dbc.getIsState()) {
-					DbMetaDataUtil.executeDDL(dataSource,
+					DbMetaDataUtil.executeDDL(connection,
 							"CREATE INDEX \"" + tableName + "_" + dbc.getColumn_name() + "\" ON " + tableName + " USING BTREE(" + columnName + " )");
 				}
 			}
@@ -85,40 +86,41 @@ public class DDLkingbase {
 			}
 
 			sb.append(isPK).append(")");
-			DbMetaDataUtil.executeDDL(dataSource, sb.toString());
+			DbMetaDataUtil.executeDDL(connection, sb.toString());
 			
 			if(StringUtils.isNotBlank(tableCName)) {
-				DbMetaDataUtil.executeDDL(dataSource,"COMMENT ON TABLE " + tableName.trim() +" IS '" + tableCName + "'");
+				DbMetaDataUtil.executeDDL(connection, "COMMENT ON TABLE " + tableName.trim() +" IS '" + tableCName + "'");
 			}
 
 			for (DbColumn dbc : dbcs) {
 				String columnName = dbc.getColumn_name();
 				if (StringUtils.isNotBlank(dbc.getComment())) {
-					DbMetaDataUtil.executeDDL(dataSource, "COMMENT ON COLUMN " + tableName.trim().toUpperCase() + "."
+					DbMetaDataUtil.executeDDL(connection, "COMMENT ON COLUMN " + tableName.trim().toUpperCase() + "."
 							+ dbc.getColumn_name().trim().toUpperCase() + " IS '" + dbc.getComment() + "'");
 				}
 				if (dbc.getIsCreateIndex()) {
-					DbMetaDataUtil.executeDDL(dataSource, "CREATE INDEX \"" + tableName + "_" + dbc.getColumn_name() + "\" ON " + tableName + " USING BTREE(" + columnName + " )");
+					DbMetaDataUtil.executeDDL(connection, "CREATE INDEX \"" + tableName + "_" + dbc.getColumn_name() + "\" ON " + tableName + " USING BTREE(" + columnName + " )");
 				}
 			}
 		}
 	}
 
-	public static void renameTable(DataSource dataSource, String tableNameOld, String tableNameNew) throws Exception {
-		DbMetaDataUtil.executeDDL(dataSource, "ALTER TABLE " + tableNameOld + " RENAME TO " + tableNameNew);
+	public static void renameTable(Connection connection, String tableNameOld, String tableNameNew) throws Exception {
+		DbMetaDataUtil.executeDDL(connection, "ALTER TABLE " + tableNameOld + " RENAME TO " + tableNameNew);
 	}
 
-	public static void dropTableColumn(DataSource dataSource, String tableName, String columnName) throws Exception {
-		DbMetaDataUtil.executeDDL(dataSource, "ALTER TABLE " + tableName + " DROP COLUMN " + columnName);
+	public static void dropTableColumn(Connection connection, String tableName, String columnName) throws Exception {
+		DbMetaDataUtil.executeDDL(connection, "ALTER TABLE " + tableName + " DROP COLUMN " + columnName);
 	}
 
-	public static void dropTable(DataSource dataSource, String tableName) throws Exception {
-		DbMetaDataUtil.executeDDL(dataSource, "DROP TABLE " + tableName);
+	public static void dropTable(Connection connection, String tableName) throws Exception {
+		DbMetaDataUtil.executeDDL(connection, "DROP TABLE " + tableName);
 	}
 
-	public static void alterTableColumn(DataSource dataSource, String tableName, String jsonDbColumns)
+	public static void alterTableColumn(Connection connection, String tableName, String jsonDbColumns)
 			throws Exception {
-		if (!DbMetaDataUtil.checkTableExist(dataSource, tableName)) {
+		if (!DbMetaDataUtil.checkTableExist(connection, tableName, false)) {
+			DbMetaDataUtil.ReleaseResource(connection, null, null, null);
 			throw new Exception("数据库中不存在这个表：" + tableName);
 		}
 		DbColumn[] dbcs = Y9JsonUtil.objectMapper.readValue(jsonDbColumns,
@@ -156,7 +158,7 @@ public class DDLkingbase {
 			if (dbc.getComment().length() > 0) {
 				DDL += " COMMENT ON  COLUMN " + tableName + "." + columnName + " IS '" + dbc.getComment() + "'";
 			}
-			DbMetaDataUtil.executeDDL(dataSource, DDL);
+			DbMetaDataUtil.executeDDL(connection, DDL);
 		}
 	}
 

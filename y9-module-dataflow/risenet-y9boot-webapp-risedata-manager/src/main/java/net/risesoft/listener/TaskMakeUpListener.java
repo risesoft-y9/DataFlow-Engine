@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -58,8 +57,7 @@ public class TaskMakeUpListener {
 	private final ConfigService configService;
     
     @SuppressWarnings("unchecked")
-	@Async
-    public void onTaskMakeUp(String taskId, String taskName, TaskConfigModel configModel) {
+    public void onTaskMakeUp(String taskId, String taskName, TaskConfigModel configModel) throws Exception {
     	// 先删除旧数据
     	List<DataTaskMakeUpEntity> taskMakeUpList = dataTaskMakeUpRepository.findByTaskId(taskId);
     	if(taskMakeUpList != null && taskMakeUpList.size() > 0) {

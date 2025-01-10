@@ -11,10 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -24,8 +20,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.alibaba.druid.pool.DruidDataSource;
 
 import jodd.util.Base64;
 import lombok.RequiredArgsConstructor;
@@ -70,10 +64,6 @@ public class DataSourceServiceImpl implements DataSourceService {
 	private final DataTaskConfigRepository dataTaskConfigRepository;
 	
 	private final DataTaskRepository dataTaskRepository;
-
-	private ConcurrentMap<String, DataSource> dataSourceMap = new ConcurrentHashMap<>();
-
-	private ConcurrentMap<String, DataSourceEntity> dsMap = new ConcurrentHashMap<>();
 
 	@Override
 	public Page<DataSourceEntity> getDataSourcePage(String baseName, int page, int rows) {
@@ -140,64 +130,6 @@ public class DataSourceServiceImpl implements DataSourceService {
 		}
 		datasourceRepository.deleteById(id);
 		return Y9Result.successMsg("删除成功");
-	}
-
-	@Override
-	public DataSource getDataSource(String id) {
-		DataSource dataSource = this.dataSourceMap.get(id);
-		DataSourceEntity df = datasourceRepository.findById(id).orElse(null);
-		DataSourceEntity df1 = dsMap.get(id);
-		boolean modified = false;
-		if (df1 == null || dataSource == null) {
-			modified = true;
-		} else {
-			if (df != null) {
-				if (!df.getUrl().equals(df1.getUrl())) {
-					modified = true;
-				}
-				if (!df.getInitialSize().equals(df1.getInitialSize())) {
-					modified = true;
-				}
-				if (!df.getMaxActive().equals(df1.getMaxActive())) {
-					modified = true;
-				}
-				if (!df.getMinIdle().equals(df1.getMinIdle())) {
-					modified = true;
-				}
-				if (!df.getUsername().equals(df1.getUsername())) {
-					modified = true;
-				}
-				if (!df.getPassword().equals(df1.getPassword())) {
-					modified = true;
-				}
-			}
-		}
-		if (modified) {
-			DruidDataSource ds = new DruidDataSource();
-			if (StringUtils.isNotBlank(df.getDriver())) {
-				ds.setDriverClassName(df.getDriver());
-			}
-			ds.setTestOnBorrow(false);
-			ds.setTestOnReturn(false);
-			ds.setTestWhileIdle(true);
-			if(df.getBaseType().equals("postgresql")) {
-				ds.setValidationQuery("SELECT VERSION()");
-			}else {
-				ds.setValidationQuery("SELECT 1 FROM DUAL");
-			}
-			ds.setInitialSize(df.getInitialSize());
-			ds.setMaxActive(df.getMaxActive());
-			ds.setMinIdle(df.getMinIdle());
-			ds.setUrl(df.getUrl());
-			ds.setUsername(df.getUsername());
-			ds.setPassword(df.getPassword());
-			//设置模式
-			//ds.setConnectionProperties("currentSchema=" + df.getBaseSchema());
-			dataSource = ds;
-			this.dataSourceMap.put(id, dataSource);
-			this.dsMap.put(id, df);
-		}
-		return dataSource;
 	}
 
 	@Override
@@ -580,14 +512,13 @@ public class DataSourceServiceImpl implements DataSourceService {
 	public Y9Result<DataTable> saveTable(DataTable entity) {
 		try {
 			if (entity != null && StringUtils.isNotBlank(entity.getName())) {
-				DataSourceEntity source = datasourceRepository.findById(entity.getBaseId()).orElse(null);
+				DataSourceEntity source = getDataSourceById(entity.getBaseId());
 				if (source == null) {
 					return Y9Result.failure("数据源不存在");
 				}
 				if (source.getType() != 0) {
 					return Y9Result.failure("不支持的数据源类型");
 				}
-				DataSource dataSource = getDataSource(entity.getBaseId());
 				if (StringUtils.isBlank(entity.getId())) {
 					// 判断是否已存在表
 					DataTable dataTable = dataTableRepository.findByBaseIdAndName(entity.getBaseId(), entity.getName());
@@ -596,7 +527,8 @@ public class DataSourceServiceImpl implements DataSourceService {
 					}
 					entity.setId(Y9IdGenerator.genId());
 					// 检查表在库中是否存在，已存在不需重新生成
-					boolean exist = DbMetaDataUtil.checkTableExist(dataSource, entity.getName());
+					boolean exist = DbMetaDataUtil.checkTableExist(DbMetaDataUtil.get(source.getDriver(), source.getUsername(), 
+							source.getPassword(), source.getUrl()), entity.getName(), true);
 					if (exist) {
 						entity.setStatus(1);
 					}else {
@@ -613,7 +545,8 @@ public class DataSourceServiceImpl implements DataSourceService {
 								return Y9Result.failure("已存在该表名称");
 							}
 							// 判断修改的表名称在库中是否存在，已存在不需重新生成
-							boolean exist = DbMetaDataUtil.checkTableExist(dataSource, entity.getName());
+							boolean exist = DbMetaDataUtil.checkTableExist(DbMetaDataUtil.get(source.getDriver(), source.getUsername(), 
+									source.getPassword(), source.getUrl()), entity.getName(), true);
 							if (exist) {
 								entity.setStatus(1);
 							}else {
@@ -654,11 +587,12 @@ public class DataSourceServiceImpl implements DataSourceService {
 		try {
 			DataTable table = getTableById(tableId);
 			if (table != null && table.getStatus() == 0) {
+				DataSourceEntity source = getDataSourceById(table.getBaseId());
 				String msg = "表创建成功";
-				DataSource dataSource = getDataSource(table.getBaseId());
 				if(StringUtils.isNotBlank(table.getOldName())) {
 					// 修改表名称
-					DDL.renameTable(dataSource, table.getOldName(), table.getName());
+					DDL.renameTable(DbMetaDataUtil.get(source.getDriver(), source.getUsername(), 
+							source.getPassword(), source.getUrl()), table.getOldName(), table.getName());
 					table.setOldName("");
 					msg = "表重命名成功";
 				}else {
@@ -667,7 +601,8 @@ public class DataSourceServiceImpl implements DataSourceService {
 					// 生成建表字段列表
 					List<DbColumn> columnList = getDbColumn(fieldList);
 					// 建表
-					DDL.addTableColumn(dataSource, table.getName(), table.getCname(), Y9JsonUtil.writeValueAsString(columnList));
+					DDL.addTableColumn(DbMetaDataUtil.get(source.getDriver(), source.getUsername(), 
+							source.getPassword(), source.getUrl()), table.getName(), table.getCname(), Y9JsonUtil.writeValueAsString(columnList));
 					// 更新字段状态信息
 					for (DataTableField field : fieldList) {
 						field.setIsState(true);
@@ -871,7 +806,9 @@ public class DataSourceServiceImpl implements DataSourceService {
 	}
 	
 	private long getTableDataCount(String sourceId, String tableName) {
-		return DbMetaDataUtil.getTableDataNum(getDataSource(sourceId), tableName);
+		DataSourceEntity source = getDataSourceById(sourceId);
+		return DbMetaDataUtil.getTableDataNum(DbMetaDataUtil.get(source.getDriver(), source.getUsername(), 
+				source.getPassword(), source.getUrl()), tableName);
 	}
 	
 	private long getElasticCount(String sourceId, String tableName) {
@@ -890,13 +827,14 @@ public class DataSourceServiceImpl implements DataSourceService {
 		try {
 			DataTable table = dataTableRepository.findByBaseIdAndName(baseId, tableName);
 			if (table != null) {
-				DataSource dataSource = getDataSource(id);
 				// 查询表字段信息
 				List<DataTableField> fieldList = dataTableFieldRepository.findByTableIdOrderByDisplayOrderAsc(table.getId());
 				// 生成建表字段列表
 				List<DbColumn> columnList = getDbColumn(fieldList);
 				// 建表
-				DDL.addTableColumn(dataSource, table.getName(), table.getCname(), Y9JsonUtil.writeValueAsString(columnList));
+				DataSourceEntity source = getDataSourceById(id);
+				DDL.addTableColumn(DbMetaDataUtil.get(source.getDriver(), source.getUsername(), 
+						source.getPassword(), source.getUrl()), table.getName(), table.getCname(), Y9JsonUtil.writeValueAsString(columnList));
 				// 提取表
 				extractTable(id, tableName, getDataSourceById(id));
 				return Y9Result.successMsg("复制表成功");

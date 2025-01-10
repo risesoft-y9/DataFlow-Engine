@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,8 +27,7 @@ public class DbMetaDataUtil {
         } catch (ClassNotFoundException e) {
 			log.error(driverClass + "-驱动包不存在");
 		} catch (SQLException e) {
-			e.printStackTrace();
-			log.error(url + "-连接失败");
+			log.error(url + "-连接失败：" + e.getMessage());
 		} finally {
 			ReleaseResource(connection, null, null, null);
 		}
@@ -69,6 +67,29 @@ public class DbMetaDataUtil {
             }
         }
     }
+    
+    /**
+     * 获取数据库连接
+     * @param driverClass
+     * @param userName
+     * @param passWord
+     * @param url
+     * @return
+     */
+    public static Connection get(String driverClass, String userName, String passWord, String url) {
+    	Connection connection = null;
+    	try {
+			// 加载驱动
+			Class.forName(driverClass);
+			// 获得数据库连接
+			connection = DriverManager.getConnection(url, userName, passWord);
+		} catch (ClassNotFoundException e) {
+			log.error(driverClass + "-驱动包不存在");
+		} catch (SQLException e) {
+			log.error(url + "-连接失败：" + e.getMessage());
+		}
+    	return connection;
+    }
 
     /**
      * 检查表是否存在
@@ -77,11 +98,9 @@ public class DbMetaDataUtil {
      * @return
      * @throws Exception
      */
-	public static boolean checkTableExist(DataSource dataSource, String tableName) throws Exception {
+	public static boolean checkTableExist(Connection connection, String tableName, Boolean isclose) throws Exception {
 		ResultSet rs = null;
-		Connection connection = null;
 		try {
-			connection = dataSource.getConnection();
 			DatabaseMetaData dbmd = connection.getMetaData();
 			String dialect = dbmd.getDatabaseProductName().toLowerCase();
 			if ("mysql".equals(dialect) || "microsoft".equals(dialect)) {
@@ -98,7 +117,10 @@ public class DbMetaDataUtil {
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			ReleaseResource(connection, null, rs, null);
+			if(isclose) {
+				ReleaseResource(connection, null, null, null);
+			}
+			ReleaseResource(null, null, rs, null);
 		}
 		return false;
 	}
@@ -159,17 +181,15 @@ public class DbMetaDataUtil {
 	 * @throws Exception
 	 */
 	@SuppressWarnings({ "resource" })
-	public static List<DbColumn> listAllColumns(DataSource dataSource, String tableName, String columnNamePatten) throws Exception {
-		Connection connection = null;
+	public static List<DbColumn> listAllColumns(Connection connection, String tableName, String columnNamePatten) throws Exception {
 		String table_schema = null;
 		String databaseName = null;
 
 		Statement stmt = null;
 		ResultSet rs = null;
 		List<DbColumn> dbColumnList = new ArrayList<DbColumn>();
-		if (DbMetaDataUtil.checkTableExist(dataSource, tableName)) {
+		if (DbMetaDataUtil.checkTableExist(connection, tableName, false)) {
 			try {
-				connection = dataSource.getConnection();
 				try {
 					databaseName = connection.getCatalog();
 				} catch (Exception e) {
@@ -177,7 +197,7 @@ public class DbMetaDataUtil {
 
 				DatabaseMetaData dbmd = connection.getMetaData();
 				table_schema = dbmd.getUserName().toUpperCase();
-				String dialect = getDatabaseDialectName(dataSource);
+				String dialect = getDatabaseDialectName(connection, false);
 
 				// 获得主键
 				if ("mysql".equals(dialect)) {
@@ -272,10 +292,8 @@ public class DbMetaDataUtil {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static String getDatabaseProductVersion(DataSource dataSource) throws SQLException {
-		Connection connection = null;
+	public static String getDatabaseProductVersion(Connection connection) throws SQLException {
 		try {
-			connection = dataSource.getConnection();
 			DatabaseMetaData dbmd = connection.getMetaData();
 			return dbmd.getDatabaseProductVersion();
 		} catch (SQLException e) {
@@ -291,20 +309,20 @@ public class DbMetaDataUtil {
 	 * @param dataSource
 	 * @return
 	 */
-	public static String getDatabaseDialectName(DataSource dataSource) {
+	public static String getDatabaseDialectName(Connection connection, Boolean isclose) {
 		String databaseName = "";
-		Connection connection = null;
 		try {
-			connection = dataSource.getConnection();
 			DatabaseMetaData dbmd = connection.getMetaData();
 			databaseName = dbmd.getDatabaseProductName().toLowerCase();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				connection.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
+			if(isclose) {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		if (databaseName.indexOf("microsoft") > -1) {
@@ -324,12 +342,10 @@ public class DbMetaDataUtil {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static Boolean executeDDL(DataSource dataSource, String DDL) throws SQLException {
-		Connection connection = null;
+	public static Boolean executeDDL(Connection connection, String DDL) throws SQLException {
 		Statement stmt = null;
 		Boolean bool = false;
 		try {
-			connection = dataSource.getConnection();
 			stmt = connection.createStatement();
 			System.out.println(DDL);
 			bool = stmt.execute(DDL);
@@ -413,13 +429,10 @@ public class DbMetaDataUtil {
 	 * @param tableName
 	 * @return
 	 */
-    public static long getTableDataNum(DataSource dataSource, String tableName) {
-    	Connection connection = null;
+    public static long getTableDataNum(Connection connection, String tableName) {
     	Statement stmt = null;
     	long count = 0;
 		try {
-			//获得数据库连接
-			connection = dataSource.getConnection();
 			stmt = connection.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM " + tableName);
 			if (rs.next()) {

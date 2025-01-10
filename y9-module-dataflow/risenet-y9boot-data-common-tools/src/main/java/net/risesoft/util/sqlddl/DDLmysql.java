@@ -6,7 +6,7 @@ import net.risesoft.y9.json.Y9JsonUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
-import javax.sql.DataSource;
+import java.sql.Connection;
 
 public class DDLmysql {
 
@@ -17,8 +17,9 @@ public class DDLmysql {
 	 * @param jsonDbColumns
 	 * @throws Exception
 	 */
-	public static void alterTableColumn(DataSource dataSource, String tableName, String jsonDbColumns) throws Exception {
-		if (!DbMetaDataUtil.checkTableExist(dataSource, tableName)) {
+	public static void alterTableColumn(Connection connection, String tableName, String jsonDbColumns) throws Exception {
+		if (!DbMetaDataUtil.checkTableExist(connection, tableName, false)) {
+			DbMetaDataUtil.ReleaseResource(connection, null, null, null);
 			throw new Exception("数据库中不存在这个表：" + tableName);
 		}
 		DbColumn[] dbcs = Y9JsonUtil.objectMapper.readValue(jsonDbColumns, TypeFactory.defaultInstance().constructArrayType(DbColumn.class));
@@ -45,7 +46,7 @@ public class DDLmysql {
 			if (StringUtils.isNotBlank(dbc.getComment())) {
 				DDL += " COMMENT '" + dbc.getComment() + "'";
 			}
-			DbMetaDataUtil.executeDDL(dataSource, DDL);
+			DbMetaDataUtil.executeDDL(connection, DDL);
 		}
 	}
 
@@ -56,9 +57,9 @@ public class DDLmysql {
 	 * @param jsonDbColumns
 	 * @throws Exception
 	 */
-	public static void addTableColumn(DataSource dataSource, String tableName, String tableCName, String jsonDbColumns) throws Exception {
+	public static void addTableColumn(Connection connection, String tableName, String tableCName, String jsonDbColumns) throws Exception {
 		DbColumn[] dbcs = Y9JsonUtil.objectMapper.readValue(jsonDbColumns, TypeFactory.defaultInstance().constructArrayType(DbColumn.class));
-		if (DbMetaDataUtil.checkTableExist(dataSource, tableName)) {
+		if (DbMetaDataUtil.checkTableExist(connection, tableName, false)) {
 			for (DbColumn dbc : dbcs) {
 				String DDL = "ALTER TABLE " + tableName;
 				if(!dbc.getIsState()) {//没有则创建
@@ -86,11 +87,11 @@ public class DDLmysql {
 				if (StringUtils.isNotBlank(dbc.getComment())) {
 					DDL += " COMMENT '" + dbc.getComment() + "'";
 				}
-				DbMetaDataUtil.executeDDL(dataSource, DDL);
+				DbMetaDataUtil.executeDDL(connection, DDL);
 				
 				if (dbc.getIsCreateIndex() && !dbc.getIsState()) {
 					String str = "ALTER TABLE " + tableName + " ADD INDEX " + tableName + "_" + dbc.getColumn_name() + " (" + dbc.getColumn_name() + ")";
-					DbMetaDataUtil.executeDDL(dataSource, str);
+					DbMetaDataUtil.executeDDL(connection, str);
 				}
 			}
 		} else {//table不存在。
@@ -129,20 +130,20 @@ public class DDLmysql {
 				sb.append(" COMMENT='" + tableCName + "'");
 			}
 			
-			DbMetaDataUtil.executeDDL(dataSource, sb.toString());
+			DbMetaDataUtil.executeDDL(connection, sb.toString());
 		}
 	}
 
-	public static void renameTable(DataSource dataSource, String tableNameOld, String tableNameNew) throws Exception {
-		DbMetaDataUtil.executeDDL(dataSource, "ALTER TABLE " + tableNameOld + " RENAME " + tableNameNew);
+	public static void renameTable(Connection connection, String tableNameOld, String tableNameNew) throws Exception {
+		DbMetaDataUtil.executeDDL(connection, "ALTER TABLE " + tableNameOld + " RENAME " + tableNameNew);
 	}
 
-	public static void dropTable(DataSource dataSource, String tableName) throws Exception {
-		DbMetaDataUtil.executeDDL(dataSource, "DROP TABLE " + tableName);
+	public static void dropTable(Connection connection, String tableName) throws Exception {
+		DbMetaDataUtil.executeDDL(connection, "DROP TABLE " + tableName);
 	}
 
-	public static void dropTableColumn(DataSource dataSource, String tableName, String columnName) throws Exception {
-		DbMetaDataUtil.executeDDL(dataSource, "ALTER TABLE " + tableName + " DROP COLUMN " + columnName);
+	public static void dropTableColumn(Connection connection, String tableName, String columnName) throws Exception {
+		DbMetaDataUtil.executeDDL(connection, "ALTER TABLE " + tableName + " DROP COLUMN " + columnName);
 	}
 
 }

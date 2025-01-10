@@ -3,7 +3,6 @@ package net.risesoft.service;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,15 +40,6 @@ public interface DataSourceService {
 	 * @param id ：数据源主键id
 	 */
 	Y9Result<String> deleteDataSource(String id);
-
-	/**
-	 * 获取根据ID获取要测试的数据源
-	 * 
-	 * @param id
-	 * @return
-	 * @throws Exception
-	 */
-	DataSource getDataSource(String id);
 
 	/**
 	 * 根据数据源名称查询

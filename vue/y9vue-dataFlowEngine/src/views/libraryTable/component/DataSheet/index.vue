@@ -21,7 +21,7 @@
                 {
                     type: 'index',
                     title: computed(() => t('序号')),
-                    width: 100,
+                    width: 80,
                     fixed: 'left'
                 },
                 {
@@ -49,7 +49,7 @@
                 {
                     title: computed(() => t('操作')),
                     fixed: 'right',
-                    width: 280,
+                    width: 300,
                     key: 'operation',
                     slot: 'operation'
                 }
