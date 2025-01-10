@@ -235,6 +235,7 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 		// 拼接or 有一个改变都得update
 		PreparedStatementHandle preparedStatementHandle;
 		String nvl = getNvlFunction();
+		String nullValue;
 		for (String columnHolder : updateField) {
 			if (!first) {
 				sb.append(" or ");
@@ -243,12 +244,13 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 			}
 			// 如果是大文本则需要为length
 			preparedStatementHandle = createColumnHandles.get(columnHolder);
+			nullValue=preparedStatementHandle.nullValue(dataBaseType);
 			if (preparedStatementHandle.isBigType()) {
-				sb.append("length(" + nvl + "(" + columnHolder + "," + preparedStatementHandle.nullValue() + ")"
-						+ ") != length(" + nvl + "(?," + preparedStatementHandle.nullValue() + "))");
+				sb.append("length(" + nvl + "(" + columnHolder + "," + nullValue + ")"
+						+ ") != length(" + nvl + "(?," + nullValue + "))");
 			} else {
-				sb.append(nvl + "(" + columnHolder + "," + preparedStatementHandle.nullValue() + ")" + " != " + nvl
-						+ "(?," + preparedStatementHandle.nullValue() + ")");
+				sb.append(nvl + "(" + columnHolder + "," + nullValue + ")" + " != " + nvl
+						+ "(?," + nullValue + ")");
 			}
 		}
 		sb.append(" WHEN NOT MATCHED THEN ").append("INSERT (")

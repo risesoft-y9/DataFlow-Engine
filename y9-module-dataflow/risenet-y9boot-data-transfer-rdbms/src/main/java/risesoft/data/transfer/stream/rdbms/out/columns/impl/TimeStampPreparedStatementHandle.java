@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.commons.lang3.tuple.Triple;
 
 import risesoft.data.transfer.core.column.Column;
+import risesoft.data.transfer.stream.rdbms.out.columns.DateNullValuePreparedStatementHandle;
 import risesoft.data.transfer.stream.rdbms.out.columns.PreparedStatementHandle;
 import risesoft.data.transfer.stream.rdbms.out.columns.PreparedStatementHandleFactory;
 import risesoft.data.transfer.stream.rdbms.out.columns.ZeroNullValuePreparedStatementHandle;
@@ -21,7 +22,8 @@ import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
  * @date 2024年1月25日
  * @author lb
  */
-public class TimeStampPreparedStatementHandle extends ZeroNullValuePreparedStatementHandle implements PreparedStatementHandle,PreparedStatementHandleFactory {
+public class TimeStampPreparedStatementHandle extends DateNullValuePreparedStatementHandle
+		implements PreparedStatementHandle, PreparedStatementHandleFactory {
 
 	@Override
 	public boolean isHandle(int type) {
@@ -53,8 +55,12 @@ public class TimeStampPreparedStatementHandle extends ZeroNullValuePreparedState
 
 		if (null != utilDate) {
 			sqlTimestamp = new java.sql.Timestamp(utilDate.getTime());
+		} else {
+			preparedStatement.setNull(columnIndex, Types.TIMESTAMP);
+			return;
 		}
-		preparedStatement.setTimestamp(columnIndex , sqlTimestamp);
+
+		preparedStatement.setTimestamp(columnIndex, sqlTimestamp);
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package risesoft.data.transfer.stream.rdbms.out.columns;
 
+import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
+
 /**
  * 空值默认为空字符的解析器
  * 
@@ -11,7 +13,7 @@ package risesoft.data.transfer.stream.rdbms.out.columns;
 public abstract class NullCharValuePreparedStatementHandle implements PreparedStatementHandle{
 
 	@Override
-	public String nullValue() {
+	public String nullValue(DataBaseType dataBaseType) {
 		return "''";
 	}
 

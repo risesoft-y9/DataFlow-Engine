@@ -9,9 +9,9 @@ import java.util.List;
 import org.apache.commons.lang3.tuple.Triple;
 
 import risesoft.data.transfer.core.column.Column;
+import risesoft.data.transfer.stream.rdbms.out.columns.DateNullValuePreparedStatementHandle;
 import risesoft.data.transfer.stream.rdbms.out.columns.PreparedStatementHandle;
 import risesoft.data.transfer.stream.rdbms.out.columns.PreparedStatementHandleFactory;
-import risesoft.data.transfer.stream.rdbms.out.columns.ZeroNullValuePreparedStatementHandle;
 import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
 
 /**
@@ -21,7 +21,8 @@ import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
  * @date 2024年1月25日
  * @author lb
  */
-public class DatePreparedStatementHandle extends ZeroNullValuePreparedStatementHandle  implements PreparedStatementHandle,PreparedStatementHandleFactory {
+public class DatePreparedStatementHandle extends DateNullValuePreparedStatementHandle
+		implements PreparedStatementHandle, PreparedStatementHandleFactory {
 
 	@Override
 	public boolean isHandle(int type) {
@@ -37,7 +38,8 @@ public class DatePreparedStatementHandle extends ZeroNullValuePreparedStatementH
 	public void fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, Column column,
 			DataBaseType dataBaseType, Triple<List<String>, List<Integer>, List<String>> resultSetMetaData)
 			throws Exception {
-		if (resultSetMetaData.getRight().get(resultSetMetaData.getLeft().indexOf(column.getName())).equalsIgnoreCase("year")) {
+		if (resultSetMetaData.getRight().get(resultSetMetaData.getLeft().indexOf(column.getName()))
+				.equalsIgnoreCase("year")) {
 			if (column.asBigInteger() == null) {
 				preparedStatement.setString(columnIndex, null);
 			} else {
@@ -53,6 +55,9 @@ public class DatePreparedStatementHandle extends ZeroNullValuePreparedStatementH
 			}
 			if (null != utilDate) {
 				sqlDate = new java.sql.Date(utilDate.getTime());
+			} else {
+				preparedStatement.setNull(columnIndex, Types.DATE);
+				return;
 			}
 			preparedStatement.setDate(columnIndex, sqlDate);
 		}
@@ -62,7 +67,5 @@ public class DatePreparedStatementHandle extends ZeroNullValuePreparedStatementH
 	public PreparedStatementHandle getPreparedStatementHandle(int type) {
 		return this;
 	}
-
-	
 
 }

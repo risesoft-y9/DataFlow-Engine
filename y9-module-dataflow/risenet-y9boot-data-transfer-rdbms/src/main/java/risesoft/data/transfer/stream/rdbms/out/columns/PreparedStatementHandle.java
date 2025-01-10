@@ -39,8 +39,8 @@ public interface PreparedStatementHandle {
 
 	/**
 	 * 这个主要用于update 时当目标字段为空时的空值比较,避免因为值为NULL导致无法更新问题
-	 * 
+	 * @param dataBaseType 数据库类型
 	 * @return
 	 */
-	String nullValue();
+	String nullValue(DataBaseType dataBaseType);
 }
