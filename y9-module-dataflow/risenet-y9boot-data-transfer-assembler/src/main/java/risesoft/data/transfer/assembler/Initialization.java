@@ -19,18 +19,27 @@ import java.util.Set;
  * @author lb
  */
 public class Initialization {
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(Initialization.class);
 
 	/**
-	 * 初始化
+	 * 初始化:初始化有生公司包自带的实现类
 	 * 
 	 * @param interfaceClass 需要初始化的类型
 	 */
-	public static void install(Class<?> interfaceClass) {
-		Reflections reflections = new Reflections(
-				new ConfigurationBuilder().setUrls(ClasspathHelper.forJavaClassPath()));
+	public static int install(Class<?> interfaceClass) {
+		return installOfPackage(interfaceClass, "risesoft.data.transfer");
+	}
 
+	/**
+	 * 根据包路径与接口加载类
+	 * 
+	 * @param interfClass
+	 * @param packageName
+	 * @return
+	 */
+	public static int installOfPackage(Class<?> interfaceClass, String packageName) {
+		Reflections reflections = new Reflections(packageName);
 		Set<?> subTypes = reflections.getSubTypesOf(interfaceClass);
 		for (Object clazz : subTypes) {
 			try {
@@ -40,6 +49,7 @@ public class Initialization {
 				throw new InstallException("加载类:" + clazz + "失败!" + e.getMessage());
 			}
 		}
+		return subTypes.size();
 	}
 
 }
