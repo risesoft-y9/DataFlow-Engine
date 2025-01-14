@@ -244,13 +244,12 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 			}
 			// 如果是大文本则需要为length
 			preparedStatementHandle = createColumnHandles.get(columnHolder);
-			nullValue=preparedStatementHandle.nullValue(dataBaseType);
+			nullValue = preparedStatementHandle.nullValue(dataBaseType);
 			if (preparedStatementHandle.isBigType()) {
-				sb.append("length(" + nvl + "(" + columnHolder + "," + nullValue + ")"
-						+ ") != length(" + nvl + "(?," + nullValue + "))");
+				sb.append("length(" + nvl + "(" + columnHolder + "," + nullValue + ")" + ") != length(" + nvl + "(?,"
+						+ nullValue + "))");
 			} else {
-				sb.append(nvl + "(" + columnHolder + "," + nullValue + ")" + " != " + nvl
-						+ "(?," + nullValue + ")");
+				sb.append(nvl + "(" + columnHolder + "," + nullValue + ")" + " != " + nvl + "(?," + nullValue + ")");
 			}
 		}
 		sb.append(" WHEN NOT MATCHED THEN ").append("INSERT (")
@@ -341,6 +340,11 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 	private static PreparedStatementHandle getHandle(int type) {
 		PreparedStatementHandle preparedStatementHandle = PREPARED_MAP.get(type);
 		if (preparedStatementHandle == null) {
+			preparedStatementHandle = createHandle((int) type);
+			if (preparedStatementHandle != null) {
+				PREPARED_MAP.put((int) type, preparedStatementHandle);
+				return preparedStatementHandle;
+			}
 			throw TransferException.as(FrameworkErrorCode.RUNTIME_ERROR, "无法处理的数据库类型:" + type);
 		}
 		return preparedStatementHandle;

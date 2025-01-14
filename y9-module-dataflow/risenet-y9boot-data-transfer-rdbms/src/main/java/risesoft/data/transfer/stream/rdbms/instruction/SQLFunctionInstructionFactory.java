@@ -11,16 +11,16 @@ import risesoft.data.transfer.core.start.StartConfiguration;
 import risesoft.data.transfer.core.util.Configuration;
 import risesoft.data.transfer.core.util.ConfigurationConst;
 import risesoft.data.transfer.core.util.ValueUtils;
+import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
 
 /**
- * 执行sql方法的指令构建工厂 
- *  执行的是查询方法
+ * 执行sql方法的指令构建工厂 执行的是查询方法
  * 
  * @typeName SQLFunctionInstructionFactory
  * @date 2024年8月27日
  * @author lb
  */
-public class SQLFunctionInstructionFactory implements InstructionFactory ,StartConfiguration{
+public class SQLFunctionInstructionFactory implements InstructionFactory, StartConfiguration {
 	static {
 		ParseInstructionFactory.registerFactory(new SQLFunctionInstructionFactory());
 	}
@@ -50,7 +50,8 @@ public class SQLFunctionInstructionFactory implements InstructionFactory ,StartC
 			sql += "where " + args[2];
 		}
 		return new SQLFunctionInstruction(sql, configuration.getString("jdbcUrl"), configuration.getString("userName"),
-				configuration.getString("password"));
+				configuration.getString("password"),
+				DataBaseType.getDataBaseTypeByJdbcUrl(configuration.getString("jdbcUrl")));
 	}
 
 }
