@@ -95,6 +95,14 @@ public class RdbmsDataInputStream implements DataInputStream {
 			logger.debug(this, "readData end");
 		} catch (Exception e) {
 			throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "读取数据报错", e);
+		}finally {
+			if (resultSet!=null) {
+				try {
+					resultSet.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 

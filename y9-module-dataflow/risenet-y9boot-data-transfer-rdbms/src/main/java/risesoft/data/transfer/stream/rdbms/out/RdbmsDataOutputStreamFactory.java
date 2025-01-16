@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
 
 import risesoft.data.transfer.core.context.JobContext;
@@ -71,6 +71,8 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 	protected List<String> columns;
 	protected String workSql;
 	protected Logger logger;
+	protected Set<String> databaseKeys;
+	protected String databaseKeyMeaning;
 
 	public RdbmsDataOutputStreamFactory(Configuration configuration, JobContext jobContext) {
 		this.jdbcUrl = ValueUtils.getRequired(configuration.getString("jdbcUrl"), "缺失jdbcUrl");
@@ -80,6 +82,8 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 		this.tableName = ValueUtils.getRequired(configuration.getString("tableName"), "缺失tableName");
 		this.writerType = configuration.getString("writerType", "insert");
 		this.columns = ValueUtils.getRequired(configuration.getList("column", String.class), "缺失列配置");
+		this.databaseKeys = DataBaseType.getKeys(dataBaseType);
+		this.databaseKeyMeaning = DataBaseType.getKeyMeaning(dataBaseType);
 		this.logger = jobContext.getLoggerFactory().getLogger(RdbmsDataOutputStreamFactory.class);
 		if (logger.isInfo()) {
 			logger.info(this, "create RdbmsDataOutputStreamFactory \njdbcUrl:" + jdbcUrl + " \ntableName:" + tableName
@@ -98,7 +102,8 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 	protected void createInsertSql(int size) {
 
 		StringBuilder sb = new StringBuilder("insert into ").append(tableName).append(" (")
-				.append(StringUtils.join(this.resultSetMetaData.getLeft(), ",")).append(") values (");
+				.append(DataBaseType.castKeyFieldsAndJoin(dataBaseType, this.resultSetMetaData.getLeft(), ","))
+				.append(") values (");
 		for (int i = 0; i < size; i++) {
 			sb.append("?");
 			if (i != size - 1) {
@@ -132,29 +137,32 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 		boolean first1 = true;
 		StringBuilder str = new StringBuilder();
 		StringBuilder update = new StringBuilder();
+		String newDataBaseField;
 		for (String columnHolder : idField) {
+			newDataBaseField = DataBaseType.castKeyField(databaseKeys, databaseKeyMeaning, columnHolder);
 			if (!first) {
 				sb.append(",");
 				str.append(" AND ");
 			} else {
 				first = false;
 			}
-			str.append("TMP.").append(columnHolder);
+			str.append("TMP.").append(newDataBaseField);
 			sb.append("?");
 			str.append(" = ");
 			sb.append(" AS ");
-			str.append("A.").append(columnHolder);
-			sb.append(columnHolder);
+			str.append("A.").append(newDataBaseField);
+			sb.append(newDataBaseField);
 
 		}
 
 		for (String columnHolder : updateField) {
+			newDataBaseField = DataBaseType.castKeyField(databaseKeys, databaseKeyMeaning, columnHolder);
 			if (!first1) {
 				update.append(",");
 			} else {
 				first1 = false;
 			}
-			update.append(columnHolder);
+			update.append(newDataBaseField);
 			update.append(" = ");
 			update.append("?");
 
@@ -165,7 +173,8 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 		sb.append(" ) WHEN MATCHED THEN UPDATE SET ");
 		sb.append(update);
 		sb.append(" WHEN NOT MATCHED THEN ").append("INSERT (")
-				.append(StringUtils.join(resultSetMetaData.getLeft(), ",")).append(") VALUES(");
+				.append(DataBaseType.castKeyFieldsAndJoin(dataBaseType, resultSetMetaData.getLeft(), ","))
+				.append(") VALUES(");
 		for (int i = 0; i < size; i++) {
 			sb.append("?");
 			if (i != size - 1) {
@@ -198,29 +207,32 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 		boolean first1 = true;
 		StringBuilder str = new StringBuilder();
 		StringBuilder update = new StringBuilder();
+		String newDataBaseField;
 		for (String columnHolder : idField) {
+			newDataBaseField = DataBaseType.castKeyField(databaseKeys, databaseKeyMeaning, columnHolder);
 			if (!first) {
 				sb.append(",");
 				str.append(" AND ");
 			} else {
 				first = false;
 			}
-			str.append("TMP.").append(columnHolder);
+			str.append("TMP.").append(newDataBaseField);
 			sb.append("?");
 			str.append(" = ");
 			sb.append(" AS ");
-			str.append("A.").append(columnHolder);
-			sb.append(columnHolder);
+			str.append("A.").append(newDataBaseField);
+			sb.append(newDataBaseField);
 
 		}
 
 		for (String columnHolder : updateField) {
+			newDataBaseField = DataBaseType.castKeyField(databaseKeys, databaseKeyMeaning, columnHolder);
 			if (!first1) {
 				update.append(",");
 			} else {
 				first1 = false;
 			}
-			update.append(columnHolder);
+			update.append(newDataBaseField);
 			update.append(" = ");
 			update.append("?");
 
@@ -237,6 +249,7 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 		String nvl = getNvlFunction();
 		String nullValue;
 		for (String columnHolder : updateField) {
+			newDataBaseField = DataBaseType.castKeyField(databaseKeys, databaseKeyMeaning, columnHolder);
 			if (!first) {
 				sb.append(" or ");
 			} else {
@@ -246,14 +259,14 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 			preparedStatementHandle = createColumnHandles.get(columnHolder);
 			nullValue = preparedStatementHandle.nullValue(dataBaseType);
 			if (preparedStatementHandle.isBigType()) {
-				sb.append("length(" + nvl + "(" + columnHolder + "," + nullValue + ")" + ") != length(" + nvl + "(?,"
+				sb.append("length(" + nvl + "(" + newDataBaseField + "," + nullValue + ")" + ") != length(" + nvl + "(?,"
 						+ nullValue + "))");
 			} else {
-				sb.append(nvl + "(" + columnHolder + "," + nullValue + ")" + " != " + nvl + "(?," + nullValue + ")");
+				sb.append(nvl + "(" + newDataBaseField + "," + nullValue + ")" + " != " + nvl + "(?," + nullValue + ")");
 			}
 		}
 		sb.append(" WHEN NOT MATCHED THEN ").append("INSERT (")
-				.append(StringUtils.join(resultSetMetaData.getLeft(), ",")).append(") VALUES(");
+				.append(DataBaseType.castKeyFieldsAndJoin(dataBaseType, resultSetMetaData.getLeft(), ",")).append(") VALUES(");
 		for (int i = 0; i < size; i++) {
 			sb.append("?");
 			if (i != size - 1) {
@@ -289,7 +302,7 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 		try {
 			logger.debug(this, "getMetaData");
 			this.resultSetMetaData = DBUtil.getColumnMetaData(dataBaseType, jdbcUrl, userName, password, tableName,
-					StringUtils.join(this.columns, ","));
+					DataBaseType.castKeyFieldsAndJoin(dataBaseType,this.columns, ","));
 			// 构建一个map
 			int size = this.resultSetMetaData.getRight().size();
 			for (int i = 0; i < size; i++) {

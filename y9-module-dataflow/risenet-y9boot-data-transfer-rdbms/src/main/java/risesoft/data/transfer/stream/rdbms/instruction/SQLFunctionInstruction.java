@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.alibaba.fastjson2.util.DateUtils;
 
 import oracle.sql.TIMESTAMP;
@@ -41,14 +43,17 @@ public class SQLFunctionInstruction implements Instruction {
 	 */
 	private String jdbcPassword;
 
-	private DataBaseType dataBaseType;
+	private DataBaseType searchDataBase;
+
+	private DataBaseType outDataBaseType;
 
 	public SQLFunctionInstruction(String sql, String jdbcUrl, String jdbcUserName, String jdbcPassword,
-			DataBaseType dataBase) {
+			DataBaseType searchDataBase, DataBaseType outDataBaseType) {
 		super();
 		this.sql = sql;
 		this.jdbcUrl = jdbcUrl;
-		this.dataBaseType = dataBase;
+		this.searchDataBase = searchDataBase;
+		this.outDataBaseType = outDataBaseType;
 		this.jdbcUserName = jdbcUserName;
 		this.jdbcPassword = jdbcPassword;
 	}
@@ -79,9 +84,9 @@ public class SQLFunctionInstruction implements Instruction {
 
 	public String getData(ResultSet rs) throws SQLException {
 		int type = rs.getMetaData().getColumnType(1);
-		String toDate = dataBaseType == DataBaseType.MySql ? " str_to_date" : " to_date";
-		String format = dataBaseType == DataBaseType.MySql ? "%Y-%m-%d %H:%i:%s" : "yyyy-mm-dd hh24:mi:ss";
-		if (dataBaseType == DataBaseType.SQLServer) {
+		String toDate = outDataBaseType == DataBaseType.MySql ? " str_to_date" : " to_date";
+		String format = outDataBaseType == DataBaseType.MySql ? "%Y-%m-%d %H:%i:%s" : "yyyy-mm-dd hh24:mi:ss";
+		if (outDataBaseType == DataBaseType.SQLServer) {
 			return " CAST('" + rs.getString(1) + "' AS DATE)";
 		}
 		switch (type) {
@@ -91,7 +96,8 @@ public class SQLFunctionInstruction implements Instruction {
 		case Types.LONGVARCHAR:
 		case Types.NVARCHAR:
 		case Types.LONGNVARCHAR:
-			return "'" + rs.getString(1) + "'";
+			String valueString = rs.getString(1);
+			return "'" + (StringUtils.isEmpty(valueString)?"":valueString) + "'";
 		case Types.SMALLINT:
 		case Types.INTEGER:
 		case Types.BIGINT:
@@ -105,13 +111,22 @@ public class SQLFunctionInstruction implements Instruction {
 			return rs.getBigDecimal(1) + "";
 		case Types.DATE:
 			java.sql.Date sqlDate = rs.getDate(1);
+			if (sqlDate == null) {
+				return toDate + "('1970-01-01 00:00:01','" + format + "')";
+			}
 			return toDate + "('" + DateUtils.format(sqlDate, "yyyy-MM-dd HH:mm:ss") + "','" + format + "')";
 		case Types.TIME:
 			java.sql.Time sqlTime = rs.getTime(1);
+			if (sqlTime == null) {
+				return toDate + "('1970-01-01 00:00:01','" + format + "')";
+			}
 			return toDate + "('" + DateUtils.format(sqlTime, "yyyy-MM-dd HH:mm:ss") + "','" + format + "')";
 		case Types.TIMESTAMP:
 		case -101:
 			java.sql.Timestamp sqlTimestamp = rs.getTimestamp(1);
+			if (sqlTimestamp == null) {
+				return toDate + "('1970-01-01 00:00:01','" + format + "')";
+			}
 			return toDate + "('" + DateUtils.format(sqlTimestamp, "yyyy-MM-dd HH:mm:ss") + "','" + format + "')";
 		case Types.BOOLEAN:
 			return rs.getBoolean(1) + "";

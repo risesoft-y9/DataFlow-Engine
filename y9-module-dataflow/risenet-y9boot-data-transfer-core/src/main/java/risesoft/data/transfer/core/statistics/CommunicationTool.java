@@ -1,6 +1,5 @@
 package risesoft.data.transfer.core.statistics;
 
-import com.alibaba.fastjson.JSON;
 
 import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.record.Record;
@@ -8,9 +7,7 @@ import risesoft.data.transfer.core.util.StrUtil;
 
 import java.text.DecimalFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.Validate;

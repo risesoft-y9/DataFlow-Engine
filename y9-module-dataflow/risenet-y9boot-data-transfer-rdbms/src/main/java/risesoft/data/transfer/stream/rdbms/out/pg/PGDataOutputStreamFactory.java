@@ -10,6 +10,7 @@ import risesoft.data.transfer.core.stream.out.DataOutputStream;
 import risesoft.data.transfer.core.util.Configuration;
 import risesoft.data.transfer.stream.rdbms.out.RdbmsDataOutputStreamFactory;
 import risesoft.data.transfer.stream.rdbms.utils.DBUtil;
+import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
 
 /**
  * PG 数据输出流主要是update 语法不一致
@@ -34,7 +35,8 @@ public class PGDataOutputStreamFactory extends RdbmsDataOutputStreamFactory {
 			}
 		}
 		StringBuilder sb = new StringBuilder("insert into ").append(tableName).append(" (")
-				.append(StringUtils.join(this.resultSetMetaData.getLeft(), ",")).append(") values (");
+				.append(DataBaseType.castKeyFieldsAndJoin(dataBaseType, this.resultSetMetaData.getLeft(), ","))
+				.append(") values (");
 		for (int i = 0; i < size; i++) {
 			sb.append("?");
 			if (i != size - 1) {
@@ -42,18 +44,20 @@ public class PGDataOutputStreamFactory extends RdbmsDataOutputStreamFactory {
 			}
 		}
 		sb.append(")");
-		sb.append(" ON CONFLICT (" + StringUtils.join(idField,",") + ") do update set ");
+		sb.append(
+				" ON CONFLICT (" + DataBaseType.castKeyFieldsAndJoin(dataBaseType, idField, ",") + ") do update set ");
 		for (int i = 0; i < updateField.size(); i++) {
 			if (i != 0) {
 				sb.append(",");
 			}
-			sb.append(updateField.get(i) + " = ?");
+			// cast
+			sb.append(DataBaseType.castKeyField(databaseKeys, databaseKeyMeaning, updateField.get(i)) + " = ?");
 		}
 //		sb.append(" DO NOTHING");
 		this.workSql = sb.toString();
 		if (logger.isInfo()) {
 			logger.info(this, "pg worksql:" + this.workSql);
-			
+
 		}
 	}
 
@@ -61,7 +65,7 @@ public class PGDataOutputStreamFactory extends RdbmsDataOutputStreamFactory {
 	protected void createReplace(int size) {
 		createUpdate(size);
 	}
-	
+
 	@Override
 	protected DataOutputStream getUpdateStream() {
 		return new PGUpadateDataOutputStream(DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password), workSql,

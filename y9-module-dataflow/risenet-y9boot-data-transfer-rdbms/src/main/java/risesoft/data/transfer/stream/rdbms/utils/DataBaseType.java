@@ -1,5 +1,11 @@
 package risesoft.data.transfer.stream.rdbms.utils;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +27,26 @@ public enum DataBaseType {
 
 	private String typeName;
 	private String driverClassName;
+	// 数据库值key
+	private static final Map<DataBaseType, Set<String>> DATABASE_KEY = new HashMap<DataBaseType, Set<String>>();
+
+	static {
+		DATABASE_KEY.put(DataBaseType.MySql, new HashSet<String>(
+				Arrays.asList("SELECT、INSERT、UPDATE、DELETE、WHERE、GROUP、ORDER、BY、FROM、TABLE、AND、OR、NOT、NULL、"
+						+ "AS、DISTINCT、JOIN、ON、IN、INTO、VALUES、LIKE、IS、BETWEEN、INNER、LEFT、RIGHT、"
+						+ "FULL、OUTER、CROSS、NATURAL、UNION、ALL、ANY、SOME、EXISTS、"
+						+ "UNIQUE、PRIMARY、KEY、FOREIGN、REFERENCES、CASCADE、SET、CHECK、"
+						+ "CONSTRAINT、DEFAULT、AUTO_INCREMENT、COLLATE、CHARACTER、VARCHAR、INT、FLOAT、DATE、TIME、"
+						+ "DATETIME、TIMESTAMP、YEAR、CHAR、TEXT、BLOB、ENUM、SERIALIZABLE、REPEATABLE、READ、COMMITTED、"
+						+ "UNCOMMITTED、PHANTOM、READS、WRITE、SHARED、EXCLUSIVE、LOCK、UNLOCK、OPTIMISTIC、PESSIMISTIC、WITH、GRANT、REVOKE"
+								.split("、"))));
+		DATABASE_KEY.put(DataBaseType.Oracle, new HashSet<String>(Arrays.asList(
+				"ACCESS、ADD、ALL、ALTER、AND、ANY、AS、ASC、AUDIT、BETWEEN、BY、CHAR、CHECK、CLUSTER、COLUMN、COMMENT、COMPRESS、CONNECT、CREATE、CURRENT、DATE、DECIMAL、DEFAULT、DELETE、DESC、DISTINCT、DROP、ELSE、EXCLUSIVE、EXISTS、FILE、FLOAT、FOR、FROM、GRANT、GROUP、HAVING、IDENTIFIED、IMMEDIATE、IN、INCREMENT、INDEX、INITIAL、INSERT、INTEGER、INTERSECT、INTO、IS、LEVEL、LIKE、LOCK、LONG、MAXEXTENTS、MINUS、MLSLABEL、MOD、MODE、MODIFY、NOAUDIT、NOCOMPRESS、NOT、NOWAIT、NULL、NUMBER、OF、OFFLINE、ON、ONLINE、OPTION、OR、ORDER、PCTFREE、PRIOR、PRIVILEGES、PUBLIC、RAW、RENAME、RESOURCE、REVOKE、ROW、ROWID、ROWNUM、ROWS、SELECT、SESSION、SET、SHARE、SIZE、SMALLINT、START、SUCCESSFUL、SYNONYM、SYSDATE、TABLE、THEN、TO、TRIGGER、UID、UNION、UNIQUE、UPDATE、USER、VALIDATE、VALUES、VARCHAR、VARCHAR2、VIEW、WHENEVER、WHERE、WITH"
+						.split("、"))));
+		DATABASE_KEY.put(DataBaseType.DM, DATABASE_KEY.get(DataBaseType.Oracle));
+		DATABASE_KEY.put(DataBaseType.RDBMS, DATABASE_KEY.get(DataBaseType.Oracle));
+
+	}
 
 	DataBaseType(String typeName, String driverClassName) {
 		this.typeName = typeName;
@@ -203,6 +229,106 @@ public enum DataBaseType {
 			return oracle.group(1);
 		}
 		return null;
+	}
+
+	/**
+	 * 获取数据库的转义
+	 * 
+	 * @param dataBaseType
+	 * @return
+	 */
+	public static String getKeyMeaning(DataBaseType dataBaseType) {
+		switch (dataBaseType) {
+		case MySql:
+
+			return "`";
+
+		default:
+			return "\"";
+		}
+	}
+
+	/**
+	 * 转义所有字段
+	 * 
+	 * @param dataBaseType
+	 * @param cloumns
+	 * @return
+	 */
+	public static List<String> castKeyFields(DataBaseType dataBaseType, List<String> cloumns) {
+		Set<String> keys = DATABASE_KEY.get(dataBaseType);
+		if (keys == null) {
+			keys = DATABASE_KEY.get(DataBaseType.RDBMS);
+		}
+		String keyMeaning = getKeyMeaning(dataBaseType);
+		String cloumn;
+		for (int i = 0; i < cloumns.size(); i++) {
+			cloumn = cloumns.get(i);
+			if (keys.contains(cloumn)) {
+				cloumns.set(i, keyMeaning + cloumn + keyMeaning);
+			}
+		}
+		return cloumns;
+	}
+
+	/**
+	 * 转义所有字段
+	 * 
+	 * @param dataBaseType
+	 * @param cloumns
+	 * @return
+	 */
+	public static String castKeyFieldsAndJoin(DataBaseType dataBaseType, List<String> cloumns,String separator) {
+		Set<String> keys = DATABASE_KEY.get(dataBaseType);
+		if (keys == null) {
+			keys = DATABASE_KEY.get(DataBaseType.RDBMS);
+		}
+		String keyMeaning = getKeyMeaning(dataBaseType);
+		String cloumn;
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < cloumns.size(); i++) {
+			cloumn = cloumns.get(i);
+			if (i != 0) {
+				sb.append(separator);
+			}
+			if (keys.contains(cloumn)) {
+				sb.append(keyMeaning + cloumn + keyMeaning);
+			} else {
+				sb.append(cloumn);
+			}
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * 获取不能作为字段的关键字
+	 * 
+	 * @param dataBaseType
+	 * @return
+	 */
+	public static Set<String> getKeys(DataBaseType dataBaseType) {
+		Set<String> keys = DATABASE_KEY.get(dataBaseType);
+		if (keys == null) {
+			keys = DATABASE_KEY.get(DataBaseType.RDBMS);
+		}
+		return keys;
+	}
+
+	/**
+	 * 识别key转换成可以用的字段
+	 * 
+	 * @param keys
+	 * @param keyMeaning
+	 * @param cloumn
+	 * @return
+	 */
+	public static String castKeyField(Set<String> keys, String keyMeaning, String cloumn) {
+
+		if (keys.contains(cloumn)) {
+			return keyMeaning + cloumn + keyMeaning;
+		}
+
+		return cloumn;
 	}
 
 	/**

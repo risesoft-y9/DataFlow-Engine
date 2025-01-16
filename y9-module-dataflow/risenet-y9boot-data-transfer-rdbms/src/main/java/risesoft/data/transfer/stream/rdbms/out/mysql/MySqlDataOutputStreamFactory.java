@@ -10,6 +10,7 @@ import risesoft.data.transfer.core.stream.out.DataOutputStream;
 import risesoft.data.transfer.core.util.Configuration;
 import risesoft.data.transfer.stream.rdbms.out.RdbmsDataOutputStreamFactory;
 import risesoft.data.transfer.stream.rdbms.utils.DBUtil;
+import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
 
 /**
  * mysql 数据输出流主要是update 语法不一致
@@ -34,7 +35,8 @@ public class MySqlDataOutputStreamFactory extends RdbmsDataOutputStreamFactory {
 			}
 		}
 		StringBuilder sb = new StringBuilder("insert into ").append(tableName).append(" (")
-				.append(StringUtils.join(this.resultSetMetaData.getLeft(), ",")).append(") values (");
+				.append(DataBaseType.castKeyFieldsAndJoin(dataBaseType, this.resultSetMetaData.getLeft(), ","))
+				.append(") values (");
 		for (int i = 0; i < size; i++) {
 			sb.append("?");
 			if (i != size - 1) {
@@ -43,11 +45,13 @@ public class MySqlDataOutputStreamFactory extends RdbmsDataOutputStreamFactory {
 		}
 		sb.append(")");
 		sb.append(" ON DUPLICATE KEY UPDATE ");
+		String newDatabaseField;
 		for (int i = 0; i < updateField.size(); i++) {
+			newDatabaseField = DataBaseType.castKeyField(databaseKeys, databaseKeyMeaning, updateField.get(i));
 			if (i != 0) {
 				sb.append(",");
 			}
-			sb.append(updateField.get(i) + " = values(" + updateField.get(i) + ")");
+			sb.append(newDatabaseField + " = values(" + newDatabaseField + ")");
 		}
 		this.workSql = sb.toString();
 		if (logger.isInfo()) {

@@ -1,11 +1,8 @@
 package risesoft.data.transfer.core.instruction;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,7 +13,6 @@ import risesoft.data.transfer.core.exception.InstallException;
 import risesoft.data.transfer.core.instruction.factory.InstructionFactory;
 import risesoft.data.transfer.core.start.StartConfiguration;
 import risesoft.data.transfer.core.util.ClassTools;
-import risesoft.data.transfer.core.util.ClassUtils;
 import risesoft.data.transfer.core.util.Configuration;
 
 /**
@@ -27,7 +23,7 @@ import risesoft.data.transfer.core.util.Configuration;
  * @date 2024年8月23日
  * @author lb
  */
-public class ParseInstructionFactory implements StartConfiguration{
+public class ParseInstructionFactory implements StartConfiguration {
 	private static final String rgex = "\\$(.*?)\\{(.*?)\\}";
 	private static final Pattern p = Pattern.compile(rgex);
 
@@ -44,7 +40,8 @@ public class ParseInstructionFactory implements StartConfiguration{
 				String jsonConfig = config.toJSON();
 				Matcher matcher = p.matcher(jsonConfig);
 				Map<String, Byte> setMap = new HashMap<String, Byte>();
-				while (matcher.find()) {	
+				int startIndex = 0;
+				while (matcher.find(startIndex)) {
 					if (setMap.containsKey(matcher.group(0))) {
 						continue;
 					}
@@ -53,7 +50,8 @@ public class ParseInstructionFactory implements StartConfiguration{
 					if (instructionFactory != null) {
 						jsonConfig = jsonConfig.replace(matcher.group(0), instructionFactory
 								.getInstance(matcher.group(2).split("#"), jsonConfig).executor(jsonConfig, jobContext));
-					}
+					} 
+					startIndex = matcher.start()+1;
 				}
 				return setMap.size() == 0 ? config : Configuration.from(jsonConfig);
 			}
