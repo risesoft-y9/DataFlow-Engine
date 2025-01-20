@@ -264,7 +264,7 @@ public enum DataBaseType {
 		String cloumn;
 		for (int i = 0; i < cloumns.size(); i++) {
 			cloumn = cloumns.get(i);
-			if (keys.contains(cloumn)) {
+			if (keys.contains(cloumn)||cloumn.contains("-")) {
 				cloumns.set(i, keyMeaning + cloumn + keyMeaning);
 			}
 		}
@@ -291,7 +291,7 @@ public enum DataBaseType {
 			if (i != 0) {
 				sb.append(separator);
 			}
-			if (keys.contains(cloumn)) {
+			if (keys.contains(cloumn)||cloumn.contains("-")) {
 				sb.append(keyMeaning + cloumn + keyMeaning);
 			} else {
 				sb.append(cloumn);
@@ -324,7 +324,7 @@ public enum DataBaseType {
 	 */
 	public static String castKeyField(Set<String> keys, String keyMeaning, String cloumn) {
 
-		if (keys.contains(cloumn)) {
+		if (keys.contains(cloumn)||cloumn.contains("-")) {
 			return keyMeaning + cloumn + keyMeaning;
 		}
 

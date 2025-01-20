@@ -79,10 +79,9 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 		this.jdbcUrl = ValueUtils.getRequired(configuration.getString("jdbcUrl"), "缺失jdbcUrl");
 		this.password = ValueUtils.getRequired(configuration.getString("password"), "缺失password");
 		this.userName = ValueUtils.getRequired(configuration.getString("userName"), "缺失userName");
-		dataBaseType = DataBaseType.RDBMS;
+		dataBaseType = DataBaseType.getDataBaseTypeByJdbcUrl(jdbcUrl);
 		this.tableName = ValueUtils.getRequired(configuration.getString("tableName"), "缺失tableName");
-		this.selectSql = "select " + StringUtils
-				.join(ValueUtils.getRequired(configuration.getList("column", String.class), "缺失column"), ",") + " from "
+		this.selectSql = "select " + DataBaseType.castKeyFieldsAndJoin(dataBaseType,ValueUtils.getRequired(configuration.getList("column", String.class), "缺失column"), ",") + " from "
 				+ this.tableName;
 		this.where = configuration.getString("where", "").trim();
 		// 其他地方有用到这个原始的where genPKSql pkRangeSQL = String.format("%s WHERE (%s AND %s IS
@@ -167,7 +166,7 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 			if (precise) {
 				resultSet = DBUtil.query(connection, "SELECT distinct " + splitPk + " from " + tableName);
 				querys = new ArrayList<Data>();
-				
+
 				rsMetaData = resultSet.getMetaData();
 				String fu = isStringType(rsMetaData.getColumnType(1)) ? "'%S'" : "%S";
 				while (resultSet.next()) {
