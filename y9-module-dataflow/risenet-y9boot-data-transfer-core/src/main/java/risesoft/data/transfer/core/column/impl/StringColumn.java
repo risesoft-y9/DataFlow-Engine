@@ -5,6 +5,7 @@ import risesoft.data.transfer.core.exception.CommonErrorCode;
 import risesoft.data.transfer.core.exception.TransferException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.util.Date;
 
 /**
@@ -148,6 +149,7 @@ public class StringColumn extends Column {
 		}
 	}
 
+	
 	@Override
 	public byte[] asBytes() {
 		try {

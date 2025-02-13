@@ -1,17 +1,12 @@
 package risesoft.data.transfer.base.exchange;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import risesoft.data.transfer.core.channel.OutChannel;
 import risesoft.data.transfer.core.exception.CommonErrorCode;
 import risesoft.data.transfer.core.exception.TransferException;
-import risesoft.data.transfer.core.exchange.Exchange;
 import risesoft.data.transfer.core.exchange.OutChannelExchange;
 import risesoft.data.transfer.core.log.Logger;
-import risesoft.data.transfer.core.log.LoggerFactory;
 import risesoft.data.transfer.core.record.Record;
-import risesoft.data.transfer.core.statistics.CommunicationTool;
 import risesoft.data.transfer.core.util.Configuration;
 
 /**
@@ -99,8 +94,11 @@ public abstract class MoneyExchange extends OutChannelExchange {
 	protected abstract void writerRecord(Record record);
 
 	protected synchronized void await(int size, int record) {
-		if ((speedByte > 0 && speedByte < size) || (speedRecord > 0 && speedRecord < record)) {
-			throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "配置的限速无法限制请调整限速大小!");
+		if ((speedByte > 0 && speedByte < size)) {
+			throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "配置的限速无法限制请调整限速大小!：限制大小:"+speedByte+"，实际数据大小："+size);
+		}
+		if ((speedRecord > 0 && speedRecord < record)) {
+			throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "配置的限速无法限制请调整限速大小!：限制条数:"+speedRecord+"，实际数据条数："+record);
 		}
 		long concurrentTime = System.currentTimeMillis();
 		int differTime = (int) (speed - (concurrentTime - time));

@@ -47,7 +47,7 @@ public class SQLFunctionInstructionFactory implements InstructionFactory, StartC
 		Configuration configurationFrom = Configuration.from(config);
 		Configuration configuration = configurationFrom.getListConfiguration(ConfigurationConst.JOBS).get(index)
 				.getConfiguration(position).getConfiguration("args");
-		String sql = "select " + functionName + " from " + configuration.getString("tableName");
+		String sql = "select " + functionName.replace("\\", "") + " from " + configuration.getString("tableName");
 		if (args.length >= 3 && StringUtils.isNotEmpty(args[2])) {
 			sql += "where " + args[2];
 		}

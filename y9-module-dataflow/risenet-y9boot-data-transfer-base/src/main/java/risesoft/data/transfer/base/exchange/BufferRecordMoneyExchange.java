@@ -6,6 +6,7 @@ import java.util.List;
 import risesoft.data.transfer.core.log.LoggerFactory;
 import risesoft.data.transfer.core.record.Record;
 import risesoft.data.transfer.core.statistics.CommunicationTool;
+import risesoft.data.transfer.core.statistics.RecordSize;
 import risesoft.data.transfer.core.util.Configuration;
 import risesoft.data.transfer.core.util.StrUtil;
 
@@ -32,8 +33,9 @@ public class BufferRecordMoneyExchange extends MoneyExchange {
 		super(configuration, loggerFactory.getLogger(configuration.getString("name", "BufferRecordMoneyExchange")));
 		this.bufferRecord = configuration.getInt("bufferRecord", 1024);
 		this.records = new ArrayList<Record>();
-		logger.info(this, "buffer record created buffer:" + bufferRecord + "\n speedByte: " + StrUtil.stringify(speedByte)
-				+ " \n speedRecord: " + speedRecord + " \n time: " + (speed/1000) + "/s");
+		logger.info(this,
+				"buffer record created buffer:" + bufferRecord + "\n speedByte: " + StrUtil.stringify(speedByte)
+						+ " \n speedRecord: " + speedRecord + " \n time: " + (speed / 1000) + "/s");
 	}
 
 	private void ofFlush() {
@@ -52,12 +54,15 @@ public class BufferRecordMoneyExchange extends MoneyExchange {
 		}
 		int end = 0;
 		int start = 0;
+		RecordSize recordSize;
 		while (end < record.size()) {
 			end += bufferRecord - records.size();
 			if (end > record.size()) {
 				end = record.size();
 			}
-			this.await((int) CommunicationTool.getRecordSize(record, start, end), end - start);
+			recordSize = CommunicationTool.getRecordSizeOfSpeed(record, start, end, speedByte);
+			end = recordSize.getRecord();
+			this.await((int) recordSize.getSize(), end - start);
 			this.records.addAll(new ArrayList<Record>(record.subList(start, end)));
 			start = end;
 			this.ofFlush();
@@ -82,9 +87,9 @@ public class BufferRecordMoneyExchange extends MoneyExchange {
 		this.records.clear();
 	}
 
-
 	@Override
 	protected void writerRecord(Record record) {
+		this.await((int) record.getByteSize(), 1);
 		records.add(record);
 		this.ofFlush();
 	}

@@ -1,7 +1,8 @@
 package risesoft.data.transfer.core.statistics;
 
-
 import risesoft.data.transfer.core.context.JobContext;
+import risesoft.data.transfer.core.exception.FrameworkErrorCode;
+import risesoft.data.transfer.core.exception.TransferException;
 import risesoft.data.transfer.core.record.Record;
 import risesoft.data.transfer.core.util.StrUtil;
 
@@ -125,8 +126,39 @@ public final class CommunicationTool {
 		long size = 0L;
 		for (int i = start; i < end; i++) {
 			size += records.get(i).getByteSize();
+
 		}
 		return size;
+	}
+
+	public static RecordSize getRecordSizeOfSpeed(List<Record> records, int start, int end, int speed) {
+		RecordSize recordSize = new RecordSize();
+		if (speed == 0) {
+			recordSize.record = end;
+			recordSize.size = getRecordSize(records, start, end);
+			return recordSize;
+		}
+		long size = 0L;
+		for (int i = start; i < end; i++) {
+			size += records.get(i).getByteSize();
+			if (size == speed) {
+				recordSize.size = size;
+				recordSize.record = i;
+				break;
+			} else if (size > speed) {
+				recordSize.size = size - records.get(i).getByteSize();
+				recordSize.record = i - 1;
+				break;
+			}
+			recordSize.size = size;
+			recordSize.record = i;
+		}
+		if (recordSize.record < start) {
+			throw TransferException.as(FrameworkErrorCode.RUNTIME_ERROR,
+					"无法分割的限速:" + speed + ",实际大小:" + records.get(start).getByteSize());
+		}
+		recordSize.record++;
+		return recordSize;
 	}
 
 	public static long getRecordSize(List<Record> records) {
