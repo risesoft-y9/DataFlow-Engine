@@ -206,6 +206,9 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 					}
 				}
 				resultSet.close();
+				if (minMaxPK.getLeft()==null) {
+					return new ArrayList<Data>();
+				}
 				if (isStringType) {
 					querys = StringData.as(RdbmsRangeSplitWrap.splitAndWrap(String.valueOf(minMaxPK.getLeft()),
 							String.valueOf(minMaxPK.getRight()), numberSize, splitPk, "'", dataBaseType));
