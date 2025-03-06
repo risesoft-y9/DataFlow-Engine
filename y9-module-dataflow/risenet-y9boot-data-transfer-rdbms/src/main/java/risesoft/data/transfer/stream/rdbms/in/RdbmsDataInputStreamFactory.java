@@ -185,16 +185,16 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 				boolean isStringType = false;
 				boolean isLongType = false;
 				if (!isPKTypeValid(rsMetaData)) {
-					throw new TransferException(CommonErrorCode.CONFIG_ERROR, "配置的splitPk不支持此类型");
+					throw new TransferException(CommonErrorCode.CONFIG_ERROR, "配置的splitPk不支持此类型："+rsMetaData.getColumnType(1));
 				}
 				if (isStringType(rsMetaData.getColumnType(1))) {
-					while (DBUtil.asyncResultSetNext(resultSet)) {
+					while (resultSet.next()) {
 						minMaxPK = new ImmutablePair<Object, Object>(resultSet.getString(1), resultSet.getString(2));
 					}
 					isStringType = true;
 				} else if (isLongType(rsMetaData.getColumnType(1))) {
 					isLongType = true;
-					while (DBUtil.asyncResultSetNext(resultSet)) {
+					while (resultSet.next()) {
 						minMaxPK = new ImmutablePair<Object, Object>(resultSet.getString(1), resultSet.getString(2));
 
 						String minMax = resultSet.getString(1) + resultSet.getString(2);
