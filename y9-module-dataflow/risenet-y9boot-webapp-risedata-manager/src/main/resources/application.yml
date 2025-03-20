@@ -170,10 +170,10 @@ y9:
                 allowUriQueryParameter: true
                 protectedUrlPatterns: /api/*
                 opaque:
-                    client-id: clientid
-                    client-secret: secret
-                    introspection-uri: http://127.0.0.1:7055/sso/oauth2.0/introspect
-                    profile-uri: http://127.0.0.1:7055/sso/oauth2.0/profile
+                    client-id: clientid_oidc
+                    client-secret: secret_oidc
+                    introspection-uri: http://127.0.0.1:7055/sso/oidc/introspect
+                    profile-uri: http://127.0.0.1:7055/sso/oidc/profile
 rpc.port: 7066
 #服务注册相关                    
 beta:   
