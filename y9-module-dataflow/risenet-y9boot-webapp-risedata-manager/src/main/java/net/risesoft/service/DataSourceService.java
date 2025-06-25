@@ -113,6 +113,15 @@ public interface DataSourceService {
 	Y9Result<String> copyTable(String baseId, String tableName, String id);
 	
 	/**
+	 * 复制表-elastic
+	 * @param baseId 拷贝目标数据库id
+	 * @param tableName
+	 * @param id 需要创建的数据库id
+	 * @return
+	 */
+	Y9Result<String> copyIndex(String baseId, String tableName, String id);
+	
+	/**
 	 * 获取数据源分类列表
 	 * @return
 	 */
