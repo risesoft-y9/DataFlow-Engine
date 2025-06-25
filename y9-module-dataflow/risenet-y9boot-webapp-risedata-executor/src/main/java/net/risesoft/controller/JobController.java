@@ -233,7 +233,7 @@ public class JobController {
 					throw new RuntimeException("任务" + ids[i] + "不存在配置,这通常的程序问题请联系开发人员!");
 				}
 				System.out.println("执行任务" + config.getContent());
-				ResultJobListener resultJobListener = Engine.start(ids[i], Configuration.from(config.getContent()));
+				ResultJobListener resultJobListener = Engine.start(jobLogId, Configuration.from(config.getContent()));
                 JOB_CONTEXT.put(jobLogId, resultJobListener.getJobContext());
 				if (resultJobListener.isSuccess()) {
 					stringBuilder.append("任务:" + config.getName() + "执行成功\n" + resultJobListener.getMessage());
