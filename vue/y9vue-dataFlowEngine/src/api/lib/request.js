@@ -169,7 +169,7 @@ function y9Request(baseUrl = '') {
                                         console.log('删除前执行的函数');
                                     }
                                 };
-                                $y9_SSO.ssoLogout(params);
+                                $y9_SSO.ssoLogout({});
                                 // window.location.reload();
                             }
                         }
