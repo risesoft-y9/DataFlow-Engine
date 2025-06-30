@@ -376,29 +376,39 @@ public class DataTaskServiceImpl implements DataTaskService {
 					if(taskConfig.getSourceType().equals("ftp")) {
 						map.put("sourceTable", taskConfig.getSourceTable());
 					}else {
-						DataTable sourceTable = dataTableRepository.findById(taskConfig.getSourceTable()).orElse(null);
-						map.put("sourceTable", sourceTable.getCname() + "(" + sourceTable.getName() + ")");
-					}
-				}
-				map.put("sourceClass", dataMappingRepository.findById(taskConfig.getSourceName()).orElse(null).getClassName());
-				List<String> sourceCloumn = new ArrayList<String>();
-				if(StringUtils.isNotBlank(taskConfig.getSourceCloumn())) {
-					String[] sourceCloumns = taskConfig.getSourceCloumn().split(",");
-					for(String field : sourceCloumns) {
-						if(taskConfig.getSourceType().equals("api")) {
-							DataInterfaceParamsEntity dataParamsEntity = dataInterfaceParamsRepository.findById(field).orElse(null);
-							if(dataParamsEntity != null) {
-								sourceCloumn.add(dataParamsEntity.getRemark() + "(" + dataParamsEntity.getParamName() + ")");
-							}
-						}else {
-							DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
-							if(tableField != null) {
-								sourceCloumn.add(tableField.getCname() + "(" + tableField.getName() + ")");
-							}
+						if(taskConfig.getSourceTable().equals("multi")) {
+							map.put("sourceTable", "多表查询同步");
+						} else {
+							DataTable sourceTable = dataTableRepository.findById(taskConfig.getSourceTable()).orElse(null);
+							map.put("sourceTable", sourceTable.getCname() + "(" + sourceTable.getName() + ")");
 						}
 					}
 				}
-				map.put("sourceCloumn", sourceCloumn);
+				map.put("sourceClass", dataMappingRepository.findById(taskConfig.getSourceName()).orElse(null).getClassName());
+				
+				if(taskConfig.getSourceTable().equals("multi")) {
+					map.put("sourceCloumn", "");
+				} else {
+					List<String> sourceCloumn = new ArrayList<String>();
+					if(StringUtils.isNotBlank(taskConfig.getSourceCloumn())) {
+						String[] sourceCloumns = taskConfig.getSourceCloumn().split(",");
+						for(String field : sourceCloumns) {
+							if(taskConfig.getSourceType().equals("api")) {
+								DataInterfaceParamsEntity dataParamsEntity = dataInterfaceParamsRepository.findById(field).orElse(null);
+								if(dataParamsEntity != null) {
+									sourceCloumn.add(dataParamsEntity.getRemark() + "(" + dataParamsEntity.getParamName() + ")");
+								}
+							}else {
+								DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
+								if(tableField != null) {
+									sourceCloumn.add(tableField.getCname() + "(" + tableField.getName() + ")");
+								}
+							}
+						}
+					}
+					map.put("sourceCloumn", sourceCloumn);
+				}
+				
 				if(taskConfig.getSourceType().equals("ftp")) {
 					map.put("fetchSize", DataServiceUtil.getEncoding(taskConfig.getFetchSize()));
 				}else {
@@ -409,11 +419,15 @@ public class DataTaskServiceImpl implements DataTaskService {
 					if(taskConfig.getSourceType().equals("ftp")) {
 						map.put("splitPk", taskConfig.getSplitPk());
 					}else {
-						DataTableField tableField = dataTableFieldRepository.findById(taskConfig.getSplitPk()).orElse(null);
-						if(tableField != null) {
-							map.put("splitPk", tableField.getName());
-						}else {
-							map.put("splitPk", "字段获取不到");
+						if(taskConfig.getSourceTable().equals("multi")) {
+							map.put("splitPk", taskConfig.getSplitPk());
+						} else {
+							DataTableField tableField = dataTableFieldRepository.findById(taskConfig.getSplitPk()).orElse(null);
+							if(tableField != null) {
+								map.put("splitPk", tableField.getName());
+							}else {
+								map.put("splitPk", "字段获取不到");
+							}
 						}
 					}
 				}else {

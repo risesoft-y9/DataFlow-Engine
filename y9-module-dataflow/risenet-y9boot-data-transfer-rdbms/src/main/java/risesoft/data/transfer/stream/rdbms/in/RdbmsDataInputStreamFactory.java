@@ -52,7 +52,6 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 			e.printStackTrace();
 			throw new Error("加载数据库处理工厂失败，程序错误!");
 		}
-
 	}
 
 	private String jdbcUrl;
@@ -81,8 +80,14 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 		this.userName = ValueUtils.getRequired(configuration.getString("userName"), "缺失userName");
 		dataBaseType = DataBaseType.getDataBaseTypeByJdbcUrl(jdbcUrl);
 		this.tableName = ValueUtils.getRequired(configuration.getString("tableName"), "缺失tableName");
-		this.selectSql = "select " + DataBaseType.castKeyFieldsAndJoin(dataBaseType,ValueUtils.getRequired(configuration.getList("column", String.class), "缺失column"), ",") + " from "
-				+ this.tableName;
+		// 判断多表查询情况
+		if(this.tableName.equals("multi")) {
+			this.selectSql = ValueUtils.getRequired(configuration.getString("column"), "缺失column");
+			this.tableName = "(" + this.selectSql + ") multi ";
+		} else {
+			this.selectSql = "select " + DataBaseType.castKeyFieldsAndJoin(dataBaseType, 
+					ValueUtils.getRequired(configuration.getList("column", String.class), "缺失column"), ",") + " from " + this.tableName;
+		}
 		this.where = configuration.getString("where", "").trim();
 		// 其他地方有用到这个原始的where genPKSql pkRangeSQL = String.format("%s WHERE (%s AND %s IS
 		// NOT NULL)", pkRangeSQL, where, splitPK);
@@ -134,7 +139,6 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 		} catch (Exception e) {
 			throw TransferException.as(FrameworkErrorCode.RUNTIME_ERROR, "初始化数据库输入流工厂失败，异常信息：" + e.getMessage(), e);
 		}
-
 	}
 
 	@Override
@@ -149,7 +153,6 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 			return;
 		}
 		this.connection.close();
-
 	}
 
 	@Override
@@ -163,22 +166,31 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 			List<Data> querys = null;
 			ResultSet resultSet;
 			ResultSetMetaData rsMetaData;
+			
+			// 多表同步会存在字段前加别名的情况，要特殊处理
+			String splitPk_original = "";
+			if(splitPk.indexOf(".") > -1) {
+				splitPk_original = splitPk.split("\\.")[1];
+			}else {
+				splitPk_original = splitPk;
+			}
+			
 			if (precise) {
-				resultSet = DBUtil.query(connection, "SELECT distinct " + splitPk + " from " + tableName);
+				resultSet = DBUtil.query(connection, "SELECT distinct " + splitPk_original + " from " + tableName);
 				querys = new ArrayList<Data>();
 
 				rsMetaData = resultSet.getMetaData();
 				String fu = isStringType(rsMetaData.getColumnType(1)) ? "'%S'" : "%S";
 				while (resultSet.next()) {
-					querys.add(new StringData(String.format(" %S = " + fu, splitPk, resultSet.getObject(splitPk))));
+					querys.add(new StringData(String.format(" %S = " + fu, splitPk, resultSet.getObject(splitPk_original))));
 				}
 				resultSet.close();
 			} else {
-				String pk = genPKSql(splitPk, tableName, where);
-				if (dataBaseType == DataBaseType.Oracle) {
-					querys = StringData.as(genSplitSqlForOracle(splitPk, tableName, where, numberSize));
-					return querys;
-				}
+				String pk = genPKSql(splitPk_original, tableName, where);
+//				if (dataBaseType == DataBaseType.Oracle) {
+//					querys = StringData.as(genSplitSqlForOracle(splitPk, tableName, where, numberSize));
+//					return querys;
+//				}
 				resultSet = DBUtil.query(connection, pk);
 				rsMetaData = resultSet.getMetaData();
 				Pair<Object, Object> minMaxPK = null;
@@ -276,7 +288,6 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 	}
 
 	private static String genPKSql(String splitPK, String table, String where) {
-
 		String minMaxTemplate = "SELECT MIN(%s),MAX(%s) FROM %s";
 		String pkRangeSQL = String.format(minMaxTemplate, splitPK, splitPK, table);
 		if (StringUtils.isNotBlank(where)) {
@@ -357,15 +368,15 @@ public class RdbmsDataInputStreamFactory implements DataInputStreamFactory {
 		boolean isValidLongType = type == Types.BIGINT || type == Types.INTEGER || type == Types.SMALLINT
 				|| type == Types.TINYINT;
 		switch (dataBaseType) {
-		case Oracle:
-			// TODO 手术刀:在数据库类型的时候没有判断是否为数字类型
-		case RDBMS:
-			isValidLongType |= type == Types.NUMERIC;
-			// TODO 达梦要用DECIMAL
-			isValidLongType |= type == Types.DECIMAL;
-			break;
-		default:
-			break;
+			case Oracle:
+				// TODO 手术刀:在数据库类型的时候没有判断是否为数字类型
+			case RDBMS:
+				isValidLongType |= type == Types.NUMERIC;
+				// TODO 达梦要用DECIMAL
+				isValidLongType |= type == Types.DECIMAL;
+				break;
+			default:
+				break;
 		}
 		return isValidLongType;
 	}
