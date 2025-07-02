@@ -114,13 +114,13 @@ y9:
     internalIp: 192.168.x.x,10.0.x.x,172.20.x.x,10.192.x.x
     service:
         org:
-            directUrl: http://127.0.0.1:7055/platform
+            directUrl: http://127.0.0.1:7055
     common:
         convertEnabled: true
         environments: Public,dev
         kafkaEnabled: false
-        logBaseUrl: http://127.0.0.1:7055/log
-        orgBaseUrl: http://127.0.0.1:7055/platform
+        logBaseUrl: http://127.0.0.1:7055/server-log
+        orgBaseUrl: http://127.0.0.1:7055/server-platform
     feature:
         jpa:
             packagesToScanEntityPublic: net.risesoft.y9public.entity,net.risesoft.api.persistence.model,net.risesoft.security.model
