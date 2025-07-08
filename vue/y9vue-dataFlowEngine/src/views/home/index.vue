@@ -5,37 +5,13 @@
     import { useSettingStore } from '@/store/modules/settingStore';
     const settingStore = useSettingStore();
     const { t } = useI18n();
-    // import dispatchingChart from './comp/dispatchingChart/index.vue';
-    import schedulingInfoChart from './comp/dispatchingChart/schedulingInfo.vue';
 
     import {
-        getEnvironment,
-        environmentAll,
-        showEnvironmentAll,
-        selectName,
         selectClick,
-        getData,
         getHomeDataInfo,
         homeData,
-        selectClick2SchedulingInfo,
-        todayScheduling,
-        dailySchedulingFrequencyQueryInfoSelectName,
-        dailySchedulingFrequencyQueryAllSelect,
-        selectClick2DailySchedulingFrequencyInfo,
         ChartManager,
-        taskStateInfoQueryInfoSelectName,
-        selectClick2taskStateInfo,
-        taskStateInfoQueryAllSelect,
-        echartsLoadingStates,
-        currentTaskInfoSelectName,
-        currentTaskInfoQueryAllSelect,
-        selectClick2CurrentTaskInfo,
-        setAllEchartsLoadingStates,
-        logInfoSelectName,
-        logInfoQueryAllSelect,
-        log_totalSuccess,
-        log_totalFailure,
-        selectClick2LogInfo
+        setAllEchartsLoadingStates
     } from '@/views/home/comp/dispatchingChart/data';
     // col变量
     const spanValue = ref(12);
@@ -57,14 +33,9 @@
         });
     });
     const initData = async () => {
-        //获取环境变量
-        // await getEnvironment();
-        // await getData();
-
-        //*****获取首页数据** */
         loading.value = true;
         setAllEchartsLoadingStates(true);
-        await getHomeDataInfo();
+        await getHomeDataInfo(homeData.defaultSelectValue);
         initChart();
         loading.value = false;
         setAllEchartsLoadingStates(false);
@@ -151,58 +122,48 @@
                                     :size="fontSizeObj.buttonSize"
                                     :style="{ 'font-size': fontSizeObj.baseFontSize }"
                                 >
-                                    <!-- {{ $t('最近一个月') }} -->
-                                    <!-- disabled -->
-                                    {{ currentTaskInfoSelectName }}
+                                    {{ homeData.selectName }}
                                 </el-button>
                                 <template #dropdown>
                                     <el-dropdown-menu>
                                         <el-dropdown-item
-                                            v-for="item in currentTaskInfoQueryAllSelect"
+                                            v-for="item in homeData.allEnvironments"
                                             :key="item.name"
-                                            @click="selectClick2CurrentTaskInfo(item)"
+                                            @click="selectClick(item)"
                                         >
-                                            {{ item.name }}
+                                            {{ item.description }}
                                         </el-dropdown-item>
                                     </el-dropdown-menu>
                                 </template>
-                                <!-- <el-button>
-                                    Last 7 days<i class="ri-arrow-down-s-line"></i>
-                                </el-button>
-                                <template #dropdown>
-                                    <el-dropdown-menu>
-                                    <el-dropdown-item>last 12 days</el-dropdown-item>
-                                    <el-dropdown-item>last 13 days</el-dropdown-item>
-                                    <el-dropdown-item>last 14 days</el-dropdown-item>
-                                    <el-dropdown-item>last 15 days</el-dropdown-item>
-                                    </el-dropdown-menu>
-                                </template> -->
                             </el-dropdown>
                         </div>
-                        <div class="two-content" v-loading="echartsLoadingStates.currentTaskInfo">
+                        <div class="two-content" v-loading="homeData.currentTaskInfoLoadingStates">
                             <div class="row">
-                                <div class="left">
-                                    <h1>{{ homeData.currentTaskInfo.executTaskRatio }}%</h1>
-                                    <!-- <small>{{ $t('占用') }}</small> -->
-                                    <small>{{ $t('任务比例') }}</small>
-                                </div>
-                                <div>
-                                    <!-- echarts图 -->
-                                    <div id="currentTaskInfo" style="width: 300px; height: 276px"></div>
-                                </div>
-                            </div>
-                            <div class="footer">
-                                <div class="center">
-                                    <p>{{ $t('正在执行') }}</p>
-                                    <span>{{ homeData.currentTaskInfo.executing }}</span>
-                                </div>
                                 <div class="center">
                                     <p>{{ $t('全部任务') }}</p>
-                                    <span>{{ homeData.currentTaskInfo.allTasks }}</span>
+                                    <span>{{ homeData.currentTaskInfo.allTask }}</span>
                                 </div>
                                 <div class="center">
-                                    <p>{{ $t('今日已执行') }}</p>
-                                    <span>{{ homeData.currentTaskInfo.executedToday }}</span>
+                                    <p>{{ $t('今日已执行(成功/失败)') }}</p>
+                                    <span>{{ homeData.currentTaskInfo.doneTask }}</span>
+                                </div>
+                                <div class="center">
+                                    <p>{{ $t('正在执行') }}</p>
+                                    <span>{{ homeData.currentTaskInfo.doingTask }}</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="center">
+                                    <p>{{ $t('总执行成功') }}</p>
+                                    <span>{{ homeData.currentTaskInfo.successTask }}</span>
+                                </div>
+                                <div class="center">
+                                    <p>{{ $t('总执行失败') }}</p>
+                                    <span>{{ homeData.currentTaskInfo.errorTask }}</span>
+                                </div>
+                                <div class="center">
+                                    <p>{{ $t('等待执行') }}</p>
+                                    <span>{{ homeData.currentTaskInfo.waitTask }}</span>
                                 </div>
                             </div>
                         </div>
@@ -221,64 +182,46 @@
                                             :size="fontSizeObj.buttonSize"
                                             :style="{ 'font-size': fontSizeObj.baseFontSize }"
                                         >
-                                            {{ dailySchedulingFrequencyQueryInfoSelectName }}
+                                            {{ homeData.selectName }}
                                         </el-button>
                                         <template #dropdown>
                                             <el-dropdown-menu>
                                                 <el-dropdown-item
-                                                    v-for="item in dailySchedulingFrequencyQueryAllSelect"
+                                                    v-for="item in homeData.allEnvironments"
                                                     :key="item.name"
-                                                    @click="selectClick2DailySchedulingFrequencyInfo(item)"
+                                                    @click="selectClick(item)"
                                                 >
-                                                    {{ item.name }}
+                                                    {{ item.description }}
                                                 </el-dropdown-item>
                                             </el-dropdown-menu>
                                         </template>
                                     </el-dropdown>
                                 </div>
-                                <div
-                                    class="metric-content"
-                                    v-loading="echartsLoadingStates.dailySchedulingFrequencyInfo"
-                                >
-                                    <div class="one-content">
-                                        <span>{{}}</span>
-
-                                        <span>{{ todayScheduling }}</span>
-                                        <!-- <span>{{ $t('调度次数') }}</span> -->
-
-                                        <!-- <span>{{ $t('调度次数') }}</span> -->
-                                    </div>
-                                    <div style="width: 100%">
-                                        <!-- echarts图 -->
-                                        <div id="dailySchedulingFrequencyInfo" style="width: 100%; height: 100px"></div>
-                                    </div>
+                                <div class="metric-content" v-loading="homeData.dailySchedulingInfoLoadingStates">
+                                    <!-- echarts图 -->
+                                    <div id="dailySchedulingFrequencyInfo" style="width: 100%;height: 180px;"></div>
                                 </div>
                             </el-card>
                         </el-col>
-                        <el-col
-                            :span="spanValue"
-                            style="padding-right:0;max-width: settingStore.device === 'mobile'? 100% : 49%;flex: 0 0 49.5%;"
-                        >
+                        <el-col :span="spanValue">
                             <el-card class="box-card">
                                 <div class="card-header">
-                                    <span>{{ $t('正常状态任务比例图') }}</span>
-                                    <!-- disabled -->
+                                    <span>{{ $t('调度任务比例图') }}</span>
                                     <el-dropdown>
                                         <el-button
                                             :size="fontSizeObj.buttonSize"
                                             :style="{ 'font-size': fontSizeObj.baseFontSize }"
                                         >
-                                            <!-- {{ $t('最近一个月') }} -->
-                                            {{ taskStateInfoQueryInfoSelectName }}
+                                            {{ homeData.selectName }}
                                         </el-button>
                                         <template #dropdown>
                                             <el-dropdown-menu>
                                                 <el-dropdown-item
-                                                    v-for="item in taskStateInfoQueryAllSelect"
+                                                    v-for="item in homeData.allEnvironments"
                                                     :key="item.name"
-                                                    @click="selectClick2taskStateInfo(item)"
+                                                    @click="selectClick(item)"
                                                 >
-                                                    {{ item.name }}
+                                                    {{ item.description }}
                                                 </el-dropdown-item>
                                             </el-dropdown-menu>
                                         </template>
@@ -286,10 +229,10 @@
                                 </div>
                                 <div
                                     style="display: flex; justify-content: space-around"
-                                    v-loading="echartsLoadingStates.taskStateInfo"
+                                    v-loading="homeData.taskInfoLoadingStates"
                                 >
                                     <!-- echarts图 -->
-                                    <div id="taskStateInfo" style="width: 235px; height: 132px"></div>
+                                    <div id="taskStateInfo" style="width: 100%;height: 180px"></div>
                                 </div>
                             </el-card>
                         </el-col>
@@ -298,105 +241,34 @@
                         <el-card class="box-card">
                             <div class="card-header">
                                 <span>{{ $t('调度情况') }}</span>
-                                <el-dropdown v-if="showEnvironmentAll">
-                                    <el-button
-                                        :size="fontSizeObj.buttonSize"
-                                        :style="{ 'font-size': fontSizeObj.baseFontSize }"
-                                    >
-                                        {{ selectName }}
-                                        <i class="ri-arrow-down-s-line"></i>
-                                    </el-button>
-                                    <template #dropdown>
-                                        <el-dropdown-menu>
-                                            <el-dropdown-item
-                                                v-for="item in environmentAll"
-                                                :key="item.name"
-                                                @click="selectClick2SchedulingInfo(item.name)"
-                                            >
-                                                {{ item.name }}
-                                            </el-dropdown-item>
-                                            <!-- <el-dropdown-item>last 15 days</el-dropdown-item> -->
-                                        </el-dropdown-menu>
-                                    </template>
-                                </el-dropdown>
-                            </div>
-                            <div class="card-content" v-loading="echartsLoadingStates.schedulingInfo">
-                                <!-- 任务忙碌图 -->
-                                <!-- <dispatchingChart></dispatchingChart> -->
-                                <schedulingInfoChart> </schedulingInfoChart>
-                            </div>
-                        </el-card>
-                        <el-card class="box-card">
-                            <div class="card-header">
-                                <span>{{ $t('日志量') }}</span>
                                 <el-dropdown>
                                     <el-button
                                         :size="fontSizeObj.buttonSize"
                                         :style="{ 'font-size': fontSizeObj.baseFontSize }"
                                     >
-                                        <!-- {{ $t('最近一周') }} -->
-                                        {{ logInfoSelectName }}
-                                        <i class="ri-arrow-down-s-line"></i>
+                                        {{ homeData.selectName }}
                                     </el-button>
                                     <template #dropdown>
                                         <el-dropdown-menu>
                                             <el-dropdown-item
-                                                v-for="item in logInfoQueryAllSelect"
+                                                v-for="item in homeData.allEnvironments"
                                                 :key="item.name"
-                                                @click="selectClick2LogInfo(item)"
+                                                @click="selectClick(item)"
                                             >
-                                                {{ item.name }}
+                                                {{ item.description }}
                                             </el-dropdown-item>
-                                            <!-- <el-dropdown-item>{{ $t('最近两周') }}</el-dropdown-item>
-                                            <el-dropdown-item>{{ $t('最近三周') }}</el-dropdown-item>
-                                            <el-dropdown-item>{{ $t('最近一个月') }}</el-dropdown-item> -->
-                                            <!-- <el-dropdown-item>last 15 days</el-dropdown-item> -->
                                         </el-dropdown-menu>
                                     </template>
                                 </el-dropdown>
                             </div>
-                            <!-- <div class="card-item" v-loading="loading">
-                                <div class="item-left">
-                                    <div class="left-item">
-                                        <i class="ri-checkbox-blank-circle-line"></i>
-                                        <span>{{ $t('完成') }}</span>
-                                        <span>23043</span>
-                                    </div>
-                                    <div class="left-item">
-                                        <i style="color: #95d475" class="ri-checkbox-blank-circle-line"></i>
-                                        <span>{{ $t('错误') }}</span>
-                                        <span>2343</span>
-                                    </div>
-                                </div>
-
-                                <div id="logInfo" style="width: 600px; height: 400px"></div>
-                            </div> -->
-
-                            <div class="card-item" v-loading="echartsLoadingStates.logInfo">
-                                <div class="top-row" style="display: flex">
-                                    <div class="left-content" style="flex: 1">
-                                        <div class="left-item" style="margin-left: 20px">
-                                            <i class="ri-checkbox-blank-circle-line"></i>
-                                            <span>{{ $t('完成') }}</span>
-                                            <span>{{ log_totalSuccess }}</span>
-                                        </div>
-                                        <div class="left-item" style="margin-left: 20px">
-                                            <i style="color: #95d475" class="ri-checkbox-blank-circle-line"></i>
-                                            <span>{{ $t('错误') }}</span>
-                                            <span>{{ log_totalFailure }}</span>
-                                        </div>
-                                    </div>
-                                    <div id="logInfo" style="width: 600px; height: 400px"></div>
-                                </div>
+                            <div class="card-content" v-loading="homeData.schedulingInfoLoadingStates">
+                                <div id="schedulingInfo" style="width: 100%;height: 480px;"></div>
                             </div>
                         </el-card>
                     </div>
                 </div>
             </el-col>
         </el-row>
-        <!-- <div class="footer">
-            <span>Powered by YouSheng . v1.0.0</span>
-        </div> -->
     </div>
 </template>
 
@@ -404,52 +276,26 @@
     .left {
         display: flex;
         flex-direction: column;
-        height: 70%;
+        height: 100%;
         .left-two {
             :deep(.el-card__body) {
                 padding: 0px;
-                height: 90%;
+                height: 100%;
             }
             .two-content {
-                height: calc(100% - 50px - 1.1rem);
+                // height: calc(100% - 50px - 1.1rem);
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 .row {
-                    display: flex;
-                    flex-wrap: wrap;
-                    margin-right: -14px;
-                    margin-left: -14px;
-                    justify-content: space-around;
-                    .left {
-                        display: flex;
-                        flex: 0 0 16.6666666667%;
-                        max-width: 16.6666666667%;
-                        text-align: center;
-                        flex-wrap: wrap;
-                        flex-direction: column;
-                        h1 {
-                            font-size: v-bind('fontSizeObj.maximumFontSize');
-                            margin: 1.5rem 0 0 1rem;
-                            font-weight: 400;
-                            font-family: Nunito, Montserrat, system-ui, BlinkMacSystemFont, -apple-system, sans-serif;
-                            color: #2c2c2c;
-                        }
-                        small {
-                            font-size: v-bind('fontSizeObj.mediumFontSize');
-                            font-weight: 400;
-                        }
-                    }
-                }
-                .footer {
-                    padding: 1rem 5rem;
+                    padding: 6rem 5rem;
                     display: flex;
                     justify-content: space-between;
                     .center {
                         text-align: center;
                         p {
                             margin-top: 0;
-                            margin-bottom: 1rem;
+                            margin-bottom: 2rem;
                             font-size: v-bind('fontSizeObj.mediumFontSize');
                         }
                         span {
@@ -515,7 +361,7 @@
 
         .box-card:nth-child(2) {
             margin-bottom: v-bind("settingStore.device === 'mobile'? '1.5rem' : '0px'");
-            height: calc(100% - 338px);
+            // height: calc(100% - 338px);
         }
     }
     .card-header {
@@ -556,10 +402,6 @@
                 margin: 0 3px 0 10px;
                 margin-bottom: 1.5rem;
             }
-            .box-card:nth-child(2) {
-                margin-bottom: 0;
-                height: calc(100% - 285px - 1.5rem);
-            }
             .card-content {
                 display: flex;
                 justify-content: v-bind("settingStore.device === 'mobile'? 'center' : 'space-evenly'");
@@ -588,65 +430,9 @@
                     }
                 }
             }
-            .card-item {
-                display: flex;
-                align-items: center;
-                justify-content: space-evenly;
-                margin-bottom: 1rem;
-                padding-right: 3.5rem;
-                height: calc(100% - 50px - 2.2rem);
-                .item-left {
-                    margin: 1.5rem 0 1rem 0;
-                    .left-item {
-                        display: flex;
-                        justify-content: space-between;
-                        margin-left: 2rem;
-                        margin-bottom: 2rem;
-                        font-size: v-bind('fontSizeObj.mediumFontSize');
-                        span {
-                            margin-left: 0.5rem;
-                        }
-                        i {
-                            color: var(--el-color-primary);
-                        }
-                    }
-                }
-                .top-row {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    .left-content {
-                        display: flex;
-                        flex-direction: row;
-                        align-items: center;
-                        justify-content: space-around;
-                    }
-                }
-            }
         }
         .metric-content {
-            height: 116px;
-            .one-content {
-                display: flex;
-                margin: 1rem 0 2px 0;
-                align-items: center;
-                justify-content: space-between;
-                box-sizing: border-box;
-                h2 {
-                    font-size: v-bind('fontSizeObj.moreLargeFont');
-                    margin: 0 0 0.5rem 1rem;
-                    line-height: 1.3;
-                    color: #2c2c2c;
-                    font-weight: 500;
-                    font-family: Nunito, Montserrat, system-ui, BlinkMacSystemFont, -apple-system, sans-serif;
-                }
-                span {
-                    color: #7c858e;
-                    margin: 0 1rem 0 0;
-                    font-size: v-bind('fontSizeObj.mediumFontSize');
-                }
-            }
+            height: 180px;
         }
         #right-top-one {
             :deep(div) {

@@ -4,90 +4,35 @@ import java.util.List;
 import java.util.Map;
 
 import net.risesoft.pojo.Y9Result;
-import net.risesoft.pojo.home.HomeData;
-import net.risesoft.pojo.home.HomeData.CurrentTaskInfo;
-import net.risesoft.pojo.home.HomeData.DailySchedulingFrequencyInfo;
-import net.risesoft.pojo.home.HomeData.JobLogInfo;
-import net.risesoft.pojo.home.HomeData.SchedulingInfo;
-import net.risesoft.pojo.home.HomeQueryModel.CurrentTaskQueryInfo;
-import net.risesoft.pojo.home.HomeQueryModel.DailySchedulingFrequencyQueryInfo;
-import net.risesoft.pojo.home.HomeQueryModel.JobLogQueryInfo;
-import net.risesoft.pojo.home.HomeQueryModel.SchedulingQueryInfo;
-import net.risesoft.pojo.home.HomeQueryModel.TaskStateQueryInfo;
 
 public interface HomeDataService {
 
 	/**
-	 * 获取首页全部数据
-	 *
-	 * @MethodName: getHomeData
-	 * @Description: TODO
-	 * @author
-	 * @return Y9Result<HomeData>
-	 *
+	 * 当前运行的任务情况
+	 * @param type  Public-默认环境，dev-测试环境
+	 * @return
 	 */
-	Y9Result<HomeData> getHomeData();
-
-	Y9Result<HomeData> getHomeDataSync();
+	Y9Result<Map<String, Object>> getCurrentTaskInfo(String type);
 
 	/**
-	 * 获取当前任务执行情况
-	 *
-	 * @MethodName: getCurrentTaskInfo
-	 * @Description: TODO
-	 * @author
-	 * @param currentTaskQueryInfo
-	 * @return CurrentTaskInfo
-	 *
+	 * 获取近期每日调度次数
+	 * @param type  Public-默认环境，dev-测试环境
+	 * @return
 	 */
-	CurrentTaskInfo getCurrentTaskInfo(CurrentTaskQueryInfo currentTaskQueryInfo);
-
-	/**
-	 *
-	 * @MethodName: getDailySchedulingFrequencyInfo
-	 * @Description: TODO 获取每日调度频率
-	 * @author
-	 * @param dailySchedulingFrequencyQueryInfo
-	 * @return DailySchedulingFrequencyInfo
-	 *
-	 */
-	DailySchedulingFrequencyInfo getDailySchedulingFrequencyInfo(
-			DailySchedulingFrequencyQueryInfo dailySchedulingFrequencyQueryInfo, List<String> jobTypes);
+	Y9Result<Map<String, Object>> getDailySchedulingFrequencyInfo(String type);
 
 	/**
 	 * 获取正常任务状态比例
-	 *
-	 * @MethodName: getTaskStateInfo
-	 * @Description: TODO
-	 * @author
-	 * @param taskStateQueryInfo
-	 * @return TaskStateInfo
-	 *
+	 * @param type
+	 * @return
 	 */
-	List<Map<String, Object>> getTaskStateInfo(TaskStateQueryInfo taskStateQueryInfo);
+	List<Map<String, Object>> getTaskStateInfo(String type);
 
 	/**
 	 * 获取调度情况
-	 *
-	 * @MethodName: getTaskStateInfo
-	 * @Description: TODO
-	 * @author
-	 * @param schedulingQueryInfo
-	 * @return TaskStateInfo
-	 *
+	 * @param type
+	 * @return
 	 */
-	SchedulingInfo getSchedulingInfo(SchedulingQueryInfo schedulingQueryInfo, List<String> jobTypes);
-
-	/**
-	 * 获取日志信息成功失败
-	 *
-	 * @MethodName: getJobLogInfo
-	 * @Description: TODO
-	 * @author
-	 * @param jobLogQueryInfo
-	 * @return List<JobLogInfo>
-	 *
-	 */
-	JobLogInfo getJobLogInfo(JobLogQueryInfo jobLogQueryInfo, List<String> jobTypes);
+	Map<String, Object> getSchedulingInfo(String type);
 
 }

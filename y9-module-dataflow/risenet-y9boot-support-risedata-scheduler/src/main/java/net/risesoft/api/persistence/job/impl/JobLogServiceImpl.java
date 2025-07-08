@@ -42,7 +42,7 @@ import net.risesoft.exceptions.ServiceOperationException;
 import net.risesoft.security.ConcurrentSecurity;
 
 /**
- * @Description :
+ * @Description :调度日志实现类
  * @ClassName JobLogServiceImpl
  * @Author lb
  * @Date 2022/9/13 16:33
@@ -401,6 +401,7 @@ public class JobLogServiceImpl extends AutomaticCrudService<JobLog, String> impl
 				}, 99));
 	}
 
+	@Override
 	public List<Map<String, Object>> searchByGroupLog(Date startDate, Date endDate, String environment,
 			String jobName) {
 		JobLog jobLog = new JobLog();
@@ -426,25 +427,38 @@ public class JobLogServiceImpl extends AutomaticCrudService<JobLog, String> impl
 	}
 
 	@Override
-	public Integer getExecutedCountByStatusAndTime(List<Integer> statusList, long start, long end, List<String> jobTypes) {
-		return jobLogDao.getExecutedCountByStatusAndTime(statusList, start, end, jobTypes);
+	public int getCount(List<Integer> status, String environment, List<String> jobTypes, boolean isAdmin) {
+		if(isAdmin) {
+			return jobLogDao.getCount(status, environment);
+		} 
+		if(jobTypes != null && jobTypes.size() > 0) {
+			return jobLogDao.getCount(status, environment, jobTypes);
+		}
+		return 0;
 	}
 
 	@Override
-	public List<Map<String, Object>> getExecutedCountGroupByDispatchTime(List<Integer> statusList, long start,
-			long end, List<String> jobTypes) {
-		return jobLogDao.getExecutedCountGroupByDispatchTime(statusList, start, end, jobTypes);
+	public Integer getFrequencyCount(Long startTime, Long endTime, String environment, List<String> jobTypes,
+			boolean isAdmin) {
+		if(isAdmin) {
+			return jobLogDao.getCount(environment, startTime, endTime);
+		} 
+		if(jobTypes != null && jobTypes.size() > 0) {
+			return jobLogDao.getCount(environment, startTime, endTime, jobTypes);
+		}
+		return 0;
 	}
 
 	@Override
-	public List<Map<String, Object>> getSchedulingInfo(List<Integer> statuslist, Long startTime, Long endTime,
-			String environment, List<String> jobTypes) {
-		return jobLogDao.getSchedulingInfo(statuslist, startTime, endTime, environment, jobTypes);
-	}
-
-	@Override
-	public List<Map<String, Object>> getLogGroupInfo(List<Integer> statuslist, Long startTime, Long endTime, List<String> jobTypes) {
-		return jobLogDao.getLogGroupInfo(statuslist, startTime, endTime, jobTypes);
+	public Integer getJobCount(List<Integer> status, Long startTime, Long endTime, String environment,
+			List<String> jobTypes, boolean isAdmin) {
+		if(isAdmin) {
+			return jobLogDao.getJobCount(environment, startTime, endTime, status);
+		} 
+		if(jobTypes != null && jobTypes.size() > 0) {
+			return jobLogDao.getJobCount(environment, startTime, endTime, jobTypes, status);
+		}
+		return 0;
 	}
 
 }
