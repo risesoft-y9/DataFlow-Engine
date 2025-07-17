@@ -142,14 +142,13 @@ public class JobController extends BaseController {
 	/**
 	 * 指定服务并调度
 	 *
-	 * @param jobId  任务id
-	 * @param args   参数
+	 * @param jobId  调度任务id
+	 * @param args   任务配置id
 	 * @param server 指定服务
 	 * @return
 	 */
 	@PostMapping("sendJob")
 	public Y9Result<Object> sendJob(Integer jobId, String args, String server, String dispatchArgs) {
-
 		Job byJobId = jobService.findByJobId(jobId);
 		if (byJobId != null) {
 			if (!StringUtils.isBlank(args)) {
@@ -203,11 +202,6 @@ public class JobController extends BaseController {
 			e.printStackTrace();
 		}
 		return Y9Result.success(res);
-	}
-
-	@RequestMapping("/getCount")
-	public Y9Result<Object> getCount(String environment) {
-		return Y9Result.success(jobService.getCount(environment));
 	}
 
 	/**
