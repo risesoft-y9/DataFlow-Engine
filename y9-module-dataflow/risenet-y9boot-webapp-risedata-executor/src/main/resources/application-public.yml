@@ -8,7 +8,7 @@ beta:
     #监听文件
     listener: true
     #日志文件位置
-    logPath: /risedata/nohup.out
+    logPath: /dataxapp/nohup.out
     #版本号
     version: 1.0.1
     #描述
@@ -17,7 +17,7 @@ beta:
     environment: Public
     watch:
     #是否监控
-      watch: true
+      watch: false
       time: 5000 #配置多少秒监控一次
-    serverAddr: http://localhost:7055/risedata/
-  servers: rpc:127.0.0.1:7066
+    serverAddr: http://10.192.198.82/risedata/
+  servers: rpc:10.190.219.139:82

@@ -182,11 +182,7 @@ const checkBoxChange = () => {
 };
 //表筛选
 const tableChange = () => {
-    if(tableSetForm.tableData.sourceTable == 'multi') {
-        tableSetForm.tableData.sourceCloumn = [];
-    } else {
-        getTableFieldList();
-    }
+    getTableFieldList();
 };
 const rules = {
     sourceTable: [{ required: true, message: '请选择', trigger: ['blur', 'change'] }],
@@ -246,19 +242,10 @@ const activeName = ref('1');
             <el-descriptions-item label-align="center" label="字段详情" v-if="addTaskForm.tableData.sourceType != 'ftp'">
                 <template #label>
                     <div>
-                        <span v-if="tableSetForm.tableData.sourceTable == 'multi'">查询语句</span>
-                        <span v-else>字段详情</span>
+                        <span>字段详情</span>
                     </div>
                 </template>
-                <el-form-item prop="sourceCloumn" v-if="tableSetForm.tableData.sourceTable == 'multi'">
-                    <el-input
-                        placeholder="请输入多表查询SQL，例如：select au.id as ID, au.name as NAME, ad.mobile as MOBILE from a_user au left join a_detail ad on au.id = ad.userId"
-                        type="textarea"
-                        rows="3"
-                        v-model="tableSetForm.tableData.sourceCloumn"
-                    ></el-input>
-                </el-form-item>
-                <el-form-item prop="sourceCloumn" v-else>
+                <el-form-item prop="sourceCloumn">
                     <el-checkbox-group v-model="tableSetForm.tableData.sourceCloumn" class="field">
                         <div v-for="item in tableSetForm.tableFieldList" class="type">
                             <el-checkbox @change="checkBoxChange" v-model="item.id" :label="item.id">
@@ -452,7 +439,6 @@ const activeName = ref('1');
                             value-key="id"
                             placeholder="请选择"
                             filterable
-                            v-if="tableSetForm.tableData.sourceTable != 'multi'"
                         >
                             <el-option
                                 v-for="item in filteredTableFieldList"
@@ -461,11 +447,6 @@ const activeName = ref('1');
                                 :value="item.id"
                             />
                         </el-select>
-                        <el-input
-                            placeholder="填写多表查询SQL里返回的字段名称，当填写的字段名称是多张表里重复的字段名称时加上表别名前缀，例如：t.id"
-                            v-model="tableSetForm.tableData.splitPk"
-                            v-else
-                        ></el-input>
                     </el-form-item>
                 </el-descriptions-item>
                 <!--      执行数基数  切分数量-->

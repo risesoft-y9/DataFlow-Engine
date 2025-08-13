@@ -1,7 +1,13 @@
 package net.risesoft.api.job;
 
 import net.risesoft.api.exceptions.JobException;
+import net.risesoft.api.persistence.model.job.Job;
+import org.springframework.scheduling.Trigger;
+import org.springframework.scheduling.TriggerContext;
+import org.springframework.scheduling.support.CronTrigger;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**

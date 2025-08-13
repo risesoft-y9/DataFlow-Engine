@@ -259,14 +259,16 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 			preparedStatementHandle = createColumnHandles.get(columnHolder);
 			nullValue = preparedStatementHandle.nullValue(dataBaseType);
 			if (preparedStatementHandle.isBigType()) {
-				sb.append("length(" + nvl + "(" + newDataBaseField + "," + nullValue + ")" + ") != length(" + nvl + "(?,"
-						+ nullValue + "))");
+				sb.append("length(" + nvl + "(" + newDataBaseField + "," + nullValue + ")" + ") != length(" + nvl
+						+ "(?," + nullValue + "))");
 			} else {
-				sb.append(nvl + "(" + newDataBaseField + "," + nullValue + ")" + " != " + nvl + "(?," + nullValue + ")");
+				sb.append(
+						nvl + "(" + newDataBaseField + "," + nullValue + ")" + " != " + nvl + "(?," + nullValue + ")");
 			}
 		}
 		sb.append(" WHEN NOT MATCHED THEN ").append("INSERT (")
-				.append(DataBaseType.castKeyFieldsAndJoin(dataBaseType, resultSetMetaData.getLeft(), ",")).append(") VALUES(");
+				.append(DataBaseType.castKeyFieldsAndJoin(dataBaseType, resultSetMetaData.getLeft(), ","))
+				.append(") VALUES(");
 		for (int i = 0; i < size; i++) {
 			sb.append("?");
 			if (i != size - 1) {
@@ -302,12 +304,15 @@ public class RdbmsDataOutputStreamFactory implements DataOutputStreamFactory {
 		try {
 			logger.debug(this, "getMetaData");
 			this.resultSetMetaData = DBUtil.getColumnMetaData(dataBaseType, jdbcUrl, userName, password, tableName,
-					DataBaseType.castKeyFieldsAndJoin(dataBaseType,this.columns, ","));
+					DataBaseType.castKeyFieldsAndJoin(dataBaseType, this.columns, ","));
 			// 构建一个map
 			int size = this.resultSetMetaData.getRight().size();
+			PreparedStatementHandle preparedStatementHandle;
 			for (int i = 0; i < size; i++) {
-				createColumnHandles.put(this.resultSetMetaData.getLeft().get(i),
-						getHandle(this.resultSetMetaData.getMiddle().get(i)));
+				// 在大小写不敏感的情况下需要解决大小写问题
+				preparedStatementHandle = getHandle(this.resultSetMetaData.getMiddle().get(i));
+				createColumnHandles.put(this.columns.get(i), preparedStatementHandle);
+				createColumnHandles.put(this.resultSetMetaData.getLeft().get(i), preparedStatementHandle);
 			}
 			// 构建sql
 			logger.debug(this, "create writer sql");

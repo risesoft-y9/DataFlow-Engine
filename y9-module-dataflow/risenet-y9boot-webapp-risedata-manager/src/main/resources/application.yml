@@ -1,6 +1,7 @@
 server:
-    port: 7055
+    port: 80
     servlet:
+        context-path: /risedata
         register-default-servlet: true
         encoding:
             charset: UTF-8
@@ -52,10 +53,10 @@ spring:
                 #url: jdbc:oracle:thin:@127.0.0.1:1521:orcl
                 #username: Y9_PUBLIC
                 #password: '111111'
-                driver-class-name: com.mysql.cj.jdbc.Driver
-                url: jdbc:mysql://localhost:3306/y9_data?serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true&useUnicode=true&characterEncoding=utf-8&rewriteBatchedStatements=true&useCompression=true&useSSL=false
-                username: root
-                password: '111111'
+                driver-class-name: oracle.jdbc.OracleDriver
+                url: jdbc:oracle:thin:@172.33.248.13:1521/orclft
+                username: SJGLXT
+                password: pTuCU2%qu2
                 initialSize: 1
                 maxActive: 20
                 maxPoolPreparedStatementPerConnectionSize: 100
@@ -82,7 +83,7 @@ spring:
                 cache:
                     use_query_cache: false
                     use_second_level_cache: false
-                dialect: org.hibernate.dialect.MySQL8Dialect
+                dialect: org.hibernate.dialect.Oracle10gDialect
                 hbm2ddl:
                     auto: update
                 jdbc:
@@ -114,13 +115,13 @@ y9:
     internalIp: 192.168.x.x,10.0.x.x,172.20.x.x,10.192.x.x
     service:
         org:
-            directUrl: http://127.0.0.1:7055
+            directUrl: http://127.0.0.1:7055/platform
     common:
         convertEnabled: true
         environments: Public,dev
         kafkaEnabled: false
-        logBaseUrl: http://127.0.0.1:7055/server-log
-        orgBaseUrl: http://127.0.0.1:7055/server-platform
+        logBaseUrl: http://127.0.0.1:7055/log
+        orgBaseUrl: http://127.0.0.1:7055/platform
     feature:
         jpa:
             packagesToScanEntityPublic: net.risesoft.y9public.entity,net.risesoft.api.persistence.model,net.risesoft.security.model
@@ -141,6 +142,7 @@ y9:
                     - http://localhost:7070
                     - http://127.0.0.1:7055
                     - http://127.0.0.1:7056
+                    - http://data.szft.gov.cn
             xss:
                 ignoreParam:
                     - ID
@@ -162,19 +164,21 @@ y9:
                 acceptedReferer:
                     - 127.0.0.1
                     - localhost
+                    - data.szft.gov.cn
         oauth2:
             resource:
                 enabled: false
+                saveOnlineMessage: false
                 allowBasicAuthentication: true
                 allowFormEncodedBodyParameter: true
                 allowUriQueryParameter: true
                 protectedUrlPatterns: /api/*
                 opaque:
-                    client-id: clientid_oidc
-                    client-secret: secret_oidc
-                    introspection-uri: http://127.0.0.1:7055/sso/oidc/introspect
-                    profile-uri: http://127.0.0.1:7055/sso/oidc/profile
-rpc.port: 7066
+                    client-id: clientid
+                    client-secret: secret
+                    introspection-uri: http://127.0.0.1:7055/sso/oauth2.0/introspect
+                    profile-uri: http://127.0.0.1:7055/sso/oauth2.0/profile
+rpc.port: 82
 #服务注册相关                    
 beta:   
   service:
@@ -195,7 +199,7 @@ beta:
     managerInfo: 17620075923
     description: 调度管控中心
     version: 1.0.3
-    ip: 127.0.0.1
-    serverAddr: http://127.0.0.1:7055/    
-  servers: rpc:127.0.0.1:7066    
+    ip: 10.192.198.82
+    serverAddr: http://10.190.219.139:80/risedata/    
+  servers: rpc:10.190.219.139:82  
 net.risedata.jdbc.show.sql: false

@@ -8,9 +8,11 @@ import net.risedata.jdbc.repository.Repository;
 import net.risesoft.api.persistence.model.job.Job;
 
 /**
- * @Description : 调度任务
- * @ClassName JobDao
+ * @Description :
+ * @ClassName IServiceDao
  * @Author lb
+ * @Date 2022/8/3 16:04
+ * @Version 1.0
  */
 public interface JobDao extends Repository {
 
@@ -98,10 +100,10 @@ public interface JobDao extends Repository {
 	@Search("select count(distinct service_Id) from Y9_DATASERVICE_JOB  where environment=?")
 	Integer getServiceCount(String environment);
 
-	@Search("select count(*) from Y9_DATASERVICE_JOB where SERVICE_JOB_TYPE in (?1) and environment = ?2")
-	int searchCountByJobType(List<String> jobType, String environment);
+	@Search("select count(*) from Y9_DATASERVICE_JOB where SERVICE_JOB_TYPE=? and environment=?")
+	int searchCountByJobType(String name, String environment);
 
-	@Search("select * from Y9_DATASERVICE_JOB where SERVICE_ID=? and environment=? and status = 1")
+	@Search("select * from Y9_DATASERVICE_JOB where Service_id=? and environment=? and status = 1")
 	List<Job> findJobsByServiceId(String serviceId, String environment);
 
 	@Search("select count(*) from Y9_DATASERVICE_JOB where instr(args,?)>0 ")
@@ -113,13 +115,14 @@ public interface JobDao extends Repository {
 	@Search("select args from Y9_DATASERVICE_JOB where id=? ")
 	String findArgsById(String id);
 	
-	@Search("select count(*) from Y9_DATASERVICE_JOB where STATUS = ?1 and ENVIRONMENT = ?2")
-	int getJobCountByStatus(Integer status, String environment);
-	
-	@Search("select count(*) from Y9_DATASERVICE_JOB where STATUS = ?1 and ENVIRONMENT = ?2 and SERVICE_JOB_TYPE in (?3)")
-	int getJobCountByStatus(Integer status, String environment, List<String> jobType);
+	@Search("select count(*) from Y9_DATASERVICE_JOB where STATUS in(?1)")
+	Integer getallJobCountByStatus(List<Integer> JobStatus);
 
+	@Search("SELECT COUNT(*) FROM Y9_DATASERVICE_JOB  WHERE id IN (select Y9_DATASERVICE_JOB_LOG.JOB_ID FROM Y9_DATASERVICE_JOB_LOG where Y9_DATASERVICE_JOB_LOG.status in (?1) and Y9_DATASERVICE_JOB_LOG.DISPATCH_TIME >=?2  and Y9_DATASERVICE_JOB_LOG.DISPATCH_TIME<=?3) and  Y9_DATASERVICE_JOB.STATUS in(?4)")
+	Integer getActiveTaskCountByTime(List<Integer> logStatus, Long startTime, Long endTime, List<Integer> jobStatus);
+	
 	@Search("select * from Y9_DATASERVICE_JOB where ARGS = ?1 and JOB_TYPE = ?2 and ENVIRONMENT = ?3 and SERVICE_ID = ?4")
 	Job findByArgsAndTypeAndEnvironmentAndServiceId(String args, String type, String environment, String serviceId);
+	
 	
 }

@@ -28,7 +28,7 @@ public class DataSourceEntity extends BaseEntity {
 	@Comment(value = "主键")
 	private String id;
 
-	@Column(name = "BASENAME", length = 100, nullable = false)
+	@Column(name = "BASENAME", length = 500, nullable = false)
 	@Comment(value = "数据源名称")
 	private String baseName;
 	

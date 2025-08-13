@@ -103,9 +103,6 @@ public class ElasticsearchInputStream implements DataInputStream {
 			case "boolean":
 				return new BoolColumn(data, name);
 			case "date":
-				if(data.indexOf("T") > -1) {
-					return new StringColumn(data, name);
-				}
 				return new DateColumn(getDate(data), name);
 			default:
 				return new StringColumn(data, name);

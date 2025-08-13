@@ -119,15 +119,11 @@ export const getTableListAll = async (sourceId,targetId) => {
 }
 const updateForm = (form, data, type) => {
     form.classListOptions = data.classList;
-    if(type == 'input') {
+    if(type == 'input'){
         if(addTaskForm.tableData.sourceType == 'ftp') {
             form.tableData.sourceTable = data.tableList;
         }else {
             form.tableOptions = data.tableList;
-            // 添加多表同步选项，不支持elastic
-            if(addTaskForm.tableData.sourceType != 'elasticsearch') {
-                form.tableOptions.unshift({id: 'multi', name: '多表查询同步'});
-            }
         }
         form.tableData.sourceName = data?.classList[0]?.id;
     }else{

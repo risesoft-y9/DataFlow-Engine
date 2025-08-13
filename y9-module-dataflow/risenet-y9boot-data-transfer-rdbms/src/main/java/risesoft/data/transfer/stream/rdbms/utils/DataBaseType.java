@@ -1,8 +1,10 @@
 package risesoft.data.transfer.stream.rdbms.utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,9 +45,21 @@ public enum DataBaseType {
 		DATABASE_KEY.put(DataBaseType.Oracle, new HashSet<String>(Arrays.asList(
 				"ACCESS、ADD、ALL、ALTER、AND、ANY、AS、ASC、AUDIT、BETWEEN、BY、CHAR、CHECK、CLUSTER、COLUMN、COMMENT、COMPRESS、CONNECT、CREATE、CURRENT、DATE、DECIMAL、DEFAULT、DELETE、DESC、DISTINCT、DROP、ELSE、EXCLUSIVE、EXISTS、FILE、FLOAT、FOR、FROM、GRANT、GROUP、HAVING、IDENTIFIED、IMMEDIATE、IN、INCREMENT、INDEX、INITIAL、INSERT、INTEGER、INTERSECT、INTO、IS、LEVEL、LIKE、LOCK、LONG、MAXEXTENTS、MINUS、MLSLABEL、MOD、MODE、MODIFY、NOAUDIT、NOCOMPRESS、NOT、NOWAIT、NULL、NUMBER、OF、OFFLINE、ON、ONLINE、OPTION、OR、ORDER、PCTFREE、PRIOR、PRIVILEGES、PUBLIC、RAW、RENAME、RESOURCE、REVOKE、ROW、ROWID、ROWNUM、ROWS、SELECT、SESSION、SET、SHARE、SIZE、SMALLINT、START、SUCCESSFUL、SYNONYM、SYSDATE、TABLE、THEN、TO、TRIGGER、UID、UNION、UNIQUE、UPDATE、USER、VALIDATE、VALUES、VARCHAR、VARCHAR2、VIEW、WHENEVER、WHERE、WITH"
 						.split("、"))));
-		DATABASE_KEY.put(DataBaseType.DM, DATABASE_KEY.get(DataBaseType.Oracle));
+		DATABASE_KEY.put(DataBaseType.DM, new HashSet<String>(Arrays.asList(
+				"ACCESS、ADD、ADMIN、ALL、ALTER、AND、ANY、AS、ASC、AUDIT、BETWEEN、BY、CHAR、CHECK、CLUSTER、COLUMN、COMMENT、COMPRESS、CONNECT、CREATE、CURRENT、DATE、DECIMAL、DEFAULT、DELETE、DESC、DISTINCT、DROP、ELSE、EXCLUSIVE、EXISTS、FILE、FLOAT、FOR、FROM、GRANT、GROUP、HAVING、IDENTIFIED、IMMEDIATE、IN、INCREMENT、INDEX、INITIAL、INSERT、INTEGER、INTERSECT、INTO、IS、LEVEL、LIKE、LOCK、LONG、MAXEXTENTS、MINUS、MLSLABEL、MOD、MODE、MODIFY、NOAUDIT、NOCOMPRESS、NOT、NOWAIT、NULL、NUMBER、OF、OFFLINE、ON、ONLINE、OPTION、OR、ORDER、PCTFREE、PRIOR、PRIVILEGES、PUBLIC、RAW、RENAME、RESOURCE、REVOKE、ROW、ROWID、ROWNUM、ROWS、SELECT、SESSION、SET、SHARE、SIZE、SMALLINT、START、SUCCESSFUL、SYNONYM、SYSDATE、TABLE、THEN、TO、TRIGGER、UID、UNION、UNIQUE、UPDATE、USER、VALIDATE、VALUES、VARCHAR、VARCHAR2、VIEW、WHENEVER、WHERE、WITH"
+						.split("、"))));
 		DATABASE_KEY.put(DataBaseType.RDBMS, DATABASE_KEY.get(DataBaseType.Oracle));
-
+		Set<DataBaseType> keys = DATABASE_KEY.keySet();
+		Set<String> keyFields;
+		List<String> lowerKeyFields;
+		for (DataBaseType key : keys) {
+			keyFields = DATABASE_KEY.get(key);
+			lowerKeyFields = new ArrayList<String>(keyFields.size());
+			for (String keyField : keyFields) {
+				lowerKeyFields.add(keyField.toLowerCase());
+			}
+			keyFields.addAll(lowerKeyFields);
+		}
 	}
 
 	DataBaseType(String typeName, String driverClassName) {
@@ -264,7 +278,7 @@ public enum DataBaseType {
 		String cloumn;
 		for (int i = 0; i < cloumns.size(); i++) {
 			cloumn = cloumns.get(i);
-			if (keys.contains(cloumn)||cloumn.contains("-")) {
+			if (keys.contains(cloumn) || cloumn.contains("-")) {
 				cloumns.set(i, keyMeaning + cloumn + keyMeaning);
 			}
 		}
@@ -278,7 +292,7 @@ public enum DataBaseType {
 	 * @param cloumns
 	 * @return
 	 */
-	public static String castKeyFieldsAndJoin(DataBaseType dataBaseType, List<String> cloumns,String separator) {
+	public static String castKeyFieldsAndJoin(DataBaseType dataBaseType, List<String> cloumns, String separator) {
 		Set<String> keys = DATABASE_KEY.get(dataBaseType);
 		if (keys == null) {
 			keys = DATABASE_KEY.get(DataBaseType.RDBMS);
@@ -291,8 +305,22 @@ public enum DataBaseType {
 			if (i != 0) {
 				sb.append(separator);
 			}
-			if (keys.contains(cloumn)||cloumn.contains("-")) {
+			if (keys.contains(cloumn) || cloumn.contains("-")) {
 				sb.append(keyMeaning + cloumn + keyMeaning);
+			} else if (cloumn.contains(" AS ") || cloumn.contains(" as ")) {
+
+				String[] asCloumn = null;
+				if (cloumn.contains(" AS ")) {
+					asCloumn = cloumn.split(" AS ");
+				}
+				if (cloumn.contains(" as ")) {
+					asCloumn = cloumn.split(" as ");
+				}
+				if (keys.contains(asCloumn[0].trim()) || asCloumn[0].contains("-")) {
+					sb.append(keyMeaning + asCloumn[0].trim() + keyMeaning + " AS " + asCloumn[1]);
+				} else {
+					sb.append(cloumn);
+				}
 			} else {
 				sb.append(cloumn);
 			}
@@ -324,7 +352,7 @@ public enum DataBaseType {
 	 */
 	public static String castKeyField(Set<String> keys, String keyMeaning, String cloumn) {
 
-		if (keys.contains(cloumn)||cloumn.contains("-")) {
+		if (keys.contains(cloumn) || cloumn.contains("-")) {
 			return keyMeaning + cloumn + keyMeaning;
 		}
 

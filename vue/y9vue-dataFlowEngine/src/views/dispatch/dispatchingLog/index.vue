@@ -59,9 +59,18 @@
             </div>
         </template>
         <template #queryFun>
-            <el-button type="primary" @click="handleClickQuery" class="global-btn-main">
-                <i class="ri-search-2-line"></i>{{ $t('搜索') }}
+            <el-button type="primary" @click="handleClickQuery" class="global-btn-main"
+                ><i class="ri-search-2-line"></i>{{ $t('搜索') }}
             </el-button>
+        </template>
+        <template #typeName="{ row, column, index }">
+            <template>{{ row.typeName }}</template>
+        </template>
+        <template #className="{ row, column, index }">
+            <template>{{ row.name }}</template>
+        </template>
+        <template #description="{ row, column, index }">
+            <template>{{ row.description }}</template>
         </template>
         <template #status="{ row, column, index }">
             <div class="statusBtn" @click="handle(2, row)" title="点击查看任务">
@@ -111,11 +120,10 @@ import router from '@/router';
 import moment from 'moment/moment';
 import dispatchInfo from '../index.vue';
 import result from '../comp/result/index.vue';
-import { useRoute } from 'vue-router';
-import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
-
 const { t } = useI18n();
 const fontSizeObj: any = inject('sizeObjInfo');
+import { useRoute } from 'vue-router';
+import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
 
 const props = defineProps({
     tableRow: {
@@ -149,7 +157,13 @@ const state = reactive({
         { label: '失败', value: 2, id: 4 },
         { label: '成功', value: 1, id: 5 }
     ],
+    dispatchTypeOptions: [
+        // todo 后续查看服务接口
+        { label: '全部', value: '', id: 1 }
+    ],
     environmentAll: [], //环境下拉
+    businessId: null,
+    dataSource: [] //数据源
 });
 
 // 搜索的filter条件变量
@@ -245,8 +259,8 @@ const handle = (type, row) => {
     if (type == 1) {
         Object.assign(dialogConfigLog.value, {
             show: true,
-            title: '任务结果信息',
-            width: '60%',
+            title: '日志',
+            width: '50%',
             okText: false,
             cancelText: false,
             appendToBody: true
@@ -375,6 +389,9 @@ const initParams = () => {
                 filterConfig.value.itemList.splice(index, 1);
             }
         });
+        filterConfig.value.itemList.forEach((item, index) => {
+            item.span = 4;
+        });
     }
 };
 const getTree = async () => {
@@ -385,7 +402,7 @@ const getTree = async () => {
         }
     }
 };
-//获取环境
+//获取环境 todo 后续改成获取用户
 const getEnvironment = async () => {
     let res = await getEnvironmentAll();
     if (res) {
@@ -445,6 +462,7 @@ function handleClickQuery() {
 
 // 分页操作
 function onCurrentChange(currPage) {
+    console.log(currPage, 'currPage');
     tableConfig.value.pageConfig.currentPage = currPage;
     initTableData();
 }

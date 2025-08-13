@@ -128,6 +128,8 @@ public interface JobService {
 	 */
 	List<Map<String, Object>> searchJob(Job job, ConcurrentSecurity securityJurisdiction);
 
+	Map<String, Object> getCount(String environment);
+
 	/**
 	 * 查询所有的任务名字
 	 * 
@@ -138,13 +140,13 @@ public interface JobService {
 	List<String> searchJobService(Job job, ConcurrentSecurity securityJurisdiction);
 
 	/**
-	 * 根据环境查询任务数量
+	 * 查询根据类型查询任务
 	 * 
 	 * @param name
 	 * @param environment
 	 * @return
 	 */
-	int searchCountByEnvironment(String environment);
+	int searchCountByJobType(String name, String environment);
 
 	/**
 	 * 删除正在等待的任务
@@ -188,7 +190,6 @@ public interface JobService {
 	 * @return
 	 */
 	int findCountJobByArgs(String args);
-	
 	/**
 	 * 根据id获取参数
 	 * @param id
@@ -197,12 +198,18 @@ public interface JobService {
 	List<String> findArgsById(String id);
 
 	/**
-	 * 根据状态获取调度任务数
-	 * @param environment
-	 * @param status
-	 * @return
+	 * 获取正常任务状态数量 活跃非活跃
+	 * @MethodName: getNormalStatetTaskProportion
+	 * @Description: TODO
+	 * @author 
+	 * @param logStatus
+	 * @param startTime
+	 * @param endTime
+	 * @param jobStatus
+	 * @return List<Map<String,Integer>>
+	 *
 	 */
-	int getTaskCountByStatus(String environment, Integer status, List<String> jobType, boolean isAdmin);
+	Map<String,Integer> getNormalStateTaskNumber(List<Integer> logStatus, Long startTime, Long endTime, List<Integer> jobStatus);
 	
 	/**
 	 * 根据相关字段信息获取实体
@@ -213,12 +220,4 @@ public interface JobService {
 	 * @return
 	 */
 	Job findByArgsAndTypeAndEnvironmentAndServiceId(String args, String type, String environment, String serviceId);
-	
-	/**
-	 * 根据环境和业务类别查询调度任务数
-	 * @param environment
-	 * @param jobType
-	 * @return
-	 */
-	int countByEnvironmentAndJobType(String environment, List<String> jobType, boolean isAdmin);
 }

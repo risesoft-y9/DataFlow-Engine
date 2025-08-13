@@ -36,14 +36,10 @@ public class ElasticsearchOutputStream implements DataOutputStream {
 		
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void writer(List<Record> records, Ack ack) {
 		try {
 			logger.debug(this, "plan writer: " + records.size());
-			String document = "";
-			// 存储记录
-			Map<String, Record> dataMap = new HashMap<String, Record>();
 			// 遍历数据
 			for (Record record : records) {
 				try {
@@ -61,45 +57,14 @@ public class ElasticsearchOutputStream implements DataOutputStream {
 							data.put(name, column.getRawData());
 						}
 					}
-					dataMap.put(id, record);// 记录
 					// 插入一条数据
-					//elasticsearchRestClient.addDocument(indexName, Y9JsonUtil.writeValueAsString(data), id);
-					//ack.confirm(record);
-					
-					// 拼接数据进行批量插入
-					document += "{\"index\":{\"_id\":\""+id+"\"}}\n";
-					document += Y9JsonUtil.writeValueAsString(data) + "\n";
+					elasticsearchRestClient.addDocument(indexName, Y9JsonUtil.writeValueAsString(data), id);
+					ack.confirm(record);
 				} catch (Exception e) {
 					logger.error(this, record + " error:" + e.getMessage());
 					ack.cancel(record, e, e.toString());
 				}
 			}
-			// 批量插入
-			String response = elasticsearchRestClient.bulkAddDocument(indexName, document);
-			// 解析返回结果
-			Map<String, Object> map = Y9JsonUtil.readHashMap(response);
-			// 检查是否有错误信息，有遍历处理
-			boolean errors = (boolean) map.get("errors");
-			if(errors) {
-				List<Map<String, Object>> items = (List<Map<String, Object>>) map.get("items");
-				for(Map<String, Object> item : items) {
-					Map<String, Object> info = (Map<String, Object>) item.get("index");
-					if(info != null) {
-						String id = (String) info.get("_id");
-						int status = (int) info.get("status");
-						if(status == 200 || status == 201) {
-							ack.confirm(dataMap.get(id));
-						} else {
-							// 获取报错信息
-							Map<String, Object> errorMsg = (Map<String, Object>) info.get("error");
-							ack.cancel(dataMap.get(id), new Throwable((String) errorMsg.get("type")), (String) errorMsg.get("reason"));
-						}
-					}
-				}
-			} else {
-				ack.confirm(records);
-			}
-			
 			if (logger.isDebug()) {
 				logger.debug(this, "confirm end: " + records.size());
 			}

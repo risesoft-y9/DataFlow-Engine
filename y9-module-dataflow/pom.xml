@@ -41,7 +41,6 @@
         <module>risenet-y9boot-support-y9kernel-security</module>
         <module>risenet-y9boot-webapp-risedata-executor</module>
         <module>risenet-y9boot-webapp-risedata-manager</module>
-        <module>risenet-y9boot-webapp-risedata-log</module>
     </modules>
 
     <profiles>
@@ -56,7 +55,6 @@
                             <excludeArtifacts>
                                 <artifact>risenet-y9boot-webapp-risedata-executor</artifact>
                                 <artifact>risenet-y9boot-webapp-risedata-manager</artifact>
-                                <artifact>risenet-y9boot-webapp-risedata-log</artifact>
                             </excludeArtifacts>
                         </configuration>
                     </plugin>

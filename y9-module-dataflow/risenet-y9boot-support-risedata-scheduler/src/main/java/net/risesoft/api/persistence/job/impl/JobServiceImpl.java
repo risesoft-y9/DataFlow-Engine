@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.support.CronExpression;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +36,7 @@ import net.risesoft.api.utils.SqlUtils;
 import net.risesoft.security.ConcurrentSecurity;
 
 /**
- * @Description :调度服务实现类
+ * @Description :
  * @ClassName JobServiceImpl
  * @Author lb
  * @Date 2022/8/30 16:05
@@ -45,25 +46,19 @@ import net.risesoft.security.ConcurrentSecurity;
 public class JobServiceImpl extends AutomaticCrudService<Job, Integer> implements JobService {
 
 	@Autowired
-	private JobDao jobDao;
+	JobDao jobDao;
 	
 	@Autowired
-	private JobLogDao jobLogDao;
+	JobLogDao jobLogDao;
 
 	@Autowired
-	private IServiceInstanceFactory iServiceInstanceFactory;
+	IServiceInstanceFactory iServiceInstanceFactory;
 
 	@Autowired(required = false)
-	private TaskManager taskManager;
+	TaskManager taskManager;
 
 	@Autowired
-	private JobChangeService jobChangeService;
-	
-	@Autowired
-	private JobLogService jobLogService;
-	
-	@Autowired(required = false)
-	private TaskExecutorService taskExecutorService;
+	JobChangeService jobChangeService;
 
 	@Override
 	@Transactional
@@ -144,6 +139,9 @@ public class JobServiceImpl extends AutomaticCrudService<Job, Integer> implement
 		}));
 	}
 
+	@Autowired
+	JdbcTemplate jt;
+
 	@Override
 	public List<Job> findMiss(String instanceId, Integer[] ids, Map<Integer, JobTask> jobTask) {
 
@@ -219,16 +217,32 @@ public class JobServiceImpl extends AutomaticCrudService<Job, Integer> implement
 				createBuilder("dispatchServer", securityJurisdiction), null, false);
 	}
 
+	@Autowired
+	JobLogService jobLogService;
+
+	@Override
+	public Map<String, Object> getCount(String environment) {
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("jobCount", jobDao.getJobCount(environment));
+		map.put("serviceCount", jobDao.getServiceCount(environment));
+		map.put("logCount", jobLogService.getLogCount(environment));
+		return map;
+	}
+
 	@Override
 	public List<String> searchJobService(Job job, ConcurrentSecurity securityJurisdiction) {
 		return getSearchExecutor().searchForList(job, "distinct SERVICE_ID",
 				createBuilder("dispatchServer", securityJurisdiction), null, false, String.class);
+
 	}
 
 	@Override
-	public int searchCountByEnvironment(String environment) {
-		return jobDao.getJobCount(environment);
+	public int searchCountByJobType(String name, String environment) {
+		return jobDao.searchCountByJobType(name, environment);
 	}
+
+	@Autowired(required = false)
+	TaskExecutorService taskExecutorService;
 
 	@Override
 	public boolean killAwaitJob(Integer jobId) {
@@ -276,32 +290,24 @@ public class JobServiceImpl extends AutomaticCrudService<Job, Integer> implement
 	public List<String> findArgsById(String id) {
 		return Arrays.asList(jobDao.findArgsById(id).split(","));
 	}
+
 	
 	@Override
-	public int getTaskCountByStatus(String environment, Integer status, List<String> jobType, boolean isAdmin) {
-		if(isAdmin) {
-			return jobDao.getJobCountByStatus(status, environment);
-		}
-		if(jobType != null && jobType.size() > 0) {
-			return jobDao.getJobCountByStatus(status, environment, jobType);
-		}
-		return 0;
+	public Map<String,Integer> getNormalStateTaskNumber(List<Integer> logStatus, Long startTime, Long endTime,
+			List<Integer> jobStatus) {
+		Integer activeTaskCount = jobDao.getActiveTaskCountByTime(logStatus, startTime, endTime,
+				jobStatus);
+		Integer allCount = jobDao.getallJobCountByStatus(jobStatus);
+		Integer notActiveCount=allCount-activeTaskCount;
+		Map<String,Integer> result=new HashMap<>();
+		result.put("active", activeTaskCount);
+		result.put("notActive", notActiveCount);
+		return result;
 	}
 
 	@Override
 	public Job findByArgsAndTypeAndEnvironmentAndServiceId(String args, String type, String environment,
 			String serviceId) {
 		return jobDao.findByArgsAndTypeAndEnvironmentAndServiceId(args, type, environment, serviceId);
-	}
-
-	@Override
-	public int countByEnvironmentAndJobType(String environment, List<String> jobType, boolean isAdmin) {
-		if(isAdmin) {
-			return jobDao.getJobCount(environment);
-		}
-		if(jobType != null && jobType.size() > 0) {
-			return jobDao.searchCountByJobType(jobType, environment);
-		}
-		return 0;
 	}
 }

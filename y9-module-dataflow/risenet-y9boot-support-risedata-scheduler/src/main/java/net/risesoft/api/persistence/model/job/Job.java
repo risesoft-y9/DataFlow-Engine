@@ -32,7 +32,6 @@ import java.util.Date;
 @Table(name = "Y9_DATASERVICE_JOB")
 @org.hibernate.annotations.Table(comment = "调度任务表", appliesTo = "Y9_DATASERVICE_JOB")
 public class Job implements GetEnvironment, GetService {
-	
 	/**
 	 * id
 	 */
@@ -97,10 +96,10 @@ public class Job implements GetEnvironment, GetService {
 	@NotBlank(message = "调度方式不能为空")
 	@Column(name = "DISPATCH_METHOD", length = 100)
 	private String dispatchMethod;
-	
 	/**
 	 * 调度参数 对分片广播的时候生效默认为index 可以使用数组参数
 	 */
+
 	@Column(name = "DISPATCH_ARGS", length = 500)
 	private String dispatchArgs;
 
@@ -119,19 +118,17 @@ public class Job implements GetEnvironment, GetService {
 	private String email;
 
 	/**
-	 * 调度参数：任务配置id，多个用逗号分割
+	 * 调度参数
 	 */
 	@Comment(value = "调度")
 	@Column(name = "ARGS", length = 2000)
 	private String args;
-	
 	/**
 	 * 子任务id 多个用 ,号
 	 */
 	@Comment(value = "子任务id,多个并行子任务")
 	@Column(name = "CHILD_JOBS", length = 100)
 	private String childJobs;
-	
 	/**
 	 * 调度任务整个超时时间单位秒
 	 */
@@ -139,7 +136,6 @@ public class Job implements GetEnvironment, GetService {
 	@NotNull(message = "超时时间不能为空")
 	@Column(name = "TIME_OUT", length = 10)
 	private Integer timeOut;
-	
 	/**
 	 * 任务超时时间单位秒
 	 */
@@ -147,7 +143,6 @@ public class Job implements GetEnvironment, GetService {
 	@NotNull(message = "超时时间不能为空")
 	@Column(name = "SOURCE_TIME_OUT", length = 10)
 	private Integer sourceTimeOut;
-	
 	/**
 	 * 失败重试次数
 	 */
@@ -155,14 +150,12 @@ public class Job implements GetEnvironment, GetService {
 	@NotNull(message = "重试次数不能为空")
 	@Column(name = "ERROR_COUNT", length = 2)
 	private Integer errorCount;
-	
 	/**
 	 * 最近更新时间
 	 */
 	@Comment(value = "最近更新时间")
 	@Column(name = "UPDATE_TIME", length = 40)
 	private Long updateTime;
-	
 	/**
 	 * 创建时间
 	 */
@@ -170,7 +163,6 @@ public class Job implements GetEnvironment, GetService {
 	@Desc
 	@Column(name = "CREATE_DATE", length = 40)
 	private Date createDate;
-	
 	/**
 	 * 任务所属环境
 	 */
@@ -178,7 +170,6 @@ public class Job implements GetEnvironment, GetService {
 	@NotBlank(message = "环境不能为空")
 	@Column(name = "ENVIRONMENT", length = 30)
 	private String environment;
-	
 	/**
 	 * 是否启动0代表不启动1代表启动
 	 */
@@ -186,7 +177,6 @@ public class Job implements GetEnvironment, GetService {
 	@NotNull(message = "状态不能为空")
 	@Column(name = "STATUS", length = 2)
 	private Integer status;
-	
 	/**
 	 * 调度服务 由哪一台服务器调度和监控一个原理
 	 */
@@ -219,7 +209,6 @@ public class Job implements GetEnvironment, GetService {
 	@Comment(value = "任务名")
 	@Column(name = "JOB_NAME", length = 200)
 	private String name;
-	
 	/**
 	 * 任务来源
 	 */

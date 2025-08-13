@@ -846,34 +846,4 @@ public class DataSourceServiceImpl implements DataSourceService {
 		}
 	}
 
-	@Override
-	public Y9Result<String> copyIndex(String baseId, String tableName, String id) {
-		try {
-			// 获取目标库
-			DataSourceEntity dataSourceEntity = getDataSourceById(baseId);
-			ElasticsearchRestClient elasticsearchRestClient = new ElasticsearchRestClient(dataSourceEntity.getUrl(), 
-					dataSourceEntity.getUsername(), dataSourceEntity.getPassword());
-			// 获取索引表字段
-			String mapping = elasticsearchRestClient.getMapping(tableName);
-			if(mapping.equals("failed")) {
-				return Y9Result.failure("复制失败，请联系技术人员处理");
-			}
-			Map<String, Object> map = Y9JsonUtil.readHashMap(mapping);
-			String mapping2 = Y9JsonUtil.writeValueAsString(map.get(tableName));
-			// 获取创建库
-			DataSourceEntity sourceEntity = getDataSourceById(id);
-			ElasticsearchRestClient elasticsearchRestClient2 = new ElasticsearchRestClient(sourceEntity.getUrl(), 
-					sourceEntity.getUsername(), sourceEntity.getPassword());
-			// 创建索引表
-			String data = elasticsearchRestClient2.createIndexAndMapping(tableName, mapping2);
-			if(data.equals("failed")) {
-				return Y9Result.failure("复制失败，请联系技术人员处理");
-			}
-			return Y9Result.successMsg("复制表成功");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return Y9Result.failure("复制表失败：" + e.getMessage());
-		}
-	}
-
 }

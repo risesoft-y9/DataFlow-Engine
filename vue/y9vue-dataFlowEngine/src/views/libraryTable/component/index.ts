@@ -30,8 +30,6 @@ export const onNodeClick = async (currTreeNode) => {
         currNode.value = currTreeNode;
         state.copyBtn = true;
         getPage();
-    }else {
-        state.copyBtn = false;
     }
 };
 

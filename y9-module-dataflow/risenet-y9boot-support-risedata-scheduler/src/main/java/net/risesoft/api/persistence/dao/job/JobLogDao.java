@@ -9,6 +9,14 @@ import net.risedata.jdbc.annotations.repository.Search;
 import net.risedata.jdbc.repository.Repository;
 import net.risesoft.api.persistence.model.job.JobLog;
 
+
+/**
+ * @Description : 配置文件操作
+ * @ClassName ConfigHisDao
+ * @Author lb
+ * @Date 2022/8/3 16:04
+ * @Version 1.0
+ */
 public interface JobLogDao extends Repository {
 
     /**
@@ -109,18 +117,15 @@ public interface JobLogDao extends Repository {
             " and JOB_ID in (select ID from Y9_DATASERVICE_JOB where TIME_OUT>0 and dispatch_server=?4)" +
             " and dispatch_time < ?2-(select TIME_OUT*1000 from Y9_DATASERVICE_JOB where ID=JOB_ID)")
     Integer clearTimeOutJob(String msg, Long newTime, Long endTime,String serviceId);
-    
 //TODO 有问题 会出现结束的任务还查询到的情况 加上服务监控做条件只能操作自己所管理的服务
     @Search("select JOB_ID from  Y9_DATASERVICE_JOB_LOG  where status =0 and environment=?2  " +
             "and JOB_ID in (select ID from Y9_DATASERVICE_JOB where TIME_OUT>0 and dispatch_server=?2 )" +
             "and dispatch_time < ?1-(select TIME_OUT*1000 from Y9_DATASERVICE_JOB where ID=JOB_ID)")
     List<Integer> searchClearTimeOutJob(Long newTime,String serviceId);
-    
     @Modify("update Y9_DATASERVICE_JOB_LOG set LOG_CONSOLE =  concat(LOG_CONSOLE,?1),RESULT=?1,status=2,end_time=?3 where status =-1 " +
             "and JOB_ID in (select ID from Y9_DATASERVICE_JOB where TIME_OUT>0 and dispatch_server=?4)" +
             "and dispatch_time < ?2-(select TIME_OUT*1000 from Y9_DATASERVICE_JOB where ID=JOB_ID)")
     Integer clearTimeOutJobAndAwait(String msg, Long newTime, Long endTime,String serviceId);
-    
     @Search("select count(*) from Y9_DATASERVICE_JOB_LOG where environment=?")
     Integer getLogCount(String environment);
 
@@ -140,6 +145,7 @@ public interface JobLogDao extends Repository {
             "and dispatch_time < ?1")
     List<Integer> searchClearDefaultTimeOut(Long l,String serviceId);
 
+
     @Search("select * from #{?1}")
     Map<String, Object> findRunableMinInstance(String sql);
 
@@ -152,28 +158,25 @@ public interface JobLogDao extends Repository {
     @Modify("delete from Y9_DATASERVICE_JOB_LOG where job_id=?1")
     int deleteJobLog(Integer jobId);
     
-    @Search("select count(*) from Y9_DATASERVICE_JOB_LOG "
-    		+ "where STATUS in (?1) and ENVIRONMENT = ?2 and JOB_ID in (select ID from Y9_DATASERVICE_JOB where SERVICE_JOB_TYPE in (?3))")
-    Integer getCount(List<Integer> status, String environment, List<String> jobTypes);
+    //根据状态获取执行任务数量
+    @Search("select count(*) from  (select distinct  log_t.JOB_ID from  Y9_DATASERVICE_JOB_LOG as log_t where  status=?1) as t")
+    Integer getExecutingCount(Integer status);
     
-    @Search("select count(*) from Y9_DATASERVICE_JOB_LOG where STATUS in (?1) and ENVIRONMENT = ?2")
-    Integer getCount(List<Integer> status, String environment);
     
-    @Search("select count(*) from Y9_DATASERVICE_JOB_LOG where ENVIRONMENT = ?1 and DISPATCH_TIME >= ?2 and DISPATCH_TIME <= ?3")
-    Integer getCount(String environment, Long startTime, Long endTime);
+    //获取今日执行
+    //force index(idx_status_dis_end) 
+    //CREATE INDEX idx_status_dis_end_env USING BTREE ON y9_data.y9_dataservice_job_log (STATUS,DISPATCH_TIME,END_TIME,ENVIRONMENT);
+
+    @Search("select count(*) from (select distinct log_t.JOB_ID from Y9_DATASERVICE_JOB_LOG as log_t where status in (?1) and DISPATCH_TIME >=?2 and END_TIME<=?3 and JOB_ID in (select ID from Y9_DATASERVICE_JOB where SERVICE_JOB_TYPE in (?4))) as t")
+    Integer getExecutedCountByStatusAndTime(List<Integer> status, Long dispatchTime, Long endTime, List<String> jobTypes);
     
-    @Search("select count(*) from Y9_DATASERVICE_JOB_LOG "
-    		+ "where ENVIRONMENT = ?1 and DISPATCH_TIME >= ?2 and DISPATCH_TIME <= ?3 "
-    		+ "and JOB_ID in (select ID from Y9_DATASERVICE_JOB where SERVICE_JOB_TYPE in (?4))")
-    Integer getCount(String environment, Long startTime, Long endTime, List<String> jobTypes);
-    
-    @Search("select count(*) from Y9_DATASERVICE_JOB_LOG "
-    		+ "where ENVIRONMENT = ?1 and DISPATCH_TIME >= ?2 and DISPATCH_TIME <= ?3 and STATUS in (?4)")
-    Integer getJobCount(String environment, Long startTime, Long endTime, List<Integer> status);
-    
-    @Search("select count(*) from Y9_DATASERVICE_JOB_LOG "
-    		+ "where ENVIRONMENT = ?1 and DISPATCH_TIME >= ?2 and DISPATCH_TIME <= ?3 and STATUS in (?5) "
-    		+ "and JOB_ID in (select ID from Y9_DATASERVICE_JOB where SERVICE_JOB_TYPE in (?4))")
-    Integer getJobCount(String environment, Long startTime, Long endTime, List<String> jobTypes, List<Integer> status);
+    @Search("select count(*) as execute_count,DATE_FORMAT(FROM_UNIXTIME(log_t.DISPATCH_TIME/1000),'%Y-%m-%d' ) as execute_start_time from Y9_DATASERVICE_JOB_LOG as log_t where status in (?1) and DISPATCH_TIME>=?2 and DISPATCH_TIME<=?3 and JOB_ID in (select ID from Y9_DATASERVICE_JOB where SERVICE_JOB_TYPE in (?4)) GROUP by execute_start_time order by execute_start_time")
+    List<Map<String,Object>> getExecutedCountGroupByDispatchTime(List<Integer> status, Long startTime, Long endTime, List<String> jobTypes);
+
+    @Search("select status , count(*) as execute_count,DATE_FORMAT(FROM_UNIXTIME(log_t.DISPATCH_TIME/1000),'%Y-%m-%d' ) as execute_start_time from Y9_DATASERVICE_JOB_LOG as log_t where status in (?1) and DISPATCH_TIME >=?2 and DISPATCH_TIME<=?3 and environment=?4 and JOB_ID in (select ID from Y9_DATASERVICE_JOB where SERVICE_JOB_TYPE in (?5)) GROUP by execute_start_time ,status ")
+	List<Map<String, Object>> getSchedulingInfo(List<Integer> statuslist, Long startTime, Long endTime, String environment, List<String> jobTypes);
+
+    @Search("select DATE_FORMAT(FROM_UNIXTIME(log_t.DISPATCH_TIME / 1000), '%Y-%m-%d') AS execute_start_time, SUM(CASE WHEN STATUS = 1 THEN 1 ELSE 0 END) AS success,SUM(CASE WHEN STATUS = 2 THEN 1 ELSE 0 END) AS failure from Y9_DATASERVICE_JOB_LOG AS log_t where status IN (?1) AND DISPATCH_TIME >= ?2 AND DISPATCH_TIME <= ?3 and JOB_ID in (select ID from Y9_DATASERVICE_JOB where SERVICE_JOB_TYPE in (?4)) GROUP by execute_start_time;")
+	List<Map<String, Object>> getLogGroupInfo(List<Integer> statuslist, Long startTime, Long endTime, List<String> jobTypes);
     
 }
