@@ -1,6 +1,14 @@
 package net.risesoft.util;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -142,4 +150,50 @@ public class DataServiceUtil {
 				return "";
 		}
 	}
+
+    /**
+     * 近一周日期List
+     *
+     * @return
+     */
+    public static List<String> getNearlyWeek() {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar begin = Calendar.getInstance();// 得到一个Calendar的实例
+        begin.setTime(new Date()); // 设置时间为当前时间
+        begin.add(Calendar.DATE, -6);
+        Calendar end = Calendar.getInstance();
+        Long startTime = begin.getTimeInMillis();
+        Long endTime = end.getTimeInMillis();
+        Long oneDay = 1000 * 60 * 60 * 24L;// 一天的时间转化为ms
+        List<String> dates = new ArrayList<String>();
+        Long time = startTime;
+        int i = 0;
+        while (time <= endTime) {
+            Date d = new Date(time);
+            dates.add(i, df.format(d));
+            i++;
+            time += oneDay;
+        }
+        return dates;
+    }
+
+    /**
+     * 根据日期获取当天时间戳区间
+     * @param time
+     * @return
+     */
+    public static long[] getDayTimestamps(String time) {
+	// 解析日期字符串
+        LocalDate date = LocalDate.parse(time, DateTimeFormatter.ISO_DATE);
+
+        // 获取当天的开始时间（00:00:00）
+        LocalDateTime startOfDay = date.atStartOfDay();
+        long startTimestamp = startOfDay.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+        // 获取当天的结束时间（23:59:59.999）
+        LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+        long endTimestamp = endOfDay.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+        return new long[]{startTimestamp, endTimestamp};
+    }
 }

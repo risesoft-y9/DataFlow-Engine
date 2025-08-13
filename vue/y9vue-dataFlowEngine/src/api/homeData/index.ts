@@ -5,7 +5,7 @@ const platformRequest = Request();
 
 /**
  * 获取首页数据
- * @param params  //暂时没有
+ * @param params
  * @returns
  */
 export const getHomeData = async (params) => {
@@ -22,64 +22,39 @@ export const getHomeData = async (params) => {
  * @param params
  * @returns
  */
-export const getSchedulingInfo = async (data) => {
+export const getSchedulingInfo = async (params) => {
     return await platformRequest({
         url: 'home/getSchedulingInfo',
-        method: 'POST',
-        JSON: true,
-        data
+        method: 'GET',
+        cType: false,
+        params
     });
 };
 
 /**
- * 获取每日
- * @param data
+ * 获取每日调度次数
+ * @param params
  * @returns
  */
-export const getDailySchedulingFrequencyInfo = async (data) => {
+export const getDailySchedulingFrequencyInfo = async (params) => {
     return await platformRequest({
-        url: 'home/getDailySchedulingFrequencyInfo',
-        method: 'POST',
-        JSON: true,
-        data
+        url: 'home/getDailyInfo',
+        method: 'GET',
+        cType: false,
+        params
     });
 };
 
 /**
- * 获取状态
- * @param data
+ * 获取任务状态比例图
+ * @param params
  * @returns
  */
-export const getTaskStateInfo = async (data) => {
+export const getTaskStateInfo = async (params) => {
     return await platformRequest({
         url: 'home/getTaskStateInfo',
-        method: 'POST',
-        JSON: true,
-        data
-    });
-};
-
-/**
- * 获取当前任务
- */
-export const getCurrentTaskInfo = async (data) => {
-    return await platformRequest({
-        url: 'home/getCurrentTaskInfo',
-        method: 'POST',
-        JSON: true,
-        data
-    });
-};
-/**
- *
- * @param data 获取日志分类信息
- * @returns
- */
-export const getJobLogInfo = async (data) => {
-    return await platformRequest({
-        url: 'home/getJobLogInfo',
-        method: 'POST',
-        JSON: true,
-        data
+        method: 'GET',
+        cType: false,
+        params
     });
 };

@@ -1,61 +1,31 @@
 package net.risesoft.service.impl;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Resource;
-
-import net.risesoft.util.home.QueryTimeRangeCacheUtil;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import net.risedata.jdbc.commons.utils.DateUtils;
 import net.risesoft.api.persistence.job.JobLogService;
 import net.risesoft.api.persistence.job.JobService;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.pojo.Y9Result;
-import net.risesoft.pojo.home.HomeData;
-import net.risesoft.pojo.home.HomeQueryModel;
-import net.risesoft.pojo.home.HomeData.CurrentTaskInfo;
-import net.risesoft.pojo.home.HomeData.DailySchedulingFrequencyInfo;
-import net.risesoft.pojo.home.HomeData.JobLogInfo;
-import net.risesoft.pojo.home.HomeData.LogGroupInfo;
-import net.risesoft.pojo.home.HomeData.SchedulingInfo;
-import net.risesoft.pojo.home.HomeQueryModel.CurrentTaskQueryInfo;
-import net.risesoft.pojo.home.HomeQueryModel.DailySchedulingFrequencyQueryInfo;
-import net.risesoft.pojo.home.HomeQueryModel.JobLogQueryInfo;
-import net.risesoft.pojo.home.HomeQueryModel.SchedulingQueryInfo;
-import net.risesoft.pojo.home.HomeQueryModel.TaskStateQueryInfo;
 import net.risesoft.security.ConcurrentSecurity;
 import net.risesoft.security.SecurityManager;
-import net.risesoft.security.model.Environment;
 import net.risesoft.security.service.EnvironmentService;
 import net.risesoft.service.HomeDataService;
-import net.risesoft.util.ExceptionUtils;
-import net.risesoft.util.JobLogStatusEnum;
+import net.risesoft.util.DataServiceUtil;
 
 @Service(value = "homeDataService")
 @RequiredArgsConstructor
-@Slf4j
 public class HomeDataServiceImpl implements HomeDataService {
-
-	@Resource(name = "homeDataExecutor")
-	ThreadPoolTaskExecutor homeDataExecutor;
 
 	private final JobLogService jobLogService;
 
@@ -66,210 +36,78 @@ public class HomeDataServiceImpl implements HomeDataService {
 	private final SecurityManager securityManager;
 
 	@Override
-	public Y9Result<HomeData> getHomeDataSync() {
-		HomeData homeData = new HomeData();
-		HomeQueryModel homeQueryModel = new HomeQueryModel();
+	public Y9Result<Map<String, Object>> getCurrentTaskInfo(String type) {
+		Map<String, Object> map = new HashMap<String, Object>();
 		try {
+			// 获取环境列表
+			map.put("allEnvironments", environmentService.findAll());
+			// 查看权限
 			ConcurrentSecurity security = securityManager.getConcurrentSecurity();
-			CurrentTaskInfo currentTaskInfo = getCurrentTaskInfo(homeQueryModel.getCurrentTaskQueryInfo());
-
-			DailySchedulingFrequencyInfo dailySchedulingFrequencyInfo = getDailySchedulingFrequencyInfo(
-					homeQueryModel.getDailySchedulingFrequencyQueryInfo(), security.getJobTypes());
-
-			List<Map<String, Object>> TaskStateInfo = getTaskStateInfo(homeQueryModel.getTaskStateQueryInfo());
-
-			List<Environment> environmentList = environmentService.findAll();
-
-			homeData.setAllEnvironments(environmentList);
-			homeQueryModel.getSchedulingQueryInfo().setEnvironment(Optional.ofNullable(environmentList)
-					.orElse(Collections.emptyList()).stream().findFirst().map(Environment::getName).orElse(""));
-			SchedulingInfo schedulingInfo = getSchedulingInfo(homeQueryModel.getSchedulingQueryInfo(), security.getJobTypes());
-
-			JobLogInfo jobLogInfo = getJobLogInfo(homeQueryModel.getJobLogQueryInfo(), security.getJobTypes());
-
-			homeData.setSchedulingInfo(schedulingInfo);
-
-			homeData.setCurrentTaskInfo(currentTaskInfo);
-			homeData.setDailySchedulingFrequencyInfo(dailySchedulingFrequencyInfo);
-			homeData.setTaskStateInfo(TaskStateInfo);
-			homeData.setJobLogInfo(jobLogInfo);
-
+			// 获取全部任务数量
+			map.put("allTask", jobService.countByEnvironmentAndJobType(type, security.getJobTypes(), security.isSystemManager()));
+			// 今日已执行任务数
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			long[] timestamps = DataServiceUtil.getDayTimestamps(sdf.format(new Date()));
+			// 获取成功数
+			Integer scount = jobLogService.getJobCount(Arrays.asList(JobLog.SUCCESS), timestamps[0], timestamps[1],
+					type, security.getJobTypes(), security.isSystemManager());
+			// 获取失败数
+			Integer ecount = jobLogService.getJobCount(Arrays.asList(JobLog.ERROR), timestamps[0], timestamps[1],
+					type, security.getJobTypes(), security.isSystemManager());
+			map.put("doneTask", scount + ecount + "（"+scount+"/"+ecount+"）");
+			// 正在执行任务数
+			map.put("doingTask", jobLogService.getCount(Arrays.asList(JobLog.START), type, security.getJobTypes(), security.isSystemManager()));
+			// 执行成功数
+			map.put("successTask", jobLogService.getCount(Arrays.asList(JobLog.SUCCESS), type, security.getJobTypes(), security.isSystemManager()));
+			// 执行失败数
+			map.put("errorTask", jobLogService.getCount(Arrays.asList(JobLog.ERROR), type, security.getJobTypes(), security.isSystemManager()));
+			// 等待执行数
+			map.put("waitTask", jobLogService.getCount(Arrays.asList(JobLog.AWAIT), type, security.getJobTypes(), security.isSystemManager()));
 		} catch (Exception e) {
-			LOGGER.error("获取首页数据失败", ExceptionUtils.extractConcurrentException(e));
-			return Y9Result.failure("获取首页数据失败");
+			e.printStackTrace();
+			return Y9Result.failure("获取当前任务运行情况失败：" + e.getMessage());
 		}
-
-		return Y9Result.success(homeData, "获取首页数据成功");
+		return Y9Result.success(map);
 	}
 
 	@Override
-	public Y9Result<HomeData> getHomeData() {
-		HomeData homeData = new HomeData();
-		HomeQueryModel homeQueryModel = new HomeQueryModel();
+	public Y9Result<Map<String, Object>> getDailySchedulingFrequencyInfo(String type) {
+		Map<String, Object> result = new HashMap<String, Object>();
 		try {
+			// 查看权限
 			ConcurrentSecurity security = securityManager.getConcurrentSecurity();
-
-			CompletableFuture<CurrentTaskInfo> currentTaskInfo = createCurrentTaskInfo(
-					homeQueryModel.getCurrentTaskQueryInfo(), security.getJobTypes());
-
-			CompletableFuture<DailySchedulingFrequencyInfo> dailySchedulingFrequencyInfo = CompletableFuture
-					.supplyAsync(() -> getDailySchedulingFrequencyInfo(
-							homeQueryModel.getDailySchedulingFrequencyQueryInfo(), security.getJobTypes()), homeDataExecutor);
-
-			CompletableFuture<List<Map<String, Object>>> TaskStateInfo = CompletableFuture
-					.supplyAsync(() -> getTaskStateInfo(homeQueryModel.getTaskStateQueryInfo()), homeDataExecutor);
-
-			CompletableFuture<Void> schedulingInfo = CompletableFuture
-					.supplyAsync(() -> environmentService.findAll(), homeDataExecutor).thenAccept(data -> {
-
-						homeData.setAllEnvironments(data);
-						homeQueryModel.getSchedulingQueryInfo()
-								.setEnvironment(Optional.ofNullable(data).orElse(Collections.emptyList()).stream()
-										.findFirst().map(Environment::getName).orElse(""));
-					}).thenCompose(data -> CompletableFuture.supplyAsync(
-							() -> getSchedulingInfo(homeQueryModel.getSchedulingQueryInfo(), security.getJobTypes()), homeDataExecutor))
-
-					.thenAccept(data -> homeData.setSchedulingInfo(data));
-
-			CompletableFuture<Void> jobLogInfo = CompletableFuture
-					.supplyAsync(() -> getJobLogInfo(homeQueryModel.getJobLogQueryInfo(), security.getJobTypes()), homeDataExecutor)
-					.thenAccept(data -> homeData.setJobLogInfo(data));
-
-			CompletableFuture
-					.allOf(currentTaskInfo, dailySchedulingFrequencyInfo, TaskStateInfo, schedulingInfo, jobLogInfo)
-					.join();
-
-			homeData.setCurrentTaskInfo(currentTaskInfo.get());
-			homeData.setDailySchedulingFrequencyInfo(dailySchedulingFrequencyInfo.get());
-			homeData.setTaskStateInfo(TaskStateInfo.get());
-
-		} catch (Exception e) {
-			LOGGER.error("获取首页数据失败", ExceptionUtils.extractConcurrentException(e));
-			return Y9Result.failure("获取首页数据失败");
-		}
-
-		return Y9Result.success(homeData, "获取首页数据成功");
-	}
-
-	@Override
-	public CurrentTaskInfo getCurrentTaskInfo(CurrentTaskQueryInfo currentTaskQueryInfo) {
-		ConcurrentSecurity security = securityManager.getConcurrentSecurity();
-		CurrentTaskInfo currentTaskInfo = null;
-		CompletableFuture<CurrentTaskInfo> createCurrentTaskInfo = createCurrentTaskInfo(currentTaskQueryInfo, security.getJobTypes());
-		try {
-			currentTaskInfo = createCurrentTaskInfo.get();
-		} catch (Exception e) {
-			LOGGER.error("获取当前运行任务情况失败", ExceptionUtils.extractConcurrentException(e));
-			currentTaskInfo = new CurrentTaskInfo();
-		}
-		return currentTaskInfo;
-	}
-
-	public CompletableFuture<CurrentTaskInfo> createCurrentTaskInfo(CurrentTaskQueryInfo currentTaskQueryInfo, List<String> jobTypes) {
-
-		try {
-			// 全部任务
-			Long startTime = currentTaskQueryInfo.getStartTime();
-			Long endTime = currentTaskQueryInfo.getEndTime();
-			CompletableFuture<Integer> allTasksCF = CompletableFuture.supplyAsync(
-					() -> jobLogService.getExecutedCountByStatusAndTime(
-							Arrays.asList(JobLog.SUCCESS, JobLog.ERROR, JobLog.START), startTime, endTime, jobTypes),
-					homeDataExecutor);
-			// 正在执行
-			CompletableFuture<Integer> executingCF = CompletableFuture.supplyAsync(() -> jobLogService
-							.getExecutedCountByStatusAndTime(Arrays.asList(JobLog.START), startTime, endTime, jobTypes),
-					homeDataExecutor);
-			// 今日已经执行
-			long[] currentDayTimestamp = DateUtils.getCurrentDayStartAndEndDateTimestamp();
-			CompletableFuture<Integer> executedTodayCF = CompletableFuture.supplyAsync(
-					() -> jobLogService.getExecutedCountByStatusAndTime(Arrays.asList(JobLog.SUCCESS, JobLog.ERROR),
-							currentDayTimestamp[0], currentDayTimestamp[1], jobTypes),
-					homeDataExecutor);
-			return CompletableFuture.allOf(allTasksCF, executingCF, executedTodayCF).thenApply(v -> {
-				try {
-					int allTasks = allTasksCF.get();
-					int executing = executingCF.get();
-					int executedToday = executedTodayCF.get();
-
-					CurrentTaskInfo info = new CurrentTaskInfo(executing, allTasks, executedToday);
-					return info;
-				} catch (Exception e) {
-					LOGGER.error("获取当前运行任务情况失败", ExceptionUtils.extractConcurrentException(e));
-					return new CurrentTaskInfo();
-				}
-			});
-		} catch (Exception e) {
-			LOGGER.error("获取当前运行任务情况失败", ExceptionUtils.extractConcurrentException(e));
-		}
-		return new CompletableFuture<>();
-	}
-
-	@Override
-	public DailySchedulingFrequencyInfo getDailySchedulingFrequencyInfo(
-			DailySchedulingFrequencyQueryInfo dailySchedulingFrequencyQueryInfo, List<String> jobTypes) {
-
-		DailySchedulingFrequencyInfo result = new DailySchedulingFrequencyInfo();
-		try {
-			Long startTime = dailySchedulingFrequencyQueryInfo.getStartTime();
-			Long endTime = dailySchedulingFrequencyQueryInfo.getEndTime();
-			List<Map<String, Object>> dataList = jobLogService.getExecutedCountGroupByDispatchTime(
-					Arrays.asList(JobLog.SUCCESS, JobLog.ERROR, JobLog.START), startTime, endTime, jobTypes);
-			Map<String, List<String>> resultMap = new HashMap<>();
-
-			for (Map<String, Object> map : dataList) {
-				map.forEach((key, value) -> resultMap.computeIfAbsent(key, k -> new ArrayList<>()).add(value.toString()));
+			List<Integer> frequencyList = new ArrayList<Integer>();
+			// 获取近一周的日期时间戳
+			List<String> dateList = DataServiceUtil.getNearlyWeek();
+			for(String date : dateList) {
+				long[] timestamps = DataServiceUtil.getDayTimestamps(date);
+				// 获取当天的调度次数
+				Integer count = jobLogService.getFrequencyCount(timestamps[0], timestamps[1], type, security.getJobTypes(), security.isSystemManager());
+				frequencyList.add(count);
 			}
-			List<String> dateList = resultMap.get("execute_start_time");
-			List<String> frequencyList = resultMap.get("execute_count");
-			if (dateList == null || frequencyList == null) {
-				dateList = new ArrayList<>();
-				frequencyList = new ArrayList<>();
-			}
-			result.setDateList(dateList);
-			result.setFrequencyList(frequencyList);
+			result.put("dateList", dateList);
+			result.put("frequencyList", frequencyList);
 		} catch (Exception e) {
-			LOGGER.error("获取任务执行频率失败情况失败", ExceptionUtils.extractConcurrentException(e));
+			e.getStackTrace();
+			return Y9Result.failure("获取每日调度次数失败：" + e.getMessage());
 		}
-		return result;
-	}
-
-	// 处理查询为空的情况
-	@SuppressWarnings("unused")
-	private void handleDailySchedulingFrequencyResult(List<String> dateList, List<String> frequencyList, Long startTime,
-													  Long endTime) {
-
-		LocalDate startDate = LocalDate.ofEpochDay(startTime / 86400000); // 起始日期
-		LocalDate endDate = LocalDate.ofEpochDay(endTime / 86400000); // 结束日期
-		for (LocalDate date = startDate; date.isBefore(endDate.plusDays(1)); date = date.plusDays(1)) {
-			dateList.add(date.toString());
-			frequencyList.add("0");
-		}
-
-	}
-	
-	public static <T, R> List<R> flatMapAndCollect(List<T> dataList, Function<T, Collection<R>> mapper) {
-		return dataList.stream().flatMap(mapper.andThen(Collection::stream)).collect(Collectors.toList());
+		return Y9Result.success(result);
 	}
 
 	@Override
-	public List<Map<String, Object>> getTaskStateInfo(TaskStateQueryInfo taskStateQueryInfo) {
-
-		List<Map<String, Object>> result = null;
+	public List<Map<String, Object>> getTaskStateInfo(String type) {
+		List<Map<String, Object>> result = new ArrayList<Map<String,Object>>();
 		try {
-			// 全部任务
-			Long startTime = taskStateQueryInfo.getStartTime();
-			Long endTime = taskStateQueryInfo.getEndTime();
-
-			Map<String, Integer> data = jobService.getNormalStateTaskNumber(
-					Arrays.asList(JobLog.SUCCESS, JobLog.ERROR, JobLog.START), startTime, endTime, Arrays.asList(0, 1));
-			Integer activeTaskCount = data.get("active");
-			Integer notActiveCount = data.get("notActive");
-			result = Stream.of(createDataMap("活跃", activeTaskCount), createDataMap("不活跃", notActiveCount))
-					.collect(Collectors.toList());
-			data = null;
+			// 查看权限
+			ConcurrentSecurity security = securityManager.getConcurrentSecurity();
+			// 获取定时任务数
+			int taskCount1 = jobService.getTaskCountByStatus(type, 1, security.getJobTypes(), security.isSystemManager());
+			// 获取非定时任务数
+			int taskCount2 = jobService.getTaskCountByStatus(type, 0, security.getJobTypes(), security.isSystemManager());
+			// 创建listMap
+			result = Stream.of(createDataMap("定时", taskCount1), createDataMap("非定时", taskCount2)).collect(Collectors.toList());
 		} catch (Exception e) {
-			LOGGER.error("获取活跃任务占比情况失败", ExceptionUtils.extractConcurrentException(e));
-			result = new ArrayList<>();
+			e.printStackTrace();
 		}
 		return result;
 	}
@@ -282,99 +120,44 @@ public class HomeDataServiceImpl implements HomeDataService {
 	}
 
 	@Override
-	public SchedulingInfo getSchedulingInfo(SchedulingQueryInfo schedulingQueryInfo, List<String> jobTypes) {
-
-		SchedulingInfo result = null;
+	public Map<String, Object> getSchedulingInfo(String type) {
+		Map<String, Object> result = new HashMap<String, Object>();
 		try {
-			Long startTime = schedulingQueryInfo.getStartTime();
-			Long endTime = schedulingQueryInfo.getEndTime();
-
-			if (startTime == null || endTime == null) {
-				HomeData.QueryTimeRange lastMonth = QueryTimeRangeCacheUtil.getQueryTimeRangeByName(QueryTimeRangeCacheUtil.LAST_MONTH);
-				startTime = lastMonth.getStartTime();
-				endTime = lastMonth.getEndTime();
-
+			List<Map<String, Object>> listMap = new ArrayList<Map<String,Object>>();
+			// 查看权限
+			ConcurrentSecurity security = securityManager.getConcurrentSecurity();
+			List<Integer> successCount = new ArrayList<Integer>();
+			List<Integer> errorCount = new ArrayList<Integer>();
+			// 获取近一周的日期时间戳
+			List<String> dateList = DataServiceUtil.getNearlyWeek();
+			for(String date : dateList) {
+				long[] timestamps = DataServiceUtil.getDayTimestamps(date);
+				// 获取当天的调度成功数
+				Integer count1 = jobLogService.getJobCount(Arrays.asList(JobLog.SUCCESS), timestamps[0], timestamps[1], type,
+						security.getJobTypes(), security.isSystemManager());
+				successCount.add(count1);
+				// 获取当天的调度失败数
+				Integer count2 = jobLogService.getJobCount(Arrays.asList(JobLog.ERROR), timestamps[0], timestamps[1], type,
+						security.getJobTypes(), security.isSystemManager());
+				errorCount.add(count2);
 			}
-			List<Map<String, Object>> records = jobLogService.getSchedulingInfo(
-					Arrays.asList(JobLog.SUCCESS, JobLog.ERROR, JobLog.START), startTime, endTime,
-					schedulingQueryInfo.getEnvironment(), jobTypes);
+			result.put("dateList", dateList);
 
-			result = convertToSchedulingInfo(records);
-			records = null;
+			Map<String, Object> sMap = new HashMap<String, Object>();
+			sMap.put("name", "成功");
+			sMap.put("data", successCount);
+			listMap.add(sMap);
+
+			Map<String, Object> eMap = new HashMap<String, Object>();
+			eMap.put("name", "失败");
+			eMap.put("data", errorCount);
+			listMap.add(eMap);
+
+			result.put("taskScheduLingInfo", listMap);
 		} catch (Exception e) {
-			LOGGER.error("获取任务调度情况失败", ExceptionUtils.extractConcurrentException(e));
-			result = new SchedulingInfo();
+			e.printStackTrace();
 		}
 		return result;
-	}
-
-	public static SchedulingInfo convertToSchedulingInfo(List<Map<String, Object>> databaseData) {
-		Set<String> typeSet = databaseData.stream().map(data -> data.get("status").toString())
-				.collect(Collectors.toSet());
-
-		List<String> dateList = databaseData.stream().map(data -> data.get("execute_start_time").toString()).distinct()
-				.sorted().collect(Collectors.toList());
-
-		List<Map<String, Object>> taskScheduLingInfo = new ArrayList<>();
-		for (String type : typeSet) {
-			String typeName = JobLogStatusEnum.fromCode(type).getDescription();
-			List<String> countList = new ArrayList<>(Collections.nCopies(dateList.size(), "0"));
-
-			for (Map<String, Object> data : databaseData) {
-				if (type.equals(data.get("status").toString())) {
-					String date = data.get("execute_start_time").toString();
-					int index = dateList.indexOf(date);
-					String count = String.valueOf(data.get("execute_count"));
-					countList.set(index, count);
-				}
-			}
-
-			Map<String, Object> taskData = new HashMap<>();
-			taskData.put("name", typeName);
-			taskData.put("data", countList);
-			taskScheduLingInfo.add(taskData);
-		}
-		SchedulingInfo schedulingInfo = new SchedulingInfo();
-		schedulingInfo
-				.setTypeList(typeSet.stream().map(type -> JobLogStatusEnum.fromCode(type).getDescription()).collect(Collectors.toList()));
-		schedulingInfo.setDateList(dateList);
-		schedulingInfo.setTaskScheduLingInfo(taskScheduLingInfo);
-		return schedulingInfo;
-	}
-
-	@Override
-	public JobLogInfo getJobLogInfo(JobLogQueryInfo jobLogQueryInfo, List<String> jobTypes) {
-
-		JobLogInfo result = null;
-		try {
-			Long startTime = jobLogQueryInfo.getStartTime();
-			Long endTime = jobLogQueryInfo.getEndTime();
-
-			List<Map<String, Object>> records = jobLogService
-					.getLogGroupInfo(Arrays.asList(JobLog.SUCCESS, JobLog.ERROR), startTime, endTime, jobTypes);
-
-			result = convertToJobLogInfo(records);
-			records = null;
-		} catch (Exception e) {
-			result = new JobLogInfo();
-			LOGGER.error("获取任务调度情况失败", ExceptionUtils.extractConcurrentException(e));
-		}
-
-		return result;
-	}
-
-	private JobLogInfo convertToJobLogInfo(List<Map<String, Object>> records) {
-		List<LogGroupInfo> logGroupInfos = records.stream().map(record -> {
-			long successCount = ((BigDecimal) record.get("success")).longValue();
-			long failureCount = ((BigDecimal) record.get("failure")).longValue();
-			String executeStartTime = (String) record.get("execute_start_time");
-			return new LogGroupInfo(successCount, failureCount, executeStartTime);
-		}).collect(Collectors.toList());
-
-		long totalSuccessCount = logGroupInfos.stream().mapToLong(LogGroupInfo::getSuccess).sum();
-		long totalFailureCount = logGroupInfos.stream().mapToLong(LogGroupInfo::getFailure).sum();
-
-		return new JobLogInfo(totalSuccessCount, totalFailureCount, logGroupInfos);
 	}
 
 }

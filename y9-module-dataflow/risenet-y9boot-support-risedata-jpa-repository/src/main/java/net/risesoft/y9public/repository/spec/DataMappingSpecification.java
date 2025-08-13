@@ -41,6 +41,7 @@ public class DataMappingSpecification implements Specification<DataMappingEntity
 		if (StringUtils.isNotBlank(className)) {
 			expressions.add(cb.like(root.get("className").as(String.class), "%" + className + "%"));
 		}
+		expressions.add(cb.isNotNull(root.get("id")));
 		return predicate;
 	}
 

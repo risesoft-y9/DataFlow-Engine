@@ -198,6 +198,8 @@ public class SourceController {
 		DataSourceEntity dataSourceEntity = dataSourceService.getDataSourceById(id);
 		if(dataSourceEntity.getType() == 0) {
 			return dataSourceService.copyTable(baseId, tableName, id);
+		}else if(dataSourceEntity.getBaseType().equals(DataConstant.ES)) {
+			return dataSourceService.copyIndex(baseId, tableName, id);
 		}
 		return Y9Result.failure("不支持的类型");
 	}

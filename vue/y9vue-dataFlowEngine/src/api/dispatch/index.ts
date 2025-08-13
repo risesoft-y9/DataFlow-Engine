@@ -238,3 +238,16 @@ export const doOperationByLogId = async (data) => {
         data
     });
 };
+
+/**
+ * 获取脏数据列表
+ * @param params
+ */
+export const getLogByError = async (params) => {
+    return await platformRequest({
+        url: import.meta.env.VUE_APP_HOST + 'datalog/api/rest/get',
+        method: 'GET',
+        cType: false,
+        params
+    });
+};

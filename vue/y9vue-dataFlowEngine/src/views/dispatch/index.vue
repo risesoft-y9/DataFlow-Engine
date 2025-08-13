@@ -78,19 +78,8 @@
                 </el-button>
             </div>
         </template>
-        <template #typeName="{ row, column, index }">
-            <template>{{ row.typeName }}</template>
-        </template>
-        <template #className="{ row, column, index }">
-            <template>{{ row.name }}</template>
-        </template>
-        <template #description="{ row, column, index }">
-            <template>{{ row.description }}</template>
-        </template>
 
         <template #tableStatus="{ row, column, index }">
-            <!--          active-text="启动"-->
-            <!--          inactive-text="关闭"-->
             <el-switch
                 :active-value="1"
                 :inactive-value="0"
@@ -127,8 +116,8 @@
                     </div>
                     <div class="delete" @click="handle(6, row)">
                         <i class="ri-delete-bin-line"></i>
-                        <span class="text">{{ '删除' }}</span></div
-                    >
+                        <span class="text">{{ '删除' }}</span>
+                    </div>
                 </div>
             </div>
         </template>
@@ -284,7 +273,7 @@
             {
                 title: computed(() => t('操作')),
                 fixed: 'right',
-                width: 510,
+                width: 540,
                 key: 'operation',
                 slot: 'operation'
             }
@@ -368,9 +357,11 @@
         }
         dialogConfig.value.show = false;
     };
+
     const closeTask = () => {
         dialog.value.show = false;
     };
+
     let tableRow = ref({}); //修改使用
     const handle = (type, row) => {
         tableRow.value = row;

@@ -101,7 +101,7 @@ public class ElasticsearchRestClient {
     }
     
     /**
-     * 复制表和数据
+     * 复制表和数据-只支持同一个elastic库内部复制
      * @param indexName
      * @param newIndexName
      * @param isData 是否拷贝数据
@@ -148,6 +148,24 @@ public class ElasticsearchRestClient {
     	}
     }
     
+    /**
+     * 批量新增/修改文档
+     * @param indexName
+     * @param document "{\"index\":{\"_id\":\"1\"}}\n" +
+					"{\"name\": \"张三\",\"age\":\"18\" }\n" +
+					"{\"index\":{\"_id\":\"2\"}}\n" +
+					"{\"name\": \"李四\",\"age\":\"16\"}\n"
+     * @return
+     */
+    public String bulkAddDocument(String indexName, String document) throws Exception {
+	String data = HttpClientEsUtil.httpPost(document, url + "/" + indexName + "/_doc/_bulk", username, password);
+	if(!data.equals("failed")) {
+		return data;
+	}else {
+		throw new Exception("批量新增/修改文档失败");
+	}
+    }
+
     /**
      * 根据id获取文档
      * @param id

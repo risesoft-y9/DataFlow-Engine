@@ -204,17 +204,15 @@ public class ElasticsearchInputStreamFactory implements DataInputStreamFactory {
         }  
         List<Map<String, Integer>> listMap = new ArrayList<Map<String,Integer>>();
         int chunkSize = count / parts; // 计算每份的平均大小  
-        int remainder = count % parts; // 计算余数  
-        for (int i = 0; i < parts; i++) {
+        int remainder = count % parts; // 计算余数
+        if(remainder > 0) {
+		parts += 1;
+        }
+        for (int i = 1; i <= parts; i++) {
         	Map<String, Integer> result = new HashMap<String, Integer>();
-            int start = i * chunkSize;  
-            int end = (i == parts - 1) ? count : start + chunkSize; // 最后一份可能包含余数  
-            if (remainder > 0) {  
-                end++; // 如果还有余数，当前份多包含一个元素  
-                remainder--;  
-            }
+		int start = (i - 1) * chunkSize;
             result.put("from", start);
-            result.put("size", end);
+            result.put("size", i == parts ? remainder : chunkSize);
             listMap.add(result);
         }  
         return listMap;  

@@ -174,23 +174,35 @@ public interface JobLogService {
 
 	List<Map<String, Object>> searchByGroupLog(Date startDate, Date endDate, String environment, String jobName);
 
-	/*
-	 * 根据状态 任务执行时间 结束时间 获取 配置的任务数
+	/**
+	 * 根据条件获取数量
+	 * @param status
+	 * @param environment
+	 * @param jobTypes
+	 * @return
 	 */
-	Integer getExecutedCountByStatusAndTime(List<Integer> statusList, long start, long end, List<String> jobTypes);
+	int getCount(List<Integer> status, String environment, List<String> jobTypes, boolean isAdmin);
 
-	/*
-	 * 根据状态 任务执行时间获取每日执行数量
+	/**
+	 * 根据时间区间获取每日的调度次数
+	 * @param startTime
+	 * @param endTime
+	 * @param environment
+	 * @param jobTypes
+	 * @param isAdmin
+	 * @return
 	 */
-	List<Map<String, Object>> getExecutedCountGroupByDispatchTime(List<Integer> statusList, long start, long end, List<String> jobTypes);
+	Integer getFrequencyCount(Long startTime, Long endTime, String environment, List<String> jobTypes, boolean isAdmin);
 
-	/*
-	 * 获取时间范围内 各状态分类情况
+	/**
+	 * 根据状态获取每日调度情况
+	 * @param status
+	 * @param startTime
+	 * @param endTime
+	 * @param environment
+	 * @param jobTypes
+	 * @param isAdmin
+	 * @return
 	 */
-	List<Map<String, Object>> getSchedulingInfo(List<Integer> statuslist, Long startTime, Long endTime,String environment, List<String> jobTypes);
-
-	/*
-	 * 根据日期分组获取
-	 */
-	List<Map<String, Object>> getLogGroupInfo(List<Integer> statuslist, Long startTime, Long endTime, List<String> jobTypes);
+	Integer getJobCount(List<Integer> status, Long startTime, Long endTime, String environment, List<String> jobTypes, boolean isAdmin);
 }
