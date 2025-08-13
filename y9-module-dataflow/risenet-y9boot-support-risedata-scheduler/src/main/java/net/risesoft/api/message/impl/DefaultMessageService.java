@@ -1,9 +1,9 @@
 package net.risesoft.api.message.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import net.risesoft.api.listener.JobListener;
 import net.risesoft.api.message.InstanceMessage;

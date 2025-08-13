@@ -43,12 +43,13 @@ public class DDLpg {
 			} else {
 				DDL += " NOT NULL";
 			}
-			DbMetaDataUtil.executeDDL(connection, DDL);
+			DbMetaDataUtil.executeDDL(connection, DDL, false);
 			
 			if (StringUtils.isNotBlank(dbc.getComment())) {
-				DbMetaDataUtil.executeDDL(connection, "COMMENT ON COLUMN " + tableName + "." + dbc.getColumn_name() + " IS '" + dbc.getComment() + "'");
+				DbMetaDataUtil.executeDDL(connection, "COMMENT ON COLUMN " + tableName + "." + dbc.getColumn_name() + " IS '" + dbc.getComment() + "'", false);
 			}
 		}
+		DbMetaDataUtil.ReleaseResource(connection, null, null, null);
 	}
 
 	/**
@@ -85,17 +86,18 @@ public class DDLpg {
 				} else {
 					DDL += " NOT NULL";
 				}
-				DbMetaDataUtil.executeDDL(connection, DDL);
+				DbMetaDataUtil.executeDDL(connection, DDL, false);
 				
 				if (StringUtils.isNotBlank(dbc.getComment())) {
-					DbMetaDataUtil.executeDDL(connection, "COMMENT ON COLUMN " + tableName + "." + dbc.getColumn_name() + " IS '" + dbc.getComment() + "'");
+					DbMetaDataUtil.executeDDL(connection, "COMMENT ON COLUMN " + tableName + "." + dbc.getColumn_name() + " IS '" + dbc.getComment() + "'", false);
 				}
 				
 				if (dbc.getIsCreateIndex() && !dbc.getIsState()) {
 					DbMetaDataUtil.executeDDL(connection, "ALTER TABLE " + tableName + " ADD INDEX " + tableName + "_" + dbc.getColumn_name() +
-							" (" + dbc.getColumn_name() + ")");
+							" (" + dbc.getColumn_name() + ")", false);
 				}
 			}
+			DbMetaDataUtil.ReleaseResource(connection, null, null, null);
 		} else {//table不存在。
 			StringBuilder comment = new StringBuilder();
 			StringBuilder sb = new StringBuilder();
@@ -130,26 +132,27 @@ public class DDLpg {
 				}
 			}
 			sb.append(isPK).append(")");
-			DbMetaDataUtil.executeDDL(connection, sb.toString());
+			DbMetaDataUtil.executeDDL(connection, sb.toString(), false);
 			
 			if(StringUtils.isNotBlank(tableCName)) {
-				DbMetaDataUtil.executeDDL(connection,"COMMENT ON TABLE " + tableName.trim() +" IS '" + tableCName + "'");
+				DbMetaDataUtil.executeDDL(connection,"COMMENT ON TABLE " + tableName.trim() +" IS '" + tableCName + "'", false);
 			}
 			
-			DbMetaDataUtil.executeDDL(connection, comment.toString());
+			DbMetaDataUtil.executeDDL(connection, comment.toString(), false);
+			DbMetaDataUtil.ReleaseResource(connection, null, null, null);
 		}
 	}
 
 	public static void renameTable(Connection connection, String tableNameOld, String tableNameNew) throws Exception {
-		DbMetaDataUtil.executeDDL(connection, "ALTER TABLE " + tableNameOld + " RENAME " + tableNameNew);
+		DbMetaDataUtil.executeDDL(connection, "ALTER TABLE " + tableNameOld + " RENAME " + tableNameNew, true);
 	}
 
 	public static void dropTable(Connection connection, String tableName) throws Exception {
-		DbMetaDataUtil.executeDDL(connection, "DROP TABLE " + tableName);
+		DbMetaDataUtil.executeDDL(connection, "DROP TABLE " + tableName, true);
 	}
 
 	public static void dropTableColumn(Connection connection, String tableName, String columnName) throws Exception {
-		DbMetaDataUtil.executeDDL(connection, "ALTER TABLE " + tableName + " DROP COLUMN " + columnName);
+		DbMetaDataUtil.executeDDL(connection, "ALTER TABLE " + tableName + " DROP COLUMN " + columnName, true);
 	}
 
 }

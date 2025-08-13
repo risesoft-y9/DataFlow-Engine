@@ -206,11 +206,11 @@ public class ElasticsearchInputStreamFactory implements DataInputStreamFactory {
         int chunkSize = count / parts; // 计算每份的平均大小  
         int remainder = count % parts; // 计算余数
         if(remainder > 0) {
-		parts += 1;
+        	parts += 1;
         }
         for (int i = 1; i <= parts; i++) {
         	Map<String, Integer> result = new HashMap<String, Integer>();
-		int start = (i - 1) * chunkSize;
+        	int start = (i - 1) * chunkSize;
             result.put("from", start);
             result.put("size", i == parts ? remainder : chunkSize);
             listMap.add(result);

@@ -50,17 +50,18 @@ public class DDLkingbase {
 					DDL += " SET NOT NULL;";
 				}
 
-				DbMetaDataUtil.executeDDL(connection, DDL);
+				DbMetaDataUtil.executeDDL(connection, DDL, false);
 				if (StringUtils.isNotBlank(dbc.getComment())) {
 					DbMetaDataUtil.executeDDL(connection, "COMMENT ON COLUMN " + tableName.trim().toUpperCase() + "."
-							+ dbc.getColumn_name().trim().toUpperCase() + " IS '" + dbc.getComment() + "'");
+							+ dbc.getColumn_name().trim().toUpperCase() + " IS '" + dbc.getComment() + "'", false);
 				}
 
 				if (dbc.getIsCreateIndex() && !dbc.getIsState()) {
 					DbMetaDataUtil.executeDDL(connection,
-							"CREATE INDEX \"" + tableName + "_" + dbc.getColumn_name() + "\" ON " + tableName + " USING BTREE(" + columnName + " )");
+							"CREATE INDEX \"" + tableName + "_" + dbc.getColumn_name() + "\" ON " + tableName + " USING BTREE(" + columnName + " )", false);
 				}
 			}
+			DbMetaDataUtil.ReleaseResource(connection, null, null, null);
 		} else { // table不存在。
 			StringBuilder sb = new StringBuilder();
 			String isPK = "";
@@ -86,35 +87,36 @@ public class DDLkingbase {
 			}
 
 			sb.append(isPK).append(")");
-			DbMetaDataUtil.executeDDL(connection, sb.toString());
+			DbMetaDataUtil.executeDDL(connection, sb.toString(), false);
 			
 			if(StringUtils.isNotBlank(tableCName)) {
-				DbMetaDataUtil.executeDDL(connection, "COMMENT ON TABLE " + tableName.trim() +" IS '" + tableCName + "'");
+				DbMetaDataUtil.executeDDL(connection, "COMMENT ON TABLE " + tableName.trim() +" IS '" + tableCName + "'", false);
 			}
 
 			for (DbColumn dbc : dbcs) {
 				String columnName = dbc.getColumn_name();
 				if (StringUtils.isNotBlank(dbc.getComment())) {
 					DbMetaDataUtil.executeDDL(connection, "COMMENT ON COLUMN " + tableName.trim().toUpperCase() + "."
-							+ dbc.getColumn_name().trim().toUpperCase() + " IS '" + dbc.getComment() + "'");
+							+ dbc.getColumn_name().trim().toUpperCase() + " IS '" + dbc.getComment() + "'", false);
 				}
 				if (dbc.getIsCreateIndex()) {
-					DbMetaDataUtil.executeDDL(connection, "CREATE INDEX \"" + tableName + "_" + dbc.getColumn_name() + "\" ON " + tableName + " USING BTREE(" + columnName + " )");
+					DbMetaDataUtil.executeDDL(connection, "CREATE INDEX \"" + tableName + "_" + dbc.getColumn_name() + "\" ON " + tableName + " USING BTREE(" + columnName + " )", false);
 				}
 			}
+			DbMetaDataUtil.ReleaseResource(connection, null, null, null);
 		}
 	}
 
 	public static void renameTable(Connection connection, String tableNameOld, String tableNameNew) throws Exception {
-		DbMetaDataUtil.executeDDL(connection, "ALTER TABLE " + tableNameOld + " RENAME TO " + tableNameNew);
+		DbMetaDataUtil.executeDDL(connection, "ALTER TABLE " + tableNameOld + " RENAME TO " + tableNameNew, true);
 	}
 
 	public static void dropTableColumn(Connection connection, String tableName, String columnName) throws Exception {
-		DbMetaDataUtil.executeDDL(connection, "ALTER TABLE " + tableName + " DROP COLUMN " + columnName);
+		DbMetaDataUtil.executeDDL(connection, "ALTER TABLE " + tableName + " DROP COLUMN " + columnName, true);
 	}
 
 	public static void dropTable(Connection connection, String tableName) throws Exception {
-		DbMetaDataUtil.executeDDL(connection, "DROP TABLE " + tableName);
+		DbMetaDataUtil.executeDDL(connection, "DROP TABLE " + tableName, true);
 	}
 
 	public static void alterTableColumn(Connection connection, String tableName, String jsonDbColumns)
@@ -158,8 +160,9 @@ public class DDLkingbase {
 			if (dbc.getComment().length() > 0) {
 				DDL += " COMMENT ON  COLUMN " + tableName + "." + columnName + " IS '" + dbc.getComment() + "'";
 			}
-			DbMetaDataUtil.executeDDL(connection, DDL);
+			DbMetaDataUtil.executeDDL(connection, DDL, false);
 		}
+		DbMetaDataUtil.ReleaseResource(connection, null, null, null);
 	}
 
 }

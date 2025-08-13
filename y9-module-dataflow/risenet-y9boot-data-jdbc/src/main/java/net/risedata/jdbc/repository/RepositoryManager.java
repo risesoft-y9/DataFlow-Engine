@@ -16,19 +16,12 @@ import net.risedata.jdbc.config.EnableRepository;
 import net.risedata.jdbc.factory.DynamicProxyFactory;
 
 @Configuration
-
 public class RepositoryManager implements BeanFactoryPostProcessor {
 
 	private static final Logger Log = LoggerFactory.getLogger(RepositoryManager.class);
 
-//	@Override
-//	public void onApplicationEvent(ApplicationPreparedEvent event) {
-//		RepositoryCreateFactory.startWeb(event.getApplicationContext());
-//	}
-
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-
 		String[] bootBean = beanFactory.getBeanNamesForAnnotation(EnableRepository.class);
 		int count = 0;
 		LogTime.start();

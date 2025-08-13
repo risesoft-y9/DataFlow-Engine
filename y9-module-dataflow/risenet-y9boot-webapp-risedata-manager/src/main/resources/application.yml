@@ -1,6 +1,7 @@
 server:
     port: 7055
     servlet:
+        context-path: /risedata
         register-default-servlet: true
         encoding:
             charset: UTF-8

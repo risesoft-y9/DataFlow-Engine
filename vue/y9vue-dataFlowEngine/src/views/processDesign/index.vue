@@ -136,11 +136,11 @@
                 { title: '状态', key: 'pattern', slot: 'pattern', width: '110' },
                 { title: '定时表达式', key: 'cron', slot: 'cron', width: '180' },
                 { title: '修改时间', key: 'updateTime', width: '180' },
-                { title: '操作', width: '350', slot: 'opt_button' }
+                { title: '操作', width: '380', slot: 'opt_button' }
             ],
             border: false,
             headerBackground: true,
-            tableData: [],
+            tableData: [{}],
             pageConfig: {
                 currentPage: 1,
                 pageSize: getStoragePageSize('engineConfig', 15),

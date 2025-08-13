@@ -247,8 +247,8 @@ public class TaskMakeUpListener {
         	}
     	}
     	
-	//检查大小写，多表查询不用检查，在sql语句里用as处理
-	if(!configModel.getSourceType().equals("ftp") && !configModel.getSourceTable().equals("multi")) {
+    	//检查大小写，多表查询不用检查，在sql语句里用as处理
+    	if(!configModel.getSourceType().equals("ftp") && !configModel.getSourceTable().equals("multi")) {
     		DataTaskMakeUpEntity makeUpEntity1 = dataTaskMakeUpRepository.findByTaskIdAndTypeNameAndTabIndex(taskId, "job.input", 1);
         	if(makeUpEntity1 != null) {
         		Map<String, Object> sourceMap = Y9JsonUtil.readHashMap(makeUpEntity1.getArgsValue());
@@ -395,21 +395,21 @@ public class TaskMakeUpListener {
         	map.put("userName", dataSourceEntity.getUsername());
         	map.put("password", dataSourceEntity.getPassword());
         	// 获取源头表信息
-		if(configModel.getSourceTable().equals("multi")) {
-			map.put("tableName", "multi");// 多表同步情况
-		}else {
-			DataTable dataTable = dataTableRepository.findById(configModel.getSourceTable()).orElse(null);
-		map.put("tableName", dataTable.getName());
-		}
+        	if(configModel.getSourceTable().equals("multi")) {
+        		map.put("tableName", "multi");// 多表同步情况
+        	}else {
+        		DataTable dataTable = dataTableRepository.findById(configModel.getSourceTable()).orElse(null);
+            	map.put("tableName", dataTable.getName());
+        	}
         	
         	if(StringUtils.isNotBlank(configModel.getSplitPk())) {
-			// 多表同步情况
-			if(configModel.getSourceTable().equals("multi")) {
-				map.put("splitPk", configModel.getSplitPk());
-			}else {
-				DataTableField dataTableField = dataTableFieldRepository.findById(configModel.getSplitPk()).orElse(null);
-			map.put("splitPk", dataTableField.getName());
-			}
+        		// 多表同步情况
+        		if(configModel.getSourceTable().equals("multi")) {
+        			map.put("splitPk", configModel.getSplitPk());
+        		}else {
+        			DataTableField dataTableField = dataTableFieldRepository.findById(configModel.getSplitPk()).orElse(null);
+                	map.put("splitPk", dataTableField.getName());
+        		}
         	}else {
         		map.put("splitPk", "");
         	}
@@ -421,19 +421,19 @@ public class TaskMakeUpListener {
         	map.put("splitFactor", configModel.getSplitFactor());
         	
         	// 获取源头字段信息
-		if(configModel.getSourceTable().equals("multi")) {
-			map.put("column", configModel.getSourceCloumn());
-		}else {
-			String[] sourceCloumns = configModel.getSourceCloumn().split(",");
-		List<String> sourceCloumn = new ArrayList<String>();
-			for(String field : sourceCloumns) {
-				DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
-				if(tableField != null) {
-					sourceCloumn.add(tableField.getName());
-				}
-			}
-			map.put("column", sourceCloumn);
-		}
+        	if(configModel.getSourceTable().equals("multi")) {
+        		map.put("column", configModel.getSourceCloumn());
+        	}else {
+        		String[] sourceCloumns = configModel.getSourceCloumn().split(",");
+            	List<String> sourceCloumn = new ArrayList<String>();
+        		for(String field : sourceCloumns) {
+        			DataTableField tableField = dataTableFieldRepository.findById(field).orElse(null);
+        			if(tableField != null) {
+        				sourceCloumn.add(tableField.getName());
+        			}
+        		}
+        		map.put("column", sourceCloumn);
+        	}
     	}
     	dataTaskMakeUpEntity.setArgsValue(Y9JsonUtil.writeValueAsString(map));
     	dataTaskMakeUpEntity.setTabIndex(1);

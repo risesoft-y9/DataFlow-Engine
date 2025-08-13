@@ -12,7 +12,7 @@ public class DDLmysql {
 
 	/**
 	 * 修改表字段
-	 * @param dataSource
+	 * @param connection
 	 * @param tableName
 	 * @param jsonDbColumns
 	 * @throws Exception
@@ -46,13 +46,14 @@ public class DDLmysql {
 			if (StringUtils.isNotBlank(dbc.getComment())) {
 				DDL += " COMMENT '" + dbc.getComment() + "'";
 			}
-			DbMetaDataUtil.executeDDL(connection, DDL);
+			DbMetaDataUtil.executeDDL(connection, DDL, false);
 		}
+		DbMetaDataUtil.ReleaseResource(connection, null, null, null);
 	}
 
 	/**
 	 * 新建表
-	 * @param dataSource
+	 * @param connection
 	 * @param tableName
 	 * @param jsonDbColumns
 	 * @throws Exception
@@ -87,13 +88,14 @@ public class DDLmysql {
 				if (StringUtils.isNotBlank(dbc.getComment())) {
 					DDL += " COMMENT '" + dbc.getComment() + "'";
 				}
-				DbMetaDataUtil.executeDDL(connection, DDL);
+				DbMetaDataUtil.executeDDL(connection, DDL, false);
 				
 				if (dbc.getIsCreateIndex() && !dbc.getIsState()) {
 					String str = "ALTER TABLE " + tableName + " ADD INDEX " + tableName + "_" + dbc.getColumn_name() + " (" + dbc.getColumn_name() + ")";
-					DbMetaDataUtil.executeDDL(connection, str);
+					DbMetaDataUtil.executeDDL(connection, str, false);
 				}
 			}
+			DbMetaDataUtil.ReleaseResource(connection, null, null, null);
 		} else {//table不存在。
 			StringBuilder sb = new StringBuilder();
 			sb.append("CREATE TABLE " + tableName + " (\r\n");
@@ -130,20 +132,20 @@ public class DDLmysql {
 				sb.append(" COMMENT='" + tableCName + "'");
 			}
 			
-			DbMetaDataUtil.executeDDL(connection, sb.toString());
+			DbMetaDataUtil.executeDDL(connection, sb.toString(), true);
 		}
 	}
 
 	public static void renameTable(Connection connection, String tableNameOld, String tableNameNew) throws Exception {
-		DbMetaDataUtil.executeDDL(connection, "ALTER TABLE " + tableNameOld + " RENAME " + tableNameNew);
+		DbMetaDataUtil.executeDDL(connection, "ALTER TABLE " + tableNameOld + " RENAME " + tableNameNew, true);
 	}
 
 	public static void dropTable(Connection connection, String tableName) throws Exception {
-		DbMetaDataUtil.executeDDL(connection, "DROP TABLE " + tableName);
+		DbMetaDataUtil.executeDDL(connection, "DROP TABLE " + tableName, true);
 	}
 
 	public static void dropTableColumn(Connection connection, String tableName, String columnName) throws Exception {
-		DbMetaDataUtil.executeDDL(connection, "ALTER TABLE " + tableName + " DROP COLUMN " + columnName);
+		DbMetaDataUtil.executeDDL(connection, "ALTER TABLE " + tableName + " DROP COLUMN " + columnName, true);
 	}
 
 }

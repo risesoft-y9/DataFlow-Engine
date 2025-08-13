@@ -93,7 +93,7 @@ public class DbMetaDataUtil {
 
     /**
      * 检查表是否存在
-     * @param dataSource
+     * @param connection
      * @param tableName
      * @return
      * @throws Exception
@@ -174,7 +174,7 @@ public class DbMetaDataUtil {
 
 	/**
 	 * 获取表字段信息
-	 * @param dataSource
+	 * @param connection
 	 * @param tableName
 	 * @param columnNamePatten
 	 * @return
@@ -288,7 +288,7 @@ public class DbMetaDataUtil {
 
 	/**
 	 * 获取数据库版本
-	 * @param dataSource
+	 * @param connection
 	 * @return
 	 * @throws SQLException
 	 */
@@ -306,7 +306,7 @@ public class DbMetaDataUtil {
 
 	/**
 	 * 获取数据库名称
-	 * @param dataSource
+	 * @param connection
 	 * @return
 	 */
 	public static String getDatabaseDialectName(Connection connection, Boolean isclose) {
@@ -337,12 +337,12 @@ public class DbMetaDataUtil {
 	
 	/**
 	 * 执行DDL语句
-	 * @param dataSource
+	 * @param connection
 	 * @param DDL
 	 * @return
 	 * @throws SQLException
 	 */
-	public static Boolean executeDDL(Connection connection, String DDL) throws SQLException {
+	public static Boolean executeDDL(Connection connection, String DDL, boolean isclose) throws SQLException {
 		Statement stmt = null;
 		Boolean bool = false;
 		try {
@@ -353,8 +353,10 @@ public class DbMetaDataUtil {
 			log.error(e.getMessage());
 			throw e;
 		} finally {
-			stmt.close();
-			connection.close();
+			if(isclose) {
+				ReleaseResource(connection, null, null, null);
+			}
+			ReleaseResource(null, null, null, stmt);
 		}
 		return bool;
 	}
@@ -422,10 +424,7 @@ public class DbMetaDataUtil {
 	
 	/**
 	 * 获取表数据量
-	 * @param driverClass
-	 * @param userName
-	 * @param passWord
-	 * @param url
+	 * @param connection
 	 * @param tableName
 	 * @return
 	 */
@@ -444,6 +443,35 @@ public class DbMetaDataUtil {
 			ReleaseResource(connection, null, null, stmt);
 		}
     	return count;
+    }
+    
+    /**
+     * 获取数据库的字段类型列表
+     * @param connection
+     * @return
+     * @throws Exception
+     */
+    public static List<Map<String, Object>> listAllTypes(Connection connection) throws Exception {
+        List<Map<String, Object>> list = new ArrayList<>();
+        ResultSet rs = null;
+        try {
+            DatabaseMetaData dbmd = connection.getMetaData();
+            rs = dbmd.getTypeInfo();
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>(16);
+                map.put("TYPE_NAME", rs.getString("TYPE_NAME"));
+                map.put("DATA_TYPE", rs.getInt("DATA_TYPE"));
+                list.add(map);
+            }
+            return list;
+        } catch (Exception e) {
+        	log.error(e.getMessage());
+            throw e;
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+        }
     }
 
 }
