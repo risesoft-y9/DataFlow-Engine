@@ -1,8 +1,13 @@
 package risesoft.data.transfer.base.executor;
 
+import java.util.AbstractQueue;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import risesoft.data.transfer.core.executor.Executor;
@@ -13,11 +18,12 @@ import risesoft.data.transfer.core.log.Logger;
 import risesoft.data.transfer.core.log.LoggerFactory;
 import risesoft.data.transfer.core.util.CloseUtils;
 import risesoft.data.transfer.core.util.Configuration;
+import risesoft.data.transfer.core.util.pool.BlockQueue;
 import risesoft.data.transfer.core.util.pool.SimpledObjectPool;
 
 /**
  * 线程池实现的任务队列执行器
- * 
+ * 不要在输入端使用block添加任务，会造成任务阻塞
  * @typeName ThreadPoolExecutorTaskQueue
  * @date 2023年12月15日
  * @author lb
@@ -46,7 +52,7 @@ public class ThreadPoolExecutorTaskQueue implements ExecutorTaskQueue {
 	/**
 	 * 任务队列
 	 */
-	private ConcurrentLinkedQueue<Object> linkedQueue;
+	private Queue<Object> linkedQueue;
 
 	private boolean isStart = false;
 	/**
@@ -65,7 +71,13 @@ public class ThreadPoolExecutorTaskQueue implements ExecutorTaskQueue {
 		size = configuration.getInt("size", 5);
 		executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(size);
 		logger = loggerFactory.getLogger(configuration.getString("name", "ThreadPoolExecutorTaskQueue"));
-		linkedQueue = new ConcurrentLinkedQueue<Object>();
+
+		if (configuration.getBool("block", false)) {
+			linkedQueue = new BlockQueue<Object>(configuration.getInt("blockSize", size * 2));
+		} else {
+			linkedQueue = new ConcurrentLinkedQueue<Object>();
+		}
+
 		isShutdown = false;
 		source = this;
 		executorPool = new SimpledObjectPool<Executor>(size, () -> {
@@ -186,5 +198,6 @@ public class ThreadPoolExecutorTaskQueue implements ExecutorTaskQueue {
 			}
 		});
 	}
+
 
 }
