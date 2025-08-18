@@ -24,14 +24,33 @@ public class PlugManager {
 	 * @param jobContext    作业上下文
 	 */
 	public static void loadPlug(Configuration configuration, JobContext jobContext) {
-		List<Plug> plugs = FactoryManager.getInstancesOfConfiguration(configuration, PLUG_KEY, Plug.class,
-				jobContext.getInstanceMap());
+		List<Plug> plugs = getPlugs(configuration, jobContext,Plug.class);
 		for (Plug plug : plugs) {
-			if (plug.register(jobContext)) {
+			if (!(plug instanceof RootPlug) && plug.register(jobContext)) {
 				jobContext.getLogger().info(jobContext, "register plug:" + plug.getClass());
 				jobContext.getHandles().add(plug);
 			}
 		}
 	}
 
+	/**
+	 * 加载顶级插件
+	 * 
+	 * @param configuration 配置文件
+	 * @param jobContext    作业上下文
+	 */
+	public static void loadRootPlug(Configuration configuration, JobContext jobContext) {
+		List<RootPlug> plugs = getPlugs(configuration, jobContext,RootPlug.class);
+		for (RootPlug plug : plugs) {
+			if (plug.register(jobContext)) {
+				jobContext.getLogger().info(jobContext, "register rootPlug:" + plug.getClass());
+				jobContext.getHandles().add(plug);
+			}
+		}
+	}
+
+	private static <T> List<T> getPlugs(Configuration configuration, JobContext jobContext,Class<T> plugClass) {
+		return FactoryManager.getInstancesOfConfiguration(configuration, PLUG_KEY, plugClass,
+				jobContext.getInstanceMap());
+	}
 }

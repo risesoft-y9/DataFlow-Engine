@@ -94,10 +94,13 @@ public class Engine {
 			}
 			jobContext.setName(configuration.getString(JOB_NAME_KEY, Thread.currentThread().getName()));
 			jobContext.setLoggerFactory(loggerFactory);
-			// 加载配置插件
+			PlugManager.loadRootPlug(configuration, jobContext);
+			// 替换配置文件读取公式
 			Configuration loadedConfiguration = ConfigLoadManager.loadConfig(configuration, jobContext);
 			jobContext.putInstance(loadedConfiguration);
+			//加载插件
 			PlugManager.loadPlug(loadedConfiguration, jobContext);
+			//调用初始化上下文事件
 			jobContext.doHandle(InitApplicationConfigHandle.class, (handle) -> {
 				handle.initApplicationConfig(loadedConfiguration);
 			});
