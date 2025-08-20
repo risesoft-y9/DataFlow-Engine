@@ -20,7 +20,8 @@ public interface InstructionFactory {
 	/**
 	 * 获取指令
 	 * 
-	 * @param args
+	 * @param args 参数
+	 * @param config 整个配置文件
 	 * @return
 	 */
 	Instruction getInstance(String[] args,String config);
