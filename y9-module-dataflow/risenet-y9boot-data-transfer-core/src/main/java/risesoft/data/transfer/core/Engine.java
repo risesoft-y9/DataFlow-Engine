@@ -85,12 +85,12 @@ public class Engine {
 	 */
 	public static JobContext start(String jobId, Configuration configuration, JobListener jobListener,
 			LoggerFactory loggerFactory) {
-		JobContext jobContext = new JobContext(new Communication(), jobId, new HandleManager(), jobListener,configuration);
+		JobContext jobContext = new JobContext(new Communication(), jobId, jobListener,configuration);
 		try {
 			// 输出通道连接输出器
 			if (loggerFactory == null) {
 				loggerFactory = new HandledLoggerFactory(jobContext.getHandles());
-				jobContext.getHandles().add((HandledLoggerFactory) loggerFactory);
+				jobContext.getHandles().add((HandledLoggerFactory) loggerFactory,jobContext);
 			}
 			jobContext.setName(configuration.getString(JOB_NAME_KEY, Thread.currentThread().getName()));
 			jobContext.setLoggerFactory(loggerFactory);

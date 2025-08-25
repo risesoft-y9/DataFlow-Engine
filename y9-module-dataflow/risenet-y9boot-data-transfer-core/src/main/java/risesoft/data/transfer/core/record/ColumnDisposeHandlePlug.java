@@ -40,7 +40,7 @@ public class ColumnDisposeHandlePlug extends AbstractRecordInHandle
 		ColumnDisposeHandlePlug cd = jobContext.getHandles().getHandle(ColumnDisposeHandle.class,
 				ColumnDisposeHandlePlug.class);
 		if (cd == null) {
-			jobContext.getHandles().add(new ColumnDisposeHandlePlug(jobContext));
+			jobContext.getHandles().add(new ColumnDisposeHandlePlug(jobContext),jobContext);
 		}
 		Map<String, List<ColumnDisposeHandle>> cache = getCache(jobContext);
 		List<ColumnDisposeHandle> handles = cache.get(field);

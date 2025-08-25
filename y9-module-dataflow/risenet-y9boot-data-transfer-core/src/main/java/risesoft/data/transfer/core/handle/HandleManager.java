@@ -23,10 +23,10 @@ import risesoft.data.transfer.core.util.ClassTools;
 public class HandleManager implements JobStartHandle {
 
 	private Map<Class<?>, HandleContext<? extends Handle>> handles = new HashMap<Class<?>, HandleContext<? extends Handle>>();
-	private HandleContext<HandleChangeHandle> changeContext =EmptyHandleContext.EMPTY;
+	private HandleContext<HandleChangeHandle> changeContext = EmptyHandleContext.EMPTY;
 
-	public HandleManager() {
-		add(this);
+	public HandleManager(JobContext jobContext) {
+		add(this, jobContext);
 	}
 
 	/**
@@ -41,7 +41,7 @@ public class HandleManager implements JobStartHandle {
 				HandleContext handleContext = getAndCreateContext(class1);
 				if (!handleContext.contains(handle)) {
 					handleContext.add(handle);
-					changeContext.handle((h)->{
+					changeContext.handle((h) -> {
 						h.doAdd(handle, class1);
 					});
 				}
@@ -54,18 +54,23 @@ public class HandleManager implements JobStartHandle {
 	 * 
 	 * @param handle
 	 */
-	public void add(Handle handle) {
+	public void add(Handle handle, JobContext jobContext) {
 		Set<Class<?>> classes = ClassTools.getInterfaceClass(handle.getClass());
 		for (Class<?> class1 : classes) {
 			if (Handle.class.isAssignableFrom(class1)) {
 				createContextAndAdd(class1, handle);
-				changeContext.handle((h)->{
+				if (jobContext!=null) {
+					jobContext.putInstance(class1, handle);
+				}
+				changeContext.handle((h) -> {
 					h.doAdd(handle, class1);
 				});
 			}
 		}
 	}
-
+	public void add(Handle handle) {
+		add(handle, null);
+	}
 	/**
 	 * 创建上下文并添加对应执行器
 	 * 
@@ -147,7 +152,7 @@ public class HandleManager implements JobStartHandle {
 		HandleContext handleContext = handles.get(classType);
 		if (handleContext != null) {
 			handles.remove(handle);
-			changeContext.handle((h)->{
+			changeContext.handle((h) -> {
 				h.doRemove(handle, classType);
 			});
 		}

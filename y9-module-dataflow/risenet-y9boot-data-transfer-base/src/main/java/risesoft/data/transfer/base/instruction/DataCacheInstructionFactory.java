@@ -1,15 +1,13 @@
 package risesoft.data.transfer.base.instruction;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
 
 import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.exception.CommonErrorCode;
-import risesoft.data.transfer.core.exception.FrameworkErrorCode;
 import risesoft.data.transfer.core.exception.TransferException;
 import risesoft.data.transfer.core.handle.cache.CacheHandle;
+import risesoft.data.transfer.core.instruction.ParseInstructionFactory;
 import risesoft.data.transfer.core.instruction.factory.Instruction;
 import risesoft.data.transfer.core.instruction.factory.InstructionFactory;
 import risesoft.data.transfer.core.start.StartConfiguration;
@@ -24,6 +22,9 @@ import risesoft.data.transfer.core.start.StartConfiguration;
  * @author lb
  */
 public class DataCacheInstructionFactory implements InstructionFactory, StartConfiguration {
+	static {
+		ParseInstructionFactory.registerFactory(new DataCacheInstructionFactory());
+	}
 
 	@Override
 	public String getName() {

@@ -34,7 +34,6 @@ public class DefaultCreateInstanceFactory implements InstanceFactory {
 			ConfigParameter configField = constructor.getParameters()[i].getAnnotation(ConfigParameter.class);
 			instanceObjects[i] = BeanFactory.getOjbect(instanceClasses[i], configField, configuration, instanceMap,
 					constructor.getParameters()[i].getName());
-
 		}
 		return cla.cast(constructor.newInstance(instanceObjects));
 	}

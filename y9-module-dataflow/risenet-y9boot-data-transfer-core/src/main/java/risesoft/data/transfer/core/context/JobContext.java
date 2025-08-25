@@ -104,12 +104,12 @@ public class JobContext {
 	 */
 	private Configuration configuration;
 
-	public JobContext(Communication communication, String jobId, HandleManager handles, JobListener jobListener,
+	public JobContext(Communication communication, String jobId, JobListener jobListener,
 			Configuration configuration) {
 		super();
 		this.communication = communication;
 		this.jobId = jobId;
-		this.handles = handles;
+		
 		this.streamContext = new StreamContext();
 		this.instanceMap = new HashMap<Class<?>, Object>();
 		this.contextMap = new HashMap<String, Object>();
@@ -119,6 +119,7 @@ public class JobContext {
 		putInstance(this);
 		putInstance(handles);
 		putInstance(communication);
+		this.handles =  new HandleManager(this);
 	}
 
 	/**

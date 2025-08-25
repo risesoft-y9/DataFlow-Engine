@@ -29,7 +29,7 @@ public class PlugManager {
 		for (Plug plug : plugs) {
 			if (!(plug instanceof RootPlug) && plug.register(jobContext)) {
 				jobContext.getLogger().info(jobContext, "register plug:" + plug.getClass());
-				jobContext.getHandles().add(plug);
+				jobContext.getHandles().add(plug,jobContext);
 			}
 		}
 	}
@@ -45,7 +45,7 @@ public class PlugManager {
 		for (RootPlug plug : plugs) {
 			if (plug.register(jobContext)) {
 				jobContext.getLogger().info(jobContext, "register rootPlug:" + plug.getClass());
-				jobContext.getHandles().add(plug);
+				jobContext.getHandles().add(plug,jobContext);
 			}
 		}
 	}
