@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.exception.ErrorCode;
 import risesoft.data.transfer.core.exception.TransferException;
 import risesoft.data.transfer.core.util.Configuration;
@@ -98,9 +97,13 @@ public class FactoryManager {
 			Configuration tmpConfiguration;
 			Object tmp = instanceMap.get(Configuration.class);
 			for (int i = 0; i < configurations.size(); i++) {
+
 				tmpConfiguration = configurations.get(i);
 				instanceMap.put(Configuration.class, tmpConfiguration);
-				retS.add(FactoryManager.getInstanceOfConfiguration(tmpConfiguration, retClass, instanceMap));
+				try {
+					retS.add(FactoryManager.getInstanceOfConfiguration(tmpConfiguration, retClass, instanceMap));
+				} catch (ClassCastException e) {
+				}
 			}
 			instanceMap.put(Configuration.class, tmp);
 			return retS;
@@ -123,9 +126,11 @@ public class FactoryManager {
 			return resT;
 		} catch (TransferException e) {
 			throw e;
+		} catch (ClassCastException e) {
+			throw e;
 		} catch (Exception e) {
 			e.printStackTrace();
-			
+
 			throw TransferException.as(new ErrorCode() {
 				@Override
 				public String getDescription() {
@@ -136,7 +141,7 @@ public class FactoryManager {
 				public String getCode() {
 					return null;
 				}
-			}, "在创建实例时报错:" +e.getCause().getMessage() + ",实例名:" + name);
+			}, "在创建实例时报错:" + e.getCause().getMessage() + ",实例名:" + name);
 		}
 
 	}

@@ -16,6 +16,7 @@ import risesoft.data.transfer.core.util.Configuration;
 public class PlugManager {
 
 	public static final String PLUG_KEY = "core.plugs";
+	public static final String ROOT_PLUG_KEY = "core.rootplugs";
 
 	/**
 	 * 加载插件
