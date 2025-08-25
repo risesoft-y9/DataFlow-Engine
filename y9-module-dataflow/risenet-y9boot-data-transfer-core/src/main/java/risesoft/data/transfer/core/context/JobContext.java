@@ -116,10 +116,11 @@ public class JobContext {
 		this.jobListener = jobListener;
 		this.communication = communication;
 		this.configuration=configuration;
+		this.handles =  new HandleManager(this);
 		putInstance(this);
 		putInstance(handles);
 		putInstance(communication);
-		this.handles =  new HandleManager(this);
+	
 	}
 
 	/**
