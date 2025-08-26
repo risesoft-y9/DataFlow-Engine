@@ -41,7 +41,7 @@ public class DataMappingArgsEntity extends BaseEntity {
 	@Comment(value = "描述")
 	private String description;
 	
-	@Column(name = "DEFAULTVALUE", length = 50)
+	@Column(name = "DEFAULTVALUE", length = 200)
 	@Comment(value = "缺省值")
 	private String defaultValue;
 	

@@ -394,9 +394,9 @@ const activeName = ref('1');
                                 </p>
                             </div>
                             <div class="tip-text" v-else>
-                                <p>动态参数公式</p>
-                                <p
-                                    >1.只支持sql语句：$sql{A(a)#B} <br />
+                                <p>动态指令公式</p>
+                                <p>
+                                    1.只支持sql语句：$sql{A(a)#B} <br />
                                     <span
                                         >①$sql：公式名，SQL查询；②A：sql函数；③a：参数（参数为字符串时在公式前后加上'
                                         '）；④B：查询对象（output-目标表，input-源头表）</span

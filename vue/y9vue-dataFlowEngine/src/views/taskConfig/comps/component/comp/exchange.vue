@@ -55,11 +55,19 @@ const setChildren = async (item, mappingId) => {
                 value.name = value.upName + '.' + value.name;
             }
             if (globalData.type == 'add') {
-                value.defaultValue = Number(value.defaultValue);
+                if(value.type == 'integer') {
+                    value.defaultValue = Number(value.defaultValue);
+                }
             } else {
                 globalData.allData?.taskCoreList?.forEach((list) => {
                     if (list.argsId == value.id) {
-                        value.defaultValue = Number(list.value);
+                        if(list.value) {
+                            if(value.type == 'integer') {
+                                value.defaultValue = Number(list.value);
+                            } else {
+                                value.defaultValue = list.value;
+                            }
+                        }
                     }
                 });
             }
@@ -146,8 +154,8 @@ const setChildren = async (item, mappingId) => {
                                     <div class="fetch-w">
                                         <el-form-item>
                                             <el-radio-group v-model="ret.defaultValue">
-                                                <el-radio :label="1">是</el-radio>
-                                                <el-radio :label="0">否</el-radio>
+                                                <el-radio value="true">是</el-radio>
+                                                <el-radio value="false">否</el-radio>
                                             </el-radio-group>
                                         </el-form-item>
                                     </div>

@@ -395,8 +395,8 @@ const deleteForm = (item) => {
                                     <div class="fetch-w">
                                         <el-form-item>
                                             <el-radio-group v-model="ret.defaultValue">
-                                                <el-radio :label="1">是</el-radio>
-                                                <el-radio :label="0">否</el-radio>
+                                                <el-radio value="true">是</el-radio>
+                                                <el-radio value="false">否</el-radio>
                                             </el-radio-group>
                                         </el-form-item>
                                     </div>

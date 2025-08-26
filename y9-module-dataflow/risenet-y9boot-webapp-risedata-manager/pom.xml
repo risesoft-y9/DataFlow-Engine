@@ -63,12 +63,11 @@
             <artifactId>risenet-y9boot-starter-idgenerator</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-        <!--elastic客户端-->
-        <!-- <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-high-level-client</artifactId>
-        </dependency> -->
+        <dependency>
+            <groupId>net.risesoft</groupId>
+            <artifactId>risenet-y9boot-starter-web</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -160,7 +160,7 @@ public interface JobLogDao extends Repository {
     Integer getCount(List<Integer> status, String environment);
     
     @Search("select count(*) from Y9_DATASERVICE_JOB_LOG where ENVIRONMENT = ?1 and DISPATCH_TIME >= ?2 and DISPATCH_TIME <= ?3")
-    Integer getCount(String environment, Long startTime, Long endTime);
+    Integer getCount2(String environment, Long startTime, Long endTime);
     
     @Search("select count(*) from Y9_DATASERVICE_JOB_LOG "
 		+ "where ENVIRONMENT = ?1 and DISPATCH_TIME >= ?2 and DISPATCH_TIME <= ?3 "

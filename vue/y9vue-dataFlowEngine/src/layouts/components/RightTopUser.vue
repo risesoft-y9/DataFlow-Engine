@@ -150,7 +150,7 @@
                                         console.log('删除前执行的函数');
                                     }
                                 };
-                                $y9_SSO.ssoLogout(params);
+                                $y9_SSO.ssoLogout({});
                             }
                         } catch (error) {
                             this.$message.error(error.message || 'Has Error');

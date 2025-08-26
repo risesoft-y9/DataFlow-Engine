@@ -53,12 +53,11 @@ public class HttpCacheHandle implements CacheHandle {
 
 	public HttpCacheHandle(@ConfigParameter(required = true, description = "服务器地址") String serverPath) {
 		this.serverPath = serverPath;
-
 	}
 
 	@Override
 	public <T> List<T> poll(String key, int size, Class<T> reClass) {
-		return send("remove", createMap("key", key, "size", size)).getJSONArray("data").toJavaList(reClass);
+		return send("poll", createMap("key", key, "size", size)).getJSONArray("data").toJavaList(reClass);
 	}
 
 	@Override
@@ -74,12 +73,11 @@ public class HttpCacheHandle implements CacheHandle {
 	@Override
 	public void put(String key, Object value) {
 		send("put", createMap("key", key, "value", value));
-
 	}
 
 	@Override
 	public int push(String key, Object value) {
-		return send("push", createMap("key", key)).getIntValue("data");
+		return send("push", createMap("key", key, "value", value)).getIntValue("data");
 	}
 
 	private Map<String, Object> createMap(String key, Object value) {
@@ -100,7 +98,7 @@ public class HttpCacheHandle implements CacheHandle {
 		request.put("operation", operation);
 		request.put("parameter", parameter);
 		try {
-			JSONObject jsonObject = JSON.parseObject(post(serverPath + "/cache", JSON.toJSONString(request)));
+			JSONObject jsonObject = JSON.parseObject(post(serverPath, JSON.toJSONString(request)));
 			if (jsonObject.getBooleanValue("success")) {
 				return jsonObject;
 			} else {
@@ -114,13 +112,11 @@ public class HttpCacheHandle implements CacheHandle {
 	}
 
 	private static String post(String url, String json) throws Exception {
-
 		HttpClient client = HttpClient.newHttpClient();
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("Content-Type", "application/json")
 				.POST(BodyPublishers.ofString(json)).build();
 
 		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 		return response.body();
-
 	}
 }

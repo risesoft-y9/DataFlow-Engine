@@ -441,7 +441,7 @@ public class JobLogServiceImpl extends AutomaticCrudService<JobLog, String> impl
 	public Integer getFrequencyCount(Long startTime, Long endTime, String environment, List<String> jobTypes,
 			boolean isAdmin) {
 		if(isAdmin) {
-			return jobLogDao.getCount(environment, startTime, endTime);
+			return jobLogDao.getCount2(environment, startTime, endTime);
 		}
 		if(jobTypes != null && jobTypes.size() > 0) {
 			return jobLogDao.getCount(environment, startTime, endTime, jobTypes);
