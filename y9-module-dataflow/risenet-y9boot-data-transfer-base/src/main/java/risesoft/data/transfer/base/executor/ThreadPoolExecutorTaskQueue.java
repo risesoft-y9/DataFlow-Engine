@@ -1,13 +1,9 @@
 package risesoft.data.transfer.base.executor;
 
-import java.util.AbstractQueue;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import risesoft.data.transfer.core.executor.Executor;
@@ -73,7 +69,11 @@ public class ThreadPoolExecutorTaskQueue implements ExecutorTaskQueue {
 		logger = loggerFactory.getLogger(configuration.getString("name", "ThreadPoolExecutorTaskQueue"));
 
 		if (configuration.getBool("block", false)) {
+			
 			linkedQueue = new BlockQueue<Object>(configuration.getInt("blockSize", size * 2));
+			if (logger.isInfo()) {
+				logger.info(this, "create BlockQueue blockSize :"+ configuration.getInt("blockSize", size * 2));
+			}
 		} else {
 			linkedQueue = new ConcurrentLinkedQueue<Object>();
 		}
@@ -104,7 +104,7 @@ public class ThreadPoolExecutorTaskQueue implements ExecutorTaskQueue {
 	}
 
 	@Override
-	public void add(Object task) {
+	public synchronized void add(Object task) {
 		linkedQueue.add(task);
 		if (isStart) {
 			this.runJob();
@@ -135,7 +135,7 @@ public class ThreadPoolExecutorTaskQueue implements ExecutorTaskQueue {
 	}
 
 	@Override
-	public void start() {
+	public synchronized  void start() {
 		this.executorPool.clear();
 		executorListener.start();
 		if (logger.isDebug()) {
@@ -158,7 +158,7 @@ public class ThreadPoolExecutorTaskQueue implements ExecutorTaskQueue {
 	}
 
 	@Override
-	public void shutdown() throws Exception {
+	public synchronized void shutdown() throws Exception {
 		logger.info(this, "shutdown");
 		this.isShutdown = true;
 		this.close();
@@ -172,6 +172,7 @@ public class ThreadPoolExecutorTaskQueue implements ExecutorTaskQueue {
 	}
 
 	private void runJob() {
+		//此处应该判断如果poll不出对象了
 		executorService.execute(() -> {
 			try {
 				if (isShutdown) {

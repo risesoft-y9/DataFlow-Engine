@@ -30,17 +30,17 @@ public class BlockQueue<T> extends AbstractQueue<T> implements Queue<T> {
 	}
 
 	@Override
-	public boolean add(T e) {
+	public   boolean add(T e) {
 		try {
 			blockQueue.put(e);
 		} catch (InterruptedException e1) {
 			throw TransferException.as(FrameworkErrorCode.RUNTIME_ERROR, "阻塞队列添加出错", e1);
 		}
-		return blockQueue.offer(e);
+		return true;
 	}
 
 	@Override
-	public T poll() {
+	public  T poll() {
 
 		try {
 			return blockQueue.take();
@@ -50,17 +50,17 @@ public class BlockQueue<T> extends AbstractQueue<T> implements Queue<T> {
 	}
 
 	@Override
-	public T peek() {
+	public  T peek() {
 		return blockQueue.peek();
 	}
 
 	@Override
-	public Iterator<T> iterator() {
+	public  Iterator<T> iterator() {
 		return blockQueue.iterator();
 	}
 
 	@Override
-	public int size() {
+	public  int size() {
 		return blockQueue.size();
 	}
 
