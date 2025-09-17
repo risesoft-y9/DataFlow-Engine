@@ -28,7 +28,7 @@ public class DefaultRecord implements Record {
 	private int byteSize;
 
 	// 首先是Record本身需要的内存
-	private long memorySize = ClassSize.DefaultRecordHead;
+	private  long memorySize = ClassSize.DefaultRecordHead;
 
 	public DefaultRecord() {
 		this.columns = new ArrayList<Column>(RECORD_AVERGAE_COLUMN_NUMBER);
@@ -90,9 +90,7 @@ public class DefaultRecord implements Record {
 		if (null == column) {
 			return;
 		}
-
 		byteSize -= column.getByteSize();
-
 		// 内存的占用是column对象的头 再加实际大小
 		memorySize = memorySize - ClassSize.ColumnHead - column.getByteSize();
 	}
@@ -101,9 +99,7 @@ public class DefaultRecord implements Record {
 		if (null == column) {
 			return;
 		}
-
 		byteSize += column.getByteSize();
-
 		// 内存的占用是column对象的头 再加实际大小
 		memorySize = memorySize + ClassSize.ColumnHead + column.getByteSize();
 	}
