@@ -18,6 +18,10 @@ import java.util.Date;
  */
 public class LongColumn extends Column {
 
+	public LongColumn() {
+		this(0, null);
+	}
+
 	/**
 	 * 从整形字符串表示转为LongColumn，支持Java科学计数法
 	 * 

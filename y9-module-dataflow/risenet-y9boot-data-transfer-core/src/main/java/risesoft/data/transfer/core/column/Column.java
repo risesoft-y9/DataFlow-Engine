@@ -28,9 +28,7 @@ public abstract class Column {
 		this.type = type;
 		this.byteSize = byteSize;
 		this.name = name;
-		if (name == null) {
-			throw new RuntimeException("没有名字");
-		}
+		
 	}
 
 	public void setName(String name) {

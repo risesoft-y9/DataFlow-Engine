@@ -18,6 +18,9 @@ import java.util.Date;
  * @author lb
  */
 public class BytesColumn extends Column {
+	public BytesColumn() {
+		this(null);
+	}
 
 	public BytesColumn(String name) {
 		this(null, name);

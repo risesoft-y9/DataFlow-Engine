@@ -16,6 +16,9 @@ import java.util.Date;
  * @author lb
  */
 public class BoolColumn extends Column {
+	public BoolColumn() {
+		this(null);
+	}
 
 	public BoolColumn(Boolean bool, String name) {
 		super(bool, Column.Type.BOOL, 1, name);

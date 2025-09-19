@@ -23,6 +23,10 @@ public class DateColumn extends Column {
 		DATE, TIME, DATETIME
 	}
 
+	public DateColumn() {
+		this(null);
+	}
+
 	/**
 	 * 构建值为null的DateColumn，使用Date子类型为DATETIME
 	 */

@@ -17,6 +17,10 @@ import java.util.Date;
  */
 public class DoubleColumn extends Column {
 
+	public DoubleColumn() {
+		this(null);
+	}
+	
 	public DoubleColumn(final String data, String name) {
 		this(data, null == data ? 0 : data.length(), name);
 		this.validate(data);
