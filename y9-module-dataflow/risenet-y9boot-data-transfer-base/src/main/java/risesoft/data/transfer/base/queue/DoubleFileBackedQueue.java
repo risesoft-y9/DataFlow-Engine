@@ -351,7 +351,6 @@ public class DoubleFileBackedQueue<T> implements AutoCloseable, Closed, Queue<T>
 		takeLock.unlock();
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void finalize() throws Throwable {
 		try {
@@ -410,7 +409,6 @@ public class DoubleFileBackedQueue<T> implements AutoCloseable, Closed, Queue<T>
 		throw new RuntimeException("文件缓存队列不支持此操作");
 	}
 
-	@SuppressWarnings("hiding")
 	@Override
 	public <T> T[] toArray(T[] a) {
 		throw new RuntimeException("文件缓存队列不支持此操作");

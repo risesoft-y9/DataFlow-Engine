@@ -7,20 +7,35 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import risesoft.data.transfer.core.close.Closed;
+import risesoft.data.transfer.core.column.impl.LongColumn;
+import risesoft.data.transfer.core.column.impl.StringColumn;
 import risesoft.data.transfer.core.exception.FrameworkErrorCode;
 import risesoft.data.transfer.core.exception.TransferException;
+import risesoft.data.transfer.core.record.DefaultRecord;
+import risesoft.data.transfer.core.record.Record;
 import risesoft.data.transfer.core.util.ByteUtils;
+import risesoft.data.transfer.core.util.pool.BlockQueue;
 
 /**
  * 文件临时存储队列，将超过设定值的数据进行临时存储到文件中
@@ -309,7 +324,6 @@ public class FileBackedQueue<T> implements AutoCloseable, Closed, Queue<T> {
 		takeLock.unlock();
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void finalize() throws Throwable {
 		try {
@@ -331,7 +345,59 @@ public class FileBackedQueue<T> implements AutoCloseable, Closed, Queue<T> {
 		}
 	}
 
-	
+	public static void main(String[] args) throws InterruptedException {
+//、双锁，filecount使用juc中的类
+		Map<Integer, Object> intMap = new ConcurrentHashMap<Integer, Object>();
+		long startTime = System.currentTimeMillis();
+		AtomicInteger count = new AtomicInteger();
+		try (FileBackedQueue<List<Record>> queue = new FileBackedQueue<>(10, "queue_data.bin", new RecordListSerializer(),
+				"1MB")) {
+			// 添加项目
+			for (int i = 0; i < 10; i++) {
+				new Thread(() -> {
+					for (int j = 0; j < 100; j++) {
+						Record deRecord = new DefaultRecord();
+						deRecord.addColumn(new StringColumn("test" + j, "UP"));
+						deRecord.addColumn(new LongColumn(count.incrementAndGet(), "count"));
+						queue.add(Arrays.asList(deRecord));
+
+						try {
+							// 延迟推送
+							Thread.sleep(10);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+
+				}).start();
+			}
+
+			System.out.println("Queue size: " + queue.size());
+			// 取出项目
+			AtomicInteger i = new AtomicInteger();
+			CountDownLatch maxSize = new CountDownLatch(10 * 100);
+			for (int j = 0; j < 5; j++) {
+				while (i.get() < 10 * 100) {
+					Thread.sleep(5L);
+					if (!queue.isEmpty()) {
+						queue.poll();
+						i.incrementAndGet(); 
+						maxSize.countDown();
+
+					}
+
+				}
+			}
+
+			maxSize.await();
+			System.out.println(i);
+			System.out.println(intMap.size());
+			System.out.println((System.currentTimeMillis() - startTime) / 1000 + "s");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Override
 	public void clear() {
@@ -368,7 +434,6 @@ public class FileBackedQueue<T> implements AutoCloseable, Closed, Queue<T> {
 		throw new RuntimeException("文件缓存队列不支持此操作");
 	}
 
-	@SuppressWarnings("hiding")
 	@Override
 	public <T> T[] toArray(T[] a) {
 		throw new RuntimeException("文件缓存队列不支持此操作");
