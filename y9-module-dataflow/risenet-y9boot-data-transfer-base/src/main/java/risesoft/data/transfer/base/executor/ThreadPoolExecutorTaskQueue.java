@@ -6,10 +6,16 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
+
+import risesoft.data.transfer.base.queue.RecordSerializer;
+import risesoft.data.transfer.base.queue.Serializer;
+import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.executor.Executor;
 import risesoft.data.transfer.core.executor.ExecutorFacotry;
 import risesoft.data.transfer.core.executor.ExecutorListener;
 import risesoft.data.transfer.core.executor.ExecutorTaskQueue;
+import risesoft.data.transfer.core.factory.BeanFactory;
+import risesoft.data.transfer.core.factory.FactoryManager;
 import risesoft.data.transfer.core.log.Logger;
 import risesoft.data.transfer.core.log.LoggerFactory;
 import risesoft.data.transfer.core.util.CloseUtils;
@@ -18,8 +24,8 @@ import risesoft.data.transfer.core.util.pool.BlockQueue;
 import risesoft.data.transfer.core.util.pool.SimpledObjectPool;
 
 /**
- * 线程池实现的任务队列执行器
- * 不要在输入端使用block添加任务，会造成任务阻塞
+ * 线程池实现的任务队列执行器 不要在输入端使用block添加任务，会造成任务阻塞
+ * 
  * @typeName ThreadPoolExecutorTaskQueue
  * @date 2023年12月15日
  * @author lb
@@ -63,16 +69,23 @@ public class ThreadPoolExecutorTaskQueue implements ExecutorTaskQueue {
 
 	private Object source;
 
-	public ThreadPoolExecutorTaskQueue(Configuration configuration, LoggerFactory loggerFactory) {
+	@SuppressWarnings("unchecked")
+	public ThreadPoolExecutorTaskQueue(Configuration configuration, LoggerFactory loggerFactory,
+			JobContext jobContext) {
 		size = configuration.getInt("size", 5);
 		executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(size);
 		logger = loggerFactory.getLogger(configuration.getString("name", "ThreadPoolExecutorTaskQueue"));
+//队列采用配置?  新增queue配置
+		Configuration queueConfiguration = configuration.getConfiguration("queue");
+		if (queueConfiguration != null) {
+			jobContext.getInstanceMap().put(Serializer.class, new RecordSerializer());
+			linkedQueue = FactoryManager.getInstanceOfConfiguration(queueConfiguration, Queue.class,
+					jobContext.getInstanceMap());
+		} else if (configuration.getBool("block", false)) {
 
-		if (configuration.getBool("block", false)) {
-			
 			linkedQueue = new BlockQueue<Object>(configuration.getInt("blockSize", size * 2));
 			if (logger.isInfo()) {
-				logger.info(this, "create BlockQueue blockSize :"+ configuration.getInt("blockSize", size * 2));
+				logger.info(this, "create BlockQueue blockSize :" + configuration.getInt("blockSize", size * 2));
 			}
 		} else {
 			linkedQueue = new ConcurrentLinkedQueue<Object>();
@@ -135,7 +148,7 @@ public class ThreadPoolExecutorTaskQueue implements ExecutorTaskQueue {
 	}
 
 	@Override
-	public synchronized  void start() {
+	public synchronized void start() {
 		this.executorPool.clear();
 		executorListener.start();
 		if (logger.isDebug()) {
@@ -172,7 +185,7 @@ public class ThreadPoolExecutorTaskQueue implements ExecutorTaskQueue {
 	}
 
 	private void runJob() {
-		//此处应该判断如果poll不出对象了
+		// 此处应该判断如果poll不出对象了
 		executorService.execute(() -> {
 			try {
 				if (isShutdown) {
@@ -199,6 +212,5 @@ public class ThreadPoolExecutorTaskQueue implements ExecutorTaskQueue {
 			}
 		});
 	}
-
 
 }

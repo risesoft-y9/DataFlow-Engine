@@ -29,6 +29,11 @@
             <artifactId>risenet-y9boot-data-transfer-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+    <groupId>com.esotericsoftware</groupId>
+    <artifactId>kryo</artifactId>
+    <version>5.5.0</version> <!-- 使用最新稳定版 -->
+</dependency>
     </dependencies>
 
 
