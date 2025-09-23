@@ -8,6 +8,7 @@ import java.util.Queue;
 
 import org.apache.commons.lang3.StringUtils;
 
+import risesoft.data.transfer.core.close.Closed;
 import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.exception.CommonErrorCode;
 import risesoft.data.transfer.core.exception.TransferException;
@@ -21,7 +22,7 @@ import risesoft.data.transfer.core.record.Record;
  * @date 2025年9月22日
  * @author lb
  */
-public class RecordFileBackedQueue implements Queue<List<Record>> {
+public class RecordFileBackedQueue implements Queue<List<Record>> ,Closed {
 
 	private FileBackedQueue<List<Record>> fileBackedQueue;
 
@@ -127,6 +128,12 @@ public class RecordFileBackedQueue implements Queue<List<Record>> {
 	@Override
 	public List<Record> peek() {
 		return fileBackedQueue.peek();
+	}
+
+	@Override
+	public void close() throws Exception {
+	
+		fileBackedQueue.close();
 	}
 
 }

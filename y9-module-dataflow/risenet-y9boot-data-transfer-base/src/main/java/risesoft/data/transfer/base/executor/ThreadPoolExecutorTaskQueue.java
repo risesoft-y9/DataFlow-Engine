@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import risesoft.data.transfer.base.queue.RecordSerializer;
 import risesoft.data.transfer.base.queue.Serializer;
+import risesoft.data.transfer.core.close.Closed;
 import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.executor.Executor;
 import risesoft.data.transfer.core.executor.ExecutorFacotry;
@@ -176,7 +177,9 @@ public class ThreadPoolExecutorTaskQueue implements ExecutorTaskQueue {
 		this.isShutdown = true;
 		this.close();
 		this.executorService.shutdownNow();
-
+        if (this.linkedQueue instanceof Closed) {
+			((Closed)this.linkedQueue).close();
+		}
 	}
 
 	@Override
