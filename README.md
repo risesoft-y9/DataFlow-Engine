@@ -20,32 +20,39 @@
 
 ```
 common -- 公共模块
- ├── risenet-y9boot-beta-api
- ├── risenet-y9boot-beta-client
- ├── risenet-y9boot-data-jdbc
- ├── risenet-y9boot-data-jdbc-commons
- ├── risenet-y9boot-data-common-tools
+ 	├── risenet-y9boot-beta-api
+ 	├── risenet-y9boot-beta-client
+ 	├── risenet-y9boot-data-jdbc
+ 	├── risenet-y9boot-data-jdbc-commons
+ 	├── risenet-y9boot-data-common-tools
 transfer -- 数据处理模块
- ├── risenet-y9boot-data-transfer-base
- ├── risenet-y9boot-data-transfer-core
- ├── risenet-y9boot-data-transfer-data
- ├── risenet-y9boot-data-transfer-elastic
- ├── risenet-y9boot-data-transfer-rdbms
- ├── risenet-y9boot-data-transfer-ftp
- ├── risenet-y9boot-data-transfer-stream
- ├── risenet-y9boot-data-transfer-api
- ├── risenet-y9boot-data-transfer-assembler
+ 	├── risenet-y9boot-data-transfer-base
+ 	├── risenet-y9boot-data-transfer-core
+ 	├── risenet-y9boot-data-transfer-data
+ 	├── risenet-y9boot-data-transfer-elastic
+ 	├── risenet-y9boot-data-transfer-rdbms
+ 	├── risenet-y9boot-data-transfer-ftp
+ 	├── risenet-y9boot-data-transfer-stream
+ 	├── risenet-y9boot-data-transfer-stream-local-file
+ 	├── risenet-y9boot-data-transfer-api
+ 	├── risenet-y9boot-data-transfer-assembler
 rpc -- 远程过程调用模块
- ├── risenet-y9boot-rpc-commons
- ├── risenet-y9boot-rpc-consumer
- ├── risenet-y9boot-rpc-provide
+ 	├── risenet-y9boot-rpc-commons
+ 	├── risenet-y9boot-rpc-consumer
+ 	├── risenet-y9boot-rpc-provide
 support -- 业务支撑模块
- ├── risenet-y9boot-support-risedata-scheduler
+	├── risenet-y9boot-security-base
+    ├── risenet-y9boot-support-api-online
+    ├── risenet-y9boot-support-risedata-jpa-repository
+    ├── risenet-y9boot-support-risedata-scheduler
+    ├── risenet-y9boot-support-risedata-security
+    ├── risenet-y9boot-support-y9kernel-security
 vue -- 前端工程
- ├── y9vue-dataFlowEngine -- 前端
+	├── y9vue-dataFlowEngine -- 前端
 webapp -- 后端工程
- ├── risenet-y9boot-webapp-risedata-executor -- 执行端
- ├── risenet-y9boot-webapp-risedata-manager -- 管理端
+ 	├── risenet-y9boot-webapp-risedata-executor -- 执行端
+ 	├── risenet-y9boot-webapp-risedata-manager -- 管理端
+ 	├── risenet-y9boot-webapp-risedata-log -- 日志端
 ```
 
 ## 逻辑架构图
