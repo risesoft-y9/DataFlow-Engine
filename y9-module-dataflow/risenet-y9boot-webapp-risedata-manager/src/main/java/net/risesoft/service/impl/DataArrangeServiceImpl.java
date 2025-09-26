@@ -62,7 +62,12 @@ public class DataArrangeServiceImpl implements DataArrangeService {
 	@Override
 	@Transactional(readOnly = false)
 	public Y9Result<String> deleteData(String id) {
-		dataArrangeRepository.deleteById(id);
+		if(StringUtils.isNotBlank(id)) {
+			dataArrangeRepository.deleteById(id);
+			dataProcessRepository.deleteByArrangeId(id);
+		}else {
+			return Y9Result.failure("id不能为空");
+		}
 		return Y9Result.successMsg("删除成功");
 	}
 
@@ -83,29 +88,36 @@ public class DataArrangeServiceImpl implements DataArrangeService {
 		dataArrangeRepository.save(entity);
 		
 		//保存定时调度信息
-		Job job = jobService.findByArgsAndTypeAndEnvironmentAndServiceId(entity.getId(), "local", "Public", "RISEDATA-MASTER");
-		if(job == null) {
-			job = new Job();
+		if(StringUtils.isNotBlank(entity.getCron())) {
+			Job job = jobService.findByArgsAndTypeAndEnvironmentAndServiceId(entity.getId(), "local", "Public", "RISEDATA-MASTER");
+			if(job == null) {
+				job = new Job();
+			}
+			job.setArgs(entity.getId());
+			job.setBlockingStrategy("串行");
+			job.setDispatchMethod("均衡");
+			job.setDispatchType("cron");
+			job.setDescription(entity.getContent());
+			job.setEnvironment("Public");
+			job.setErrorCount(0);
+			job.setJobSource("任务编排");
+			job.setJobType(entity.getUserId());
+			job.setName(entity.getName());
+			job.setServiceId("RISEDATA-MASTER");
+			job.setSource("dataArrangeService,executeProcess");
+			job.setSourceTimeOut(1200);
+			job.setSpeed(entity.getCron());
+			job.setStatus(entity.getPattern());
+			job.setTimeOut(3600);
+			job.setType("local");
+			jobService.saveJob(job);
+		}else {
+			// 删除定时任务
+			Job job = jobService.findByArgsAndTypeAndEnvironmentAndServiceId(entity.getId(), "local", "Public", "RISEDATA-MASTER");
+			if(job != null) {
+				jobService.deleteByJobId(job.getId());
+			}
 		}
-		job.setArgs(entity.getId());
-		job.setBlockingStrategy("串行");
-		job.setDispatchMethod("均衡");
-		job.setDispatchType("cron");
-		job.setDescription(entity.getContent());
-		job.setEnvironment("Public");
-		job.setErrorCount(0);
-		job.setJobSource("任务编排");
-		job.setJobType(entity.getUserId());
-		job.setName(entity.getName());
-		job.setServiceId("RISEDATA-MASTER");
-		job.setSource("dataArrangeService,executeProcess");
-		job.setSourceTimeOut(1200);
-		job.setSpeed(entity.getCron());
-		job.setStatus(entity.getPattern());
-		job.setTimeOut(3600);
-		job.setType("local");
-		jobService.saveJob(job);
-		
 		return Y9Result.success(entity, "保存成功");
 	}
 
