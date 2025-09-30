@@ -190,6 +190,13 @@ public interface DataSourceService {
 	Y9Result<String> buildTable(String tableId);
 	
 	/**
+	 * 修改表结构
+	 * @param tableId
+	 * @return
+	 */
+	Y9Result<String> updateTable(String tableId);
+	
+	/**
 	 * 批量保存字段
 	 * @param table
 	 * @param fieldList

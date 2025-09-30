@@ -1,20 +1,14 @@
 package net.risesoft.controller;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
-import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,10 +30,8 @@ import net.risesoft.service.DataInterfaceService;
 import net.risesoft.service.DataMappingService;
 import net.risesoft.service.DataSourceService;
 import net.risesoft.util.DataConstant;
-import net.risesoft.util.sqlddl.DbColumn;
 import net.risesoft.util.sqlddl.DbMetaDataUtil;
 import net.risesoft.y9.json.Y9JsonUtil;
-import net.risesoft.y9.util.base64.Y9Base64Util;
 import net.risesoft.y9public.entity.DataSourceTypeEntity;
 import net.risesoft.y9public.entity.DataInterfaceEntity;
 import net.risesoft.y9public.entity.DataSourceEntity;
@@ -248,6 +240,12 @@ public class SourceController {
 		return dataSourceService.buildTable(tableId);
 	}
 	
+	@RiseLog(operationType = OperationTypeEnum.MODIFY, operationName = "修改表结构", logLevel = LogLevelEnum.RSLOG)
+	@PostMapping(value = "/updateTable")
+	public Y9Result<String> updateTable(@RequestParam String tableId) {
+		return dataSourceService.updateTable(tableId);
+	}
+	
 	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "批量保存字段", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/saveFields")
 	public Y9Result<String> saveFields(@RequestBody String fields) {
@@ -307,110 +305,6 @@ public class SourceController {
 	@GetMapping(value = "/getTableJob")
 	public Y9Result<List<Map<String, Object>>> getTableJob(String tableId) {
 		return dataSourceService.getTableJob(tableId);
-	}
-	
-	
-	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "表数据列表页", logLevel = LogLevelEnum.RSLOG)
-	@RequestMapping(value = "/tablePage")
-	public String tablePage(@RequestParam String sourceId, @RequestParam String tableName, Model model) {
-		List<List<HashMap<String, Object>>> p = new ArrayList<List<HashMap<String, Object>>>();
-		List<HashMap<String, Object>> colModels = new ArrayList<HashMap<String, Object>>();
-		try {
-			DataSourceEntity data = dataSourceService.getDataSourceById(sourceId);
-			List<DbColumn> list = this.listAllColumns(data, tableName);
-			if(list.size() > 0) {
-				HashMap<String, Object> colModel = new HashMap<String, Object>();
-				colModel.put("title", "序号");
-				colModel.put("type", "numbers");
-				colModel.put("align", "center");
-				colModels.add(colModel);
-			}
-			for (DbColumn f : list) {
-				HashMap<String, Object> colModel = new HashMap<String, Object>();
-				colModel.put("title", f.getComment().replaceAll("\"", ""));
-				colModel.put("field", f.getColumn_name());
-				colModel.put("align", "left");
-				if(f.getColumn_name().equals("YXY_UPDATEDTIME") || f.getData_type() == 93) {
-					colModel.put("templet", "<div>{{ dateToString(d."+f.getColumn_name()+") }}</div>");
-				}
-				colModels.add(colModel);
-			}
-			p.add(colModels);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		model.addAttribute("sourceId", sourceId);
-		model.addAttribute("tableName", tableName);
-		model.addAttribute("columns", Y9JsonUtil.writeValueAsString(p));
-		return "main/tablePage";
-	}
-	
-	private List<DbColumn> listAllColumns(DataSourceEntity data, String tableName) throws Exception {
-		Connection connection = null;
-		String table_schema = null;
-
-		ResultSet rs = null;
-		List<DbColumn> dbColumnList = new ArrayList<DbColumn>();
-		try {
-			//加载驱动
-			Class.forName(data.getDriver());
-			Properties props = new Properties();
-			props.setProperty("user", data.getUsername());
-			props.setProperty("password", Y9Base64Util.decode(data.getPassword()));
-			props.setProperty("remarks", "true"); //设置可以获取remarks信息 
-			props.setProperty("useInformationSchema", "true");//设置可以获取tables remarks信息
-			//获得数据库连接
-			connection = DriverManager.getConnection(data.getUrl(), props);
-
-			DatabaseMetaData dbmd = connection.getMetaData();
-			table_schema = dbmd.getUserName().toUpperCase();
-
-			//通过表名获得所有字段名
-		    rs = dbmd.getColumns(table_schema, table_schema, tableName, "%");
-
-			while (rs.next()) {
-				DbColumn dbColumn = new DbColumn();
-				
-				String column_name = rs.getString("COLUMN_NAME");//获得字段名
-		        String remarks = rs.getString("REMARKS");//获得字段中文名
-
-				dbColumn.setTable_name(tableName);
-
-				dbColumn.setColumn_name(column_name);
-				dbColumn.setColumn_name_old(column_name);
-
-				if (StringUtils.isNotBlank(remarks)) {
-					dbColumn.setComment(remarks);
-				} else {						
-					dbColumn.setComment(column_name);
-				}
-
-				dbColumn.setData_length(rs.getString("column_size"));
-
-				int data_type = rs.getInt("data_type");
-				dbColumn.setData_type(data_type);
-				dbColumn.setType_name(((String) rs.getString("type_name")).toLowerCase());
-
-				String nullable = (String) rs.getString("is_nullable");
-				Boolean bNullable = false;
-				if ("yes".equalsIgnoreCase(nullable)) {
-					bNullable = true;
-				}
-				dbColumn.setNullable(bNullable);
-
-				dbColumnList.add(dbColumn);
-			}
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			if (rs != null) {
-				rs.close();
-			}
-			if (connection != null) {
-				connection.close();
-			}
-		}
-		return dbColumnList;
 	}
 
 	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "获取数据源可选字段类型、长度、以及对应的types", logLevel = LogLevelEnum.RSLOG, enable = false)

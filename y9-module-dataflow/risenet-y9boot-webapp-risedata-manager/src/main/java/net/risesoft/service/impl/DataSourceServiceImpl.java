@@ -517,7 +517,15 @@ public class DataSourceServiceImpl implements DataSourceService {
 					return Y9Result.failure("数据源不存在");
 				}
 				if (source.getType() != 0) {
-					return Y9Result.failure("不支持的数据源类型");
+					if (StringUtils.isNotBlank(entity.getId())) {
+						DataTable table = getTableById(entity.getId());
+						if(table != null) {
+							table.setCname(entity.getCname());
+							table.setName(entity.getName());
+							return Y9Result.success(dataTableRepository.save(table), "保存成功，该类型数据源暂只支持修改名称，不涉及物理表操作");
+						}
+					}
+					return Y9Result.failure("暂不支持的数据源类型");
 				}
 				if (StringUtils.isBlank(entity.getId())) {
 					// 判断是否已存在表
@@ -586,8 +594,14 @@ public class DataSourceServiceImpl implements DataSourceService {
 	public Y9Result<String> buildTable(String tableId) {
 		try {
 			DataTable table = getTableById(tableId);
-			if (table != null && table.getStatus() == 0) {
+			if (table != null) {
 				DataSourceEntity source = getDataSourceById(table.getBaseId());
+				if (source.getType() != 0) {
+					return Y9Result.failure("暂不支持的数据源类型");
+				}
+				if(table.getStatus() == 1) {
+					return Y9Result.failure("当前表状态显示已创建，如果想修改表结构，请点击修改表结构按钮");
+				}
 				String msg = "表创建成功";
 				if(StringUtils.isNotBlank(table.getOldName())) {
 					// 修改表名称
@@ -614,7 +628,7 @@ public class DataSourceServiceImpl implements DataSourceService {
 				dataTableRepository.save(table);
 				return Y9Result.successMsg(msg);
 			}
-			return Y9Result.failure("表信息不存在或者已在库中存在");
+			return Y9Result.failure("表信息不存在");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Y9Result.failure("表生成失败:" + e.getMessage());
@@ -644,6 +658,40 @@ public class DataSourceServiceImpl implements DataSourceService {
 			dbcs.add(dbColumn);
 		}
 		return dbcs;
+	}
+	
+	@Override
+	public Y9Result<String> updateTable(String tableId) {
+		try {
+			DataTable table = getTableById(tableId);
+			if (table != null) {
+				DataSourceEntity source = getDataSourceById(table.getBaseId());
+				if (source.getType() != 0) {
+					return Y9Result.failure("暂不支持的数据源类型");
+				}
+				if(table.getStatus() == 0) {
+					return Y9Result.failure("当前表状态显示未创建，检查是否没生成表或者修改了表名称没点生成表按钮更新");
+				}
+				// 查询表字段信息
+				List<DataTableField> fieldList = dataTableFieldRepository.findByTableIdOrderByDisplayOrderAsc(tableId);
+				// 生成建表字段列表
+				List<DbColumn> columnList = getDbColumn(fieldList);
+				// 更新表结构
+				DDL.addTableColumn(DbMetaDataUtil.get(source.getDriver(), source.getUsername(), 
+						source.getPassword(), source.getUrl()), table.getName(), table.getCname(), Y9JsonUtil.writeValueAsString(columnList));
+				// 更新字段状态信息
+				for (DataTableField field : fieldList) {
+					field.setIsState(true);
+					field.setOldName("");
+					dataTableFieldRepository.save(field);
+				}
+				return Y9Result.successMsg("更新成功");
+			}
+			return Y9Result.failure("表信息不存在");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Y9Result.failure("修改失败:" + e.getMessage());
+		}
 	}
 
 	@Override
@@ -836,7 +884,7 @@ public class DataSourceServiceImpl implements DataSourceService {
 				DDL.addTableColumn(DbMetaDataUtil.get(source.getDriver(), source.getUsername(), 
 						source.getPassword(), source.getUrl()), table.getName(), table.getCname(), Y9JsonUtil.writeValueAsString(columnList));
 				// 提取表
-				extractTable(id, tableName, getDataSourceById(id));
+				extractTable(id, tableName, source);
 				return Y9Result.successMsg("复制表成功");
 			}
 			return Y9Result.failure("表信息不存在，只能复制已提取的表");
@@ -851,12 +899,19 @@ public class DataSourceServiceImpl implements DataSourceService {
 		try {
 			// 获取目标库
 			DataSourceEntity dataSourceEntity = getDataSourceById(baseId);
+			if(!dataSourceEntity.getBaseType().equals(DataConstant.ES)) {
+				return Y9Result.failure("elastic只支持复制elastic表");
+			}
+			DataTable table = dataTableRepository.findByBaseIdAndName(baseId, tableName);
+			if (table == null) {
+				return Y9Result.failure("复制前，请先提取表信息");
+			}
 			ElasticsearchRestClient elasticsearchRestClient = new ElasticsearchRestClient(dataSourceEntity.getUrl(),
 					dataSourceEntity.getUsername(), dataSourceEntity.getPassword());
 			// 获取索引表字段
 			String mapping = elasticsearchRestClient.getMapping(tableName);
 			if(mapping.equals("failed")) {
-				return Y9Result.failure("复制失败，请联系技术人员处理");
+				return Y9Result.failure("复制失败，请查看日志处理");
 			}
 			Map<String, Object> map = Y9JsonUtil.readHashMap(mapping);
 			String mapping2 = Y9JsonUtil.writeValueAsString(map.get(tableName));
@@ -867,8 +922,10 @@ public class DataSourceServiceImpl implements DataSourceService {
 			// 创建索引表
 			String data = elasticsearchRestClient2.createIndexAndMapping(tableName, mapping2);
 			if(data.equals("failed")) {
-				return Y9Result.failure("复制失败，请联系技术人员处理");
+				return Y9Result.failure("复制失败，请查看日志处理");
 			}
+			// 提取表
+			extractIndex(id, tableName, sourceEntity);
 			return Y9Result.successMsg("复制表成功");
 		} catch (Exception e) {
 			e.printStackTrace();

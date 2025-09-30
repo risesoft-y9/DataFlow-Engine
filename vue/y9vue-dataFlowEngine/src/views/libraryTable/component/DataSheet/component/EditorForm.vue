@@ -1,18 +1,20 @@
 <script setup lang="ts">
     import { reactive, toRefs, onMounted, ref, inject, nextTick } from 'vue';
     import {
+      buildTable,
       deleteTableField,
       getFieldTypes,
       getTableField,
       saveTable,
-      saveTableAndField,
-      saveTableField
+      saveTableField,
+      updateTable
     } from '@/api/libraryTable';
     import { useSettingStore } from '@/store/modules/settingStore';
     import { getPage } from '@/views/libraryTable/component/DataSheet/data';
     import { useI18n } from 'vue-i18n';
     import { findByTypeList } from '@/api/dataSource';
     import { v4 as uuidv4 } from 'uuid';
+    import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
 
     const { t } = useI18n();
     const tableHeight = ref(280);
@@ -43,15 +45,15 @@
     };
     let showTable = ref(false);
     const getFieldTypesOptions=async ()=>{
-      let res=await getFieldTypes({sourceId:props.row.baseId||props.row.id})
-      if(res){
-        state.fieldTypeOptions=res.data
-      }
+        let res = await getFieldTypes({sourceId:props.row.baseId||props.row.id})
+        if(res){
+            state.fieldTypeOptions=res.data
+        }
     }
 
     // 初始化列表 请求
     onMounted(() => {
-      getFieldTypesOptions()
+        getFieldTypesOptions();
         formData.value.rules = {
             name: [
                 { required: true, message: '请输入数据表名称', trigger: ['blur', 'change'] },
@@ -73,12 +75,9 @@
         }
     });
 
-    const change = (e) => {
-        console.log(e, '修改');
-    };
     const getPageList = async () => {
         let params = {
-            tableId: props.row.id,
+            tableId: props.type == 'edit' ? props.row.id : props.row.tableId,
             name: state.input
         };
         const res = await getTableField(params);
@@ -120,7 +119,7 @@
                 label: 'N'
             }
         ],
-      fieldTypeOptions:[],//字段类型
+        fieldTypeOptions:[],//字段类型
 
         //  表格的过滤 条件
         filterConfig: {
@@ -145,11 +144,6 @@
         },
         // 个人权限 表格的 配置条件
         tableConfig: {
-            // scrollY: {
-            //   //竖向滚动配置
-            //   enabled: false, //开启虚拟滚动
-            //   gt: 0, //虚拟显示条数
-            // },
             height: 280,
             maxHeight: 280,
             openAutoComputedHeight: false,
@@ -190,7 +184,6 @@
         },
         rules: {}, //表单校验规则
         itemList: [
-
             {
                 type: 'text',
                 type1: 'input',
@@ -217,59 +210,57 @@
                     }
                 }
             },
-          {
-            type: 'text',
-            type1: 'input', //自定义字段-编辑时显示的类型
-            type2: 'text', //自定义字段-非编辑状态显示文本类型
-            prop: 'name',
-            label: '数据表名称',
-            props: {
-              events: {
-                blur: (e) => {
-                  if (props.type == 'edit') {
-                    // editSaveTable();
-                  }
-                }, //当选择器的输入框失去焦点时触发。
-                change:(e)=>{
-                  if(props.row.baseId){
-                    editSaveTable();
-                  }
-
-                  // console.log('修改了')
+            {
+                type: 'text',
+                type1: 'input', //自定义字段-编辑时显示的类型
+                type2: 'text', //自定义字段-非编辑状态显示文本类型
+                prop: 'name',
+                label: '数据表名称',
+                props: {
+                    events: {
+                        blur: (e) => {
+                            if (props.type == 'edit') {
+                                // editSaveTable();
+                            }
+                        }, //当选择器的输入框失去焦点时触发。
+                        change:(e)=>{
+                            if(props.row.baseId){
+                                editSaveTable();
+                            }
+                        }
+                    },
+                    render: () => {
+                        return h('span', props.row?.name);
+                        //text类型渲染的内容
+                    }
                 }
-              },
-              render: () => {
-                return h('span', props.row?.name);
-                //text类型渲染的内容
-              }
-            }
-          },
-          {
-            type: 'text',
-            type1: 'input',
-            type2: 'text',
-            prop: 'cname',
-            label: '表中文名称',
-            props: {
-              events: {
-                blur: (e) => {
-                  if (props.type == 'edit') {
-                    // editSaveTable();
-                  }
-                },
-                change:(e)=>{
-                  if(props.row.baseId){
-                    editSaveTable();
-                  }
-                  // console.log('修改了')
+            },
+            {
+                type: 'text',
+                type1: 'input',
+                type2: 'text',
+                prop: 'cname',
+                label: '表中文名称',
+                props: {
+                    events: {
+                        blur: (e) => {
+                            if (props.type == 'edit') {
+                                // editSaveTable();
+                            }
+                        },
+                        change:(e)=>{
+                            if(props.row.baseId){
+                                editSaveTable();
+                            }
+                            // console.log('修改了')
+                        }
+                    },
+                    render: () => {
+                        return h('span', props.row?.cname);
+                        //text类型渲染的内容
+                    }
                 }
-              },
-              render: () => {
-                return h('span', props.row?.cname);
-                //text类型渲染的内容
-              }
-            }
-          },
+            },
         ]
     });
 
@@ -278,13 +269,6 @@
         if (type == 1) {
             const valid = await formRef.value.validate();
             if (!valid) {
-                ElNotification({
-                    title: '失败',
-                    message: '请输入完整的字段信息',
-                    type: 'error',
-                    duration: 2000,
-                    offset: 80
-                });
                 return;
             }
             let params = {
@@ -298,57 +282,31 @@
                 typeNum:row.typeNum
             };
             if (row.id) {
-             params.id = row.id
-          }
+                params.id = row.id
+            }
             let res = await saveTableField(params);
             if (res) {
-                if (res.success == true) {
-                    let integrity = true;
-                    for (const re in params) {
-                        if (re != 'id' && re != 'fieldLength') {
-                            if (!params[re]) {
-                                ElNotification({
-                                    title: '失败',
-                                    message: '请输入完整的字段信息',
-                                    type: 'error',
-                                    duration: 2000,
-                                    offset: 80
-                                });
-                                row.edit = true;
-                                integrity = false;
-                                break;
-                            }
-                        }
-                    }
-                    if (integrity) {
-                        row.edit = false;
-                        ElNotification({
-                            title: '成功',
-                            message: '保存成功',
-                            type: 'success',
-                            duration: 2000,
-                            offset: 80
-                        });
-                    }
+                if(res.success) {
+                    row.edit = false;
+                    getPageList();// 刷新字段列表
                 }
+                ElNotification({
+                    title: res?.success ? t('成功') : t('失败'),
+                    message: res?.msg,
+                    type: res?.success ? 'success' : 'error',
+                    duration: 2000,
+                    offset: 80
+                });
             }
         } else if (type == 2) {
             row.edit = true;
             nextTick(() => {
                 inputRef.value?.focus();
             });
-        } else if (type == 4) {
-            //新增删除
-            form.value.tableData.forEach((item, i) => {
-                if (item.id == row.id) {
-                    form.value.tableData.splice(i, 1);
-                }
-            });
         } else {
             //修改删除
             if (row.type == '新增') {
                 form.value.tableData.forEach((item, i) => {
-                  console.log(item,row)
                     if (item.ids == row.ids) {
                         form.value.tableData.splice(i, 1);
                     }
@@ -359,30 +317,30 @@
                     cancelButtonText: t('取消'),
                     type: 'info'
                 })
-                    .then(async () => {
-                        let res = await deleteTableField({ id: row.id });
-                        if (res.success == true) {
-                            form.value.tableData.forEach((item, i) => {
-                                if (item.id == row.id) {
-                                    form.value.tableData.splice(i, 1);
-                                }
-                            });
-                            ElNotification({
-                                title: res?.success ? t('删除成功') : t('删除失败'),
-                                message: res?.msg,
-                                type: res?.success ? 'success' : 'error',
-                                duration: 2000,
-                                offset: 80
-                            });
-                        }
-                    })
-                    .catch(() => {
-                        ElMessage({
-                            type: 'info',
-                            message: t('已取消删除'),
-                            offset: 65
+                .then(async () => {
+                    let res = await deleteTableField({ id: row.id });
+                    if (res.success) {
+                        form.value.tableData.forEach((item, i) => {
+                            if (item.id == row.id) {
+                                form.value.tableData.splice(i, 1);
+                            }
                         });
+                    }
+                    ElNotification({
+                        title: res?.success ? t('成功') : t('失败'),
+                        message: res?.msg,
+                        type: res?.success ? 'success' : 'error',
+                        duration: 2000,
+                        offset: 80
                     });
+                })
+                .catch(() => {
+                    ElMessage({
+                        type: 'info',
+                        message: t('已取消删除'),
+                        offset: 65
+                    });
+                });
             }
         }
     };
@@ -399,7 +357,8 @@
             fieldType: '',
             fieldLength: null,
             fieldPk: '',
-            tableId: props.row.id,
+            tableId: props.type == 'edit' ? props.row.id : props.row.tableId,
+            isState: false,
             type: '新增'
         };
 
@@ -430,10 +389,10 @@
                 };
                 let res = await saveTable(params);
                 if (res) {
-                    if (res.success == true) {
+                    if (res.success) {
                         ElNotification({
                             title: t('成功'),
-                            message: t('修改成功'),
+                            message: res.msg,
                             type: 'success',
                             duration: 2000,
                             offset: 80
@@ -464,7 +423,7 @@
                 };
                 let res = await saveTable(params);
                 if (res) {
-                    if (res.success == true) {
+                    if (res.success) {
                         ElNotification({
                             title: t('成功'),
                             message: t('添加成功'),
@@ -495,75 +454,81 @@
             }
         });
     };
-    const saveTableList = async () => {
-        const valid = await formRef.value.validate();
-        if (valid) {
-            if (form.value.tableData.length > 0) {
-                let arr = [];
-                form.value.tableData.forEach((item) => {
-                    let obj = {
-                        name: item.name,
-                        cname: item.cname,
-                        tableId: props.row.tableId,
-                        fieldType: item.fieldType,
-                        fieldLength: item.fieldLength,
-                        fieldNull: item.fieldNull,
-                        fieldPk: item.fieldPk,
-                        typeNum:item.typeNum
-                    };
-                    arr.push(obj);
-                });
-                let res = await saveTableAndField(arr);
-                if (res) {
-                    if (res.success == true) {
-                        ElNotification({
-                            title: t('成功'),
-                            message: t('保存成功'),
-                            type: 'success',
-                            duration: 2000,
-                            offset: 80
-                        });
-                        emits('close');
-                    } else {
-                        ElNotification({
-                            title: t('失败'),
-                            message: res.msg,
-                            type: 'error',
-                            duration: 2000,
-                            offset: 80
-                        });
-                    }
-                }
-            } else {
-                ElNotification({
-                    title: t('成功'),
-                    message: t('保存成功'),
-                    type: 'success',
-                    duration: 2000,
-                    offset: 80
-                });
-                emits('close');
-            }
-            getPage();
-        }
-    };
     //字段过滤
     const handleClickQuery = () => {
         getPageList();
     };
     const optionChange=(e)=>{
-      let typeNum=e.fieldType
-      const foundType = state.fieldTypeOptions.find(type => type.typeName === e.fieldType);
-      if (foundType) {
-        e.typeNum = foundType.typeNum;
-      }
+        const foundType = state.fieldTypeOptions.find(type => type.typeName === e.fieldType);
+        if (foundType) {
+            e.typeNum = foundType.typeNum;
+        }
+    }
+
+    const buildTableData = () => {
+        ElMessageBox.confirm(`确定要生成数据库表吗`, t('提示'), {
+            confirmButtonText: t('确定'),
+            cancelButtonText: t('取消'),
+            type: 'info'
+        })
+        .then(async () => {
+            let res = await buildTable({ tableId: props.type == 'edit' ? props.row.id : props.row.tableId });
+            if (res) {
+                if(res.success) {
+                    getPage();
+                    getPageList();
+                }
+                ElNotification({
+                    title: res?.success ? t('生成成功') : t('生成失败'),
+                    message: res?.msg,
+                    type: res?.success ? 'success' : 'error',
+                    duration: 2000,
+                    offset: 80
+                });
+            }
+        })
+        .catch(() => {
+            ElMessage({
+                type: 'info',
+                message: t('已取消'),
+                offset: 65
+            });
+        });
+    }
+
+    const updateTableData = () => {
+        ElMessageBox.confirm('确认修改数据库表结构吗?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'info'
+        })
+        .then(async () => {
+            let result = await updateTable({ tableId: props.type == 'edit' ? props.row.id : props.row.tableId });
+            if (result.success) {
+                getPage();
+                getPageList();
+            }
+            ElNotification({
+                title: result.success ? '修改成功' : '修改失败',
+                message: result.msg,
+                type: result.success ? 'success' : 'error',
+                duration: 2000,
+                offset: 80
+            });
+        })
+        .catch(() => {
+            ElMessage({
+                type: 'info',
+                message: '已取消操作',
+                offset: 65
+            });
+        });
     }
 </script>
 
 <template>
     <y9Form ref="y9FormRef" :config="formData"></y9Form>
     <div
-        slot="footer"
         class="dialog-footer"
         style="text-align: center; margin-top: 25px"
         v-if="props.type == 'add' && !showTable"
@@ -579,7 +544,6 @@
                 <div class="label">搜索</div>
                 <div>
                     <el-input
-                        @change="change"
                         placeholder="字段名称"
                         autofocus
                         class="input"
@@ -626,7 +590,10 @@
                                 <el-input   placeholder="请输入" v-model="scope.row.name"></el-input>
                             </el-form-item>
                         </div>
-                        <div v-else class="text-center">{{ scope.row.name }}</div>
+                        <div v-else class="text-center">
+                            <font v-if="scope.row.isState == 0" color="red" title="数据库表中不存在此字段">!</font>
+                            {{ scope.row.name }}
+                        </div>
                     </template>
                 </el-table-column>
                 <el-table-column prop="cname" label="字段中文名">
@@ -668,7 +635,6 @@
 
                                 />
                               </el-select>
-<!--                                <el-input v-model="scope.row.fieldType"></el-input>-->
                             </el-form-item>
                         </div>
                         <div v-else class="text-center">
@@ -680,7 +646,7 @@
                     <template #header="{ column }">
                         <div style="text-align: center">{{ column.label }}</div>
                     </template>
-                    <template v-slot="scope" class="text-center">
+                    <template v-slot="scope">
                         <div v-if="scope.row.edit">
                             <el-form-item
                                 :prop="'tableData.' + scope.$index + '.fieldLength'"
@@ -692,7 +658,7 @@
                                     :controls="false"
                                     v-model="scope.row.fieldLength"
                                     :min="0"
-                                    :max="100000"
+                                    :max="4000"
                                     :size="fontSizeObj.buttonSize"
                                 />
                             </el-form-item>
@@ -734,7 +700,7 @@
                     <template #header="{ column }">
                         <div style="text-align: center">{{ column.label }}</div>
                     </template>
-                    <template v-slot="scope" class="text-center">
+                    <template v-slot="scope">
                         <div v-if="scope.row.edit">
                             <el-form-item :prop="'tableData.' + scope.$index + '.fieldPk'" :rules="form.rules.fieldPk">
                                 <el-select
@@ -760,31 +726,26 @@
                         <div style="text-align: center">{{ column.label }}</div>
                     </template>
                     <template v-slot="scope">
-                        <div class="operation" v-if="props.type == 'edit'">
+                        <div class="operation">
                             <div class="fields">
                                 <i class="ri-save-line" v-if="scope.row.edit" @click="handle(scope.row, 1)"></i>
-                                <i class="ri-edit-line" v-else @click="handle(scope.row, 2)"></i>
                                 <i class="ri-edit-line" v-else @click="handle(scope.row, 2)"></i>
                             </div>
                             <div class="delete" @click="handle(scope.row, 3)">
                                 <i class="ri-delete-bin-line"></i>
                             </div>
                         </div>
-                        <div v-else style="cursor: pointer; text-align: center">
-                            <i class="ri-delete-bin-line" @click="handle(scope.row, 4)"></i>
-                        </div>
                     </template>
                 </el-table-column>
             </el-table>
         </el-form>
-        <div
-            slot="footer"
-            class="dialog-footer"
-            style="text-align: center; margin-top: 25px"
-            v-if="props.type == 'add' && showTable"
-        >
-            <el-button type="primary" @click="saveTableList"><i class="ri-save-line"></i><span>保存</span></el-button>
-            <el-button type="primary" @click="close"><i class="ri-close-line"></i><span>关闭</span></el-button>
+        <div style="text-align: center;margin-top: 15px">
+            <el-button type="primary" @click="buildTableData"
+                ><i class="ri-send-plane-line"></i><span>新生成表</span>
+            </el-button>
+            <el-button type="primary" @click="updateTableData"
+                ><i class="ri-edit-box-line"></i><span>修改表结构</span>
+            </el-button>
         </div>
     </div>
 </template>
@@ -840,17 +801,9 @@
         .label {
             margin-right: 10px;
             color: #606266;
-            font-size: var(--f36f60c5-fontSizeObj\.baseFontSize\?fontSizeObj\.baseFontSize\:\'inherit\');
             display: flex;
-            align-items: cente;
+            align-items: center;
         }
-
-        //.input {
-        //  border-radius: 30px;
-        //  box-shadow: 0 2px 4px 0 rgb(0 0 0 / 5%);
-        //  border: 1px solid var(--el-color-primary-light-7);
-        //  font-size: v-bind("fontSizeObj.baseFontSize?fontSizeObj.baseFontSize:'inherit'");
-        //}
 
         .el-input {
             color: var(--el-text-color-regular);

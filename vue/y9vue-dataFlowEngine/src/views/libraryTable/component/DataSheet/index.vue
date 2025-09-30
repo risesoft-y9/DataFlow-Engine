@@ -11,7 +11,7 @@
     import CopyTable from './copyTable.vue';
     import { state, getPage, tableHeight } from '@/views/libraryTable/component/DataSheet/data';
     import { currNode } from '@/views/libraryTable/component';
-    import { buildTable, deleteTableInfo, getTableJob } from '@/api/libraryTable';
+    import { deleteTableInfo, getTableJob } from '@/api/libraryTable';
     import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
 
     const table = reactive({
@@ -44,7 +44,10 @@
                 },
                 {
                     title: computed(() => t('数据量')),
-                    key: 'dataNum'
+                    key: 'dataNum',
+                    render: (row) => {
+                        return row.status == 0 ? '未生成表' : row.dataNum;
+                    }
                 },
                 {
                     title: computed(() => t('操作')),
@@ -116,32 +119,6 @@
                     offset: 65
                 });
             });
-        } else {
-            ElMessageBox.confirm(`确定是否更新库表结构`, t('提示'), {
-                confirmButtonText: t('确定'),
-                cancelButtonText: t('取消'),
-                type: 'info'
-            })
-            .then(async () => {
-                let res = await buildTable({ tableId: row.id });
-                if (res) {
-                    ElNotification({
-                        title: res?.success ? t('更新成功') : t('更新失败'),
-                        message: res?.msg,
-                        type: res?.success ? 'success' : 'error',
-                        duration: 2000,
-                        offset: 80
-                    });
-                    getPage();
-                }
-            })
-            .catch(() => {
-                ElMessage({
-                    type: 'info',
-                    message: t('已取消更新'),
-                    offset: 65
-                });
-            });
         }
     };
     const onPageSizeChange = (pageSize) => {
@@ -197,10 +174,6 @@
             </template>
             <template v-slot:operation="{ row }">
                 <div class="operation">
-                    <div class="fields" @click="handle(3, row)" v-if="row.status==0">
-                        <i class="ri-edit-line"></i>
-                        <span class="text">{{ $t('生成表') }}</span>
-                    </div>
                     <div class="fields" @click="handle(4, row)">
                         <i class="ri-mastercard-line"></i>
                         <span class="text">{{ $t('关联关系') }}</span>

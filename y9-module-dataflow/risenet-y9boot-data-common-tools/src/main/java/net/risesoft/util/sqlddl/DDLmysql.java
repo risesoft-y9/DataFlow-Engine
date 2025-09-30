@@ -74,6 +74,9 @@ public class DDLmysql {
 				}
 
 				String sType = dbc.getType_name().toUpperCase();
+				if(sType.equals("VARCHAR2")) {
+					sType = "VARCHAR";
+				}
 				if(StringUtils.isNotBlank(dbc.getData_length())){
 					DDL += sType + "(" + dbc.getData_length() + ")";
 				}else {
@@ -108,6 +111,9 @@ public class DDLmysql {
 
 				sb.append(columnName).append(" ");
 				String sType = dbc.getType_name().toUpperCase();
+				if(sType.equals("VARCHAR2")) {
+					sType = "VARCHAR";
+				}
 				if (StringUtils.isNotBlank(dbc.getData_length())) {
 					sb.append(sType + "(" + dbc.getData_length() + ")");
 				} else {

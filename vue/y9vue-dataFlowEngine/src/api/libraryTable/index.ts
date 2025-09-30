@@ -132,12 +132,26 @@ export const deleteTableInfo = async (params) => {
 };
 
 /**
- * 更新表结构
+ * 生成表
  */
 export const buildTable = async (params) => {
     const data = qs.stringify(params);
     return await platformRequest({
         url: 'source/buildTable',
+        method: 'POST',
+        cType: false,
+        data
+    });
+};
+
+/**
+ * 更新表结构
+ * @param params
+ */
+export const updateTable = async (params) => {
+    const data = qs.stringify(params);
+    return await platformRequest({
+        url: 'source/updateTable',
         method: 'POST',
         cType: false,
         data
@@ -160,21 +174,6 @@ export const saveTable = async (params) => {
     });
 };
 
-
-/**
- * 新增表和字段 批量
- * @param params
- * @returns
- */
-export const saveTableAndField = async (data) => {
-    // const data = qs.stringify(params);
-    return await platformRequest({
-        url: 'source/saveFields',
-        method: 'POST',
-        JSON: true,
-        data
-    });
-};
 /**
  * 获取数据库可选字段类型列表
  * @param params
