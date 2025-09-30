@@ -1,6 +1,11 @@
 <template>
     <el-form ref="formRef" :model="formData" :rules="rules" class="pForm">
-        <y9Table :config="modelTableConfig" :filterConfig="filterConfig">
+        <y9Table 
+            :config="tableConfig" 
+            :filterConfig="filterConfig"
+            @on-curr-page-change="onCurrentChange"
+            @on-page-size-change="onPageSizeChange"
+        >
             <template #addBtn>
                 <el-input v-model="search" clearable placeholder="输入名称" style="margin-left: 10px" />
                 <el-select v-model="pattern" placeholder="请选择状态" style="margin-left: 10px">
@@ -108,15 +113,11 @@
 </template>
 <script lang="ts" setup>
     import { onMounted, reactive, ref, toRefs } from 'vue';
-    import { ElLoading, ElMessage, ElMessageBox, ElNotification, FormInstance, FormRules, UploadProps } from 'element-plus';
-    import y9_storage from '@/utils/storage';
-    import settings from '@/settings.ts';
-    import axios from 'axios';
+    import { ElLoading, ElMessage, ElMessageBox, ElNotification, FormInstance, FormRules } from 'element-plus';
     import { deleteArrange, executeProcess, getModelList, saveArrange } from '@/api/processAdmin/processModel';
     import Y9BpmnModel from './bpmnModel.vue';
     import logList from './logList.vue';
     import veCorn from "../dispatch/comp/saveTask/comp/ve-cron/index.vue";
-    import { getStoragePageSize } from '@/utils';
 
     const formRef = ref<FormInstance>();
     const rules = reactive<FormRules>({
@@ -127,8 +128,7 @@
         isEmptyData: false,
         formData: {id: '', name: '', content: '', pattern: '', cron: '* * * * * ? *'},
         isEdit: false,
-        modelTableConfig: {
-            //人员列表表格配置
+        tableConfig: {
             columns: [
                 { title: '序号', type: 'index', width: '60' },
                 { title: '名称', key: 'name', slot: 'name' },
@@ -143,7 +143,7 @@
             tableData: [{}],
             pageConfig: {
                 currentPage: 1,
-                pageSize: getStoragePageSize('engineConfig', 15),
+                pageSize: 15,
                 total: 0,
                 pageSizeOpts:[10,15,30,60,120,240]
             }
@@ -174,36 +174,49 @@
         rowId: ''
     });
 
-    let { formData, filterConfig, modelTableConfig, dialogConfig, editIndex, isEmptyData, isEdit, search, pattern, rowId } = toRefs(data);
+    let { formData, filterConfig, tableConfig, dialogConfig, editIndex, isEmptyData, isEdit, search, pattern, rowId } = toRefs(data);
 
     onMounted(() => {
         getTableList();
     });
 
     async function getTableList() {
+        const loading = ElLoading.service({ lock: true, text: '加载中...', background: 'rgba(0, 0, 0, 0.3)' });
         let params = {
-            page: modelTableConfig.value.pageConfig.currentPage,
-            size: modelTableConfig.value.pageConfig.pageSize,
+            page: tableConfig.value.pageConfig.currentPage,
+            size: tableConfig.value.pageConfig.pageSize,
             name: search.value,
             pattern: pattern.value
         };
         getModelList(params).then((res) => {
             if (res.success) {
-                modelTableConfig.value.tableData = res.rows;
-                modelTableConfig.value.pageConfig.total = res.total;
+                tableConfig.value.tableData = res.rows;
+                tableConfig.value.pageConfig.total = res.total;
             }
         });
+        loading.close();
+    }
+
+    // 分页操作
+    function onCurrentChange(currPage) {
+        tableConfig.value.pageConfig.currentPage = currPage;
+        getTableList();
+    }
+
+    function onPageSizeChange(pageSize) {
+        tableConfig.value.pageConfig.pageSize = pageSize;
+        getTableList();
     }
 
     const addInfo = () => {
-        for (let i = 0; i < modelTableConfig.value.tableData.length; i++) {
-            if (modelTableConfig.value.tableData[i].id == '') {
+        for (let i = 0; i < tableConfig.value.tableData.length; i++) {
+            if (tableConfig.value.tableData[i].id == '') {
                 isEmptyData.value = true;
             }
         }
         if (!isEmptyData.value) {
             editIndex.value = 0;
-            modelTableConfig.value.tableData.unshift({
+            tableConfig.value.tableData.unshift({
                 id: '',
                 name: '',
                 content: '',
@@ -227,9 +240,9 @@
         formData.value.pattern = rows.pattern + '';
         formData.value.cron = rows.cron;
         isEdit.value = true;
-        for (let i = 0; i < modelTableConfig.value.tableData.length; i++) {
-            if (modelTableConfig.value.tableData[i].id == '') {
-                modelTableConfig.value.tableData.splice(i, 1);
+        for (let i = 0; i < tableConfig.value.tableData.length; i++) {
+            if (tableConfig.value.tableData[i].id == '') {
+                tableConfig.value.tableData.splice(i, 1);
             }
         }
         isEmptyData.value = false;
@@ -286,9 +299,9 @@
         formData.value.pattern = '0';
         formData.value.cron = '';
         refForm.resetFields();
-        for (let i = 0; i < modelTableConfig.value.tableData.length; i++) {
-            if (modelTableConfig.value.tableData[i].id == '') {
-                modelTableConfig.value.tableData.splice(i, 1);
+        for (let i = 0; i < tableConfig.value.tableData.length; i++) {
+            if (tableConfig.value.tableData[i].id == '') {
+                tableConfig.value.tableData.splice(i, 1);
             }
         }
         isEmptyData.value = false;

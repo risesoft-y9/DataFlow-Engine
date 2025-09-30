@@ -314,14 +314,14 @@ public class TaskMakeUpListener {
             				for(DataMappingArgsEntity mappingArgs : dataMappingArgsList) {
             					DataTaskCoreEntity info = dataTaskCoreRepository.findByTaskIdAndArgsIdAndSequence(taskId, mappingArgs.getId(), tabIndex);
             					if(info != null) {
-            						rmap.put(mappingArgs.getName(), info.getValue());
+            						rmap.put(mappingArgs.getName(), getValue(info.getValue(), mappingArgs.getType()));
             					}
             				}
             				map.put(dataMappingArgsEntity.getUpName(), rmap);
             				upNameList.add(dataMappingArgsEntity.getUpName());// 存储，避免重复计算
         				}
         			}else {
-        				map.put(taskCore.getKeyName(), taskCore.getValue());
+        				map.put(taskCore.getKeyName(), getValue(taskCore.getValue(), dataMappingArgsEntity.getType()));
         			}
         		}
         	}
@@ -329,6 +329,24 @@ public class TaskMakeUpListener {
         	dataTaskMakeUpEntity.setTabIndex(tabIndex);
         	dataTaskMakeUpRepository.save(dataTaskMakeUpEntity);
     	}
+    }
+    
+    // 根据数据类型返回对应类型的值
+    private Object getValue(String data, String dataType) {
+    	if(StringUtils.isNotBlank(data)) {
+    		try {
+				if(dataType.equals("string")) {
+					return data;
+				} else if(dataType.equals("integer")) {
+					return Integer.valueOf(data);
+				} else if(dataType.equals("boolean")) {
+					return Boolean.valueOf(data);
+				}
+			} catch (NumberFormatException e) {
+				return data;
+			}
+    	}
+    	return data;
     }
     
     private void saveSource(String taskId, TaskConfigModel configModel) {

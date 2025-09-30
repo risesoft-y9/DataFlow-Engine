@@ -1,6 +1,11 @@
 <template>
     <el-form ref="interfaceRef" :model="formData" :rules="rules" class="interfaceForm">
-        <y9Table :config="tableConfig" :filterConfig="filterConfig">
+        <y9Table 
+            :config="tableConfig" 
+            :filterConfig="filterConfig"
+            @on-curr-page-change="onCurrentChange"
+            @on-page-size-change="onPageSizeChange"
+        >
             <template #addBtn>
                 <el-input v-model="search" clearable placeholder="输入接口名称或者地址" style="margin-left: 10px" />
                 <el-select v-model="type" placeholder="请选择接口类型" style="margin-left: 10px">
@@ -126,7 +131,6 @@
     } from '@/api/interface';
     import ParamsList from '@/views/interface/paramsList.vue';
     import EditParams from '@/views/interface/editParams.vue';
-    import { getStoragePageSize } from '@/utils';
     import router from '@/router';
 
     const interfaceRef = ref<FormInstance>();
@@ -140,6 +144,7 @@
         formData: { id: '', interfaceUrl: '', interfaceName: '', requestType: 'GET', dataType: '1', pattern: '0', contentType: '' },
         isEdit: false,
         tableConfig: {
+            loading: false,
             columns: [
                 { title: '序号', type: 'index', width: '60' },
                 { title: '接口名称', key: 'interfaceName', width: '240', slot: 'interfaceName' },
@@ -153,10 +158,10 @@
             ],
             border: false,
             headerBackground: true,
-            tableData: [],
+            tableData: [{}],
             pageConfig: {
                 currentPage: 1,
-                pageSize: getStoragePageSize('engineConfig', 15),
+                pageSize: 15,
                 total: 0,
                 pageSizeOpts:[10,15,30,60,120,240]
             }
@@ -213,6 +218,7 @@
     } = toRefs(data);
 
     async function getTableList() {
+        tableConfig.value.loading = true;
         // 接口参数
         let params = {
             page: tableConfig.value.pageConfig.currentPage,
@@ -226,6 +232,18 @@
             tableConfig.value.tableData = res.rows;
             tableConfig.value.pageConfig.total = res.total;
         }
+        tableConfig.value.loading = false;
+    }
+
+    // 分页操作
+    function onCurrentChange(currPage) {
+        tableConfig.value.pageConfig.currentPage = currPage;
+        getTableList();
+    }
+
+    function onPageSizeChange(pageSize) {
+        tableConfig.value.pageConfig.pageSize = pageSize;
+        getTableList();
     }
 
     onMounted(() => {
