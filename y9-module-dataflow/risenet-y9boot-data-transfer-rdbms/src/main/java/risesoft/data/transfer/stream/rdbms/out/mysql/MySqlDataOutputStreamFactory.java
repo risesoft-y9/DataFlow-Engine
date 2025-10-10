@@ -3,8 +3,6 @@ package risesoft.data.transfer.stream.rdbms.out.mysql;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.apache.commons.lang3.StringUtils;
-
 import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.stream.out.DataOutputStream;
 import risesoft.data.transfer.core.util.Configuration;
@@ -28,6 +26,16 @@ public class MySqlDataOutputStreamFactory extends RdbmsDataOutputStreamFactory {
 	@Override
 	protected void createUpdate(int size) {
 		idField = Arrays.asList(getStrings(writerType, "update"));
+		createSql(size);
+	}
+
+	@Override
+	protected void createReplace(int size) {
+		idField = Arrays.asList(getStrings(writerType, "replace"));
+		createSql(size);
+	}
+	
+	private void createSql(int size) {
 		updateField = new ArrayList<String>();
 		for (String columnHolder : resultSetMetaData.getLeft()) {
 			if (!idField.contains(columnHolder)) {
@@ -59,12 +67,14 @@ public class MySqlDataOutputStreamFactory extends RdbmsDataOutputStreamFactory {
 		}
 	}
 
-	protected void createReplace(int size) {
-		createUpdate(size);
-	}
-
 	@Override
 	protected DataOutputStream getUpdateStream() {
+		return new MySqlUpadateDataOutputStream(DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password),
+				workSql, resultSetMetaData, createColumnHandles, dataBaseType, logger);
+	}
+	
+	@Override
+	protected DataOutputStream getReplaceStream() {
 		return new MySqlUpadateDataOutputStream(DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password),
 				workSql, resultSetMetaData, createColumnHandles, dataBaseType, logger);
 	}

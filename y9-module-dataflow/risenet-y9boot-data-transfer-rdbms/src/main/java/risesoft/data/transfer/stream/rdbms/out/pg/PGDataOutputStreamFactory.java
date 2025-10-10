@@ -3,8 +3,6 @@ package risesoft.data.transfer.stream.rdbms.out.pg;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.apache.commons.lang3.StringUtils;
-
 import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.stream.out.DataOutputStream;
 import risesoft.data.transfer.core.util.Configuration;
@@ -28,6 +26,16 @@ public class PGDataOutputStreamFactory extends RdbmsDataOutputStreamFactory {
 	@Override
 	protected void createUpdate(int size) {
 		idField = Arrays.asList(getStrings(writerType, "update"));
+		createSql(size);
+	}
+
+	@Override
+	protected void createReplace(int size) {
+		idField = Arrays.asList(getStrings(writerType, "replace"));
+		createSql(size);
+	}
+	
+	private void createSql(int size) {
 		updateField = new ArrayList<String>();
 		for (String columnHolder : resultSetMetaData.getLeft()) {
 			if (!idField.contains(columnHolder)) {
@@ -44,8 +52,7 @@ public class PGDataOutputStreamFactory extends RdbmsDataOutputStreamFactory {
 			}
 		}
 		sb.append(")");
-		sb.append(
-				" ON CONFLICT (" + DataBaseType.castKeyFieldsAndJoin(dataBaseType, idField, ",") + ") do update set ");
+		sb.append(" ON CONFLICT (" + DataBaseType.castKeyFieldsAndJoin(dataBaseType, idField, ",") + ") do update set ");
 		for (int i = 0; i < updateField.size(); i++) {
 			if (i != 0) {
 				sb.append(",");
@@ -57,17 +64,17 @@ public class PGDataOutputStreamFactory extends RdbmsDataOutputStreamFactory {
 		this.workSql = sb.toString();
 		if (logger.isInfo()) {
 			logger.info(this, "pg worksql:" + this.workSql);
-
 		}
 	}
 
 	@Override
-	protected void createReplace(int size) {
-		createUpdate(size);
-	}
-
-	@Override
 	protected DataOutputStream getUpdateStream() {
+		return new PGUpadateDataOutputStream(DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password), workSql,
+				resultSetMetaData, createColumnHandles, dataBaseType, logger, updateField);
+	}
+	
+	@Override
+	protected DataOutputStream getReplaceStream() {
 		return new PGUpadateDataOutputStream(DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password), workSql,
 				resultSetMetaData, createColumnHandles, dataBaseType, logger, updateField);
 	}
