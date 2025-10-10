@@ -23,6 +23,7 @@ import serverNodeRouter from './modules/serverNodeRouter';
 import safetyRouter from './modules/safetyRouter';
 import systemManagementRouter from './modules/systemManagementRouter';
 import interfaceRouter from './modules/interfaceRouter';
+import dataWatermarkRouter from './modules/dataWatermarkRouter';
 import y9_storage from '@/utils/storage';
 //constantRoutes为不需要动态判断权限的路由，如登录、404、500等
 export const constantRoutes: Array<any> = [
@@ -84,7 +85,8 @@ export const asyncRoutes = [
     logMonitoringRouter,
     serverNodeRouter,
     safetyRouter,
-    systemRouter
+    systemRouter,
+    dataWatermarkRouter
 ];
 // 引入其他模块路由
 
