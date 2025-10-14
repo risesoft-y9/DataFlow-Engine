@@ -15,7 +15,7 @@ public class TaskQueue implements Runnable {
     private Queue<Task> q = new LinkedList<Task>();
     private Object o = new Object();
     private boolean isNotify = false;
-
+    private boolean start=false;
     public void add(Task t) {
         synchronized (q) {
             q.add(t);
@@ -31,13 +31,18 @@ public class TaskQueue implements Runnable {
     }
 
     public void start() {
+    	start=true;
         new Thread(this).start();
+    }
+    
+    public void stop() {
+    	start=false;
     }
 
     @Override
     public void run() {
         Task t;
-        while (true) {
+        while (start) {
 
             while (!q.isEmpty()) {
                 synchronized (q) {
