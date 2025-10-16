@@ -1,7 +1,7 @@
 package net.risesoft.api.job.actions.dispatch.executor.impl;
 
 import net.risedata.rpc.provide.listener.SyncResult;
-import net.risedata.rpc.provide.net.ClinetConnection;
+import net.risedata.rpc.provide.net.ClientConnection;
 import net.risesoft.api.exceptions.JobException;
 import net.risesoft.api.job.JobContext;
 import net.risesoft.api.job.actions.dispatch.ExecutorAction;
@@ -40,7 +40,7 @@ public class JobExecutorAction implements ExecutorAction {
 	@Override
 	public Result action(Job job, JobLog jobLog, Map<String, Object> args, ServiceInstance iServiceInstance,
 			JobContext jobContext, DoBalance doBalance) {
-		ClinetConnection clinetConnection = ClientListener.getConnection(iServiceInstance.getInstanceId());
+		ClientConnection clinetConnection = ClientListener.getConnection(iServiceInstance.getInstanceId());
 		if (clinetConnection == null) {
 			throw new JobException(iServiceInstance.getInstanceId() + "调度失败未找到连接!");
 		}

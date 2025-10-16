@@ -47,7 +47,6 @@ public class GroupUtils {
 
 		Map<K, V> result = new HashMap<K, V>();
 		K tmpK;
-		List<V> tmpV;
 		for (V v : persons) {
 			tmpK = getKey.getKey(v);
 			result.put(tmpK, v);

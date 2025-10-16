@@ -695,6 +695,7 @@ public class DataSourceServiceImpl implements DataSourceService {
 	}
 
 	@Override
+	@Transactional(readOnly = false)
 	public Y9Result<String> saveFields(List<DataTableField> fieldList) {
 		String tableId = "";
 		for (DataTableField field : fieldList) {

@@ -9,7 +9,7 @@ import net.risedata.rpc.provide.defined.ClassDefined;
 import net.risedata.rpc.provide.handle.impl.DefaultParameterHandle;
 import net.risedata.rpc.provide.handle.impl.ParamParameterHandle;
 import net.risedata.rpc.provide.listener.Listener;
-import net.risedata.rpc.provide.net.ClinetConnection;
+import net.risedata.rpc.provide.net.ClientConnection;
 import net.risedata.rpc.provide.net.Server;
 import net.risedata.rpc.service.patientia.FixedExecutorService;
 
@@ -36,7 +36,7 @@ public class ServerBootStart extends ApplicationConfig {
         ApplicationConfig.configArgs = new ConfigArgs();
         PARAMETER_HANDLES.add(new ParamParameterHandle());
         PARAMETER_HANDLES.add(new DefaultParameterHandle());
-        ClinetConnection.EXECUTOR_SERVICE = new FixedExecutorService(10);
+        ClientConnection.EXECUTOR_SERVICE = new FixedExecutorService(10);
 
     }
 

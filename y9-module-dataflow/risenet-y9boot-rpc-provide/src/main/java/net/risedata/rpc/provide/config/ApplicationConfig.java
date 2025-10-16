@@ -14,7 +14,7 @@ import net.risedata.rpc.provide.handle.TypeConvertHandle;
 import net.risedata.rpc.provide.handle.impl.DefaultTypeConvertHandle;
 import net.risedata.rpc.provide.handle.impl.RequestTypeConver;
 import net.risedata.rpc.provide.listener.Listener;
-import net.risedata.rpc.provide.net.ClinetConnection;
+import net.risedata.rpc.provide.net.ClientConnection;
 import net.risedata.rpc.provide.net.Server;
 import net.risedata.rpc.service.RPCExecutorService;
 import net.risedata.rpc.service.patientia.FixedExecutorService;
@@ -164,7 +164,7 @@ public class ApplicationConfig implements ApplicationListener {
 			}
 			applicationContext = event1.getApplicationContext();
 			configArgs = applicationContext.getBean(ConfigArgs.class);
-			ClinetConnection.EXECUTOR_SERVICE = applicationContext.getBean(RPCExecutorService.class);
+			ClientConnection.EXECUTOR_SERVICE = applicationContext.getBean(RPCExecutorService.class);
 
 			List<TypeConvertHandle> allTypeConverts = new ArrayList<>();
 			String[] typeConverts = applicationContext.getBeanNamesForType(TypeConvertHandle.class);

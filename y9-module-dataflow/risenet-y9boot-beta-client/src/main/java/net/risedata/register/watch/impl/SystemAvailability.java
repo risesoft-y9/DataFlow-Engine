@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class SystemAvailability implements ServiceAvailability {
 
-    private static Server SERVER;
+    private static volatile Server SERVER;
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(SystemAvailability.class);
 

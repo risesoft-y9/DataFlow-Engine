@@ -1,9 +1,8 @@
 package net.risedata.rpc.provide.listener.impl;
 
-import io.netty.channel.socket.SocketChannel;
 import net.risedata.rpc.provide.listener.Listener;
 import net.risedata.rpc.provide.listener.ListenerManager;
-import net.risedata.rpc.provide.net.ClinetConnection;
+import net.risedata.rpc.provide.net.ClientConnection;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,10 +14,10 @@ import java.util.List;
  */
 public class DefaultListenerManager implements ListenerManager {
 
-    private List<Listener> listeners;
+    private volatile List<Listener> listeners;
 
     @Override
-    public void onConnection(ClinetConnection clinetConnection) {
+    public void onConnection(ClientConnection clinetConnection) {
         if (listeners != null) {
             for (Listener filter : listeners) {
                 filter.onConnection(clinetConnection);
@@ -28,7 +27,7 @@ public class DefaultListenerManager implements ListenerManager {
     }
 
     @Override
-    public void onClosed(ClinetConnection clinetConnection) {
+    public void onClosed(ClientConnection clinetConnection) {
         if (listeners != null) {
             for (Listener filter : listeners) {
                 filter.onClosed(clinetConnection);

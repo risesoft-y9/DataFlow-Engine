@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  * @Author lb176
  * @Date 2021/4/29==16:32
  */
-public class ClinetConnection extends SimpleChannelInboundHandler<Msg> {
+public class ClientConnection extends SimpleChannelInboundHandler<Msg> {
 
     /**
      * 实际用来执行任务的线程service
@@ -48,14 +48,14 @@ public class ClinetConnection extends SimpleChannelInboundHandler<Msg> {
     private Listener listener;
 
 
-    public ClinetConnection(String id, Listener listener) {
+    public ClientConnection(String id, Listener listener) {
         this.id = id;
         this.listener = listener;
         this.resultMap = new ConcurrentHashMap<>();
     }
 
 
-    private Map<String, Object> attributes;
+    private volatile Map<String, Object> attributes;
 
     /**
      * 通道

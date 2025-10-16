@@ -17,7 +17,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import net.risedata.register.config.ListenerConfigs;
 import net.risedata.register.service.IServiceInstance;
-import net.risedata.rpc.provide.net.ClinetConnection;
+import net.risedata.rpc.provide.net.ClientConnection;
 import net.risesoft.api.listener.ClientListener;
 import net.risesoft.api.persistence.iservice.IServiceService;
 import net.risesoft.api.persistence.model.IServiceInstanceModel;
@@ -59,7 +59,7 @@ public class RegisterController extends BaseController {
 	 */
 	@PostMapping("/reStart/{id}")
 	public Object reStart(@PathVariable String id) {
-		ClinetConnection connection = ClientListener.getConnection(id);
+		ClientConnection connection = ClientListener.getConnection(id);
 		if (connection != null) {
 			iServiceService.setStatus(id, IServiceInstance.AWAIT_STOP);
 			JSONArray json = connection.pushListener(ListenerConfigs.RE_START, new HashMap<>(), 10000).getResult()
@@ -86,7 +86,7 @@ public class RegisterController extends BaseController {
 			@RequestParam(required = true) String operation, @RequestParam(required = true) String argsJson) {
 
 		return Mono.create((succ) -> {
-			ClinetConnection clinetConnection;
+			ClientConnection clinetConnection;
 			Map<String, Object> args = JSONObject.parseObject(argsJson);
 			Map<String, Object> res = new HashMap<>();
 			AtomicInteger count = new AtomicInteger(instanceIds.length);

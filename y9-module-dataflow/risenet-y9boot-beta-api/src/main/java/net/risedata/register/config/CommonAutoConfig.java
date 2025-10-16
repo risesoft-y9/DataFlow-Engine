@@ -17,11 +17,9 @@ import net.risedata.register.service.RegisterDiscoveryProperties;
 public class CommonAutoConfig {
 
     @Bean
-    public RegisterDiscoveryProperties RegisterDiscoveryProperties() {
-
+    public RegisterDiscoveryProperties registerDiscoveryProperties() {
         return new RegisterDiscoveryProperties();
     }
-
 
     @Bean
     IServiceInstanceFactory getIServiceInstanceFactory() {

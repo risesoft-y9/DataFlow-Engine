@@ -1,7 +1,7 @@
 package net.risesoft.api.listener;
 
 import net.risedata.rpc.provide.listener.Listener;
-import net.risedata.rpc.provide.net.ClinetConnection;
+import net.risedata.rpc.provide.net.ClientConnection;
 import net.risesoft.api.api.RegisterApi;
 import net.risesoft.api.persistence.iservice.IServiceService;
 
@@ -26,12 +26,12 @@ public class ClientListener implements Listener {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientListener.class);
 
-    public static final List<ClinetConnection> connections = new ArrayList<>();
+    public static final List<ClientConnection> connections = new ArrayList<>();
 
 
 
     @Override
-    public void onConnection(ClinetConnection clinetConnection) {
+    public void onConnection(ClientConnection clinetConnection) {
         if (LOG.isInfoEnabled()) {
             LOG.info(clinetConnection.getRemoteAddress() + " connection ");
         }
@@ -46,7 +46,7 @@ public class ClientListener implements Listener {
 
     //判断连接数量有几个连接
     @Override
-    public void onClosed(ClinetConnection clinetConnection) {
+    public void onClosed(ClientConnection clinetConnection) {
 
         if (LOG.isInfoEnabled()) {
             LOG.info(clinetConnection.getRemoteAddress() + "连接关闭 ");
@@ -62,9 +62,9 @@ public class ClientListener implements Listener {
         }
     }
 
-    public static ClinetConnection getConnection(String instanceId) {
+    public static ClientConnection getConnection(String instanceId) {
         synchronized (connections) {
-            for (ClinetConnection connection : connections) {
+            for (ClientConnection connection : connections) {
                 if (instanceId.equals(connection.getAttribute(RegisterApi.CONNECTION_INSTANCE_ID))) {
                     return connection;
                 }
@@ -76,7 +76,7 @@ public class ClientListener implements Listener {
     public static void pushListener(String name, Map<String, Object> value, String serviceName, String instanceId, String environment) {
         Map<Object, Object> sendedMap = new HashMap<>();
         synchronized (connections) {
-            for (ClinetConnection connection : connections) {
+            for (ClientConnection connection : connections) {
                 try {
                     if (environment != null) {
                         if (!environment.equals(connection.getAttribute(RegisterApi.INSTANCE_ENVIRONMENT_NAME))) {

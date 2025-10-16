@@ -23,6 +23,8 @@ public class Y9Encrytor {
     
     private String KEY = "risesoft";
     
+    private String args = "AES";
+    
     public Y9Encrytor() {
         try {
 			// 构造密钥生成器，指定为AES算法,不区分大小写
@@ -34,7 +36,7 @@ public class Y9Encrytor {
 			// 生成密钥
 			deskey = keygen.generateKey();
 			// 生成Cipher对象,指定其支持的AES算法
-			cipher = Cipher.getInstance("AES");
+			cipher = Cipher.getInstance(args);
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		} catch (NoSuchPaddingException e) {

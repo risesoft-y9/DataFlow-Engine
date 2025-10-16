@@ -1,7 +1,6 @@
 package net.risedata.register.api.system;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.FileUtil;
 import net.risedata.register.api.filter.listener.CountListener;
 import net.risedata.register.config.ListenerConfigs;
 import net.risedata.register.config.SystemConfig;
@@ -32,59 +31,20 @@ import java.util.*;
 @Listeners
 public class SystemOperation {
 
-
-    public static void main(String[] args) throws IOException {
-        Map<String, Object> res = new HashMap<>();
-
-        RandomAccessFile randomAccessFile = new RandomAccessFile("C:\\Users\\ASUS\\Desktop\\nohup.out", "r");
-        long maxSize = randomAccessFile.length();
-        long startIndex = -1;
-        int readSize=40480000;
-        if (maxSize <= startIndex) {
-            res.put("data", "");
-            res.put("nextIndex", maxSize);
-            System.out.println(res);
-        }
-        if (readSize == -1) {
-            readSize = (int) maxSize;
-        }
-        if (startIndex == -1) {
-            startIndex = randomAccessFile.getChannel().size() - readSize;
-            if (startIndex < 0) {
-                startIndex = 0;
-            }
-        }
-
-        if (startIndex + readSize > maxSize) {
-            res.put("nextIndex", maxSize);
-            readSize = (int) (maxSize - startIndex);
-        } else {
-            res.put("nextIndex", startIndex + readSize);
-        }
-
-        randomAccessFile.seek(startIndex);
-        byte[] bytes = new byte[readSize];
-        int byteread = 0;
-        while ((byteread = randomAccessFile.read(bytes)) != -1) {
-        }
-//        res.put("data", new String(bytes, "UTF-8"));
-        System.out.println(res);
-        String str =  new String(bytes, "UTF-8");
-        System.out.println(str.indexOf("20574:提交"));
-       FileUtil.writeString(str, "C:\\Users\\ASUS\\Desktop\\a.out", "UTF-8");
-    }
-
-
     @Autowired
     CountListener countListener;
 
     @Autowired
     ConfigurableApplicationContext configurableApplicationContext;
+    
     @Autowired
     ApplicationArguments arg;
+    
     private Class<?> rootClass;
+    
     @Autowired
     ApplicationContext ac;
+    
     /**
      * 标记了状态
      */
@@ -103,10 +63,9 @@ public class SystemOperation {
     @Autowired(required = false)
     ContainerManager containerManager;
 
-    //    ContainerManager
-//    使用重启容器操作 当没有实现哪个ServletWebServerFactory 这个bean 的时候触发
+    // 使用重启容器操作 当没有实现哪个ServletWebServerFactory 这个bean 的时候触发
     @Listener(ListenerConfigs.RE_START)
-    public  int reStart() {
+    public int reStart() {
         System.out.println("重启"+status);
         System.out.println("重启程序");
         if (status != START) {
@@ -122,23 +81,20 @@ public class SystemOperation {
                 while (name.indexOf("$") != -1) {
                     tempClass = tempClass.getSuperclass();
                     name = tempClass.getName();
-
                 }
                 if (ConsumerApplication.LOGGER.isInfoEnabled()) {
                     ConsumerApplication.LOGGER.info("boot class " + tempClass);
                 }
                 this.rootClass = tempClass;
-
             }
             SystemConfigSelector.rootClass = this.rootClass;
             ConsumerApplication.LOGGER.info("restart ----");
 
             Thread thread = new Thread(() -> {
-
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
                 if (servletWebServerFactory == null) {
                     System.out.println("容器对象为空 走查找-- ");
@@ -149,8 +105,6 @@ public class SystemOperation {
                         SystemConfig system = new SystemConfig();
                         system.containerManager(system.createSystemOperation()).reStart();
                     }
-
-
                     return;
                 }
                 ConsumerApplication.LOGGER.info("close ");
@@ -164,7 +118,7 @@ public class SystemOperation {
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
 
                 status = STARTING;
@@ -251,7 +205,6 @@ public class SystemOperation {
 
             map.put("status", 200);
             map.put("data", readFileStr(file, startIndex, readSize));
-
         } catch (Exception e) {
             map.put("status", 500);
             map.put("data", e.getMessage());
@@ -274,28 +227,6 @@ public class SystemOperation {
             f = files.get(0);
             for (File file1 : files) {
                 if (file1.lastModified() > f.lastModified()) {
-                    f = file1;
-                }
-            }
-            return f.getAbsolutePath();
-        }
-        return f.getAbsolutePath();
-    }
-
-    /**
-     * 获取字符串最新
-     *
-     * @param file 上册文件夹或者文件如果是文件则直接返回
-     * @return
-     */
-    private static String getMaxStrFile(String file) {
-        File f = new File(file);
-        if (f.isDirectory()) {
-            List<File> files = new ArrayList<>();
-            getFiles(f, files);
-            f = files.get(0);
-            for (File file1 : files) {
-                if (file1.getName().compareTo(f.getName()) > 1) {
                     f = file1;
                 }
             }
@@ -330,41 +261,49 @@ public class SystemOperation {
      * @return
      * @throws Exception
      */
-    private static Map<String, Object> readFileStr(String file, long startIndex, int readSize) throws Exception {
+    private static Map<String, Object> readFileStr(String file, long startIndex, int readSize) {
         Map<String, Object> res = new HashMap<>();
-        RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r");
-        long maxSize = randomAccessFile.length();
-        if (maxSize <= startIndex) {
-            res.put("data", "");
-            res.put("nextIndex", maxSize);
-            return res;
-        }
-        if (readSize == -1) {
-            readSize = (int) maxSize;
-        }
-        if (startIndex == -1) {
-            startIndex = randomAccessFile.getChannel().size() - readSize;
-            if (startIndex < 0) {
-                startIndex = 0;
-            }
-        }
+        RandomAccessFile randomAccessFile = null;
+        try {
+			randomAccessFile = new RandomAccessFile(file, "r");
+			long maxSize = randomAccessFile.length();
+			if (maxSize <= startIndex) {
+			    res.put("data", "");
+			    res.put("nextIndex", maxSize);
+			    return res;
+			}
+			if (readSize == -1) {
+			    readSize = (int) maxSize;
+			}
+			if (startIndex == -1) {
+			    startIndex = randomAccessFile.getChannel().size() - readSize;
+			    if (startIndex < 0) {
+			        startIndex = 0;
+			    }
+			}
 
-        if (startIndex + readSize > maxSize) {
-            res.put("nextIndex", maxSize);
-            readSize = (int) (maxSize - startIndex);
-        } else {
-            res.put("nextIndex", startIndex + readSize);
-        }
+			if (startIndex + readSize > maxSize) {
+			    res.put("nextIndex", maxSize);
+			    readSize = (int) (maxSize - startIndex);
+			} else {
+			    res.put("nextIndex", startIndex + readSize);
+			}
 
-        randomAccessFile.seek(startIndex);
-        byte[] bytes = new byte[readSize];
-        int byteread = 0;
-        while ((byteread = randomAccessFile.read(bytes)) != -1) {
-        }
-        res.put("data", new String(bytes, "UTF-8"));
-
+			randomAccessFile.seek(startIndex);
+			byte[] bytes = new byte[readSize];
+			res.put("data", new String(bytes, "UTF-8"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(randomAccessFile != null) {
+				try {
+					randomAccessFile.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
         return res;
     }
-
 
 }

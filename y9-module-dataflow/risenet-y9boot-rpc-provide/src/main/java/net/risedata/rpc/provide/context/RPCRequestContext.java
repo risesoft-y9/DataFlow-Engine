@@ -11,7 +11,7 @@ import net.risedata.rpc.provide.exceptions.SenderException;
 import net.risedata.rpc.provide.filter.Filter;
 import net.risedata.rpc.provide.filter.FilterNode;
 import net.risedata.rpc.provide.filter.impl.FilterNodeApplication;
-import net.risedata.rpc.provide.net.ClinetConnection;
+import net.risedata.rpc.provide.net.ClientConnection;
 
 /**
  * @description: rpc 调用的上下文
@@ -22,7 +22,7 @@ public class RPCRequestContext {
     /**
      * 当前的连接
      */
-    private ClinetConnection concurrentConnection;
+    private ClientConnection concurrentConnection;
     /**
      * request
      */
@@ -45,7 +45,7 @@ public class RPCRequestContext {
     private FilterNodeApplication filterApplication;
 
 
-    public RPCRequestContext(ClinetConnection concurrentConnection, Request request) {
+    public RPCRequestContext(ClientConnection concurrentConnection, Request request) {
         this.request = request;
         this.concurrentConnection = concurrentConnection;
     }
@@ -72,7 +72,7 @@ public class RPCRequestContext {
      * 获取当前的连接对象
      * @return
      */
-    public ClinetConnection getConcurrentConnection() {
+    public ClientConnection getConcurrentConnection() {
         return concurrentConnection;
     }
 

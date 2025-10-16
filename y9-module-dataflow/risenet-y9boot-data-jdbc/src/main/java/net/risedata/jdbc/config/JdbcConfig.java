@@ -1,5 +1,6 @@
 package net.risedata.jdbc.config;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -59,9 +60,7 @@ public class JdbcConfig implements ApplicationListener<ContextRefreshedEvent> {
 	private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(JdbcConfig.class);
 	public static final String SHOW_SQL_CONFIG = "net.risedata.jdbc.show.sql";
 	public static final String DATASOURCE_TYPE = "net.risedata.jdbc.type";
-	private static final String DATASOURCE_TYPE_ORACLE = "oracle";
-	private static final String DATASOURCE_TYPE_MYSQL = "mysql";
-	private static final String DATASOURCE_TYPE_DERBY = "derby";
+	
 	@Value("${" + SHOW_SQL_CONFIG + ":true}")
 	private boolean isShow;
 
@@ -98,7 +97,6 @@ public class JdbcConfig implements ApplicationListener<ContextRefreshedEvent> {
 							}
 						}
 						Log.print("load entiry" + count + " time for " + (System.currentTimeMillis() - startTime));
-
 					}
 				}
 			});
@@ -113,28 +111,38 @@ public class JdbcConfig implements ApplicationListener<ContextRefreshedEvent> {
 	@Bean
 	public PageExecutor getPageExecutor(DataSource dataSource) {
 		String url = null;
+		Connection connection = null;
 		try {
 			if (StringUtils.isEmpty(type)) {
-				url = ((java.sql.Connection) dataSource.getConnection()).getMetaData().getURL();
+				connection = dataSource.getConnection();
+				url = connection.getMetaData().getURL();
 				type = url.substring(5, url.indexOf(":", 5));
 			}
 		} catch (SQLException e) {
 			LOGGER.info("select page error:" + e.getMessage());
+		} finally {
+			if(connection != null) {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
 		}
-		LOGGER.info("page type=" + type);
+		LOGGER.info("page type = " + type);
 		switch (type) {
-		case "oracle":
-		case "dm":
-			return new OraclePageExecutor();
-		case "mysql":
-		case "kingbase":
-		case "postgresql":
-			return new MysqlPageExecutor();
-		case "derby":
-			return new DerbyPageExecutor();
-		default:
-			throw new ConfigException(
-					" The specified database does not have a corresponding paging implementation. Please add it manually");
+			case "oracle":
+			case "dm":
+				return new OraclePageExecutor();
+			case "mysql":
+			case "kingbase":
+			case "postgresql":
+				return new MysqlPageExecutor();
+			case "derby":
+				return new DerbyPageExecutor();
+			default:
+				throw new ConfigException(
+						" The specified database does not have a corresponding paging implementation. Please add it manually");
 		}
 	}
 
@@ -142,7 +150,6 @@ public class JdbcConfig implements ApplicationListener<ContextRefreshedEvent> {
 	@Bean
 	public JdbcExecutor getJdbcExecutor(JdbcTemplate jt, PrintExecutor print) {
 		if (isShow) {
-
 			return LoggerFactory.getInstance(new JdbcTemplateExecutor(jt), JdbcExecutor.class, print);
 		}
 		return new JdbcTemplateExecutor(jt);

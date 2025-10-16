@@ -1,6 +1,7 @@
 package risesoft.data.transfer.stream.out.stream;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -53,6 +54,8 @@ public class LocalFileOutPutStreamFactory implements DataOutputStreamFactory {
 
 			@Override
 			public void writer(Record record, Ack ack) {
+				RandomAccessFile raf = null;
+				FileChannel fileChannel = null;
 				try {
 					List<Column> columns = record.getColumns();
 					for (Column column : columns) {
@@ -62,20 +65,32 @@ public class LocalFileOutPutStreamFactory implements DataOutputStreamFactory {
 						StreamColumn streamColumn = (StreamColumn) column;
 						String fileOrgPath = localFileConfig.rootPath + streamColumn.getName();
 						FileUtils.forceMkdir(new File(fileOrgPath.substring(0, fileOrgPath.lastIndexOf("/") + 1)));
-						RandomAccessFile raf = new RandomAccessFile(fileOrgPath, "rw");
-						FileChannel fileChannel = raf.getChannel().position(streamColumn.getStart());
-						ByteBuffer buffer = ByteBuffer.wrap(streamColumn.asBytes(), 0,
-								(int) streamColumn.getByteSize());
+						raf = new RandomAccessFile(fileOrgPath, "rw");
+						fileChannel = raf.getChannel().position(streamColumn.getStart());
+						ByteBuffer buffer = ByteBuffer.wrap(streamColumn.asBytes(), 0, (int) streamColumn.getByteSize());
 						while (buffer.hasRemaining()) {
 							fileChannel.write(buffer);
 						}
-						fileChannel.close();
-						raf.close();
 					}
 					ack.confirm(record);
 				} catch (Exception e) {
 					logger.error(this, e.getMessage());
 					ack.cancel(record, e, "输出文件报错!" + e.getMessage());
+				} finally {
+					if(raf != null) {
+						try {
+							raf.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					if(fileChannel != null) {
+						try {
+							fileChannel.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
 				}
 			}
 

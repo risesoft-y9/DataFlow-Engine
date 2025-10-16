@@ -10,12 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @Version 1.0
  */
 public class IServiceInstanceFactory {
+	
     @Autowired
     RegisterDiscoveryProperties properties;
 
-
-    private IServiceInstance iServiceInstance;
-
+    private volatile IServiceInstance iServiceInstance;
 
     public IServiceInstance getIsntance() {
         if (iServiceInstance == null) {

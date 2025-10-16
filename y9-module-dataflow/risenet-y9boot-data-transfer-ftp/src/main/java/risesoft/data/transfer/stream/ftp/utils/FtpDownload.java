@@ -1,6 +1,6 @@
 package risesoft.data.transfer.stream.ftp.utils;
+
 import org.apache.commons.net.ftp.FTPClient;  
-import org.apache.commons.net.ftp.FTPFile;  
 import org.apache.commons.net.ftp.FTPReply;  
   
 import java.io.FileOutputStream;  
@@ -10,10 +10,10 @@ import java.io.OutputStream;
 public class FtpDownload {  
   
     public static void main(String[] args) {  
-        String server = "ftp.example.com";  
+        String server = "";  
         int port = 21;  
-        String user = "username";  
-        String pass = "password";  
+        String user = "";  
+        String pass = "";  
   
         FTPClient ftpClient = new FTPClient();  
   

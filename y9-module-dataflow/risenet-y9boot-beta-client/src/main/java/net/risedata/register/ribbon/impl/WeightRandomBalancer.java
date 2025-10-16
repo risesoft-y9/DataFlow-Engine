@@ -1,6 +1,5 @@
 package net.risedata.register.ribbon.impl;
 
-
 import java.util.Random;
 
 /**
@@ -12,8 +11,9 @@ import java.util.Random;
  */
 public class WeightRandomBalancer extends AbstractWeightBalancer {
 
+	private static final Random random = new Random();
 
     int getIndex(int maxIndex) {
-        return new Random().nextInt(maxIndex);
+        return random.nextInt(maxIndex);
     }
 }

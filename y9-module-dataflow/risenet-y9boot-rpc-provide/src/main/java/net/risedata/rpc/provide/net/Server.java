@@ -14,9 +14,6 @@ import net.risedata.rpc.provide.exceptions.ServerStartException;
 import net.risedata.rpc.provide.listener.ListenerManager;
 import net.risedata.rpc.provide.listener.impl.DefaultListenerManager;
 
-import java.util.UUID;
-
-
 /**
  * @description: 服务器端主要用于接收服务并且启动
  * @Author lb176
@@ -33,8 +30,6 @@ public class Server {
     public void close() {
         work.shutdownGracefully();
         root.shutdownGracefully();
-
-
     }
 
     /**
@@ -55,7 +50,7 @@ public class Server {
                 .channel(NioServerSocketChannel.class).childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
-                ClinetConnection clinetConnection = new ClinetConnection(ch.id().asLongText(), listenerManager);
+                ClientConnection clinetConnection = new ClientConnection(ch.id().asLongText(), listenerManager);
                 ChannelPipeline pipeline = ch.pipeline();
                 pipeline.addLast(new MsgDecoder());
                 pipeline.addLast(new MsgEncoder());

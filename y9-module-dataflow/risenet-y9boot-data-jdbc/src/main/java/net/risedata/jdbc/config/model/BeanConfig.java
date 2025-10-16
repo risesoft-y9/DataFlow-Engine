@@ -92,7 +92,7 @@ public class BeanConfig {
 	 */
 	private String countTableSql;
 
-	private List<ColumnMapping> columnMappings;
+	private volatile List<ColumnMapping> columnMappings;
 
 	public List<ColumnMapping> columnMappings() {
 		return columnMappings;

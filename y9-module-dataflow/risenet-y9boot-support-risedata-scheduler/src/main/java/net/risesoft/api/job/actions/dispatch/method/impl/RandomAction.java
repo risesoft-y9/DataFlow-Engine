@@ -24,23 +24,23 @@ import java.util.Random;
  */
 @Component("随机")
 public class RandomAction extends AbstractDispatchAction implements DispatchJobAction {
+	
+	private static final Random random = new Random();
+	
     @Override
     public LResult action(Job job, JobLog jobLog, TaskExecutorService taskExecutor, JobContext jobContext) {
         LResult lResult = new LResult();
         try {
-
             List<ServiceInstance> instances = getService(job);
-            Random r =  new Random();
-            int index = r.nextInt(instances.size());
+            int index = random.nextInt(instances.size());
             Result result;
-            Object value;
             try {
-                result = executorActionManager.action(job, jobLog, jobContext.getArgs(), instances.get(index), jobContext,(count,ins)->instances.get(r.nextInt(instances.size()))).onSuccess((res) -> {
+                result = executorActionManager.action(job, jobLog, jobContext.getArgs(), instances.get(index), 
+                		jobContext, (count, ins) -> instances.get(random.nextInt(instances.size()))).onSuccess((res) -> {
                     res = ObjectUtils.nullOf(res, "NULL");
                     taskExecutor.successJob(job, jobLog, "调度成功:" + res, res.toString(), jobContext);
                     lResult.end(new Object[]{res});
                 }).onError((e) -> {
-
                     taskExecutor.endJob(job, jobLog, JobLog.ERROR, instances.get(0).getInstanceId() + "调度失败原因:" + e.getMessage(), jobContext);
                     lResult.end(new Object[]{e});
                 });
@@ -49,7 +49,6 @@ public class RandomAction extends AbstractDispatchAction implements DispatchJobA
                 taskExecutor.endJob(job, jobLog, JobLog.ERROR, instances.get(0).getInstanceId() + "调度失败原因:" + e.getMessage(), jobContext);
                 lResult.end(new Object[]{e});
             }
-
         } catch (Exception e) {
             taskExecutor.endJob(job, jobLog, JobLog.ERROR, e.getMessage(), jobContext);
             lResult.end(new Object[]{e});

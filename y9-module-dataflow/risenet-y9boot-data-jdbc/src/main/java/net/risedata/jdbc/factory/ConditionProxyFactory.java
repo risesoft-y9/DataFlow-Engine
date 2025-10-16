@@ -28,6 +28,8 @@ import net.risedata.jdbc.search.exception.IfHandleException;
 
 public class ConditionProxyFactory {
 	private static final List<Parse> PARSES = new ArrayList<Parse>();
+	
+	private static final Random random = new Random();
 
 	static {// 代理解析标签的对象
 		PARSES.add(new GetValueParse());
@@ -99,8 +101,7 @@ public class ConditionProxyFactory {
 	private static <T> T newProxyInstance(ClassLoader loader, Class<T> interfaceClass, String methodBody)
 			throws Throwable {
 		ClassPool pool = ClassPool.getDefault();
-		Random r = new Random();
-		CtClass proxyCc = pool.makeClass("LProxy$" + r.nextInt() + "@" + r.nextInt());
+		CtClass proxyCc = pool.makeClass("LProxy$" + random.nextInt() + "@" + random.nextInt());
 		CtClass interfaceCc = pool.get(interfaceClass.getName());
 		proxyCc.addInterface(interfaceCc);
 		CtMethod[] ctMethods = interfaceCc.getDeclaredMethods();
