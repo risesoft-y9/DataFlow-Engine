@@ -58,6 +58,7 @@
                 <div class="label">业务分类</div>
                 <el-tree-select
                     node-key="id"
+                    clearable
                     check-strictly
                     :props="state.defaultProps"
                     v-model="state.form.jobType"
