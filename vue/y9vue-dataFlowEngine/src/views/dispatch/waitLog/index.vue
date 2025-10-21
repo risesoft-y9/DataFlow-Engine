@@ -10,7 +10,6 @@
       <div class="y9select-task">
         <div class="label">任务环境</div>
         <el-select
-            clearable
             @change="envChange"
             v-model="state.form.environment"
             class="m-2"

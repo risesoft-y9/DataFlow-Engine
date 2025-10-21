@@ -11,7 +11,6 @@
         <div class="label">任务环境</div>
         <el-select
             @change="envChange"
-            clearable
             v-model="state.form.environment"
             class="m-2"
             placeholder="请选择"
