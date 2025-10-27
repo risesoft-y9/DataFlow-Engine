@@ -24,6 +24,8 @@ spring:
             - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
             - org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
             - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
+            # 需要使用 kafka时注释掉让其能自动配置
+            - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
     datasource:
         generate-unique-name: false
         type: com.alibaba.druid.pool.DruidDataSource
@@ -84,6 +86,7 @@ spring:
                     use_query_cache: false
                     use_second_level_cache: false
                 dialect: org.hibernate.dialect.MySQL8Dialect
+                #dialect: org.hibernate.dialect.Oracle10gDialect
                 hbm2ddl:
                     auto: update
                 jdbc:
@@ -118,6 +121,7 @@ y9:
             directUrl: http://127.0.0.1:7055
     common:
         convertEnabled: true
+        secret-key: risedataflow
         environments: Public,dev
         kafkaEnabled: false
         logBaseUrl: http://127.0.0.1:7055/server-log
@@ -146,15 +150,6 @@ y9:
                 ignoreParam:
                     - ID
                     - properties
-                    - operationArray
-                    - resourceInfoJson
-                    - meta
-                    - accessLogJson
-                    - clickedAppJson
-                    - departmentJson
-                    - personJson
-                    - groupJson
-                    - positionJson
                     - url
                     - xmlData
                     - parseData

@@ -48,7 +48,7 @@ public class DataSourceEntity extends BaseEntity {
 	@Comment(value = "用户名")
 	private String username;
 
-	@Column(name = "PASSWORD", length = 50)
+	@Column(name = "PASSWORD", length = 200)
 	@Comment(value = "密码")
 	@Convert(converter = EncryptConverter.class)
 	private String password;
