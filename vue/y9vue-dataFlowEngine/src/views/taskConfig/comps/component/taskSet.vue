@@ -60,7 +60,10 @@ const save = async () => {
 
             targetCloumn: '', //目标字段详情
             targeName: '', //目标执行类
-            writerType: '' //输出类型
+            writerType: '', //输出类型
+
+            fieldAuto: false,// 异字段自动配置开关
+            valueAuto: false,// 数据转换自动配置开关
         }, //配置信息
         differentField: [], //异字段
         convertField: [], //数据转换
@@ -227,8 +230,6 @@ const setData = (form, taskCoreList, typeName) => {
             return res.className == list.className;
         });
         if (findClass) {
-            //查找执行类
-            console.log(findClass, 'findClass');
             let obj = {
                 argsId: findClass.id,
                 keyName: 'name', //执行类参数名称name

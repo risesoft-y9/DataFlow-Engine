@@ -437,7 +437,14 @@ let ruleFormRef = ref(goalTableRef);
                 <el-descriptions-item label-align="center" label="异字段同步">
                     <template #label>
                         <div>
-                            <span>异字段同步</span>
+                            <span>异字段同步 </span>
+                            <el-switch
+                                v-model="goalTableForm.tableData.fieldAuto"
+                                inline-prompt
+                                active-text="是"
+                                inactive-text="否"
+                                title="根据映射关系表自动配置开关"
+                            />
                         </div>
                     </template>
                     <div class="sync" v-for="(items, index) in goalTableForm.tableData.differentField">
@@ -553,7 +560,14 @@ let ruleFormRef = ref(goalTableRef);
                 <el-descriptions-item label-align="center" label="数据转换">
                     <template #label>
                         <div>
-                            <span>数据转换</span>
+                            <span>数据转换 </span>
+                            <el-switch
+                                v-model="goalTableForm.tableData.valueAuto"
+                                inline-prompt
+                                active-text="是"
+                                inactive-text="否"
+                                title="根据映射关系表自动配置开关"
+                            />
                         </div>
                     </template>
                     <div class="sync" v-for="(items, index) in goalTableForm.tableData.convertField">

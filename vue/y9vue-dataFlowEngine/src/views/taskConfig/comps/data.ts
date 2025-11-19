@@ -69,6 +69,8 @@ export const goalTableForm = reactive({
         convertField:[],//数据转换
         dateField:[],//日期转换
         updateField:'',//如果是更新需选择字段
+        fieldAuto: false,// 异字段自动配置开关
+        valueAuto: false,// 数据转换自动配置开关
     },
     tableOptions: [],//表名称列表
     tableFieldList: [],//字段详情列表
