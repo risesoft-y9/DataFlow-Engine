@@ -7,6 +7,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import net.risesoft.api.utils.jdbc.filedTypeMapping.TypeDefinition;
+import net.risesoft.dto.DataSourceDTO;
+import net.risesoft.dto.DataSourceTypeDTO;
+import net.risesoft.dto.DataTableDTO;
+import net.risesoft.dto.DataTableFieldDTO;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.y9public.entity.DataSourceTypeEntity;
 import net.risesoft.y9public.entity.DataSourceEntity;
@@ -22,9 +26,8 @@ public interface DataSourceService {
 
 	/**
 	 * 保存数据源实体类
-	 * 
 	 */
-	DataSourceEntity saveDataSource(DataSourceEntity entity);
+	DataSourceEntity saveDataSource(DataSourceDTO sourceDTO);
 
 	/**
 	 * 根据ID获取数据源
@@ -129,10 +132,10 @@ public interface DataSourceService {
 	
 	/**
 	 * 保存分类信息
-	 * @param entity
+	 * @param sourceTypeDTO
 	 * @return
 	 */
-	Y9Result<DataSourceTypeEntity> saveDataCategory(MultipartFile iconFile, DataSourceTypeEntity entity);
+	Y9Result<DataSourceTypeEntity> saveDataCategory(MultipartFile iconFile, DataSourceTypeDTO sourceTypeDTO);
 	
 	/**
 	 * 删除表信息
@@ -158,17 +161,17 @@ public interface DataSourceService {
 	
 	/**
 	 * 保存表信息
-	 * @param entity
+	 * @param tableDTO
 	 * @return
 	 */
-	Y9Result<DataTable> saveTable(DataTable entity);
+	Y9Result<DataTable> saveTable(DataTableDTO tableDTO);
 	
 	/**
 	 * 保存字段信息
-	 * @param entity
+	 * @param tableFieldDTO
 	 * @return
 	 */
-	Y9Result<DataTableField> saveField(DataTableField entity);
+	Y9Result<DataTableField> saveField(DataTableFieldDTO tableFieldDTO);
 	
 	/**
 	 * 删除字段信息
@@ -202,7 +205,7 @@ public interface DataSourceService {
 	 * @param fieldList
 	 * @return
 	 */
-	Y9Result<String> saveFields(List<DataTableField> fieldList);
+	Y9Result<String> saveFields(List<DataTableFieldDTO> fieldList);
 	
 	/**
 	 * 根据表id获取字段列表

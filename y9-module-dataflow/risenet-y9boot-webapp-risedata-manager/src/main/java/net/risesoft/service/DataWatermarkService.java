@@ -2,6 +2,7 @@ package net.risesoft.service;
 
 import org.springframework.data.domain.Page;
 
+import net.risesoft.dto.DataWatermarkDTO;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.y9public.entity.DataWatermarkEntity;
 
@@ -28,9 +29,9 @@ public interface DataWatermarkService {
 
 	/**
 	 * 保存水印信息
-	 * @param entity
+	 * @param watermarkDTO
 	 * @return
 	 */
-	Y9Result<DataWatermarkEntity> saveData(DataWatermarkEntity entity);
+	Y9Result<DataWatermarkEntity> saveData(DataWatermarkDTO watermarkDTO);
 	
 }

@@ -32,6 +32,7 @@ import net.risesoft.y9public.entity.DataTaskCoreEntity;
 import net.risesoft.y9public.entity.DataTaskMakeUpEntity;
 import net.risesoft.y9public.repository.DataInterfaceParamsRepository;
 import net.risesoft.y9public.repository.DataInterfaceRepository;
+import net.risesoft.y9public.repository.DataMapRepository;
 import net.risesoft.y9public.repository.DataMappingArgsRepository;
 import net.risesoft.y9public.repository.DataMappingRepository;
 import net.risesoft.y9public.repository.DataSourceRepository;
@@ -55,6 +56,7 @@ public class TaskMakeUpListener {
 	private final DataInterfaceParamsRepository dataInterfaceParamsRepository;
 	private final DataInterfaceRepository dataInterfaceRepository;
 	private final ConfigService configService;
+	private final DataMapRepository dataMapRepository;
     
     @SuppressWarnings("unchecked")
     public void onTaskMakeUp(String taskId, String taskName, TaskConfigModel configModel) throws Exception {
@@ -190,36 +192,74 @@ public class TaskMakeUpListener {
         	}
     	}
     	
+    	DataTable dataTable1 = null;// 源表
+    	DataTable dataTable2 = null;// 目标表
+    	
     	// 保存数据转换配置
     	String convertClass = Y9DataLocalHolder.getConvertClass();
     	if(StringUtils.isNotBlank(convertClass)) {
-    		DataTaskCoreEntity convert = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.PLUGS,
-        			DataServiceUtil.CONVERT, "field", 1);
-        	if(convert != null) {
-            	Map<Object, List<Map<String, Object>>> classifiedMaps = DataServiceUtil.classifyMaps(Y9JsonUtil.readListOfMap(convert.getValue()), "fieldName");
-            	for (Entry<Object, List<Map<String, Object>>> entry : classifiedMaps.entrySet()) {
-            		Map<String, Object> map = new HashMap<String, Object>();
-                	DataTaskMakeUpEntity dataTaskMakeUpEntity = new DataTaskMakeUpEntity();
-                	dataTaskMakeUpEntity.setId(Y9IdGenerator.genId());
-                	dataTaskMakeUpEntity.setTaskId(taskId);
-                	dataTaskMakeUpEntity.setTypeName(DataServiceUtil.PLUGS);
-                	dataTaskMakeUpEntity.setNameValue(convertClass);
-                	if(configModel.getSourceType().equals("api")) {
-                		map.put("field", dataInterfaceParamsRepository.findById((String)entry.getKey()).orElse(null).getParamName());
-                	}else {
-                		map.put("field", dataTableFieldRepository.findById((String)entry.getKey()).orElse(null).getName());
+    		if(configModel.getValueAuto()) {// 自动配置，只适合数据库同步
+    			// 获取表名称
+    			if(dataTable1 == null) {
+    				dataTable1 = dataTableRepository.findById(configModel.getSourceTable()).orElse(null);
+    			}
+    			if(dataTable2 == null) {
+    				dataTable2 = dataTableRepository.findById(configModel.getTargetTable()).orElse(null);
+    			}
+        		// 获取数据映射关系数据
+        		List<Map<String, Object>> list = dataMapRepository.findBySourceIdAndSourceTableAndTargetIdAndTargetTableAndDataType(configModel.getSourceId(), 
+        				dataTable1.getName(), configModel.getTargetId(), dataTable2.getName(), "data");
+        		if(list != null && list.size() > 0) {
+        			Map<Object, List<Map<String, Object>>> classifiedMaps = DataServiceUtil.classifyMaps(list, "fieldName");
+                	for (Entry<Object, List<Map<String, Object>>> entry : classifiedMaps.entrySet()) {
+                		Map<String, Object> map = new HashMap<String, Object>();
+                    	DataTaskMakeUpEntity dataTaskMakeUpEntity = new DataTaskMakeUpEntity();
+                    	dataTaskMakeUpEntity.setId(Y9IdGenerator.genId());
+                    	dataTaskMakeUpEntity.setTaskId(taskId);
+                    	dataTaskMakeUpEntity.setTypeName(DataServiceUtil.PLUGS);
+                    	dataTaskMakeUpEntity.setNameValue(convertClass);
+                    	map.put("field", (String) entry.getKey());
+                		Map<String, Object> rmap = new HashMap<String, Object>();
+                		entry.getValue().forEach(data -> {
+                        	rmap.put((String)data.get("originalData"), data.get("targetData"));
+                        });
+                        map.put("transferMapping", rmap);
+                        dataTaskMakeUpEntity.setArgsValue(Y9JsonUtil.writeValueAsString(map));
+                    	dataTaskMakeUpEntity.setTabIndex(index);
+                    	dataTaskMakeUpRepository.save(dataTaskMakeUpEntity);
+                		index++;
                 	}
-            		Map<String, Object> rmap = new HashMap<String, Object>();
-            		entry.getValue().forEach(data -> {
-                    	rmap.put((String)data.get("oldData"), data.get("newData"));
-                    });
-                    map.put("transferMapping", rmap);
-                    dataTaskMakeUpEntity.setArgsValue(Y9JsonUtil.writeValueAsString(map));
-                	dataTaskMakeUpEntity.setTabIndex(index);
-                	dataTaskMakeUpRepository.save(dataTaskMakeUpEntity);
-            		index++;
+        		}
+    		} else {
+    			DataTaskCoreEntity convert = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.PLUGS,
+            			DataServiceUtil.CONVERT, "field", 1);
+            	if(convert != null) {
+                	Map<Object, List<Map<String, Object>>> classifiedMaps = DataServiceUtil.classifyMaps(Y9JsonUtil.readListOfMap(convert.getValue()), 
+                			"fieldName");
+                	for (Entry<Object, List<Map<String, Object>>> entry : classifiedMaps.entrySet()) {
+                		Map<String, Object> map = new HashMap<String, Object>();
+                    	DataTaskMakeUpEntity dataTaskMakeUpEntity = new DataTaskMakeUpEntity();
+                    	dataTaskMakeUpEntity.setId(Y9IdGenerator.genId());
+                    	dataTaskMakeUpEntity.setTaskId(taskId);
+                    	dataTaskMakeUpEntity.setTypeName(DataServiceUtil.PLUGS);
+                    	dataTaskMakeUpEntity.setNameValue(convertClass);
+                    	if(configModel.getSourceType().equals("api")) {
+                    		map.put("field", dataInterfaceParamsRepository.findById((String)entry.getKey()).orElse(null).getParamName());
+                    	}else {
+                    		map.put("field", dataTableFieldRepository.findById((String)entry.getKey()).orElse(null).getName());
+                    	}
+                		Map<String, Object> rmap = new HashMap<String, Object>();
+                		entry.getValue().forEach(data -> {
+                        	rmap.put((String)data.get("oldData"), data.get("newData"));
+                        });
+                        map.put("transferMapping", rmap);
+                        dataTaskMakeUpEntity.setArgsValue(Y9JsonUtil.writeValueAsString(map));
+                    	dataTaskMakeUpEntity.setTabIndex(index);
+                    	dataTaskMakeUpRepository.save(dataTaskMakeUpEntity);
+                		index++;
+                	}
             	}
-        	}
+    		}
     	}
     	
     	// 等待所有任务执行完成再刷新
@@ -227,23 +267,39 @@ public class TaskMakeUpListener {
     	
     	Map<String, Object> dmap = new HashMap<String, Object>();
     	// 保存异字段配置
-    	DataTaskCoreEntity different = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.PLUGS,
-    			DataServiceUtil.DIFFERENT, "field", 1);
-    	if(different != null) {
-        	List<DifferentField> differentFields = Y9JsonUtil.readList(different.getValue(), DifferentField.class);
-        	for(DifferentField field : differentFields) {
-        		String sName = "", tName = "";
-        		if(configModel.getSourceType().equals("api")) {
-        			sName = dataInterfaceParamsRepository.findById(field.getSource()).orElse(null).getParamName();
-        		}else {
-        			sName = dataTableFieldRepository.findById(field.getSource()).orElse(null).getName();
-        		}
-        		if(configModel.getTargetType().equals("api")) {
-        			tName = dataInterfaceParamsRepository.findById(field.getTarget()).orElse(null).getParamName();
-        		}else {
-        			tName = dataTableFieldRepository.findById(field.getTarget()).orElse(null).getName();
-        		}
-        		dmap.put(sName, tName);
+    	if(configModel.getFieldAuto()) {// 自动配置，只适合数据库同步
+    		// 获取表名称
+			if(dataTable1 == null) {
+				dataTable1 = dataTableRepository.findById(configModel.getSourceTable()).orElse(null);
+			}
+			if(dataTable2 == null) {
+				dataTable2 = dataTableRepository.findById(configModel.getTargetTable()).orElse(null);
+			}
+    		// 获取字段映射关系数据
+    		List<Map<String, Object>> list = dataMapRepository.findBySourceIdAndSourceTableAndTargetIdAndTargetTableAndDataType(configModel.getSourceId(), 
+    				dataTable1.getName(), configModel.getTargetId(), dataTable2.getName(), "field");
+    		for(Map<String, Object> dataMap : list) {
+    			dmap.put(dataMap.get("originalData") + "", dataMap.get("targetData"));
+    		}
+    	} else {
+    		DataTaskCoreEntity different = dataTaskCoreRepository.findByTaskIdAndTypeNameAndDataTypeAndKeyNameAndSequence(taskId, DataServiceUtil.PLUGS,
+        			DataServiceUtil.DIFFERENT, "field", 1);
+        	if(different != null) {
+            	List<DifferentField> differentFields = Y9JsonUtil.readList(different.getValue(), DifferentField.class);
+            	for(DifferentField field : differentFields) {
+            		String sName = "", tName = "";
+            		if(configModel.getSourceType().equals("api")) {
+            			sName = dataInterfaceParamsRepository.findById(field.getSource()).orElse(null).getParamName();
+            		}else {
+            			sName = dataTableFieldRepository.findById(field.getSource()).orElse(null).getName();
+            		}
+            		if(configModel.getTargetType().equals("api")) {
+            			tName = dataInterfaceParamsRepository.findById(field.getTarget()).orElse(null).getParamName();
+            		}else {
+            			tName = dataTableFieldRepository.findById(field.getTarget()).orElse(null).getName();
+            		}
+            		dmap.put(sName, tName);
+            	}
         	}
     	}
     	

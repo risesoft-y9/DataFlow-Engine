@@ -2,13 +2,14 @@ package net.risesoft.controller;
 
 import javax.validation.Valid;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import cn.hutool.core.codec.Base64;
 import net.risedata.jdbc.commons.LPage;
 import net.risedata.jdbc.search.LPageable;
-import net.risesoft.security.SecurityManager;
+import net.risesoft.security.dto.DataUserDTO;
 import net.risesoft.security.model.DataUser;
 import net.risesoft.security.service.UserService;
 import net.risesoft.pojo.Y9Result;
@@ -26,10 +27,14 @@ public class UserController {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private ModelMapper modelMapper;
 
 	@RequestMapping("searchForPage")
-	public Y9Result<LPage<DataUser>> searchForPage(DataUser betaUser, LPageable lPageable) {
-		return Y9Result.success(userService.searchForPage(betaUser, lPageable));
+	public Y9Result<LPage<DataUser>> searchForPage(DataUserDTO userDTO, LPageable lPageable) {
+		DataUser dataUser = modelMapper.map(userDTO, DataUser.class);
+		return Y9Result.success(userService.searchForPage(dataUser, lPageable));
 	}
 
 	/**
@@ -41,7 +46,8 @@ public class UserController {
 	 * @return
 	 */
 	@PostMapping("createUser")
-	public Y9Result<Object> createUser(@Valid @RequestBody DataUser dataUser) {
+	public Y9Result<Object> createUser(@Valid @RequestBody DataUserDTO userDTO) {
+		DataUser dataUser = modelMapper.map(userDTO, DataUser.class);
 		dataUser.setPassword(Base64.decodeStr(dataUser.getPassword()));
 		return Y9Result.success(userService.createUser(dataUser));
 	}
@@ -53,8 +59,9 @@ public class UserController {
 	 * @return
 	 */
 	@PostMapping("updateUserInfo")
-	public Y9Result<Object> updateUserInfo(@Valid DataUser betaUser) {
-		return Y9Result.success(userService.updateInfoById(betaUser));
+	public Y9Result<Object> updateUserInfo(@Valid DataUserDTO userDTO) {
+		DataUser dataUser = modelMapper.map(userDTO, DataUser.class);
+		return Y9Result.success(userService.updateInfoById(dataUser));
 	}
 
 	/**
@@ -72,9 +79,6 @@ public class UserController {
 		return Y9Result.success(1);
 
 	}
-
-	@Autowired
-	SecurityManager securityManager;
 
 	/**
 	 * 删除用户

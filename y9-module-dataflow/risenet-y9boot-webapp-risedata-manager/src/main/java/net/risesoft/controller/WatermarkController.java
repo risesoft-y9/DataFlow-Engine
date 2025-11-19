@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import net.risesoft.dto.DataWatermarkDTO;
 import net.risesoft.log.LogLevelEnum;
 import net.risesoft.log.OperationTypeEnum;
 import net.risesoft.log.annotation.RiseLog;
@@ -45,8 +46,8 @@ public class WatermarkController {
 	
 	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "保存水印信息", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/saveData")
-	public Y9Result<DataWatermarkEntity> saveData(DataWatermarkEntity entity) {
-		return dataWatermarkService.saveData(entity);
+	public Y9Result<DataWatermarkEntity> saveData(DataWatermarkDTO watermarkDTO) {
+		return dataWatermarkService.saveData(watermarkDTO);
 	}
 	
 	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "根据id获取水印信息", logLevel = LogLevelEnum.RSLOG, enable = false)

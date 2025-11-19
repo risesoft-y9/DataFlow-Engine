@@ -11,23 +11,26 @@ import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.utils.Sort;
 import net.risesoft.api.utils.TaskUtils;
 import net.risesoft.controller.BaseController;
+import net.risesoft.dto.JobDTO;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.security.ConcurrentSecurity;
 import net.risesoft.service.DataBusinessService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.support.CronExpression;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import javax.validation.Valid;
 
 /**
  * @Description : 任务控制器
@@ -45,9 +48,13 @@ public class JobController extends BaseController {
 	
 	@Autowired
 	private DataBusinessService dataBusinessService;
+	
+	@Autowired
+	private ModelMapper modelMapper;
 
 	@GetMapping("/searchJob")
-	public Y9Result<Object> searchJob(String environment, Job job) {
+	public Y9Result<Object> searchJob(String environment, @Valid JobDTO jobDTO) {
+		Job job = modelMapper.map(jobDTO, Job.class);
 		return Y9Result.success(jobService.searchJob(job, getSecurityJurisdiction(environment)));
 	}
 
@@ -78,7 +85,8 @@ public class JobController extends BaseController {
 	 */
 	@CheckHttpForArgs
 	@GetMapping("search")
-	public Y9Result<Object> search(Job job, LPageable page) {
+	public Y9Result<Object> search(JobDTO jobDTO, LPageable page) {
+		Job job = modelMapper.map(jobDTO, Job.class);
 		ConcurrentSecurity jurisdiction = null;
 		try {
 			jurisdiction = getSecurityJurisdiction(job.getEnvironment());
@@ -128,7 +136,8 @@ public class JobController extends BaseController {
 	 */
 	@PostMapping("save")
 	@CheckHttpForArgs
-	public Y9Result<Object> save(@RequestBody @Valid Job job, BindingResult result) {
+	public Y9Result<Object> save(@Valid @RequestBody JobDTO jobDTO, BindingResult result) {
+		Job job = modelMapper.map(jobDTO, Job.class);
 		jobService.saveJob(job);
 		return Y9Result.success(job.getId());
 	}

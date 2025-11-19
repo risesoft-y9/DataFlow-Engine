@@ -108,5 +108,13 @@ public class DataTaskConfigEntity extends BaseEntity {
 	@Column(name = "TARGETCLOUMN")
 	@Comment(value = "目标-字段列")
 	private String targetCloumn;
+	
+	@Column(name = "FIELDAUTO")
+	@Comment(value = "异字段自动配置")
+	private Boolean fieldAuto;
+	
+	@Column(name = "VALUEAUTO")
+	@Comment(value = "数据转换自动配置")
+	private Boolean valueAuto;
 
 }

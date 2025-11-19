@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import net.risesoft.dto.DataMappingArgsDTO;
+import net.risesoft.dto.DataMappingDTO;
 import net.risesoft.log.LogLevelEnum;
 import net.risesoft.log.OperationTypeEnum;
 import net.risesoft.log.annotation.RiseLog;
@@ -37,8 +39,8 @@ public class MappingController {
 	
 	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "保存配置映射信息", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/saveData")
-	public Y9Result<DataMappingEntity> saveData(DataMappingEntity entity) {
-		return dataMappingService.saveData(entity);
+	public Y9Result<DataMappingEntity> saveData(DataMappingDTO mappingDTO) {
+		return dataMappingService.saveData(mappingDTO);
 	}
 	
 	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "根据id获取配置映射信息", logLevel = LogLevelEnum.RSLOG, enable = false)
@@ -62,8 +64,8 @@ public class MappingController {
 	
 	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "保存配置映射参数信息", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/saveArgsData")
-	public Y9Result<DataMappingArgsEntity> saveArgsData(DataMappingArgsEntity entity) {
-		return dataMappingService.saveArgsData(entity);
+	public Y9Result<DataMappingArgsEntity> saveArgsData(DataMappingArgsDTO mappingArgsDTO) {
+		return dataMappingService.saveArgsData(mappingArgsDTO);
 	}
 	
 	@RiseLog(operationType = OperationTypeEnum.DELETE, operationName = "删除配置映射参数数据", logLevel = LogLevelEnum.RSLOG)

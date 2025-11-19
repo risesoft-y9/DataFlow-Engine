@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,10 @@ import jodd.util.Base64;
 import lombok.RequiredArgsConstructor;
 import net.risesoft.api.utils.jdbc.filedTypeMapping.JdbcTypeMappingCache;
 import net.risesoft.api.utils.jdbc.filedTypeMapping.TypeDefinition;
+import net.risesoft.dto.DataSourceDTO;
+import net.risesoft.dto.DataSourceTypeDTO;
+import net.risesoft.dto.DataTableDTO;
+import net.risesoft.dto.DataTableFieldDTO;
 import net.risesoft.elastic.client.ElasticsearchRestClient;
 import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.pojo.Y9Result;
@@ -64,6 +69,8 @@ public class DataSourceServiceImpl implements DataSourceService {
 	private final DataTaskConfigRepository dataTaskConfigRepository;
 	
 	private final DataTaskRepository dataTaskRepository;
+	
+	private final ModelMapper modelMapper;
 
 	@Override
 	public Page<DataSourceEntity> getDataSourcePage(String baseName, int page, int rows) {
@@ -79,7 +86,8 @@ public class DataSourceServiceImpl implements DataSourceService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public DataSourceEntity saveDataSource(DataSourceEntity entity) {
+	public DataSourceEntity saveDataSource(DataSourceDTO sourceDTO) {
+		DataSourceEntity entity = modelMapper.map(sourceDTO, DataSourceEntity.class);
 		DataSourceEntity df = null;
 		if (entity != null) {
 			if (StringUtils.isBlank(entity.getId())) {
@@ -362,7 +370,8 @@ public class DataSourceServiceImpl implements DataSourceService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public Y9Result<DataSourceTypeEntity> saveDataCategory(MultipartFile iconFile, DataSourceTypeEntity entity) {
+	public Y9Result<DataSourceTypeEntity> saveDataCategory(MultipartFile iconFile, DataSourceTypeDTO sourceTypeDTO) {
+		DataSourceTypeEntity entity = modelMapper.map(sourceTypeDTO, DataSourceTypeEntity.class);
 		if (entity != null && StringUtils.isNotBlank(entity.getName())) {
 			DataSourceTypeEntity category = dataSourceTypeRepository.findByName(entity.getName());
 			if (category != null && !entity.getId().equals(category.getId())) {
@@ -423,7 +432,8 @@ public class DataSourceServiceImpl implements DataSourceService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public Y9Result<DataTableField> saveField(DataTableField entity) {
+	public Y9Result<DataTableField> saveField(DataTableFieldDTO tableFieldDTO) {
+		DataTableField entity = modelMapper.map(tableFieldDTO, DataTableField.class);
 		DataTableField data = null;
 		if (entity != null) {
 			if (StringUtils.isBlank(entity.getId())) {
@@ -509,8 +519,9 @@ public class DataSourceServiceImpl implements DataSourceService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public Y9Result<DataTable> saveTable(DataTable entity) {
+	public Y9Result<DataTable> saveTable(DataTableDTO tableDTO) {
 		try {
+			DataTable entity = modelMapper.map(tableDTO, DataTable.class);
 			if (entity != null && StringUtils.isNotBlank(entity.getName())) {
 				DataSourceEntity source = getDataSourceById(entity.getBaseId());
 				if (source == null) {
@@ -696,9 +707,9 @@ public class DataSourceServiceImpl implements DataSourceService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public Y9Result<String> saveFields(List<DataTableField> fieldList) {
+	public Y9Result<String> saveFields(List<DataTableFieldDTO> fieldList) {
 		String tableId = "";
-		for (DataTableField field : fieldList) {
+		for (DataTableFieldDTO field : fieldList) {
 			if(StringUtils.isBlank(tableId)) {
 				tableId = field.getTableId();
 			}

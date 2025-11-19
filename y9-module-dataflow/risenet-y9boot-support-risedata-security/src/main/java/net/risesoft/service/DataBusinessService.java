@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.data.domain.Page;
 
+import net.risesoft.dto.DataBusinessDTO;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.y9public.entity.DataBusinessEntity;
 
@@ -42,10 +43,10 @@ public interface DataBusinessService {
 	
 	/**
 	 * 保存业务分类信息
-	 * @param entity
+	 * @param businessDTO
 	 * @return
 	 */
-	Y9Result<DataBusinessEntity> saveData(DataBusinessEntity entity);
+	Y9Result<String> saveData(DataBusinessDTO businessDTO);
 	
 	/**
 	 * 获取业务分类树状图

@@ -3,10 +3,12 @@ package net.risesoft.controller.security;
 import net.risedata.jdbc.search.LPageable;
 import net.risesoft.api.aop.CheckHttpForArgs;
 import net.risesoft.api.aop.CheckResult;
+import net.risesoft.dto.NetworkWhiteListDTO;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.security.model.NetworkWhiteList;
 import net.risesoft.security.service.NetworkWhiteListService;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +31,9 @@ public class NetworkWhiteListController {
 
 	@Autowired
 	NetworkWhiteListService networkWhiteListService;
+	
+	@Autowired
+	private ModelMapper modelMapper;
 
 	/**
 	 * 保存/修改
@@ -39,7 +44,8 @@ public class NetworkWhiteListController {
 	@PostMapping("save")
 	@CheckResult
 	@CheckHttpForArgs
-	public Y9Result<Object> save(@Valid NetworkWhiteList networkWhiteList, BindingResult result) {
+	public Y9Result<Object> save(@Valid NetworkWhiteListDTO networkWhiteListDTO, BindingResult result) {
+		NetworkWhiteList networkWhiteList = modelMapper.map(networkWhiteListDTO, NetworkWhiteList.class);
 		networkWhiteListService.saveNetworkWhiteList(networkWhiteList);
 		return Y9Result.success("ok");
 	}
@@ -65,7 +71,8 @@ public class NetworkWhiteListController {
 	 */
 	@GetMapping("searchForPage")
 	@CheckHttpForArgs
-	public Y9Result<Object> searchForPage(NetworkWhiteList networkWhiteList, LPageable pageable) {
+	public Y9Result<Object> searchForPage(NetworkWhiteListDTO networkWhiteListDTO, LPageable pageable) {
+		NetworkWhiteList networkWhiteList = modelMapper.map(networkWhiteListDTO, NetworkWhiteList.class);
 		return Y9Result.success(networkWhiteListService.searchByNetworkWhiteList(networkWhiteList, pageable));
 	}
 	

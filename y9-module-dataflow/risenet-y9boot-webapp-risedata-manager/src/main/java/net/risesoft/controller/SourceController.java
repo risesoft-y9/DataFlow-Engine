@@ -20,6 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import net.risesoft.api.utils.jdbc.filedTypeMapping.TypeDefinition;
+import net.risesoft.dto.DataSourceDTO;
+import net.risesoft.dto.DataSourceTypeDTO;
+import net.risesoft.dto.DataTableDTO;
+import net.risesoft.dto.DataTableFieldDTO;
 import net.risesoft.elastic.client.ElasticsearchRestClient;
 import net.risesoft.log.LogLevelEnum;
 import net.risesoft.log.OperationTypeEnum;
@@ -82,8 +86,8 @@ public class SourceController {
 	
 	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "保存数据源分类信息", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/saveDataCategory")
-	public Y9Result<DataSourceTypeEntity> saveDataCategory(MultipartFile iconFile, DataSourceTypeEntity entity) {
-		return dataSourceService.saveDataCategory(iconFile, entity);
+	public Y9Result<DataSourceTypeEntity> saveDataCategory(MultipartFile iconFile, DataSourceTypeDTO sourceTypeDTO) {
+		return dataSourceService.saveDataCategory(iconFile, sourceTypeDTO);
 	}
 	
 	@RiseLog(operationType = OperationTypeEnum.DELETE, operationName = "删除数据源分类信息", logLevel = LogLevelEnum.RSLOG)
@@ -94,8 +98,8 @@ public class SourceController {
 	
 	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "保存数据源连接信息", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/saveSource")
-	public Y9Result<String> saveSource(DataSourceEntity entity) {
-		dataSourceService.saveDataSource(entity);
+	public Y9Result<String> saveSource(DataSourceDTO sourceDTO) {
+		dataSourceService.saveDataSource(sourceDTO);
 		return Y9Result.successMsg("保存成功");
 	}
 	
@@ -217,14 +221,14 @@ public class SourceController {
 	
 	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "保存表信息", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/saveTable")
-	public Y9Result<DataTable> saveTable(DataTable entity) {
-		return dataSourceService.saveTable(entity);
+	public Y9Result<DataTable> saveTable(DataTableDTO tableDTO) {
+		return dataSourceService.saveTable(tableDTO);
 	}
 	
 	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "保存表字段信息", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/saveField")
-	public Y9Result<DataTableField> saveField(DataTableField entity) {
-		return dataSourceService.saveField(entity);
+	public Y9Result<DataTableField> saveField(DataTableFieldDTO tableFieldDTO) {
+		return dataSourceService.saveField(tableFieldDTO);
 	}
 	
 	@RiseLog(operationType = OperationTypeEnum.DELETE, operationName = "删除表字段信息", logLevel = LogLevelEnum.RSLOG)
@@ -249,7 +253,7 @@ public class SourceController {
 	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "批量保存字段", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/saveFields")
 	public Y9Result<String> saveFields(@RequestBody String fields) {
-		return dataSourceService.saveFields(Y9JsonUtil.readList(fields, DataTableField.class));
+		return dataSourceService.saveFields(Y9JsonUtil.readList(fields, DataTableFieldDTO.class));
 	}
 	
 	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "根据数据源id获取表列表和执行类", logLevel = LogLevelEnum.RSLOG, enable = false)

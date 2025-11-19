@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.risesoft.security.ConcurrentSecurity;
 import net.risesoft.security.SecurityManager;
+import net.risesoft.dto.DataBusinessDTO;
 import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.service.DataBusinessService;
@@ -33,6 +35,8 @@ public class DataBusinessServiceImpl implements DataBusinessService {
 	private final DataBusinessRepository dataBusinessRepository;
 	
 	private final SecurityManager securityManager;
+	
+	private final ModelMapper modelMapper;
 	
 	@Override
 	public Page<DataBusinessEntity> findByNamePage(String name, String parentId, int page, int rows) {
@@ -82,29 +86,36 @@ public class DataBusinessServiceImpl implements DataBusinessService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public Y9Result<DataBusinessEntity> saveData(DataBusinessEntity entity) {
-		if (entity != null && StringUtils.isNotBlank(entity.getName())) {
-			// 判断是否顶节点，当权限不是管理员时，不允许添加顶节点
-			boolean top = StringUtils.isBlank(entity.getId()) && StringUtils.isBlank(entity.getParentId());
-			ConcurrentSecurity security = securityManager.getConcurrentSecurity();
-			if(security.getJobTypes().size() > 0 && top) {
-				return Y9Result.failure("权限不够，只能添加子节点");
-			}
-			DataBusinessEntity dataBusinessEntity = null;
-			if (StringUtils.isBlank(entity.getId())) {
-				dataBusinessEntity = new DataBusinessEntity();
-				dataBusinessEntity.setId(Y9IdGenerator.genId());
-				dataBusinessEntity.setParentId(entity.getParentId());
+	public Y9Result<String> saveData(DataBusinessDTO businessDTO) {
+		try {
+			DataBusinessEntity entity = modelMapper.map(businessDTO, DataBusinessEntity.class);
+			if (StringUtils.isNotBlank(entity.getName())) {
+				// 判断是否顶节点，当权限不是管理员时，不允许添加顶节点
+				boolean top = StringUtils.isBlank(entity.getId()) && StringUtils.isBlank(entity.getParentId());
+				ConcurrentSecurity security = securityManager.getConcurrentSecurity();
+				if(security.getJobTypes().size() > 0 && top) {
+					return Y9Result.failure("权限不够，只能添加子节点");
+				}
+				DataBusinessEntity dataBusinessEntity = null;
+				if (StringUtils.isBlank(entity.getId())) {
+					dataBusinessEntity = new DataBusinessEntity();
+					dataBusinessEntity.setId(Y9IdGenerator.genId());
+					dataBusinessEntity.setParentId(entity.getParentId());
+				}else {
+					dataBusinessEntity = getById(entity.getId());
+				}
+				dataBusinessEntity.setName(entity.getName());
+				if(StringUtils.isBlank(dataBusinessEntity.getParentId())) {
+					dataBusinessEntity.setParentId("0");
+				}
+				return Y9Result.successMsg("保存成功");
 			}else {
-				dataBusinessEntity = getById(entity.getId());
+				return Y9Result.failure("数据不能为空");
 			}
-			dataBusinessEntity.setName(entity.getName());
-			if(StringUtils.isBlank(dataBusinessEntity.getParentId())) {
-				dataBusinessEntity.setParentId("0");
-			}
-			return Y9Result.success(dataBusinessRepository.save(dataBusinessEntity), "保存成功");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Y9Result.failure("保存失败：" + e.getMessage());
 		}
-		return Y9Result.failure("数据不能为空");
 	}
 
 	@Override

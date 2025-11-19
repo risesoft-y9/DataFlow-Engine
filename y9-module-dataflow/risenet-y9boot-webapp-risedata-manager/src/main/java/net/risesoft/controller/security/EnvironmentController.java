@@ -1,6 +1,7 @@
 package net.risesoft.controller.security;
 
 import net.risesoft.api.aop.CheckResult;
+import net.risesoft.dto.EnvironmentDTO;
 import net.risesoft.security.ConcurrentSecurity;
 import net.risesoft.security.SecurityManager;
 import net.risesoft.security.model.Environment;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,9 @@ public class EnvironmentController {
 	
 	@Autowired
 	private SecurityManager securityManager;
+	
+	@Autowired
+	private ModelMapper modelMapper;
 
 	/**
 	 * 获取所有环境根据权限 此权限是安全管理权限
@@ -59,7 +64,8 @@ public class EnvironmentController {
 	 */
 	@CheckResult
 	@PostMapping("insertEnvironment")
-	public Y9Result<Object> insertEnvironment(@RequestBody @Valid Environment environment, BindingResult result) {
+	public Y9Result<Object> insertEnvironment(@RequestBody @Valid EnvironmentDTO environmentDTO, BindingResult result) {
+		Environment environment = modelMapper.map(environmentDTO, Environment.class);
 		environmentService.insertEnvironment(environment);
 		return Y9Result.success(environment.getName());
 	}
@@ -73,7 +79,8 @@ public class EnvironmentController {
 	 */
 	@CheckResult
 	@PostMapping("updateEnvironment")
-	public Y9Result<Object> updateEnvironment(@Valid Environment environment, BindingResult result) {
+	public Y9Result<Object> updateEnvironment(@Valid EnvironmentDTO environmentDTO, BindingResult result) {
+		Environment environment = modelMapper.map(environmentDTO, Environment.class);
 		environmentService.updateEnvironment(environment);
 		return Y9Result.success(environment.getName());
 	}

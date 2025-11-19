@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import net.risesoft.dto.DataArrangeDTO;
 import net.risesoft.log.LogLevelEnum;
 import net.risesoft.log.OperationTypeEnum;
 import net.risesoft.log.annotation.RiseLog;
@@ -41,8 +42,8 @@ public class ArrangeController {
 	
 	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "保存任务编排信息", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/saveData")
-	public Y9Result<DataArrangeEntity> saveData(DataArrangeEntity entity) {
-		return dataArrangeService.saveData(entity);
+	public Y9Result<String> saveData(DataArrangeDTO arrangeDTO) {
+		return dataArrangeService.saveData(arrangeDTO);
 	}
 	
 	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "根据id获取任务编排信息", logLevel = LogLevelEnum.RSLOG, enable = false)

@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import net.risesoft.dto.DataInterfaceDTO;
+import net.risesoft.dto.DataInterfaceParamsDTO;
 import net.risesoft.log.LogLevelEnum;
 import net.risesoft.log.OperationTypeEnum;
 import net.risesoft.log.annotation.RiseLog;
@@ -43,8 +45,8 @@ public class InterfaceController {
 	
 	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "保存接口信息", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/saveData")
-	public Y9Result<DataInterfaceEntity> saveData(DataInterfaceEntity entity) {
-		return dataInterfaceService.saveData(entity);
+	public Y9Result<String> saveData(DataInterfaceDTO interfaceDTO) {
+		return dataInterfaceService.saveData(interfaceDTO);
 	}
 	
 	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "根据id获取接口信息", logLevel = LogLevelEnum.RSLOG, enable = false)
@@ -70,8 +72,8 @@ public class InterfaceController {
 	
 	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "保存接口参数信息", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/saveParams")
-	public Y9Result<DataInterfaceParamsEntity> saveParams(DataInterfaceParamsEntity entity) {
-		return dataInterfaceService.saveData(entity);
+	public Y9Result<String> saveParams(DataInterfaceParamsDTO interfaceParamsDTO) {
+		return dataInterfaceService.saveData(interfaceParamsDTO);
 	}
 	
 	@RiseLog(operationType = OperationTypeEnum.DELETE, operationName = "删除接口参数数据", logLevel = LogLevelEnum.RSLOG)

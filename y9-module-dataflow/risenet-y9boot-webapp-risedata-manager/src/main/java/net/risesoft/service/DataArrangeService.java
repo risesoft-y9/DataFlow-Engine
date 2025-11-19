@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.data.domain.Page;
 
+import net.risesoft.dto.DataArrangeDTO;
 import net.risesoft.pojo.Y9Page;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.y9public.entity.DataArrangeEntity;
@@ -33,10 +34,10 @@ public interface DataArrangeService {
 
 	/**
 	 * 保存任务编排信息
-	 * @param entity
+	 * @param arrangeDTO
 	 * @return
 	 */
-	Y9Result<DataArrangeEntity> saveData(DataArrangeEntity entity);
+	Y9Result<String> saveData(DataArrangeDTO arrangeDTO);
 	
 	/**
 	 * 保存流程内容

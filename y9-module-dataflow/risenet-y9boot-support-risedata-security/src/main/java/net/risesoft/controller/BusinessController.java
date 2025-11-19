@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import net.risesoft.dto.DataBusinessDTO;
 import net.risesoft.pojo.Y9Page;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.service.DataBusinessService;
@@ -53,8 +54,8 @@ public class BusinessController {
 	 * @return
 	 */
 	@PostMapping(value = "/saveData")
-	public Y9Result<DataBusinessEntity> saveData(DataBusinessEntity entity) {
-		return dataBusinessService.saveData(entity);
+	public Y9Result<String> saveData(DataBusinessDTO businessDTO) {
+		return dataBusinessService.saveData(businessDTO);
 	}
 	
 	/**

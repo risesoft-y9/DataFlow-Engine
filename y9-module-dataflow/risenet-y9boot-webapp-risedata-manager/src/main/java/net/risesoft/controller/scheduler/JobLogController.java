@@ -10,12 +10,14 @@ import net.risesoft.api.persistence.job.JobLogService;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.api.persistence.model.log.LogAnalyse;
 import net.risesoft.controller.BaseController;
+import net.risesoft.dto.JobLogDTO;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.security.ConcurrentSecurity;
 import net.risesoft.service.DataBusinessService;
 import net.risesoft.service.JobDoActionService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.web.bind.WebDataBinder;
@@ -55,6 +57,9 @@ public class JobLogController extends BaseController  {
 
 	@Autowired
 	private JobDoActionService jobDoActionService;
+	
+	@Autowired
+	private ModelMapper modelMapper;
 
 	/**
 	 * 根据id 获取任务信息
@@ -87,9 +92,10 @@ public class JobLogController extends BaseController  {
 	 */
 	@CheckHttpForArgs
 	@GetMapping("search")
-	public Y9Result<Object> search(JobLog job, LPageable page, String environment, String jobType, Integer[] jobIds) {
+	public Y9Result<Object> search(JobLogDTO jobLogDTO, LPageable page, String environment, String jobType, Integer[] jobIds) {
 		ConcurrentSecurity jurisdiction = null;
 		try {
+			JobLog job = modelMapper.map(jobLogDTO, JobLog.class);
 			jurisdiction = getSecurityJurisdiction(environment);
 			LPage<Map<String, Object>> pages = jobLogService.search(job, page, jurisdiction, jobType, jobIds);
 			pages.getContent().stream().map((item) -> {

@@ -2,12 +2,15 @@ package net.risesoft.controller;
 
 import javax.validation.Valid;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import net.risedata.jdbc.search.LPageable;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.security.model.RoleUserLink;
+import net.risesoft.security.dto.DataUserDTO;
+import net.risesoft.security.dto.RoleUserLinkDTO;
 import net.risesoft.security.model.DataUser;
 import net.risesoft.security.service.RoleLinkService;
 import net.risesoft.security.service.UserService;
@@ -28,19 +31,25 @@ public class RoleLinkController {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private ModelMapper modelMapper;
 
 	@RequestMapping("/searchUsers")
-	public Y9Result<Object> searchUsers(String roleId, DataUser betaUser, LPageable page, Boolean isNot) {
-		return Y9Result.success(userService.searchForPageRole(betaUser, page, roleId, isNot));
+	public Y9Result<Object> searchUsers(String roleId, DataUserDTO userDTO, LPageable page, Boolean isNot) {
+		DataUser dataUser = modelMapper.map(userDTO, DataUser.class);
+		return Y9Result.success(userService.searchForPageRole(dataUser, page, roleId, isNot));
 	}
 
 	@PostMapping("/bind")
-	public Y9Result<Object> bind(@RequestBody @Valid RoleUserLink roleUserLink) {
+	public Y9Result<Object> bind(@RequestBody @Valid RoleUserLinkDTO userLinkDTO) {
+		RoleUserLink roleUserLink = modelMapper.map(userLinkDTO, RoleUserLink.class);
 		return Y9Result.success(roleLinkService.save(roleUserLink));
 	}
 
 	@PostMapping("/unBind")
-	public Y9Result<Object> unBind(@RequestBody @Valid RoleUserLink roleUserLink) {
+	public Y9Result<Object> unBind(@RequestBody @Valid RoleUserLinkDTO userLinkDTO) {
+		RoleUserLink roleUserLink = modelMapper.map(userLinkDTO, RoleUserLink.class);
 		return Y9Result.success(roleLinkService.delete(roleUserLink));
 	}
 }

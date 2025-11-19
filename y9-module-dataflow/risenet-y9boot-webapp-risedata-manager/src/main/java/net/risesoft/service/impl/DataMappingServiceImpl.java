@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.risesoft.security.ConcurrentSecurity;
 import net.risesoft.security.SecurityManager;
+import net.risesoft.dto.DataMappingArgsDTO;
+import net.risesoft.dto.DataMappingDTO;
 import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.service.DataMappingService;
@@ -35,6 +38,7 @@ public class DataMappingServiceImpl implements DataMappingService {
 	private final DataMappingArgsRepository dataMappingArgsRepository;
 	private final DataTaskCoreRepository dataTaskCoreRepository;
 	private final SecurityManager securityManager;
+	private final ModelMapper modelMapper;
 	
 	@Override
 	public Page<DataMappingEntity> getDataPage(String typeName, String className, int page, int rows) {
@@ -68,11 +72,12 @@ public class DataMappingServiceImpl implements DataMappingService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public Y9Result<DataMappingEntity> saveData(DataMappingEntity entity) {
+	public Y9Result<DataMappingEntity> saveData(DataMappingDTO mappingDTO) {
 		// 判断有没有操作权限
 		if(!isSystemManager()) {
 			return Y9Result.failure("没有操作权限");
 		}
+		DataMappingEntity entity = modelMapper.map(mappingDTO, DataMappingEntity.class);
 		if (entity != null && StringUtils.isNotBlank(entity.getClassName())) {
 			DataMappingEntity info = dataMappingRepository.findByTypeNameAndClassNameAndFuncType(entity.getTypeName(), 
 					entity.getClassName(), entity.getFuncType());
@@ -117,11 +122,12 @@ public class DataMappingServiceImpl implements DataMappingService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public Y9Result<DataMappingArgsEntity> saveArgsData(DataMappingArgsEntity entity) {
+	public Y9Result<DataMappingArgsEntity> saveArgsData(DataMappingArgsDTO mappingArgsDTO) {
 		// 判断有没有操作权限
 		if(!isSystemManager()) {
 			return Y9Result.failure("没有操作权限");
 		}
+		DataMappingArgsEntity entity = modelMapper.map(mappingArgsDTO, DataMappingArgsEntity.class);
 		if (entity != null && StringUtils.isNotBlank(entity.getName())) {
 			DataMappingArgsEntity info = dataMappingArgsRepository.findByNameAndMappingId(entity.getName(), entity.getMappingId());
 			if(info != null && !info.getId().equals(entity.getId())) {

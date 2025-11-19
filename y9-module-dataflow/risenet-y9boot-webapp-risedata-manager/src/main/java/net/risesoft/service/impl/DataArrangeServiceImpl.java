@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import net.risesoft.api.persistence.job.JobLogService;
 import net.risesoft.api.persistence.job.JobService;
 import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
+import net.risesoft.dto.DataArrangeDTO;
 import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.listener.ArrangeExecuteListener;
 import net.risesoft.pojo.Y9Page;
@@ -43,6 +45,7 @@ public class DataArrangeServiceImpl implements DataArrangeService {
 	private final DataArrangeLogRepository dataArrangeLogRepository;
 	private final ArrangeExecuteListener arrangeExecuteListener;
 	private final JobService jobService;
+	private final ModelMapper modelMapper;
 	
 	@Override
 	public Page<DataArrangeEntity> searchPage(String name, Integer pattern, int page, int rows) {
@@ -73,52 +76,58 @@ public class DataArrangeServiceImpl implements DataArrangeService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public Y9Result<DataArrangeEntity> saveData(DataArrangeEntity entity) {
-		if (StringUtils.isBlank(entity.getId())) {
-			entity.setId(Y9IdGenerator.genId());
-		}else {
-			DataArrangeEntity dataArrangeEntity = dataArrangeRepository.findById(entity.getId()).orElse(null);
-			if(dataArrangeEntity != null) {
-				entity.setXmlData(dataArrangeEntity.getXmlData());
+	public Y9Result<String> saveData(DataArrangeDTO arrangeDTO) {
+		try {
+			DataArrangeEntity entity = modelMapper.map(arrangeDTO, DataArrangeEntity.class);
+			if (StringUtils.isBlank(entity.getId())) {
+				entity.setId(Y9IdGenerator.genId());
+			}else {
+				DataArrangeEntity dataArrangeEntity = dataArrangeRepository.findById(entity.getId()).orElse(null);
+				if(dataArrangeEntity != null) {
+					entity.setXmlData(dataArrangeEntity.getXmlData());
+				}
 			}
+			entity.setUserId(Y9LoginUserHolder.getPersonId());
+			entity.setUserName(Y9LoginUserHolder.getUserInfo().getName());
+			entity.setTenantId(Y9LoginUserHolder.getTenantId());
+			dataArrangeRepository.save(entity);
+			
+			//保存定时调度信息
+			if(StringUtils.isNotBlank(entity.getCron())) {
+				Job job = jobService.findByArgsAndTypeAndEnvironmentAndServiceId(entity.getId(), "local", "Public", "RISEDATA-MASTER");
+				if(job == null) {
+					job = new Job();
+				}
+				job.setArgs(entity.getId());
+				job.setBlockingStrategy("串行");
+				job.setDispatchMethod("均衡");
+				job.setDispatchType("cron");
+				job.setDescription(entity.getContent());
+				job.setEnvironment("Public");
+				job.setErrorCount(0);
+				job.setJobSource("任务编排");
+				job.setJobType(entity.getUserId());
+				job.setName(entity.getName());
+				job.setServiceId("RISEDATA-MASTER");
+				job.setSource("dataArrangeService,executeProcess");
+				job.setSourceTimeOut(1200);
+				job.setSpeed(entity.getCron());
+				job.setStatus(entity.getPattern());
+				job.setTimeOut(3600);
+				job.setType("local");
+				jobService.saveJob(job);
+			}else {
+				// 删除定时任务
+				Job job = jobService.findByArgsAndTypeAndEnvironmentAndServiceId(entity.getId(), "local", "Public", "RISEDATA-MASTER");
+				if(job != null) {
+					jobService.deleteByJobId(job.getId());
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Y9Result.failure("保存失败：" + e.getMessage());
 		}
-		entity.setUserId(Y9LoginUserHolder.getPersonId());
-		entity.setUserName(Y9LoginUserHolder.getUserInfo().getName());
-		entity.setTenantId(Y9LoginUserHolder.getTenantId());
-		dataArrangeRepository.save(entity);
-		
-		//保存定时调度信息
-		if(StringUtils.isNotBlank(entity.getCron())) {
-			Job job = jobService.findByArgsAndTypeAndEnvironmentAndServiceId(entity.getId(), "local", "Public", "RISEDATA-MASTER");
-			if(job == null) {
-				job = new Job();
-			}
-			job.setArgs(entity.getId());
-			job.setBlockingStrategy("串行");
-			job.setDispatchMethod("均衡");
-			job.setDispatchType("cron");
-			job.setDescription(entity.getContent());
-			job.setEnvironment("Public");
-			job.setErrorCount(0);
-			job.setJobSource("任务编排");
-			job.setJobType(entity.getUserId());
-			job.setName(entity.getName());
-			job.setServiceId("RISEDATA-MASTER");
-			job.setSource("dataArrangeService,executeProcess");
-			job.setSourceTimeOut(1200);
-			job.setSpeed(entity.getCron());
-			job.setStatus(entity.getPattern());
-			job.setTimeOut(3600);
-			job.setType("local");
-			jobService.saveJob(job);
-		}else {
-			// 删除定时任务
-			Job job = jobService.findByArgsAndTypeAndEnvironmentAndServiceId(entity.getId(), "local", "Public", "RISEDATA-MASTER");
-			if(job != null) {
-				jobService.deleteByJobId(job.getId());
-			}
-		}
-		return Y9Result.success(entity, "保存成功");
+		return Y9Result.successMsg("保存成功");
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

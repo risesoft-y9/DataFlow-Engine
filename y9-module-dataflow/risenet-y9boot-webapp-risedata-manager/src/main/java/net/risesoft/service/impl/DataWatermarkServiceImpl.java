@@ -1,6 +1,7 @@
 package net.risesoft.service.impl;
 
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import net.risesoft.dto.DataWatermarkDTO;
 import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.service.DataWatermarkService;
@@ -21,6 +23,7 @@ import net.risesoft.y9public.repository.DataWatermarkRepository;
 public class DataWatermarkServiceImpl implements DataWatermarkService {
 	
 	private final DataWatermarkRepository dataWatermarkRepository;
+	private final ModelMapper modelMapper;
 	
 	@Override
 	public Page<DataWatermarkEntity> searchPage(int page, int size) {
@@ -45,7 +48,8 @@ public class DataWatermarkServiceImpl implements DataWatermarkService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public Y9Result<DataWatermarkEntity> saveData(DataWatermarkEntity entity) {
+	public Y9Result<DataWatermarkEntity> saveData(DataWatermarkDTO watermarkDTO) {
+		DataWatermarkEntity entity = modelMapper.map(watermarkDTO, DataWatermarkEntity.class);
 		if (StringUtils.isBlank(entity.getId())) {
 			entity.setId(Y9IdGenerator.genId());
 		}

@@ -106,5 +106,15 @@ public class TaskConfigModel {
 	 * 目标-字段列
 	 */
 	private String targetCloumn;
+	
+	/**
+	 * 异字段自动配置
+	 */
+	private Boolean fieldAuto;
+	
+	/**
+	 * 数据转换自动配置
+	 */
+	private Boolean valueAuto;
 
 }

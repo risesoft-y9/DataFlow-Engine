@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.data.domain.Page;
 
+import net.risesoft.dto.DataTaskDTO;
 import net.risesoft.pojo.SingleTaskModel;
 import net.risesoft.pojo.TaskModel;
 import net.risesoft.pojo.Y9Result;
@@ -49,10 +50,10 @@ public interface DataTaskService {
 	
 	/**
 	 * 保存任务主体信息
-	 * @param entity
+	 * @param taskDTO
 	 * @return
 	 */
-	Y9Result<DataTaskEntity> saveData(DataTaskEntity entity);
+	Y9Result<DataTaskEntity> saveData(DataTaskDTO taskDTO);
 	
 	/**
 	 * 保存任务配置

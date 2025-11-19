@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import net.risesoft.dto.DataInterfaceDTO;
+import net.risesoft.dto.DataInterfaceParamsDTO;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.y9public.entity.DataInterfaceEntity;
 import net.risesoft.y9public.entity.DataInterfaceParamsEntity;
@@ -34,17 +36,17 @@ public interface DataInterfaceService {
 
 	/**
 	 * 保存接口信息
-	 * @param entity
+	 * @param interfaceDTO
 	 * @return
 	 */
-	Y9Result<DataInterfaceEntity> saveData(DataInterfaceEntity entity);
+	Y9Result<String> saveData(DataInterfaceDTO interfaceDTO);
 	
 	/**
 	 * 保存接口参数信息
-	 * @param entity
+	 * @param interfaceParamsDTO
 	 * @return
 	 */
-	Y9Result<DataInterfaceParamsEntity> saveData(DataInterfaceParamsEntity entity);
+	Y9Result<String> saveData(DataInterfaceParamsDTO interfaceParamsDTO);
 	
 	/**
 	 * 获取接口参数列表

@@ -3,12 +3,14 @@ package net.risesoft.controller;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import net.risedata.jdbc.commons.LPage;
 import net.risedata.jdbc.search.LPageable;
 import net.risesoft.pojo.Y9Result;
+import net.risesoft.security.dto.RoleDTO;
 import net.risesoft.security.model.Role;
 import net.risesoft.security.service.RoleService;
 import net.risesoft.y9public.repository.DataBusinessRepository;
@@ -22,6 +24,9 @@ public class RoleController {
 	
 	@Autowired
 	private DataBusinessRepository dataBusinessRepository;
+	
+	@Autowired
+	private ModelMapper modelMapper;
 
 	/**
 	 * 获取所有用户
@@ -30,7 +35,8 @@ public class RoleController {
 	 * @return
 	 */
 	@GetMapping("search")
-	public Y9Result<Object> search(Role role, LPageable page) {
+	public Y9Result<Object> search(RoleDTO roleDTO, LPageable page) {
+		Role role = modelMapper.map(roleDTO, Role.class);
 		LPage<Role> rolePage = roleService.searchForPage(role, page);
 		for(Role row : rolePage.getContent()) {
 			// 获取业务分类信息
@@ -58,8 +64,9 @@ public class RoleController {
 	 * @return
 	 */
 	@PostMapping("saveRole")
-	public Y9Result<String> saveRole(@RequestBody @Valid Role role) {
+	public Y9Result<String> saveRole(@RequestBody @Valid RoleDTO roleDTO) {
 		try {
+			Role role = modelMapper.map(roleDTO, Role.class);
 			roleService.saveRole(role);
 		} catch (Exception e) {
 			return Y9Result.failure(e.getMessage());

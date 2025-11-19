@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.springframework.data.domain.Page;
 
+import net.risesoft.dto.DataMappingArgsDTO;
+import net.risesoft.dto.DataMappingDTO;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.y9public.entity.DataMappingArgsEntity;
 import net.risesoft.y9public.entity.DataMappingEntity;
@@ -30,10 +32,10 @@ public interface DataMappingService {
 
 	/**
 	 * 保存映射数据
-	 * @param entity
+	 * @param mappingDTO
 	 * @return
 	 */
-	Y9Result<DataMappingEntity> saveData(DataMappingEntity entity);
+	Y9Result<DataMappingEntity> saveData(DataMappingDTO mappingDTO);
 	
 	/**
 	 * 根据类别获取映射数据
@@ -65,10 +67,10 @@ public interface DataMappingService {
 	
 	/**
 	 * 保存参数信息
-	 * @param entity
+	 * @param mappingArgsDTO
 	 * @return
 	 */
-	Y9Result<DataMappingArgsEntity> saveArgsData(DataMappingArgsEntity entity);
+	Y9Result<DataMappingArgsEntity> saveArgsData(DataMappingArgsDTO mappingArgsDTO);
 	
 	/**
 	 * 根据类别获取页面信息

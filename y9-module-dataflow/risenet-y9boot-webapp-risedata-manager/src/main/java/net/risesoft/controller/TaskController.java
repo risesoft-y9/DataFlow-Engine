@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import net.risesoft.api.persistence.job.JobService;
+import net.risesoft.dto.DataTaskDTO;
 import net.risesoft.security.ConcurrentSecurity;
 import net.risesoft.security.SecurityManager;
 import net.risesoft.log.LogLevelEnum;
@@ -92,8 +93,8 @@ public class TaskController {
 	
 	@RiseLog(operationType = OperationTypeEnum.ADD, operationName = "保存任务基本信息", logLevel = LogLevelEnum.RSLOG)
 	@PostMapping(value = "/saveTask")
-	public Y9Result<DataTaskEntity> saveTask(DataTaskEntity entity) {
-		return dataTaskService.saveData(entity);
+	public Y9Result<DataTaskEntity> saveTask(DataTaskDTO taskDTO) {
+		return dataTaskService.saveData(taskDTO);
 	}
 	
 	@RiseLog(operationType = OperationTypeEnum.BROWSE, operationName = "根据id获取同步任务信息", logLevel = LogLevelEnum.RSLOG, enable = false)

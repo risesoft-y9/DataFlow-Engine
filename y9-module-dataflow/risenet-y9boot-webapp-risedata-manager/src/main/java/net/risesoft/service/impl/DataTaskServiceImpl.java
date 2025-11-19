@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.risesoft.dto.DataTaskDTO;
 import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.listener.TaskMakeUpListener;
 import net.risesoft.pojo.ConvertField;
@@ -69,6 +71,7 @@ public class DataTaskServiceImpl implements DataTaskService {
 	private final DataInterfaceParamsRepository dataInterfaceParamsRepository;
 	private final DataInterfaceRepository dataInterfaceRepository;
 	private final DataSingleTaskConfigRepository dataSingleTaskConfigRepository;
+	private final ModelMapper modelMapper;
 	
 	@Override
 	public Page<DataTaskEntity> findPage(List<String> ids, String name, List<String> businessIds, int page, int rows) {
@@ -199,7 +202,8 @@ public class DataTaskServiceImpl implements DataTaskService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public Y9Result<DataTaskEntity> saveData(DataTaskEntity entity) {
+	public Y9Result<DataTaskEntity> saveData(DataTaskDTO taskDTO) {
+		DataTaskEntity entity = modelMapper.map(taskDTO, DataTaskEntity.class);
 		if (entity != null && StringUtils.isNotBlank(entity.getName())) {
 			if (StringUtils.isBlank(entity.getId())) {
 				entity.setId(Y9IdGenerator.genId());
@@ -339,6 +343,7 @@ public class DataTaskServiceImpl implements DataTaskService {
 			
 			return Y9Result.success(entity, "保存成功");
 		} catch (Exception e) {
+			e.printStackTrace();
 			return Y9Result.failure("保存失败：" + e.getMessage());
 		}
 	}

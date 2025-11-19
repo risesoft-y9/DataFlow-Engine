@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import net.risesoft.dto.DataInterfaceDTO;
+import net.risesoft.dto.DataInterfaceParamsDTO;
 import net.risesoft.id.Y9IdGenerator;
 import net.risesoft.pojo.Y9Result;
 import net.risesoft.service.DataInterfaceService;
@@ -32,6 +35,7 @@ public class DataInterfaceServiceImpl implements DataInterfaceService {
 	private final DataInterfaceRepository dataInterfaceRepository;
 	private final DataInterfaceParamsRepository dataInterfaceParamsRepository;
 	private final DataTaskConfigRepository dataTaskConfigRepository;
+	private final ModelMapper modelMapper;
 	
 	@Override
 	public Page<DataInterfaceEntity> searchPage(String search, String requestType, Integer dataType, int page, int rows) {
@@ -60,26 +64,30 @@ public class DataInterfaceServiceImpl implements DataInterfaceService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public Y9Result<DataInterfaceEntity> saveData(DataInterfaceEntity entity) {
+	public Y9Result<String> saveData(DataInterfaceDTO interfaceDTO) {
+		DataInterfaceEntity entity = modelMapper.map(interfaceDTO, DataInterfaceEntity.class);
 		if (StringUtils.isBlank(entity.getId())) {
 			entity.setId(Y9IdGenerator.genId());
 		}
 		entity.setTenantId(Y9LoginUserHolder.getTenantId());
 		entity.setUserId(Y9LoginUserHolder.getPersonId());
 		entity.setUserName(Y9LoginUserHolder.getUserInfo().getName());
-		return Y9Result.success(dataInterfaceRepository.save(entity), "保存成功");
+		dataInterfaceRepository.save(entity);
+		return Y9Result.successMsg("保存成功");
 	}
 
 	@Override
 	@Transactional(readOnly = false)
-	public Y9Result<DataInterfaceParamsEntity> saveData(DataInterfaceParamsEntity entity) {
+	public Y9Result<String> saveData(DataInterfaceParamsDTO interfaceParamsDTO) {
+		DataInterfaceParamsEntity entity = modelMapper.map(interfaceParamsDTO, DataInterfaceParamsEntity.class);
 		if (StringUtils.isBlank(entity.getId())) {
 			entity.setId(Y9IdGenerator.genId());
 		}
 		entity.setTenantId(Y9LoginUserHolder.getTenantId());
 		entity.setUserId(Y9LoginUserHolder.getPersonId());
 		entity.setUserName(Y9LoginUserHolder.getUserInfo().getName());
-		return Y9Result.success(dataInterfaceParamsRepository.save(entity), "保存成功");
+		dataInterfaceParamsRepository.save(entity);
+		return Y9Result.successMsg("保存成功");
 	}
 
 	@Override
