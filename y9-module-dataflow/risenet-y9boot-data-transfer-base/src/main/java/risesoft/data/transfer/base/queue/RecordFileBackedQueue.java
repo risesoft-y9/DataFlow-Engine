@@ -13,6 +13,7 @@ import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.exception.CommonErrorCode;
 import risesoft.data.transfer.core.exception.TransferException;
 import risesoft.data.transfer.core.factory.annotations.ConfigParameter;
+import risesoft.data.transfer.core.log.Logger;
 import risesoft.data.transfer.core.record.Record;
 
 /**
@@ -25,13 +26,14 @@ import risesoft.data.transfer.core.record.Record;
 public class RecordFileBackedQueue implements Queue<List<Record>> ,Closed {
 
 	private FileBackedQueue<List<Record>> fileBackedQueue;
-
+    private Logger logger;
 	public RecordFileBackedQueue(@ConfigParameter(description = "缓存队列大小", value = "10") int memoryCacheSize,
 			@ConfigParameter(description = "文件名称", required = false) String fileName,
 			@ConfigParameter(description = "文件大小", value = "100MB") String fileSize, JobContext jobContext) {
 		if (StringUtils.isEmpty(fileName)) {
 			fileName = "fileQueue_" + jobContext.getJobId() + ".queue";
 		}
+		logger = jobContext.getLoggerFactory().getLogger("RecordFileBackedQueue");
 		try {
 			fileBackedQueue = new FileBackedQueue<List<Record>>(memoryCacheSize, fileName, new RecordListSerializer(),
 					fileSize);
@@ -132,8 +134,9 @@ public class RecordFileBackedQueue implements Queue<List<Record>> ,Closed {
 
 	@Override
 	public void close() throws Exception {
-	
+		logger.debug(this,"recordFileBackedQueue close ");
 		fileBackedQueue.close();
+		logger.debug(this,"recordFileBackedQueue closed");
 	}
 
 }

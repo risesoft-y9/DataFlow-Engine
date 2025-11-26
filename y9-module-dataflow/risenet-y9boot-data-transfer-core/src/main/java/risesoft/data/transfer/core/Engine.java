@@ -2,6 +2,9 @@ package risesoft.data.transfer.core;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import risesoft.data.transfer.core.channel.JoinOutExecutorChannel;
 import risesoft.data.transfer.core.channel.OutChannel;
 import risesoft.data.transfer.core.config.ConfigLoadManager;
@@ -11,7 +14,6 @@ import risesoft.data.transfer.core.exchange.CoreExchange;
 import risesoft.data.transfer.core.exchange.Exchange;
 import risesoft.data.transfer.core.executor.ExecutorTaskQueue;
 import risesoft.data.transfer.core.factory.FactoryManager;
-import risesoft.data.transfer.core.handle.HandleManager;
 import risesoft.data.transfer.core.handle.InitApplicationConfigHandle;
 import risesoft.data.transfer.core.job.Job;
 import risesoft.data.transfer.core.job.JobEndHandle;
@@ -211,14 +213,26 @@ public class Engine {
 		try {
 			jobContext.getOutExecutorTaskQueue().shutdown();
 		} catch (Exception e) {
+			try {
+				jobContext.getLogger().error(jobContext, "close OutExecutorTaskQueue error："+ExceptionUtils.getStackTrace(e));
+			} catch (Exception e2) {
+			}
 		}
 		try {
 			jobContext.getInExecutorTaskQueue().shutdown();
 		} catch (Exception e) {
+			try {
+				jobContext.getLogger().error(jobContext, "close InExecutorTaskQueue error："+ExceptionUtils.getStackTrace(e));
+			} catch (Exception e2) {
+			}
 		}
 		try {
 			jobContext.getCoreExchange().shutdown();
-		} catch (Exception e2) {
+		} catch (Exception e) {
+			try {
+				jobContext.getLogger().error(jobContext, "close CoreExchange error："+ExceptionUtils.getStackTrace(e));
+			} catch (Exception e2) {
+			}
 		}
 	}
 }

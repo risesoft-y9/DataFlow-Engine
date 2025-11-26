@@ -1,5 +1,6 @@
 package risesoft.data.transfer.base.queue;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -174,10 +175,13 @@ public class FileBackedQueue<T> implements AutoCloseable, Closed, Queue<T> {
 			}
 
 			if (memoryQueue.isEmpty() && fileItemCount.get() > 0) {
+				fileLock.lock();
 				try {
 					loadBatchFromFile(memoryCacheSize);
 				} catch (IOException e) {
 					throw TransferException.as(FrameworkErrorCode.RUNTIME_ERROR, "队列读取文件异常!", e);
+				} finally {
+					fileLock.unlock();
 				}
 			}
 
@@ -301,11 +305,13 @@ public class FileBackedQueue<T> implements AutoCloseable, Closed, Queue<T> {
 
 	private void lockAll() {
 		putLock.lock();
+		fileLock.lock();
 		takeLock.lock();
 	}
 
 	private void unLockAll() {
 		putLock.unlock();
+		fileLock.lock();
 		takeLock.unlock();
 	}
 
@@ -330,7 +336,6 @@ public class FileBackedQueue<T> implements AutoCloseable, Closed, Queue<T> {
 			return new String(data, java.nio.charset.StandardCharsets.UTF_8);
 		}
 	}
-
 
 	@Override
 	public void clear() {
