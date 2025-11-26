@@ -311,7 +311,7 @@ public class FileBackedQueue<T> implements AutoCloseable, Closed, Queue<T> {
 
 	private void unLockAll() {
 		putLock.unlock();
-		fileLock.lock();
+		fileLock.unlock();
 		takeLock.unlock();
 	}
 

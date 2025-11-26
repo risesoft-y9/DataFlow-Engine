@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import risesoft.data.transfer.base.queue.RecordSerializer;
 import risesoft.data.transfer.base.queue.Serializer;
@@ -111,9 +112,20 @@ public class ThreadPoolExecutorTaskQueue implements ExecutorTaskQueue {
 		int size = executorPool.getConcurrentSize();
 		logger.info(this, "close:" + executorPool.getConcurrentSize());
 		for (int i = 0; i < size; i++) {
-			CloseUtils.close(executorPool.getInstance());
+			try {
+				CloseUtils.close(executorPool.getInstance());
+			} catch (Exception e) {
+				logger.error(this,"close executor error："+ExceptionUtils.getStackTrace(e));
+			}
 		}
-		this.executor.close();
+		if (this.executor!=null) {
+			try {
+				this.executor.close();
+			} catch (Exception e) {
+				logger.error(this,"close ExecutorFactory error："+ExceptionUtils.getStackTrace(e));
+			}
+			
+		}
 		this.isStart = false;
 	}
 
@@ -175,10 +187,14 @@ public class ThreadPoolExecutorTaskQueue implements ExecutorTaskQueue {
 	public synchronized void shutdown() throws Exception {
 		logger.info(this, "shutdown");
 		this.isShutdown = true;
-		this.close();
-		this.executorService.shutdownNow();
-        if (this.linkedQueue instanceof Closed) {
-			((Closed)this.linkedQueue).close();
+		try {
+			this.close();
+			this.executorService.shutdownNow();
+		} catch (Exception e) {
+			logger.error(this, "close executor error： " + ExceptionUtils.getStackTrace(e));
+		}
+		if (this.linkedQueue instanceof Closed) {
+			((Closed) this.linkedQueue).close();
 		}
 	}
 
