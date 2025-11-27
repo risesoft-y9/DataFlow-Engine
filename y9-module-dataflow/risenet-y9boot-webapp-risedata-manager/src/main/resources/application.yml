@@ -123,7 +123,6 @@ y9:
         convertEnabled: true
         secret-key: risedataflow
         environments: Public,dev
-        kafkaEnabled: false
         logBaseUrl: http://127.0.0.1:7055/server-log
         orgBaseUrl: http://127.0.0.1:7055/server-platform
     feature:
