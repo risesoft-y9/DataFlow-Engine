@@ -98,5 +98,13 @@ public class DataSourceEntity extends BaseEntity {
 	@Column(name = "USERID", length = 50)
 	@Comment(value = "创建者ID")
 	private String userId;
+	
+	@Column(name = "SYSTEMNAME", length = 50)
+	@Comment(value = "任务来源")
+	private String systemName;
+	
+	@Column(name = "EXTERNALID", length = 50)
+	@Comment(value = "关联ID")
+	private String externalId;
 
 }

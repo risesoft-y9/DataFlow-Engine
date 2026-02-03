@@ -235,10 +235,17 @@ public class DataTaskServiceImpl implements DataTaskService {
 			entity.setUserName(Y9LoginUserHolder.getUserInfo().getName());
 			entity.setTenantId(Y9LoginUserHolder.getTenantId());
 			entity.setTaskType(2);
+			
+			TaskConfigModel configModel = taskModel.getTaskConfigModel();
+			String targetId = configModel.getTargetId();
+			DataSourceEntity dataSourceEntity = dataSourceRepository.findById(targetId).orElse(null);
+			if(dataSourceEntity != null) {
+				entity.setSystemName(dataSourceEntity.getSystemName());
+				entity.setExternalId(dataSourceEntity.getExternalId());
+			}
 			dataTaskRepository.save(entity);
 			
 			// 保存config
-			TaskConfigModel configModel = taskModel.getTaskConfigModel();
 			if(configModel != null) {
 				if(StringUtils.isBlank(configModel.getId())) {
 					configModel.setId(Y9IdGenerator.genId());

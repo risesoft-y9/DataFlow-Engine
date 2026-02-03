@@ -12,6 +12,7 @@
         @onRemoveNode="onRemoveNode"
         @onAddNode="onAddNode"
         @onNodeClick="onNodeClick"
+        :search="search"
     >
         <template #treeHeaderRight>
             <el-button
@@ -79,21 +80,24 @@
     import DataSource from './comps/dataSource/dataForm.vue';
     import dataSourceType from './comps/dataSourceType/index.vue';
     import { useI18n } from 'vue-i18n';
+    import y9_storage from '@/utils/storage';
+
+    const search = decodeURIComponent(y9_storage.getObjectItem('query').search);
+
     const { t } = useI18n();
     // 注入 字体对象
     const fontSizeObj: any = inject('sizeObjInfo');
 
     const loading = ref(false);
     const changeLoading = (status: boolean) => {
-        console.log('status==', status);
         loading.value = status;
     };
 
     //固定树组件实例
-    const fixedTreeRef = ref(null);
+    const fixedTreeRef = ref();
 
     //弹窗组件实例
-    const dialogRef = ref(null);
+    const dialogRef = ref();
 
     //tree接口对象
     const treeApiObj = reactive({
@@ -116,18 +120,6 @@
 
     //新增节点-新增源数据
     const onAddNode = (node) => {
-        // let FormTypeFlag = '';
-        // switch (node.name) {
-        //     case 'elastic':
-        //         FormTypeFlag = FormType.DATA_SOURCE_ELASTIC;
-        //         break;
-        //     case 'ftp':
-        //         FormTypeFlag = FormType.DATA_SOURCE_FTP;
-        //         break;
-        //     default:
-        //         FormTypeFlag = FormType.DATA_SOURCE;
-        //         break;
-        // }
         //打开弹窗
         dialogRef.value.assginDialogConfig({
             show: true,
@@ -149,8 +141,6 @@
             type: 'info'
         })
             .then(async () => {
-                console.log('删除节点', node);
-                let result = { success: false, msg: '' };
                 //删除数据源类型
                 if (node.$level === 1) {
                     loading.value = true;
@@ -191,8 +181,6 @@
                     offset: 65
                 });
             });
-        //这里请求删除数据源接口
-        //成功后刷新树
     };
 
     //点击节点时

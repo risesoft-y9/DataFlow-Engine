@@ -158,12 +158,12 @@ public class ElasticsearchRestClient {
      * @return
      */
     public String bulkAddDocument(String indexName, String document) throws Exception {
-	String data = HttpClientEsUtil.httpPost(document, url + "/" + indexName + "/_doc/_bulk", username, password);
-	if(!data.equals("failed")) {
-		return data;
-	}else {
-		throw new Exception("批量新增/修改文档失败");
-	}
+		String data = HttpClientEsUtil.httpPost(document, url + "/" + indexName + "/_doc/_bulk", username, password);
+		if(!data.equals("failed")) {
+			return data;
+		}else {
+			throw new Exception("批量新增/修改文档失败");
+		}
     }
 
     /**

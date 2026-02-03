@@ -110,11 +110,11 @@ public class TaskConfigModel {
 	/**
 	 * 异字段自动配置
 	 */
-	private Boolean fieldAuto;
+	private Boolean fieldAuto = false;
 	
 	/**
 	 * 数据转换自动配置
 	 */
-	private Boolean valueAuto;
+	private Boolean valueAuto = false;
 
 }

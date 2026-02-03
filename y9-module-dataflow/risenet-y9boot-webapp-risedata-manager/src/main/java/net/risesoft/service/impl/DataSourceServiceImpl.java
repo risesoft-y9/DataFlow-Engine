@@ -97,6 +97,8 @@ public class DataSourceServiceImpl implements DataSourceService {
 				if(df != null && entity.getPassword().equals("******")) {
 					entity.setPassword(df.getPassword());
 				}
+				entity.setExternalId(df.getExternalId());
+				entity.setSystemName(df.getSystemName());
 			}
 			if (entity.getIsLook() == null) {
 				entity.setIsLook(0);

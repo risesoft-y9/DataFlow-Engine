@@ -176,6 +176,12 @@ export const routerBeforeEach = async (to, from) => {
         }
     }
 
+    let session_query = y9_storage.getObjectItem('query');
+    if(session_query['search'] != null) {
+        session_query['search'] = '';
+        y9_storage.setObjectItem('query', session_query);
+    }
+
     // 路由是否带参数
     let query = parseQueryString(window.location.search.substring(1));
     if (query) {

@@ -108,7 +108,7 @@ public class DefaultSecurityManager implements SecurityManager, Filter {
 	/**
 	 * getToken 接口放开
 	 */
-	public String[] excludeEndUrls = { "getToken", "/register/", "getTestData", "saveTestData" };
+	public String[] excludeEndUrls = { "getToken", "/register/", "getTestData", "getDataFlowLog" };
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

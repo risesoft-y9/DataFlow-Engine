@@ -198,7 +198,7 @@ public class TaskMakeUpListener {
     	// 保存数据转换配置
     	String convertClass = Y9DataLocalHolder.getConvertClass();
     	if(StringUtils.isNotBlank(convertClass)) {
-    		if(configModel.getValueAuto()) {// 自动配置，只适合数据库同步
+    		if(configModel.getValueAuto() != null && configModel.getValueAuto()) {// 自动配置，只适合数据库同步
     			// 获取表名称
     			if(dataTable1 == null) {
     				dataTable1 = dataTableRepository.findById(configModel.getSourceTable()).orElse(null);
@@ -267,7 +267,7 @@ public class TaskMakeUpListener {
     	
     	Map<String, Object> dmap = new HashMap<String, Object>();
     	// 保存异字段配置
-    	if(configModel.getFieldAuto()) {// 自动配置，只适合数据库同步
+    	if(configModel.getFieldAuto() != null && configModel.getFieldAuto()) {// 自动配置，只适合数据库同步
     		// 获取表名称
 			if(dataTable1 == null) {
 				dataTable1 = dataTableRepository.findById(configModel.getSourceTable()).orElse(null);

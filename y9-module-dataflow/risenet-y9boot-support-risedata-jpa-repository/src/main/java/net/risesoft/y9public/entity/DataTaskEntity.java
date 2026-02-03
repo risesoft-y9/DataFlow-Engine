@@ -54,5 +54,13 @@ public class DataTaskEntity extends BaseEntity {
 	@Comment(value = "任务类型：1-单节点任务，2-同步任务")
 	@ColumnDefault("2")
 	private Integer taskType;
+	
+	@Column(name = "SYSTEMNAME", length = 50)
+	@Comment(value = "任务来源")
+	private String systemName;
+	
+	@Column(name = "EXTERNALID", length = 50)
+	@Comment(value = "关联ID")
+	private String externalId;
 
 }

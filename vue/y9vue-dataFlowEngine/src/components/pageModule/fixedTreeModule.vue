@@ -115,6 +115,11 @@
             //是否显示删除icon
             type: Boolean,
             default: true
+        },
+
+        search: {
+            type: String,
+            default: ''
         }
     });
 
@@ -527,6 +532,13 @@
         }
         if (!isFiexHeader.value) {
             window.addEventListener('scroll', listener, false);
+        }
+        
+        if(props.search != '' && props.search) {
+            setTimeout(async () => {
+                apiSearchKey.value = props.search;
+                onSearchChange(apiSearchKey.value);
+            }, 900)
         }
     });
 </script>

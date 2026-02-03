@@ -63,5 +63,13 @@ public class DataInterfaceEntity extends BaseEntity {
 	@Column(name = "USERNAME", length = 50)
 	@Comment(value = "创建者")
 	private String userName;
+	
+	@Column(name = "SYSTEMNAME", length = 50)
+	@Comment(value = "任务来源")
+	private String systemName;
+	
+	@Column(name = "EXTERNALID", length = 50)
+	@Comment(value = "关联ID")
+	private String externalId;
 
 }
