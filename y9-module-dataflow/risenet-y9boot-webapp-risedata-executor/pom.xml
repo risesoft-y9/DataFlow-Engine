@@ -44,7 +44,7 @@
             <artifactId>risenet-y9boot-data-transfer-elastic</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>net.risesoft</groupId>
             <artifactId>risenet-y9boot-data-transfer-api</artifactId>
@@ -72,7 +72,7 @@
             <artifactId>risenet-y9boot-data-transfer-ftp</artifactId>
             <version>${project.version}</version>
         </dependency>
-            <dependency>
+        <dependency>
             <groupId>net.risesoft</groupId>
             <artifactId>risenet-y9boot-data-transfer-assembler</artifactId>
             <version>${project.version}</version>
@@ -98,4 +98,28 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>deploy-maven-central</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <configuration>
+                            <skipPublishing>true</skipPublishing>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
