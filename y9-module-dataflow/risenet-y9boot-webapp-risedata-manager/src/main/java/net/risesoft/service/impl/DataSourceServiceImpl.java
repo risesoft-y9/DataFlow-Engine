@@ -41,12 +41,14 @@ import net.risesoft.util.sqlddl.DbMetaDataUtil;
 import net.risesoft.y9.Y9LoginUserHolder;
 import net.risesoft.y9.json.Y9JsonUtil;
 import net.risesoft.y9public.entity.DataSourceTypeEntity;
+import net.risesoft.y9public.entity.DataInterfaceEntity;
 import net.risesoft.y9public.entity.DataSourceEntity;
 import net.risesoft.y9public.entity.DataTable;
 import net.risesoft.y9public.entity.DataTableField;
 import net.risesoft.y9public.entity.DataTaskConfigEntity;
 import net.risesoft.y9public.entity.DataTaskEntity;
 import net.risesoft.y9public.repository.DataSourceTypeRepository;
+import net.risesoft.y9public.repository.DataInterfaceRepository;
 import net.risesoft.y9public.repository.DataSourceRepository;
 import net.risesoft.y9public.repository.DataTableFieldRepository;
 import net.risesoft.y9public.repository.DataTableRepository;
@@ -69,6 +71,8 @@ public class DataSourceServiceImpl implements DataSourceService {
 	private final DataTaskConfigRepository dataTaskConfigRepository;
 	
 	private final DataTaskRepository dataTaskRepository;
+	
+	private final DataInterfaceRepository dataInterfaceRepository;
 	
 	private final ModelMapper modelMapper;
 
@@ -827,36 +831,55 @@ public class DataSourceServiceImpl implements DataSourceService {
 					Map<String, Object> map = new HashMap<String, Object>();
 					DataTaskEntity dataTaskEntity = dataTaskRepository.findById(taskConfigEntity.getTaskId()).orElse(null);
 					map.put("taskName", dataTaskEntity.getName());
-					// 源表信息
-					String sourceTable = dataTable.getName();
-					if(taskConfigEntity.getSourceTable().equals(tableId)) {
-						map.put("sourceTable", dataTable.getName());
-					}else {
-						DataTable dataTable2 = dataTableRepository.findById(taskConfigEntity.getSourceTable()).orElse(null);
-						map.put("sourceTable", dataTable2.getName() + "(" + getDataSourceById(taskConfigEntity.getSourceId()).getBaseName() + ")");
-						sourceTable = dataTable2.getName();
+					// 源表信息，如果来源于api或者ftp不用查询表名称和数据量
+					if(taskConfigEntity.getSourceType().equals("api")) {
+						DataInterfaceEntity dataInterfaceEntity = dataInterfaceRepository.findById(taskConfigEntity.getSourceTable()).orElse(null);
+						map.put("sourceTable", dataInterfaceEntity.getInterfaceName());
+					} else if(taskConfigEntity.getSourceType().equals("ftp")) {
+						map.put("sourceTable", taskConfigEntity.getSourceTable());
+					} else {
+						if(taskConfigEntity.getSourceTable().equals("multi")) {
+							map.put("sourceTable", "多表查询同步");
+						} else {
+							String sourceTable = dataTable.getName();
+							if(taskConfigEntity.getSourceTable().equals(tableId)) {
+								map.put("sourceTable", dataTable.getName());
+							} else {
+								DataTable dataTable2 = dataTableRepository.findById(taskConfigEntity.getSourceTable()).orElse(null);
+								map.put("sourceTable", dataTable2.getName() + "(" + getDataSourceById(taskConfigEntity.getSourceId()).getBaseName() + ")");
+								sourceTable = dataTable2.getName();
+							}
+							// 获取表数据量
+							if(taskConfigEntity.getSourceType().equals(DataConstant.ES)) {
+								map.put("sourceTableNum", getElasticCount(taskConfigEntity.getSourceId(), sourceTable));
+							} else {
+								map.put("sourceTableNum", getTableDataCount(taskConfigEntity.getSourceId(), sourceTable));
+							}
+						}
 					}
-					// 获取表数据量
-					if(taskConfigEntity.getSourceType().equals(DataConstant.ES)) {
-						map.put("sourceTableNum", getElasticCount(taskConfigEntity.getSourceId(), sourceTable));
-					}else {
-						map.put("sourceTableNum", getTableDataCount(taskConfigEntity.getSourceId(), sourceTable));
-					}
+					
 					// 目的表信息
-					String targetTable = dataTable.getName();
-					if(taskConfigEntity.getTargetTable().equals(tableId)) {
-						map.put("targetTable", dataTable.getName());
-					}else {
-						DataTable dataTable2 = dataTableRepository.findById(taskConfigEntity.getTargetTable()).orElse(null);
-						map.put("targetTable", dataTable2.getName() + "(" + getDataSourceById(taskConfigEntity.getTargetId()).getBaseName() + ")");
-						
-						targetTable = dataTable2.getName();
-					}
-					// 获取表数据量
-					if(taskConfigEntity.getTargetType().equals(DataConstant.ES)) {
-						map.put("targetTableNum", getElasticCount(taskConfigEntity.getTargetId(), targetTable));
-					}else {
-						map.put("targetTableNum", getTableDataCount(taskConfigEntity.getTargetId(), targetTable));
+					if(taskConfigEntity.getTargetType().equals("api")) {
+						DataInterfaceEntity dataInterfaceEntity = dataInterfaceRepository.findById(taskConfigEntity.getTargetTable()).orElse(null);
+						map.put("targetTable", dataInterfaceEntity.getInterfaceName());
+					} else if(taskConfigEntity.getTargetType().equals("ftp")) {
+						map.put("targetTable", taskConfigEntity.getTargetTable());
+					} else {
+						String targetTable = dataTable.getName();
+						if(taskConfigEntity.getTargetTable().equals(tableId)) {
+							map.put("targetTable", dataTable.getName());
+						}else {
+							DataTable dataTable2 = dataTableRepository.findById(taskConfigEntity.getTargetTable()).orElse(null);
+							map.put("targetTable", dataTable2.getName() + "(" + getDataSourceById(taskConfigEntity.getTargetId()).getBaseName() + ")");
+							
+							targetTable = dataTable2.getName();
+						}
+						// 获取表数据量
+						if(taskConfigEntity.getTargetType().equals(DataConstant.ES)) {
+							map.put("targetTableNum", getElasticCount(taskConfigEntity.getTargetId(), targetTable));
+						}else {
+							map.put("targetTableNum", getTableDataCount(taskConfigEntity.getTargetId(), targetTable));
+						}
 					}
 					listMap.add(map);
 				}

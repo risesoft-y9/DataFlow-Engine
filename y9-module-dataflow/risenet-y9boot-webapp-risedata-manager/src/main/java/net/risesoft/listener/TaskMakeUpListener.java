@@ -427,7 +427,7 @@ public class TaskMakeUpListener {
     		map.put("column", sourceCloumn);
     		map.put("columnTypes", columnTypes);
     		// 判断是否有分页参数
-    		if(configModel.getWhereSql().indexOf("$page{") > -1) {
+    		if(StringUtils.isNotBlank(configModel.getWhereSql()) && configModel.getWhereSql().indexOf("$page{") > -1) {
     			RequestModel requestModel = Y9JsonUtil.readValue(configModel.getWhereSql(), RequestModel.class);
     			map.put("isPage", true);
     			int page = 0;
