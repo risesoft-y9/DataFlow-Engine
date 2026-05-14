@@ -1,6 +1,7 @@
 package net.risesoft.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -8,6 +9,11 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.validation.annotation.Validated;
@@ -17,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import net.risesoft.pojo.Y9Page;
+import net.risesoft.pojo.Y9Result;
+import net.risesoft.y9.json.Y9JsonUtil;
 import net.risesoft.y9public.entity.DataTaskEntity;
 import net.risesoft.y9public.repository.DataTaskRepository;
 
@@ -31,7 +39,7 @@ public class ApiController {
 	@Resource(name = "jdbcTemplate4Public")
 	private JdbcTemplate jdbcTemplate4Public;
 	
-	@GetMapping(value = "/getTestData")
+	//@GetMapping(value = "/getTestData")
     public Y9Page<Map<String, Object>> get(int num, int page, int size) {
 		List<Map<String, Object>> listMap = jdbcTemplate4Public.queryForList("select * from test_data where id <= " 
 				+ num + " ORDER BY id LIMIT ? OFFSET ?", size, page * size);
@@ -62,6 +70,9 @@ public class ApiController {
 					jobIds.add(dataMap.get("ID").toString());
 				}
 			}
+			if(jobIds.size() == 0) {
+				return Y9Page.success(0, 0, 0, null, "获取成功");
+			}
 			// 手动拼接IN后的占位符：根据集合长度生成 "?, ?, ..."
 	        String placeholders = jobIds.stream()
 	                .map(id -> "?")
@@ -74,7 +85,7 @@ public class ApiController {
 			if(count == 0) {
 				return Y9Page.success(page, 0, 0, new ArrayList<>()); 
 			}
-			String sql2 = String.format("select * from Y9_DATASERVICE_JOB_LOG where JOB_ID in (%s) ORDER BY ID "
+			String sql2 = String.format("select * from Y9_DATASERVICE_JOB_LOG where JOB_ID in (%s) ORDER BY DISPATCH_TIME desc "
 					+ "LIMIT %s OFFSET %s", placeholders, size, (page - 1) * size);
 			List<Map<String, Object>> listMap = jdbcTemplate4Public.queryForList(sql2, jobIds.toArray());
 			for(Map<String, Object> map : listMap) {
@@ -100,5 +111,40 @@ public class ApiController {
 			return Y9Page.failure(0, 0, 0, null, "程序出错：" + e.getMessage(), 500);
 		}
 	}
+	
+	@GetMapping(value = "/getTestData")
+	public Y9Result<List<Map<String, Object>>> getWbNews() {
+		List<Map<String, Object>> listMap = new ArrayList<Map<String, Object>>();
+        try {
+        	listMap = httpClient();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Y9Result.success(listMap);
+    }
+	
+	@SuppressWarnings("unchecked")
+	public static List<Map<String, Object>> httpClient() throws Exception {
+		List<Map<String, Object>> listMap = new ArrayList<Map<String,Object>>();
+		
+        // 创建CloseableHttpClient
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet httpGet = new HttpGet("https://uapis.cn/api/v1/misc/hotboard?type=weibo");
+
+        CloseableHttpResponse response = client.execute(httpGet);
+        String obj = EntityUtils.toString(response.getEntity());
+        Map<String, Object> map = Y9JsonUtil.readHashMap(obj);
+        
+        List<Map<String, Object>> data = (List<Map<String, Object>>) map.get("list");
+        for(Map<String, Object> dataMap : data) {
+        	Map<String, Object> rmap = new HashMap<String, Object>();
+        	rmap.put("index", dataMap.get("index"));
+        	rmap.put("title", dataMap.get("title"));
+        	rmap.put("url", dataMap.get("url"));
+        	rmap.put("time", map.get("update_time"));
+        	listMap.add(rmap);
+        }
+        return listMap;
+    }
 
 }

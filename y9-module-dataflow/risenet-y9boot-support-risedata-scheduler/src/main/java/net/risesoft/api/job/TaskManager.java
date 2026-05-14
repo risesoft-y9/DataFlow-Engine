@@ -1,7 +1,5 @@
 package net.risesoft.api.job;
 
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.map.MapUtil;
 import net.risedata.register.service.IServiceInstanceFactory;
 import net.risedata.rpc.consumer.annotation.Listener;
 import net.risedata.rpc.consumer.annotation.Listeners;
@@ -12,7 +10,6 @@ import net.risesoft.api.persistence.job.JobLogService;
 import net.risesoft.api.persistence.job.JobService;
 import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
-import net.risesoft.api.persistence.model.log.Log;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -91,7 +88,7 @@ public class TaskManager {
     /**
      * 清理30天前的数据
      */
-    @Scheduled(cron = "0 0 0 * * ?")
+    //@Scheduled(cron = "0 0 0 * * ?")
     public void clearLog() {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MONDAY, -1);
