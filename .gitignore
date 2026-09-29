@@ -25,5 +25,6 @@ rebel.xml
 
 # vue
 node_modules/
+vue/y9vue-dataflow-engine/dataflow/
 
 .flattened-pom.xml
