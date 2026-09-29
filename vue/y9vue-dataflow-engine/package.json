@@ -1,6 +1,6 @@
 {
     "name": "y9vue-dataflow-engine",
-    "version": "9.6.11-SNAPSHOT",
+    "version": "9.6.11",
     "description": "数据流引擎",
     "main": "/electron/main.js",
     "scripts": {
