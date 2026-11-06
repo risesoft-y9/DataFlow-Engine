@@ -11,7 +11,7 @@ package risesoft.data.transfer.core.util.strings.handles;
  */
 public interface CastValueHandle<T, V> {
 
-	Class<?>[] getTypes();
+    Class<?>[] getTypes();
 
-	T getValue(V value);
+    T getValue(V value);
 }

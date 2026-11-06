@@ -7,21 +7,21 @@ import risesoft.data.transfer.core.util.CloseUtils;
 
 public abstract class AbstractCloseListenerning implements CloseListenerning, Closed {
 
-	private List<CloseListener> listeners = new ArrayList<CloseListener>();
+    private List<CloseListener> listeners = new ArrayList<CloseListener>();
 
-	@Override
-	public void close() throws Exception {
-		for (CloseListener closeListener : listeners) {
-			CloseUtils.close(closeListener);
-		}
-		this.closed();
-	}
+    @Override
+    public void close() throws Exception {
+        for (CloseListener closeListener : listeners) {
+            CloseUtils.close(closeListener);
+        }
+        this.closed();
+    }
 
-	protected abstract void closed();
+    protected abstract void closed();
 
-	@Override
-	public void addCloseListener(CloseListener closeListener) {
-		listeners.add(closeListener);
-	}
+    @Override
+    public void addCloseListener(CloseListener closeListener) {
+        listeners.add(closeListener);
+    }
 
 }

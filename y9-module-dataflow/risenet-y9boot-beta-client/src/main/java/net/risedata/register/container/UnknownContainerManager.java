@@ -14,9 +14,6 @@ public class UnknownContainerManager extends SystemContainerManager {
         super(systemOperation, rootPath);
     }
 
-
-
-
     @Override
     public void start() {
         LOGGER.error("unknown container");

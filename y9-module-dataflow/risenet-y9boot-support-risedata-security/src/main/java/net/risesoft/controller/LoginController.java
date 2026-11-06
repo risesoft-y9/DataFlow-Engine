@@ -1,13 +1,18 @@
 package net.risesoft.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import cn.hutool.core.codec.Base64;
+import net.risesoft.pojo.Y9Result;
 import net.risesoft.security.SecurityManager;
 import net.risesoft.security.service.TokenService;
 import net.risesoft.security.service.UserService;
-import net.risesoft.pojo.Y9Result;
+
+import cn.hutool.core.codec.Base64;
 
 /**
  * @Description : 登录
@@ -19,43 +24,41 @@ import net.risesoft.pojo.Y9Result;
 @RestController
 @RequestMapping("/services/rest/login")
 public class LoginController {
-	
-	@Autowired
-	UserService userService;
 
-	@Autowired
-	TokenService tokenService;
-	
-	/**
-	 * @param userName 用户名
-	 * @param password 密码加密后
-	 * @return
-	 */
-	@PostMapping("getToken")
-	public Y9Result<Object> getToken(
-			@RequestParam(required = true)  String account,
-			@RequestParam(required = true)  String password) {
-		return Y9Result.success(tokenService.createToken(userService.checkLogin(account, Base64.decodeStr(password))));
-	}
+    @Autowired
+    UserService userService;
 
-	@Autowired
-	SecurityManager securityManager;
+    @Autowired
+    TokenService tokenService;
 
-	
-	@GetMapping("getUser")
-	public Y9Result<Object> getUser() {
-		return Y9Result.success(securityManager.getConcurrentSecurity().getUser());
-	}
+    /**
+     * @param userName 用户名
+     * @param password 密码加密后
+     * @return
+     */
+    @PostMapping("getToken")
+    public Y9Result<Object> getToken(@RequestParam(required = true) String account,
+        @RequestParam(required = true) String password) {
+        return Y9Result.success(tokenService.createToken(userService.checkLogin(account, Base64.decodeStr(password))));
+    }
 
-	/**
-	 * 删除掉token
-	 * 
-	 * @param token
-	 * @return
-	 */
-	@PostMapping("removeToken")
-	public Y9Result<Object> removeToken() {
-		return Y9Result.success(securityManager.removeToken(securityManager.getToken()));
-	}
+    @Autowired
+    SecurityManager securityManager;
+
+    @GetMapping("getUser")
+    public Y9Result<Object> getUser() {
+        return Y9Result.success(securityManager.getConcurrentSecurity().getUser());
+    }
+
+    /**
+     * 删除掉token
+     * 
+     * @param token
+     * @return
+     */
+    @PostMapping("removeToken")
+    public Y9Result<Object> removeToken() {
+        return Y9Result.success(securityManager.removeToken(securityManager.getToken()));
+    }
 
 }

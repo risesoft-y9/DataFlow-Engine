@@ -1,13 +1,13 @@
 package net.risedata.rpc.provide.filter.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.risedata.rpc.model.Response;
 import net.risedata.rpc.provide.context.RPCRequestContext;
 import net.risedata.rpc.provide.context.Send;
 import net.risedata.rpc.provide.filter.Filter;
 import net.risedata.rpc.provide.filter.FilterNode;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @Description :
@@ -22,8 +22,8 @@ public class FilterNodeApplication extends FilterNode {
 
     public FilterNodeApplication(Filter fistFilter, Filter lastFilter) {
         filterNodes = new ArrayList<>();
-        filterNodes.add(new DefaultFilterNode(filterNodes,fistFilter));
-        filterNodes.add(new DefaultFilterNode(filterNodes,lastFilter));
+        filterNodes.add(new DefaultFilterNode(filterNodes, fistFilter));
+        filterNodes.add(new DefaultFilterNode(filterNodes, lastFilter));
         refreshIndex();
     }
 
@@ -36,10 +36,10 @@ public class FilterNodeApplication extends FilterNode {
     public void addFilter(Filter filter, int index) {
         if (index == 0) {
             index = 1;
-        }else if(index>=this.filterNodes.size()){
-            index = this.filterNodes.size()-1;
+        } else if (index >= this.filterNodes.size()) {
+            index = this.filterNodes.size() - 1;
         }
-        filterNodes.add(index,new DefaultFilterNode(filterNodes,filter));
+        filterNodes.add(index, new DefaultFilterNode(filterNodes, filter));
         refreshIndex();
     }
 
@@ -49,24 +49,26 @@ public class FilterNodeApplication extends FilterNode {
      * @param filter
      */
     public void addFilter(Filter filter) {
-        filterNodes.add(1,new DefaultFilterNode(filterNodes,filter));
+        filterNodes.add(1, new DefaultFilterNode(filterNodes, filter));
         refreshIndex();
     }
+
     /**
      * 添加一个过滤器到
      *
      * @param filter
      */
     public void addFilterNode(FilterNode filter) {
-        filterNodes.add(1,filter);
+        filterNodes.add(1, filter);
         refreshIndex();
     }
 
-    private void refreshIndex(){
+    private void refreshIndex() {
         for (int i = 0; i < filterNodes.size(); i++) {
             ((DefaultFilterNode)filterNodes.get(i)).setIndex(i);
         }
     }
+
     @Override
     public void doBefore(RPCRequestContext request) throws Exception {
         filterNodes.get(0).doBefore(request);
@@ -78,6 +80,6 @@ public class FilterNodeApplication extends FilterNode {
 
     @Override
     public void doAfter(Response response, RPCRequestContext context, Send send) throws Exception {
-        filterNodes.get(filterNodes.size()-1).doAfter(response,context,send);
+        filterNodes.get(filterNodes.size() - 1).doAfter(response, context, send);
     }
 }

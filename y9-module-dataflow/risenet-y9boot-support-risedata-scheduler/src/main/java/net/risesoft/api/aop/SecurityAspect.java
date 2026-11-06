@@ -14,14 +14,13 @@ import net.risesoft.pojo.Y9Result;
 public class SecurityAspect {
 
     @Pointcut("@annotation(net.risesoft.api.aop.CheckResult)")
-    public void doCheck() {
-    }
+    public void doCheck() {}
 
     @Around("doCheck()")
     public Object doCheckResult(ProceedingJoinPoint joinPoint) throws Throwable {
-        BindingResult result = (BindingResult) joinPoint.getArgs()[1];
+        BindingResult result = (BindingResult)joinPoint.getArgs()[1];
         if (result.hasErrors()) {
-            return Y9Result.failure(500,result.getFieldError().getDefaultMessage());
+            return Y9Result.failure(500, result.getFieldError().getDefaultMessage());
         }
         return joinPoint.proceed();
     }

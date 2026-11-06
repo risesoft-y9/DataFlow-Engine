@@ -11,13 +11,13 @@ import risesoft.data.transfer.core.util.strings.handles.StringCastValueHandle;
  */
 public class StringToDoubleHandle implements StringCastValueHandle<Double> {
 
-	public Class<?>[] getTypes() {
-		return new Class<?>[] { double.class, Double.class };
-	}
+    public Class<?>[] getTypes() {
+        return new Class<?>[] {double.class, Double.class};
+    }
 
-	@Override
-	public Double getValue(String value) {
-		return Double.valueOf(value);
-	}
+    @Override
+    public Double getValue(String value) {
+        return Double.valueOf(value);
+    }
 
 }

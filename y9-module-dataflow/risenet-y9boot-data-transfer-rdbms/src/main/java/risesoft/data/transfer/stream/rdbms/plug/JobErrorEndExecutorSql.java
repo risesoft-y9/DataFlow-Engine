@@ -13,20 +13,20 @@ import risesoft.data.transfer.core.statistics.State;
  */
 public class JobErrorEndExecutorSql extends JobEndExecutorSql implements Plug {
 
-	public JobErrorEndExecutorSql(ExecutorConfig config, JobContext jobContext) {
-		super(config, jobContext);
-	}
+    public JobErrorEndExecutorSql(ExecutorConfig config, JobContext jobContext) {
+        super(config, jobContext);
+    }
 
-	@Override
-	public void onJobEnd(JobContext jobContext) {
-		if (jobContext.getCommunication().getState()==State.FAILED) {
-			super.onJobEnd(jobContext);
-		}
-	}
+    @Override
+    public void onJobEnd(JobContext jobContext) {
+        if (jobContext.getCommunication().getState() == State.FAILED) {
+            super.onJobEnd(jobContext);
+        }
+    }
 
-	@Override
-	public boolean register(JobContext jobContext) {
-		return true;
-	}
+    @Override
+    public boolean register(JobContext jobContext) {
+        return true;
+    }
 
 }

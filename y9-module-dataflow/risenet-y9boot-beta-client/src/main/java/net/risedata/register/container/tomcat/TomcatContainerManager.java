@@ -1,6 +1,5 @@
 package net.risedata.register.container.tomcat;
 
-
 import net.risedata.register.container.ContainerManager;
 import net.risedata.register.container.SystemContainerManager;
 import net.risedata.register.system.operation.SystemOperation;
@@ -15,7 +14,6 @@ import net.risedata.register.system.operation.linux.LinuxSystemOperation;
  */
 public class TomcatContainerManager extends SystemContainerManager {
 
-
     public TomcatContainerManager(SystemOperation systemOperation, String rootPath) {
         super(systemOperation, rootPath);
     }
@@ -23,7 +21,6 @@ public class TomcatContainerManager extends SystemContainerManager {
     public static ContainerManager create(String rootPath, SystemOperation systemOperation) {
         return null;
     }
-
 
     @Override
     public void start() {
@@ -34,6 +31,5 @@ public class TomcatContainerManager extends SystemContainerManager {
         }
 
     }
-
 
 }

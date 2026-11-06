@@ -17,15 +17,15 @@ import java.lang.annotation.Target;
 @Documented
 @Inherited
 public @interface UpdateId {
-	/**
-	 * 是否在 wehre 的同时进行update操作 default false
-	 * 
-	 * @return
-	 */
-	boolean isUpdate() default false;
+    /**
+     * 是否在 wehre 的同时进行update操作 default false
+     * 
+     * @return
+     */
+    boolean isUpdate() default false;
 
-	/**
-	 * 是否占位开启后 如果没有传入自定义的操作则不会生效 只在操作为update的时候生效
-	 */
-	boolean isPlaceholder() default false;
+    /**
+     * 是否占位开启后 如果没有传入自定义的操作则不会生效 只在操作为update的时候生效
+     */
+    boolean isPlaceholder() default false;
 }

@@ -12,17 +12,17 @@ import risesoft.data.transfer.core.handle.Handle;
  * @author lb
  */
 public interface RecordInHandle extends Handle {
-	/**
-	 * 从输入通道中进入一条数据
-	 * 
-	 * @param record
-	 */
-	void doIn(Record record);
+    /**
+     * 从输入通道中进入一条数据
+     * 
+     * @param record
+     */
+    void doIn(Record record);
 
-	/**
-	 * 从输入通道中进入一批数据
-	 * 
-	 * @param records
-	 */
-	void doIn(List<Record> records);
+    /**
+     * 从输入通道中进入一批数据
+     * 
+     * @param records
+     */
+    void doIn(List<Record> records);
 }

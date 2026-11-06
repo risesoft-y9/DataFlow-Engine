@@ -17,49 +17,49 @@ import net.risedata.jdbc.mapping.RowMapping;
  */
 public class EntiryHandle extends SimpleHandleMapping<Object> {
 
-	RowMapping<Object> rowMapping;
+    RowMapping<Object> rowMapping;
 
-	/**
-	 * 
-	 * @param fields 连接的fields
-	 * @param bc     为当前bean的config对象
-	 */
-	public EntiryHandle(List<FieldConfig> fields, BeanConfig bc) {
+    /**
+     * 
+     * @param fields 连接的fields
+     * @param bc 为当前bean的config对象
+     */
+    public EntiryHandle(List<FieldConfig> fields, BeanConfig bc) {
 
-		rowMapping = new RowMapping<>(bc, fields);
-	}
+        rowMapping = new RowMapping<>(bc, fields);
+    }
 
-	@Override
-	public boolean isHandle(Class<?> cla) {
-		return cla.getAnnotation(Entity.class) == null;
-	}
+    @Override
+    public boolean isHandle(Class<?> cla) {
+        return cla.getAnnotation(Entity.class) == null;
+    }
 
-	public static boolean isEntiryHandle(Class<?> cla) {
-		return cla.getAnnotation(Entity.class) != null;
-	}
+    public static boolean isEntiryHandle(Class<?> cla) {
+        return cla.getAnnotation(Entity.class) != null;
+    }
 
-	@Override
-	Object getValue(Field field, Object value, Class<?> type) {
-//		Object returnValue = null;
-//		try { 暂未搞懂 原本写 returnValue 的用意?
-//			returnValue = type.newInstance();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-		try {
-			return rowMapping.mapRow((ResultSet) value, 0);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+    @Override
+    Object getValue(Field field, Object value, Class<?> type) {
+        // Object returnValue = null;
+        // try { 暂未搞懂 原本写 returnValue 的用意?
+        // returnValue = type.newInstance();
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // }
+        try {
+            return rowMapping.mapRow((ResultSet)value, 0);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-	@Override
-	public Object getValue(ResultSet set, String field) throws SQLException {
-		/**
-		 * 在 resultset 中 拿到 所有 colum 的 map返回出去
-		 */
-		return set;
-	}
+    @Override
+    public Object getValue(ResultSet set, String field) throws SQLException {
+        /**
+         * 在 resultset 中 拿到 所有 colum 的 map返回出去
+         */
+        return set;
+    }
 
 }

@@ -14,21 +14,21 @@ import net.risedata.jdbc.operation.Where;
  */
 public abstract class AbstractCustomOperation extends SimpleOperation {
 
-	@Override
-	public boolean where(FieldConfig field, List<Object> args, StringBuilder sql, Map<String, Object> valueMap,
-			BeanConfig bc, Map<String, Object> excludeMap) {
-		return handle(new Where(sql, field, valueMap, args, excludeMap, bc));
-	}
+    @Override
+    public boolean where(FieldConfig field, List<Object> args, StringBuilder sql, Map<String, Object> valueMap,
+        BeanConfig bc, Map<String, Object> excludeMap) {
+        return handle(new Where(sql, field, valueMap, args, excludeMap, bc));
+    }
 
-	protected abstract boolean handle(Where where);
+    protected abstract boolean handle(Where where);
 
-	public int getLevel() {
-		return -1;
-	}
+    public int getLevel() {
+        return -1;
+    }
 
-	@Override
-	public int getOperate() {
-		return getLevel();
-	}
+    @Override
+    public int getOperate() {
+        return getLevel();
+    }
 
 }

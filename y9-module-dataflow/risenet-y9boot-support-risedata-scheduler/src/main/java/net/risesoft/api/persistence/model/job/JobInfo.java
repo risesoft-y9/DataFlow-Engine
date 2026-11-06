@@ -1,13 +1,17 @@
 package net.risesoft.api.persistence.model.job;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
 
 import org.hibernate.annotations.Comment;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
- * @Description :  日志信息
+ * @Description : 日志信息
  * @ClassName JobInfo
  * @Author lb
  * @Date 2022/9/14 11:47
@@ -21,20 +25,20 @@ public class JobInfo {
     /**
      * 时间
      */
-	@Comment(value = "日志记录的时间")
+    @Comment(value = "日志记录的时间")
     @Id
     @Column(name = "INFO_DATE", length = 100)
     private String date;
-	@Comment(value = "成功的次数")
+    @Comment(value = "成功的次数")
     @Column(name = "SUCCESS", length = 10)
     private Integer success;
-	@Comment(value = "异常次数")
+    @Comment(value = "异常次数")
     @Column(name = "ERROR", length = 10)
     private Integer error;
     /**
      * 所属环境
      */
-	@Comment(value = "所属环境")
+    @Comment(value = "所属环境")
     @Id
     @Column(name = "ENVIRONMENT", length = 10)
     private String environment;
@@ -73,10 +77,6 @@ public class JobInfo {
 
     @Override
     public String toString() {
-        return "JobInfo{" +
-                "date='" + date + '\'' +
-                ", success=" + success +
-                ", error=" + error +
-                '}';
+        return "JobInfo{" + "date='" + date + '\'' + ", success=" + success + ", error=" + error + '}';
     }
 }

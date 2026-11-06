@@ -9,13 +9,13 @@ import risesoft.data.transfer.core.handle.Handle;
  * @date 2023年12月22日
  * @author lb
  */
-public interface LogInfoHandle extends Handle{
-	/**
-	 * 
-	 * @param source 日志源
-	 * @param info   信息
-	 * @param name   名字
-	 */
-	void info(Object source, String info);
+public interface LogInfoHandle extends Handle {
+    /**
+     * 
+     * @param source 日志源
+     * @param info 信息
+     * @param name 名字
+     */
+    void info(Object source, String info);
 
 }

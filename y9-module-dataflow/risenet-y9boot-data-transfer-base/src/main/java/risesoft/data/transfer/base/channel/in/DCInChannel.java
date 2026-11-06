@@ -16,29 +16,29 @@ import risesoft.data.transfer.core.util.Configuration;
  */
 public class DCInChannel extends AbstractInChannel {
 
-	/**
-	 * 直流交换机
-	 * 
-	 * @param configuration
-	 */
-	public DCInChannel(Configuration configuration, JobContext jobContext) {
-		super(jobContext);
-	}
+    /**
+     * 直流交换机
+     * 
+     * @param configuration
+     */
+    public DCInChannel(Configuration configuration, JobContext jobContext) {
+        super(jobContext);
+    }
 
-	@Override
-	public void writer(Record record) {
-		recordOutuptStream.writer(record);
-	}
+    @Override
+    public void writer(Record record) {
+        recordOutuptStream.writer(record);
+    }
 
-	@Override
-	public void writer(List<Record> record) {
-		recordOutuptStream.writer(record);
-	}
+    @Override
+    public void writer(List<Record> record) {
+        recordOutuptStream.writer(record);
+    }
 
-	@Override
-	public void flush() {
-		recordOutuptStream.flush();
+    @Override
+    public void flush() {
+        recordOutuptStream.flush();
 
-	}
+    }
 
 }

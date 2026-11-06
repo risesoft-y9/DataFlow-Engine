@@ -15,24 +15,24 @@ import net.risedata.jdbc.config.model.FieldConfig;
  */
 public class DatePlusOneSectionOperation extends SimpleOperation {
 
-	@Override
-	public boolean where(FieldConfig field, List<Object> args, StringBuilder sql, Map<String, Object> valueMap,
-			BeanConfig bc, Map<String, Object> excludeMap) {
+    @Override
+    public boolean where(FieldConfig field, List<Object> args, StringBuilder sql, Map<String, Object> valueMap,
+        BeanConfig bc, Map<String, Object> excludeMap) {
 
-		Object ovalue = getValue(field, valueMap);
-		if (isNotNull(ovalue)) {
-			sql.append(field.getColumn() + ">=" + "? ");
-			args.add(ovalue);
-			sql.append(" and " + field.getColumn() + "<=" + "? ");
-			args.add(DateUtils.updateDay((Date) ovalue, 1));
-			return true;
-		}
-		return false;
-	}
+        Object ovalue = getValue(field, valueMap);
+        if (isNotNull(ovalue)) {
+            sql.append(field.getColumn() + ">=" + "? ");
+            args.add(ovalue);
+            sql.append(" and " + field.getColumn() + "<=" + "? ");
+            args.add(DateUtils.updateDay((Date)ovalue, 1));
+            return true;
+        }
+        return false;
+    }
 
-	@Override
-	public int getOperate() {
-		return 6;
-	}
+    @Override
+    public int getOperate() {
+        return 6;
+    }
 
 }

@@ -4,9 +4,6 @@ import net.risedata.rpc.consumer.result.SyncResult;
 import net.risedata.rpc.consumer.result.value.ReturnValueHandle;
 import net.risedata.rpc.factory.model.ReturnType;
 
-import java.util.List;
-import java.util.Map;
-
 /**
  * @description: 处理异步返回值
  * @Author lb176
@@ -22,6 +19,5 @@ public class SyncResultHandle implements ReturnValueHandle {
     public Object getValue(SyncResult result, ReturnType returnType, Object[] args) {
         return result;
     }
-
 
 }

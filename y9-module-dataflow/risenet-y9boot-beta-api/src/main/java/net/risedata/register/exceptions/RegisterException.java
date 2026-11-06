@@ -7,9 +7,9 @@ package net.risedata.register.exceptions;
  * @Date 2021/12/6 10:24
  * @Version 1.0
  */
-public class RegisterException extends  RuntimeException {
+public class RegisterException extends RuntimeException {
 
-    public RegisterException(String msg){
+    public RegisterException(String msg) {
         super(msg);
     }
 

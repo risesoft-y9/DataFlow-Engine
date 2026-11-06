@@ -1,15 +1,11 @@
 package net.risedata.rpc.provide.context;
 
-
 import com.alibaba.fastjson.JSON;
 
-import io.netty.channel.ChannelHandlerContext;
 import net.risedata.rpc.model.Request;
 import net.risedata.rpc.model.Response;
 import net.risedata.rpc.provide.defined.MethodDefined;
 import net.risedata.rpc.provide.exceptions.SenderException;
-import net.risedata.rpc.provide.filter.Filter;
-import net.risedata.rpc.provide.filter.FilterNode;
 import net.risedata.rpc.provide.filter.impl.FilterNodeApplication;
 import net.risedata.rpc.provide.net.ClientConnection;
 
@@ -44,12 +40,10 @@ public class RPCRequestContext {
      */
     private FilterNodeApplication filterApplication;
 
-
     public RPCRequestContext(ClientConnection concurrentConnection, Request request) {
         this.request = request;
         this.concurrentConnection = concurrentConnection;
     }
-
 
     public FilterNodeApplication getFilterApplication() {
         return filterApplication;
@@ -58,7 +52,6 @@ public class RPCRequestContext {
     public void setFilterApplication(FilterNodeApplication filterApplication) {
         this.filterApplication = filterApplication;
     }
-
 
     public MethodDefined getMethodDefined() {
         return methodDefined;
@@ -70,12 +63,12 @@ public class RPCRequestContext {
 
     /**
      * 获取当前的连接对象
+     * 
      * @return
      */
     public ClientConnection getConcurrentConnection() {
         return concurrentConnection;
     }
-
 
     public Request getRequest() {
         return request;
@@ -93,19 +86,20 @@ public class RPCRequestContext {
 
     /**
      * 发送一个异常
+     * 
      * @param msg
      */
-    public void sendError(Object msg){
+    public void sendError(Object msg) {
         send(new Response(Response.ERROR, JSON.toJSONString(msg), request.getId()));
     }
 
-
     /**
      * 发送一个成功的返回值注意必须是json
+     * 
      * @param msg
      */
-    public void sendSuccess(Object msg){
-       send(new Response(Response.SUCCESS, JSON.toJSONString(msg), request.getId()));
+    public void sendSuccess(Object msg) {
+        send(new Response(Response.SUCCESS, JSON.toJSONString(msg), request.getId()));
     }
 
     /**
@@ -114,22 +108,21 @@ public class RPCRequestContext {
      * @param response
      */
     public void send(Response response) {
-        if (this.isSend == true){
-          throw new SenderException("request send");
+        if (this.isSend == true) {
+            throw new SenderException("request send");
         }
         this.isSend = true;
         if (sendFunction == null) {
             concurrentConnection.writeAndFlush(response.asMsg());
         } else {
             try {
-                sendFunction.send( response, (res) -> {
+                sendFunction.send(response, (res) -> {
                     concurrentConnection.writeAndFlush(res.asMsg());
                 });
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 throw new SenderException(e.getMessage());
             }
         }
     }
 }
-

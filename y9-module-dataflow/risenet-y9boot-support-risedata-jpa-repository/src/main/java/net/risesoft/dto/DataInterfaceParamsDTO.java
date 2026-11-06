@@ -7,26 +7,26 @@ import lombok.NoArgsConstructor;
 @Data
 public class DataInterfaceParamsDTO {
 
-	private String id;
+    private String id;
 
-	private String paramName;
-	
-	private String paramType;
-	
-	private String paramValue;
-	
-	private String remark;
-	
-	private String reqType;
-	
-	private Integer dataType;
-	
-	private String parentId;
-	
-	private String tenantId;
-	
-	private String userId;
-	
-	private String userName;
+    private String paramName;
+
+    private String paramType;
+
+    private String paramValue;
+
+    private String remark;
+
+    private String reqType;
+
+    private Integer dataType;
+
+    private String parentId;
+
+    private String tenantId;
+
+    private String userId;
+
+    private String userName;
 
 }

@@ -1,6 +1,5 @@
 package net.risedata.rpc.consumer.result.genericity;
 
-
 import java.util.List;
 
 import net.risedata.rpc.consumer.result.Error;
@@ -28,9 +27,9 @@ public interface ListGenericitySyncResult<T> {
      */
     ListGenericitySyncResult onError(Error error);
 
-
     /**
      * 拿到list 形式的返回值
+     * 
      * @param <T> 类型
      * @return list<T> value
      */

@@ -17,24 +17,24 @@ import risesoft.data.transfer.stream.rdbms.in.columns.CreateColumnHandle;
  */
 public class TimeStampCreateColumnHandle implements CreateColumnHandle {
 
-	@Override
-	public boolean isHandle(int type) {
-		switch (type) {
-		case Types.TIMESTAMP:
-		case -101:
-			return true;
-		default:
-			return false;
-		}
+    @Override
+    public boolean isHandle(int type) {
+        switch (type) {
+            case Types.TIMESTAMP:
+            case -101:
+                return true;
+            default:
+                return false;
+        }
 
-	}
+    }
 
-	@Override
-	public Column getColumn(ResultSet rs, ResultSetMetaData metaData, int index, String mandatoryEncoding)
-			throws Exception {
+    @Override
+    public Column getColumn(ResultSet rs, ResultSetMetaData metaData, int index, String mandatoryEncoding)
+        throws Exception {
 
-		return new DateColumn(rs.getTimestamp(index), metaData.getColumnLabel(index));
+        return new DateColumn(rs.getTimestamp(index), metaData.getColumnLabel(index));
 
-	}
+    }
 
 }

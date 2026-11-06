@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * 任务编排信息
+ * 
  * @author pzx
  *
  */
@@ -12,22 +13,22 @@ import lombok.NoArgsConstructor;
 @Data
 public class DataArrangeDTO {
 
-	private String id;
+    private String id;
 
-	private String name;
-	
-	private String content;
-	
-	private String xmlData;
-	
-	private Integer pattern;
-	
-	private String userId;
-	
-	private String userName;
-	
-	private String tenantId;
-	
-	private String cron;
+    private String name;
+
+    private String content;
+
+    private String xmlData;
+
+    private Integer pattern;
+
+    private String userId;
+
+    private String userName;
+
+    private String tenantId;
+
+    private String cron;
 
 }

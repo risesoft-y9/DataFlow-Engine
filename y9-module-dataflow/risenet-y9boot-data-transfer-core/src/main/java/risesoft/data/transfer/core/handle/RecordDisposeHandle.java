@@ -7,6 +7,6 @@ package risesoft.data.transfer.core.handle;
  * @date 2023年12月4日
  * @author lb
  */
-public interface RecordDisposeHandle extends Handle{
+public interface RecordDisposeHandle extends Handle {
 
 }

@@ -50,7 +50,12 @@ public class ReturnType {
      * @param isClass
      * @param index
      */
-    public ReturnType(Class<?> returnType, Class<?> genericityClass, boolean isClass, int index, boolean isReturnTypeClass) {
+    public ReturnType(
+        Class<?> returnType,
+        Class<?> genericityClass,
+        boolean isClass,
+        int index,
+        boolean isReturnTypeClass) {
         this.returnType = returnType;
         this.genericityClass = genericityClass;
         this.isClass = isClass;
@@ -71,12 +76,12 @@ public class ReturnType {
      */
     public Class<?> toGenericityClass(Object[] args) {
         try {
-            return isClass ? genericityClass : (Class<?>) args[index];
+            return isClass ? genericityClass : (Class<?>)args[index];
         } catch (Exception e) {
             System.out.println(isClass);
             System.out.println(genericityClass);
             System.out.println(index);
-            return isClass ? genericityClass : (Class<?>) args[index];
+            return isClass ? genericityClass : (Class<?>)args[index];
         }
 
     }
@@ -88,7 +93,7 @@ public class ReturnType {
      * @return
      */
     public Class<?> toReturnTypeClass(Object[] args) {
-        return isReturnTypeClass ? returnType : (Class<?>) args[index];
+        return isReturnTypeClass ? returnType : (Class<?>)args[index];
     }
 
     public boolean isReturnTypeClass() {
@@ -175,7 +180,7 @@ public class ReturnType {
     @Override
     public String toString() {
         return "ReturnType [returnType=" + returnType + ", genericityClass=" + genericityClass + ", isClass=" + isClass
-                + ", index=" + index + "]";
+            + ", index=" + index + "]";
     }
 
 }

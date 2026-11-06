@@ -20,7 +20,6 @@ public class FilterContextCache {
      */
     MethodDefined methodDefined;
 
-
     public FilterNodeApplication getFilters() {
         return filters;
     }

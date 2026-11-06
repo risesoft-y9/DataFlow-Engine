@@ -1,12 +1,12 @@
 package net.risesoft.security.checks;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Component;
 
 import net.risesoft.security.ConcurrentSecurity;
 import net.risesoft.security.SecurityCheck;
 import net.risesoft.security.SecurityConfig;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @Description : 是否可以管理用户角色
@@ -17,10 +17,10 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Component
 public class HasUserManager implements SecurityCheck {
-	
-	@Override
-	public boolean check(SecurityConfig config, ConcurrentSecurity security, String url, HttpServletRequest request) {
-		return security.isUserManager();
-	}
-	
+
+    @Override
+    public boolean check(SecurityConfig config, ConcurrentSecurity security, String url, HttpServletRequest request) {
+        return security.isUserManager();
+    }
+
 }

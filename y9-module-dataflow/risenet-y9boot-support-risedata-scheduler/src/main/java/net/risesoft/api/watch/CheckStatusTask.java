@@ -1,17 +1,18 @@
 package net.risesoft.api.watch;
 
-import cn.hutool.http.HttpUtil;
-import io.netty.util.Timeout;
-import io.netty.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.risedata.register.model.Const;
 import net.risedata.register.model.WatchProperties;
 import net.risedata.register.service.IServiceInstance;
 import net.risesoft.api.persistence.iservice.IServiceService;
 import net.risesoft.api.persistence.model.IServiceInstanceModel;
 
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.StringUtils;
+import cn.hutool.http.HttpUtil;
+import io.netty.util.Timeout;
+import io.netty.util.TimerTask;
 
 /**
  * @Description : 检查连接信息的任务
@@ -31,9 +32,9 @@ public class CheckStatusTask implements TimerTask {
      * 连续成功次数
      */
     private int successCount = 0;
-    
+
     private String myInstanceId;
-    
+
     private IServiceService iServiceService;
 
     public CheckStatusTask(String instanceId, String myInstanceId, IServiceService iServiceService) {
@@ -41,7 +42,6 @@ public class CheckStatusTask implements TimerTask {
         this.myInstanceId = myInstanceId;
         this.iServiceService = iServiceService;
     }
-
 
     public static boolean check(IServiceInstanceModel iServiceInstance) {
         String checkUrl = createCheckUrl(iServiceInstance);
@@ -89,7 +89,6 @@ public class CheckStatusTask implements TimerTask {
             successCount = 0;
         }
 
-
         if (iServiceInstance.getStatus() == IServiceInstance.SUCCESS) {
             if (errorCout >= iServiceInstance.getWatchInfo().getFail()) {
 
@@ -97,13 +96,17 @@ public class CheckStatusTask implements TimerTask {
             }
         } else if (iServiceInstance.getStatus() == IServiceInstance.ERROR) {
 
-            if (iServiceInstance.getWatchInfo().getSuccess() > 0 && successCount >= iServiceInstance.getWatchInfo().getSuccess()) {
+            if (iServiceInstance.getWatchInfo().getSuccess() > 0
+                && successCount >= iServiceInstance.getWatchInfo().getSuccess()) {
 
                 iServiceService.setStatus(iServiceInstance.getInstanceId(), IServiceInstance.SUCCESS);
             }
         }
         if (iServiceInstance.getStatus() != IServiceInstance.AWAIT) {
-            timeout.timer().newTimeout(this, iServiceInstance.getWatchInfo().getTime() * (errorCout > 3 ? errorCout > 10 ? 10 : errorCout : 1), TimeUnit.MILLISECONDS);
+            timeout.timer()
+                .newTimeout(this,
+                    iServiceInstance.getWatchInfo().getTime() * (errorCout > 3 ? errorCout > 10 ? 10 : errorCout : 1),
+                    TimeUnit.MILLISECONDS);
         }
 
     }
@@ -124,19 +127,19 @@ public class CheckStatusTask implements TimerTask {
         WatchProperties info = watchInfo.getWatchInfo();
         StringBuilder urlBuild = new StringBuilder();
         urlBuild.append((watchInfo.getSecure() ? "https://" : "http://"));
-        urlBuild.append(watchInfo.getHost()).append(":")
-                .append(watchInfo.getPort()).append("/")
-                .append(watchInfo.getWatchInfo().getBaseContext()).append(StringUtils.isEmpty(info.getWatchUrl()) ? Const.WATCH_URL : watchInfo.getWatchInfo().getWatchUrl())
-                .append(Const.CHECK);
+        urlBuild.append(watchInfo.getHost())
+            .append(":")
+            .append(watchInfo.getPort())
+            .append("/")
+            .append(watchInfo.getWatchInfo().getBaseContext())
+            .append(StringUtils.isEmpty(info.getWatchUrl()) ? Const.WATCH_URL : watchInfo.getWatchInfo().getWatchUrl())
+            .append(Const.CHECK);
         return urlBuild.toString();
     }
 
     @Override
     public String toString() {
-        return "CheckStatusTask{" +
-                "instanceId='" + instanceId + '\'' +
-                ", errorCout=" + errorCout +
-                ", successCount=" + successCount +
-                '}';
+        return "CheckStatusTask{" + "instanceId='" + instanceId + '\'' + ", errorCout=" + errorCout + ", successCount="
+            + successCount + '}';
     }
 }

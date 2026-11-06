@@ -1,14 +1,18 @@
 package net.risedata.rpc.provide.annotation;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 import org.springframework.stereotype.Indexed;
 
-import java.lang.annotation.*;
-
 /**
-* @description: 添加了此注解的 类会被视为rpc调用的服务类
-* @Author lb176
-* @Date 2021/4/29==16:28
-*/
+ * @description: 添加了此注解的 类会被视为rpc调用的服务类
+ * @Author lb176
+ * @Date 2021/4/29==16:28
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Indexed
@@ -16,11 +20,14 @@ import java.lang.annotation.*;
 public @interface RPCServer {
     /**
      * 给此api服务起名字
+     * 
      * @return 名字
      */
-   String name() default "";
+    String name() default "";
+
     /**
      * 是否获取request对象request是此rpc框架的request非httprequest
+     * 
      * @return
      */
     boolean enableRequest() default false;

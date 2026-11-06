@@ -1,5 +1,30 @@
 package net.risesoft.controller.scheduler;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+
+import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.support.CronExpression;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import net.risedata.jdbc.commons.LPage;
 import net.risedata.jdbc.factory.ObjectBuilderFactory;
 import net.risedata.jdbc.search.LPageable;
@@ -16,22 +41,6 @@ import net.risesoft.pojo.Y9Result;
 import net.risesoft.security.ConcurrentSecurity;
 import net.risesoft.service.DataBusinessService;
 
-import org.apache.commons.lang3.StringUtils;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.support.CronExpression;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.validation.Valid;
-
 /**
  * @Description : 任务控制器
  * @ClassName JobController
@@ -43,280 +52,280 @@ import javax.validation.Valid;
 @RequestMapping("/api/rest/job/data")
 public class JobController extends BaseController {
 
-	@Autowired
-	JobService jobService;
-	
-	@Autowired
-	private DataBusinessService dataBusinessService;
-	
-	@Autowired
-	private ModelMapper modelMapper;
+    @Autowired
+    JobService jobService;
 
-	@GetMapping("/searchJob")
-	public Y9Result<Object> searchJob(String environment, @Valid JobDTO jobDTO) {
-		Job job = modelMapper.map(jobDTO, Job.class);
-		return Y9Result.success(jobService.searchJob(job, getSecurityJurisdiction(environment)));
-	}
+    @Autowired
+    private DataBusinessService dataBusinessService;
 
-	@GetMapping("/searchJobService")
-	public Y9Result<Object> searchJobService(String environment) {
-		return Y9Result.success(
-				jobService.searchJobService(ObjectBuilderFactory.builder(Job.class).builder("environment", environment),
-						getSecurityJurisdiction(environment)));
-	}
+    @Autowired
+    private ModelMapper modelMapper;
 
-	/**
-	 * 根据id 获取任务信息
-	 *
-	 * @param id 任务id
-	 * @return
-	 */
-	@GetMapping("getOne")
-	public Y9Result<Object> getOne(Integer id) {
-		return Y9Result.success(jobService.findByJobId(id));
-	}
+    @GetMapping("/searchJob")
+    public Y9Result<Object> searchJob(String environment, @Valid JobDTO jobDTO) {
+        Job job = modelMapper.map(jobDTO, Job.class);
+        return Y9Result.success(jobService.searchJob(job, getSecurityJurisdiction(environment)));
+    }
 
-	/**
-	 * 查询
-	 *
-	 * @param job
-	 * @param page
-	 * @return
-	 */
-	@CheckHttpForArgs
-	@GetMapping("search")
-	public Y9Result<Object> search(JobDTO jobDTO, LPageable page) {
-		Job job = modelMapper.map(jobDTO, Job.class);
-		ConcurrentSecurity jurisdiction = null;
-		try {
-			jurisdiction = getSecurityJurisdiction(job.getEnvironment());
-		} catch (Exception e) {
-			return Y9Result.failure(e.getMessage());
-		}
-		LPage<Job> jobPage = jobService.search(job, page, jurisdiction);
-		jobPage.getContent().stream().map((item) -> {
-			if(StringUtils.isBlank(item.getJobTypeName())) {
-				item.setJobTypeName(dataBusinessService.getNameById(item.getJobType()));
-			}
+    @GetMapping("/searchJobService")
+    public Y9Result<Object> searchJobService(String environment) {
+        return Y9Result.success(
+            jobService.searchJobService(ObjectBuilderFactory.builder(Job.class).builder("environment", environment),
+                getSecurityJurisdiction(environment)));
+    }
+
+    /**
+     * 根据id 获取任务信息
+     *
+     * @param id 任务id
+     * @return
+     */
+    @GetMapping("getOne")
+    public Y9Result<Object> getOne(Integer id) {
+        return Y9Result.success(jobService.findByJobId(id));
+    }
+
+    /**
+     * 查询
+     *
+     * @param job
+     * @param page
+     * @return
+     */
+    @CheckHttpForArgs
+    @GetMapping("search")
+    public Y9Result<Object> search(JobDTO jobDTO, LPageable page) {
+        Job job = modelMapper.map(jobDTO, Job.class);
+        ConcurrentSecurity jurisdiction = null;
+        try {
+            jurisdiction = getSecurityJurisdiction(job.getEnvironment());
+        } catch (Exception e) {
+            return Y9Result.failure(e.getMessage());
+        }
+        LPage<Job> jobPage = jobService.search(job, page, jurisdiction);
+        jobPage.getContent().stream().map((item) -> {
+            if (StringUtils.isBlank(item.getJobTypeName())) {
+                item.setJobTypeName(dataBusinessService.getNameById(item.getJobType()));
+            }
             return item;
         }).collect(Collectors.toList());
-		return Y9Result.success(jobPage);
-	}
+        return Y9Result.success(jobPage);
+    }
 
-	/**
-	 * 删除任务
-	 *
-	 * @param id
-	 * @return
-	 */
-	@PostMapping("delete")
-	public Y9Result<Object> delete(Integer id) {
-		jobService.deleteByJobId(id);
-		return Y9Result.success("删除成功");
-	}
+    /**
+     * 删除任务
+     *
+     * @param id
+     * @return
+     */
+    @PostMapping("delete")
+    public Y9Result<Object> delete(Integer id) {
+        jobService.deleteByJobId(id);
+        return Y9Result.success("删除成功");
+    }
 
-	/**
-	 * 修改状态
-	 *
-	 * @param id
-	 * @return
-	 */
+    /**
+     * 修改状态
+     *
+     * @param id
+     * @return
+     */
 
-	@PostMapping("setStatus")
-	public Y9Result<Object> setStatus(Integer id, int status) {
-		jobService.setStatus(id, status);
-		return Y9Result.success(status);
-	}
+    @PostMapping("setStatus")
+    public Y9Result<Object> setStatus(Integer id, int status) {
+        jobService.setStatus(id, status);
+        return Y9Result.success(status);
+    }
 
-	/**
-	 * 配置文件
-	 *
-	 * @param job
-	 * @return
-	 */
-	@PostMapping("save")
-	@CheckHttpForArgs
-	public Y9Result<Object> save(@Valid @RequestBody JobDTO jobDTO, BindingResult result) {
-		Job job = modelMapper.map(jobDTO, Job.class);
-		jobService.saveJob(job);
-		return Y9Result.success(job.getId());
-	}
+    /**
+     * 配置文件
+     *
+     * @param job
+     * @return
+     */
+    @PostMapping("save")
+    @CheckHttpForArgs
+    public Y9Result<Object> save(@Valid @RequestBody JobDTO jobDTO, BindingResult result) {
+        Job job = modelMapper.map(jobDTO, Job.class);
+        jobService.saveJob(job);
+        return Y9Result.success(job.getId());
+    }
 
-	@Autowired(required = false)
-	TaskExecutorService taskExecutorService;
+    @Autowired(required = false)
+    TaskExecutorService taskExecutorService;
 
-	@Autowired
-	JobLogService jobLogService;
+    @Autowired
+    JobLogService jobLogService;
 
-	/**
-	 * 指定服务并调度
-	 *
-	 * @param jobId  调度任务id
-	 * @param args   任务配置id
-	 * @param server 指定服务
-	 * @return
-	 */
-	@PostMapping("sendJob")
-	public Y9Result<Object> sendJob(Integer jobId, String args, String server, String dispatchArgs) {
-		Job byJobId = jobService.findByJobId(jobId);
-		if (byJobId != null) {
-			if (!StringUtils.isBlank(args)) {
-				byJobId.setArgs(args);
-			}
-			if (!StringUtils.isBlank(server)) {
-				byJobId.setDispatchMethod("指定");
-			}
-			if (!StringUtils.isBlank(dispatchArgs)) {
-				byJobId.setDispatchArgs(dispatchArgs);
-			}
+    /**
+     * 指定服务并调度
+     *
+     * @param jobId 调度任务id
+     * @param args 任务配置id
+     * @param server 指定服务
+     * @return
+     */
+    @PostMapping("sendJob")
+    public Y9Result<Object> sendJob(Integer jobId, String args, String server, String dispatchArgs) {
+        Job byJobId = jobService.findByJobId(jobId);
+        if (byJobId != null) {
+            if (!StringUtils.isBlank(args)) {
+                byJobId.setArgs(args);
+            }
+            if (!StringUtils.isBlank(server)) {
+                byJobId.setDispatchMethod("指定");
+            }
+            if (!StringUtils.isBlank(dispatchArgs)) {
+                byJobId.setDispatchArgs(dispatchArgs);
+            }
 
-			String logId = taskExecutorService.startJob(byJobId, server);
-			return Y9Result.success(logId);
-		} else {
-			return Y9Result.failure("没有找到此任务");
-		}
-	}
+            String logId = taskExecutorService.startJob(byJobId, server);
+            return Y9Result.success(logId);
+        } else {
+            return Y9Result.failure("没有找到此任务");
+        }
+    }
 
-	/**
-	 * 获取下10次执行的时间
-	 *
-	 * @param jobId
-	 * @return
-	 */
-	@PostMapping("nextExecutorTime")
-	public Y9Result<Object> nextExecutorTime(@RequestParam(required = true) Integer jobId) {
-		List<String> res = new ArrayList<>();
-		try {
-			Job job = jobService.findByJobId(jobId);
-			if (job == null) {
-				return Y9Result.failure("未找到任务");
-			}
-			String dispatchType = job.getDispatchType();
-			if (dispatchType.equals("cron")) {
-				LocalDateTime dateTime = LocalDateTime.now();
-				for (int i = 0; i < 10; i++) {
-					dateTime = CronExpression.parse(job.getSpeed()).next(dateTime);
-					res.add(dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-				}
-			} else if (dispatchType.equals("固定速度")) {
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				Date date = new Date();
-				int speed = Integer.parseInt(job.getSpeed()) * 1000;
-				for (int i = 0; i < 10; i++) {
-					date = new Date(date.getTime() + speed);
-					res.add(sdf.format(date));
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return Y9Result.success(res);
-	}
+    /**
+     * 获取下10次执行的时间
+     *
+     * @param jobId
+     * @return
+     */
+    @PostMapping("nextExecutorTime")
+    public Y9Result<Object> nextExecutorTime(@RequestParam(required = true) Integer jobId) {
+        List<String> res = new ArrayList<>();
+        try {
+            Job job = jobService.findByJobId(jobId);
+            if (job == null) {
+                return Y9Result.failure("未找到任务");
+            }
+            String dispatchType = job.getDispatchType();
+            if (dispatchType.equals("cron")) {
+                LocalDateTime dateTime = LocalDateTime.now();
+                for (int i = 0; i < 10; i++) {
+                    dateTime = CronExpression.parse(job.getSpeed()).next(dateTime);
+                    res.add(dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                }
+            } else if (dispatchType.equals("固定速度")) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date date = new Date();
+                int speed = Integer.parseInt(job.getSpeed()) * 1000;
+                for (int i = 0; i < 10; i++) {
+                    date = new Date(date.getTime() + speed);
+                    res.add(sdf.format(date));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Y9Result.success(res);
+    }
 
-	/**
-	 * 删除掉这个任务正在运行的任务
-	 *
-	 * @param jobId
-	 * @return
-	 */
-	@PostMapping("/killAwaitJob")
-	public Y9Result<Object> killAwaitJob(Integer jobId) {
-		return Y9Result.success(jobService.killAwaitJob(jobId));
-	}
+    /**
+     * 删除掉这个任务正在运行的任务
+     *
+     * @param jobId
+     * @return
+     */
+    @PostMapping("/killAwaitJob")
+    public Y9Result<Object> killAwaitJob(Integer jobId) {
+        return Y9Result.success(jobService.killAwaitJob(jobId));
+    }
 
-	/**
-	 * 停止任务 暂未实现 需要调度端提供相应接口
-	 * 
-	 * @param jobId
-	 * @param jobLogId
-	 * @param result
-	 * @param msg
-	 * @param status
-	 * @return
-	 */
-	@PostMapping("/endJob")
-	public Boolean endJob(Integer jobId, String jobLogId, String result, String msg, Integer status) {
-		return jobService.endJob(jobId, jobLogId, result, msg, status);
-	}
+    /**
+     * 停止任务 暂未实现 需要调度端提供相应接口
+     * 
+     * @param jobId
+     * @param jobLogId
+     * @param result
+     * @param msg
+     * @param status
+     * @return
+     */
+    @PostMapping("/endJob")
+    public Boolean endJob(Integer jobId, String jobLogId, String result, String msg, Integer status) {
+        return jobService.endJob(jobId, jobLogId, result, msg, status);
+    }
 
-	/**
-	 * 根据任务项id获取任务
-	 * 
-	 * @param taskId
-	 * @return
-	 */
-	@RequestMapping("/getJobsByTaskId")
-	public Y9Result<List<Job>> getJobsByTaskId(@RequestParam(required = true) String taskId) {
-		return Y9Result.success(jobService.searchJobByArgs(taskId));
-	}
+    /**
+     * 根据任务项id获取任务
+     * 
+     * @param taskId
+     * @return
+     */
+    @RequestMapping("/getJobsByTaskId")
+    public Y9Result<List<Job>> getJobsByTaskId(@RequestParam(required = true) String taskId) {
+        return Y9Result.success(jobService.searchJobByArgs(taskId));
+    }
 
-	/**
-	 * 生成任务忙碌图
-	 * 
-	 * @param serviceId
-	 * @param environment
-	 * @return
-	 * @throws ParseException
-	 */
-	@RequestMapping("/showJobView")
-	public Y9Result<Object> showJobView(String serviceId, String environment) throws ParseException {
-		List<Job> jobs = jobService.findJobsByServiceId(serviceId, environment);
-		if (jobs.size() > 0) {
-			Map<String, Integer> map = new HashMap<>();
-			List<List<String>> result = new ArrayList<>();
-			Integer count;
-			List<String> res;
-			for (Job job : jobs) {
-				if (job.getDispatchType().equals("cron")) {
-					res = TaskUtils.getDayTaskOfCron(job.getSpeed(), null);
-				} else {
-					res = TaskUtils.getDayTaskOfSpped(Integer.parseInt(job.getSpeed()), null);
-				}
-				result.add(res);
-				for (String d : res) {
-					count = map.get(d);
-					if (count == null) {
-						count = 0;
-					}
-					count++;
-					map.put(d, count);
-				}
-			}
-			// 根据count 将key 归类后排序
-			ArrayList<Sort> sorts = new ArrayList<>();
-			map.forEach((k, v) -> {
-				sorts.add(new Sort(v, k));
-			});
-			sorts.sort(Sort::compareTo);
-			int startIndex = -1;
-			int endIndex = -1;
-			List<Sort> sorts1 = new ArrayList<>();
-			for (int i = 0; i < sorts.size(); i++) {
-				if (startIndex == -1) {
-					startIndex = i;
-					endIndex = i;
-				} else {
-					if (sorts.get(startIndex).count == sorts.get(i).count) {
-						endIndex = i;
-					} else {
-						sorts1.add(new Sort(sorts.get(startIndex).count, doSortName(startIndex, endIndex, sorts)));
-						startIndex = i;
-						endIndex = i;
-					}
-				}
-			}
-			sorts1.add(new Sort(sorts.get(startIndex).count, doSortName(startIndex, endIndex, sorts)));
-			return Y9Result.success(sorts1);
-		}
-		return Y9Result.failure("无启动的任务");
-	}
+    /**
+     * 生成任务忙碌图
+     * 
+     * @param serviceId
+     * @param environment
+     * @return
+     * @throws ParseException
+     */
+    @RequestMapping("/showJobView")
+    public Y9Result<Object> showJobView(String serviceId, String environment) throws ParseException {
+        List<Job> jobs = jobService.findJobsByServiceId(serviceId, environment);
+        if (jobs.size() > 0) {
+            Map<String, Integer> map = new HashMap<>();
+            List<List<String>> result = new ArrayList<>();
+            Integer count;
+            List<String> res;
+            for (Job job : jobs) {
+                if (job.getDispatchType().equals("cron")) {
+                    res = TaskUtils.getDayTaskOfCron(job.getSpeed(), null);
+                } else {
+                    res = TaskUtils.getDayTaskOfSpped(Integer.parseInt(job.getSpeed()), null);
+                }
+                result.add(res);
+                for (String d : res) {
+                    count = map.get(d);
+                    if (count == null) {
+                        count = 0;
+                    }
+                    count++;
+                    map.put(d, count);
+                }
+            }
+            // 根据count 将key 归类后排序
+            ArrayList<Sort> sorts = new ArrayList<>();
+            map.forEach((k, v) -> {
+                sorts.add(new Sort(v, k));
+            });
+            sorts.sort(Sort::compareTo);
+            int startIndex = -1;
+            int endIndex = -1;
+            List<Sort> sorts1 = new ArrayList<>();
+            for (int i = 0; i < sorts.size(); i++) {
+                if (startIndex == -1) {
+                    startIndex = i;
+                    endIndex = i;
+                } else {
+                    if (sorts.get(startIndex).count == sorts.get(i).count) {
+                        endIndex = i;
+                    } else {
+                        sorts1.add(new Sort(sorts.get(startIndex).count, doSortName(startIndex, endIndex, sorts)));
+                        startIndex = i;
+                        endIndex = i;
+                    }
+                }
+            }
+            sorts1.add(new Sort(sorts.get(startIndex).count, doSortName(startIndex, endIndex, sorts)));
+            return Y9Result.success(sorts1);
+        }
+        return Y9Result.failure("无启动的任务");
+    }
 
-	private static String doSortName(int startIndex, int endIndex, List<Sort> sorts) {
-		if (startIndex != endIndex) {
-			return sorts.get(startIndex).name + "至" + sorts.get(endIndex).name;
-		} else {
-			return sorts.get(startIndex).name;
-		}
-	}
+    private static String doSortName(int startIndex, int endIndex, List<Sort> sorts) {
+        if (startIndex != endIndex) {
+            return sorts.get(startIndex).name + "至" + sorts.get(endIndex).name;
+        } else {
+            return sorts.get(startIndex).name;
+        }
+    }
 
 }

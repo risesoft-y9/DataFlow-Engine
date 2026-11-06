@@ -10,11 +10,11 @@ import risesoft.data.transfer.core.close.Closed;
  * @author lb
  * @param <Task>
  */
-public interface Executor extends Closed{
-	/**
-	 * 执行任务
-	 * 
-	 * @param task 任务
-	 */
-	void run(Object task);
+public interface Executor extends Closed {
+    /**
+     * 执行任务
+     * 
+     * @param task 任务
+     */
+    void run(Object task);
 }

@@ -21,5 +21,4 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface ConfigBean {
 
-	
 }

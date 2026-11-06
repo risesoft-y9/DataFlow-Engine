@@ -1,12 +1,13 @@
 package net.risedata.rpc.coder;
 
+import java.io.Serializable;
+
+import net.risedata.rpc.model.Msg;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import net.risedata.rpc.model.Msg;
-
-import java.io.Serializable;
 
 /**
  * 对于发出的消息进行编码
@@ -23,6 +24,7 @@ public class MsgEncoder extends MessageToByteEncoder<Msg> implements Serializabl
         }
         return true;
     }
+
     @Override
     protected void encode(ChannelHandlerContext ctx, Msg msg, ByteBuf out) throws Exception {
         out.writeInt(msg.getLength());

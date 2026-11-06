@@ -10,6 +10,7 @@ package net.risesoft.api.persistence.model;
 public interface GetIP {
     /**
      * 检查环境
+     * 
      * @return
      */
     String getIP();

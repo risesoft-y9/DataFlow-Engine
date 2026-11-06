@@ -57,156 +57,155 @@ import net.risedata.jdbc.utils.Log;
  */
 @Configuration
 public class JdbcConfig implements ApplicationListener<ContextRefreshedEvent> {
-	private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(JdbcConfig.class);
-	public static final String SHOW_SQL_CONFIG = "net.risedata.jdbc.show.sql";
-	public static final String DATASOURCE_TYPE = "net.risedata.jdbc.type";
-	
-	@Value("${" + SHOW_SQL_CONFIG + ":true}")
-	private boolean isShow;
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(JdbcConfig.class);
+    public static final String SHOW_SQL_CONFIG = "net.risedata.jdbc.show.sql";
+    public static final String DATASOURCE_TYPE = "net.risedata.jdbc.type";
 
-	@Value("${" + DATASOURCE_TYPE + ":}")
-	private String type;
+    @Value("${" + SHOW_SQL_CONFIG + ":true}")
+    private boolean isShow;
 
-	public static SyncService SYNC;
-	public static boolean isSync;
+    @Value("${" + DATASOURCE_TYPE + ":}")
+    private String type;
 
-	@Override
-	public void onApplicationEvent(ContextRefreshedEvent event) {
-		Map<String, Object> objects = event.getApplicationContext().getBeansWithAnnotation(SpringBootApplication.class);
-		Log.setDefaultPrintExecutor(event.getApplicationContext().getBean(PrintExecutor.class));
-		Log.print("start ---- jdbc ");
+    public static SyncService SYNC;
+    public static boolean isSync;
 
-		InstanceFactoryManager.init(new SpringApplicationFactory(event.getApplicationContext()));
-		if (objects.keySet().size() > 0) {
-			objects.forEach((k, v) -> {
-				JdbcScan lScan = AnnotationUtils.findAnnotation(v.getClass(), JdbcScan.class);
-				if (lScan != null) {
-					int count = 0;
-					long startTime = System.currentTimeMillis();
-					if (!StringUtils.isEmpty(lScan.value()[0])) {
-						List<Class<?>> classs = null;
-						String[] paths = lScan.value();
-						for (int i = 0; i < paths.length; i++) {
-							classs = ClassTools.getClasses(paths[i]);
-							for (Class<?> class1 : classs) {
-								if (AnnotationUtils.findAnnotation(class1, Table.class) != null) {
-									count++;
-									Load.loadBean(class1);
-								}
-								;
-							}
-						}
-						Log.print("load entiry" + count + " time for " + (System.currentTimeMillis() - startTime));
-					}
-				}
-			});
-		}
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        Map<String, Object> objects = event.getApplicationContext().getBeansWithAnnotation(SpringBootApplication.class);
+        Log.setDefaultPrintExecutor(event.getApplicationContext().getBean(PrintExecutor.class));
+        Log.print("start ---- jdbc ");
 
-		if (isSync) {
-			SYNC = event.getApplicationContext().getBean(SyncService.class);
-		}
-	}
+        InstanceFactoryManager.init(new SpringApplicationFactory(event.getApplicationContext()));
+        if (objects.keySet().size() > 0) {
+            objects.forEach((k, v) -> {
+                JdbcScan lScan = AnnotationUtils.findAnnotation(v.getClass(), JdbcScan.class);
+                if (lScan != null) {
+                    int count = 0;
+                    long startTime = System.currentTimeMillis();
+                    if (!StringUtils.isEmpty(lScan.value()[0])) {
+                        List<Class<?>> classs = null;
+                        String[] paths = lScan.value();
+                        for (int i = 0; i < paths.length; i++) {
+                            classs = ClassTools.getClasses(paths[i]);
+                            for (Class<?> class1 : classs) {
+                                if (AnnotationUtils.findAnnotation(class1, Table.class) != null) {
+                                    count++;
+                                    Load.loadBean(class1);
+                                } ;
+                            }
+                        }
+                        Log.print("load entiry" + count + " time for " + (System.currentTimeMillis() - startTime));
+                    }
+                }
+            });
+        }
 
-	@ConditionalOnMissingBean(PageExecutor.class)
-	@Bean
-	public PageExecutor getPageExecutor(DataSource dataSource) {
-		String url = null;
-		Connection connection = null;
-		try {
-			if (StringUtils.isEmpty(type)) {
-				connection = dataSource.getConnection();
-				url = connection.getMetaData().getURL();
-				type = url.substring(5, url.indexOf(":", 5));
-			}
-		} catch (SQLException e) {
-			LOGGER.info("select page error:" + e.getMessage());
-		} finally {
-			if(connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		LOGGER.info("page type = " + type);
-		switch (type) {
-			case "oracle":
-			case "dm":
-				return new OraclePageExecutor();
-			case "mysql":
-			case "kingbase":
-			case "postgresql":
-				return new MysqlPageExecutor();
-			case "derby":
-				return new DerbyPageExecutor();
-			default:
-				throw new ConfigException(
-						" The specified database does not have a corresponding paging implementation. Please add it manually");
-		}
-	}
+        if (isSync) {
+            SYNC = event.getApplicationContext().getBean(SyncService.class);
+        }
+    }
 
-	@ConditionalOnMissingBean(JdbcExecutor.class)
-	@Bean
-	public JdbcExecutor getJdbcExecutor(JdbcTemplate jt, PrintExecutor print) {
-		if (isShow) {
-			return LoggerFactory.getInstance(new JdbcTemplateExecutor(jt), JdbcExecutor.class, print);
-		}
-		return new JdbcTemplateExecutor(jt);
-	}
+    @ConditionalOnMissingBean(PageExecutor.class)
+    @Bean
+    public PageExecutor getPageExecutor(DataSource dataSource) {
+        String url = null;
+        Connection connection = null;
+        try {
+            if (StringUtils.isEmpty(type)) {
+                connection = dataSource.getConnection();
+                url = connection.getMetaData().getURL();
+                type = url.substring(5, url.indexOf(":", 5));
+            }
+        } catch (SQLException e) {
+            LOGGER.info("select page error:" + e.getMessage());
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        LOGGER.info("page type = " + type);
+        switch (type) {
+            case "oracle":
+            case "dm":
+                return new OraclePageExecutor();
+            case "mysql":
+            case "kingbase":
+            case "postgresql":
+                return new MysqlPageExecutor();
+            case "derby":
+                return new DerbyPageExecutor();
+            default:
+                throw new ConfigException(
+                    " The specified database does not have a corresponding paging implementation. Please add it manually");
+        }
+    }
 
-	@ConditionalOnMissingBean(SearchExecutor.class)
-	@Bean
-	public SearchExecutor getSearchExecutor(JdbcExecutor je, PageExecutor pageExecutor) {
-		SearchExecutor search = new DefaultSearchExecutor(je, pageExecutor);
-		Search.setSearchExecutor(search);
-		return search;
-	}
+    @ConditionalOnMissingBean(JdbcExecutor.class)
+    @Bean
+    public JdbcExecutor getJdbcExecutor(JdbcTemplate jt, PrintExecutor print) {
+        if (isShow) {
+            return LoggerFactory.getInstance(new JdbcTemplateExecutor(jt), JdbcExecutor.class, print);
+        }
+        return new JdbcTemplateExecutor(jt);
+    }
 
-	@ConditionalOnMissingBean(InsertExecutor.class)
-	@Bean
-	public InsertExecutor getInsertExecutor(JdbcExecutor je) {
-		DefaultInsertExecutor insertExecutor = new DefaultInsertExecutor(je);
-		Insert.setInsertExecutor(insertExecutor);
-		return insertExecutor;
-	}
+    @ConditionalOnMissingBean(SearchExecutor.class)
+    @Bean
+    public SearchExecutor getSearchExecutor(JdbcExecutor je, PageExecutor pageExecutor) {
+        SearchExecutor search = new DefaultSearchExecutor(je, pageExecutor);
+        Search.setSearchExecutor(search);
+        return search;
+    }
 
-	@ConditionalOnMissingBean(UpdateExecutor.class)
-	@Bean
-	public UpdateExecutor getUpdateExecutor(JdbcExecutor je) {
-		UpdateExecutor update = new DefaultUpdateExecutor(je);
-		Update.setUpdateExecutor(update);
-		return update;
-	}
+    @ConditionalOnMissingBean(InsertExecutor.class)
+    @Bean
+    public InsertExecutor getInsertExecutor(JdbcExecutor je) {
+        DefaultInsertExecutor insertExecutor = new DefaultInsertExecutor(je);
+        Insert.setInsertExecutor(insertExecutor);
+        return insertExecutor;
+    }
 
-	@ConditionalOnMissingBean(DeleteExecutor.class)
-	@Bean
-	public DeleteExecutor getDeleteExecutor(JdbcExecutor je) {
-		DefaultDeleteExecutor deleteExecutor = new DefaultDeleteExecutor(je);
-		Delete.setDeleteExecutor(deleteExecutor);
-		return deleteExecutor;
-	}
+    @ConditionalOnMissingBean(UpdateExecutor.class)
+    @Bean
+    public UpdateExecutor getUpdateExecutor(JdbcExecutor je) {
+        UpdateExecutor update = new DefaultUpdateExecutor(je);
+        Update.setUpdateExecutor(update);
+        return update;
+    }
 
-	@ConditionalOnMissingBean(TableExecutor.class)
-	@Bean
-	public TableExecutor getTableExecutor(JdbcExecutor je) {
-		return new DefaultTableExecutor(je);
-	}
+    @ConditionalOnMissingBean(DeleteExecutor.class)
+    @Bean
+    public DeleteExecutor getDeleteExecutor(JdbcExecutor je) {
+        DefaultDeleteExecutor deleteExecutor = new DefaultDeleteExecutor(je);
+        Delete.setDeleteExecutor(deleteExecutor);
+        return deleteExecutor;
+    }
 
-	@ConditionalOnMissingBean(PrintExecutor.class)
-	@Bean
-	public DefaultPrintExecutor getPrintExecutor() {
-		return new DefaultPrintExecutor();
-	}
+    @ConditionalOnMissingBean(TableExecutor.class)
+    @Bean
+    public TableExecutor getTableExecutor(JdbcExecutor je) {
+        return new DefaultTableExecutor(je);
+    }
 
-	@Bean
-	public OneToManyColumnMapping getOneToManyColumnMapping() {
-		return new OneToManyColumnMapping();
-	}
+    @ConditionalOnMissingBean(PrintExecutor.class)
+    @Bean
+    public DefaultPrintExecutor getPrintExecutor() {
+        return new DefaultPrintExecutor();
+    }
 
-	@Bean
-	public RepositoryCreateFactory getRepositoryCreateFactory() {
-		return new RepositoryCreateFactory();
-	}
+    @Bean
+    public OneToManyColumnMapping getOneToManyColumnMapping() {
+        return new OneToManyColumnMapping();
+    }
+
+    @Bean
+    public RepositoryCreateFactory getRepositoryCreateFactory() {
+        return new RepositoryCreateFactory();
+    }
 
 }

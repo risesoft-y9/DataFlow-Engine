@@ -14,33 +14,33 @@ import net.risedata.jdbc.repository.proxy.RepositoryCreateFactory;
 
 public class UpdateParseHandle implements MethodParseHandle {
 
-	@Override
-	public boolean isHandle(Method m) {
-		return AnnotationUtils.findAnnotation(m, Modify.class) != null;
-	}
+    @Override
+    public boolean isHandle(Method m) {
+        return AnnotationUtils.findAnnotation(m, Modify.class) != null;
+    }
 
-	@Override
-	public String parse(Method m, ReturnType returnType, ClassBuild properties) {
-		Modify modify = AnnotationUtils.findAnnotation(m, Modify.class);
-		if (returnType.isVoid() || returnType.getReturnType() == int.class
-				|| returnType.getReturnType() == Integer.class) {
-			return parseBody(m, returnType, properties, modify.value());
-		} else {
-			throw new ParseException("modify return type unidentifiable " + m);
-		}
-	}
+    @Override
+    public String parse(Method m, ReturnType returnType, ClassBuild properties) {
+        Modify modify = AnnotationUtils.findAnnotation(m, Modify.class);
+        if (returnType.isVoid() || returnType.getReturnType() == int.class
+            || returnType.getReturnType() == Integer.class) {
+            return parseBody(m, returnType, properties, modify.value());
+        } else {
+            throw new ParseException("modify return type unidentifiable " + m);
+        }
+    }
 
-	public static String parseBody(Method m, ReturnType returnType, ClassBuild properties, String sql) {
-		ArgsBuilder args = new ArgsBuilder(m);
-		StringBuilder body = new StringBuilder(SqlParseFactory.parseSql(returnType, m, args, sql));
-		body.append(args.toBody());
-		body.append(toReturn(returnType, args));
-		return body.toString();
-	}
+    public static String parseBody(Method m, ReturnType returnType, ClassBuild properties, String sql) {
+        ArgsBuilder args = new ArgsBuilder(m);
+        StringBuilder body = new StringBuilder(SqlParseFactory.parseSql(returnType, m, args, sql));
+        body.append(args.toBody());
+        body.append(toReturn(returnType, args));
+        return body.toString();
+    }
 
-	private static String toReturn(ReturnType type, ArgsBuilder argsBuilder) {
-		return (type.isVoid() ? "" : type.getReturnType() == int.class ? "return ($r)" : "return ")
-				+ RepositoryCreateFactory.JDBC_TEMPLATE + ".update(_sql" + argsBuilder.to() + ");";
-	}
+    private static String toReturn(ReturnType type, ArgsBuilder argsBuilder) {
+        return (type.isVoid() ? "" : type.getReturnType() == int.class ? "return ($r)" : "return ")
+            + RepositoryCreateFactory.JDBC_TEMPLATE + ".update(_sql" + argsBuilder.to() + ");";
+    }
 
 }

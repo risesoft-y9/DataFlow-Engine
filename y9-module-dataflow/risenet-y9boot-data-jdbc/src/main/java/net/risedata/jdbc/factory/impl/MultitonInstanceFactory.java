@@ -9,11 +9,9 @@ import net.risedata.jdbc.factory.InstanceFactory;
  */
 public class MultitonInstanceFactory implements InstanceFactory {
 
-	@Override
-	public <T> T getInstance(Class<T> instanceType) throws InstantiationException, IllegalAccessException {
-		return instanceType.newInstance();
-	}
-
-
+    @Override
+    public <T> T getInstance(Class<T> instanceType) throws InstantiationException, IllegalAccessException {
+        return instanceType.newInstance();
+    }
 
 }

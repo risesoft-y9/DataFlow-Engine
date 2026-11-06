@@ -11,5 +11,5 @@ import net.risesoft.api.job.actions.dispatch.executor.Result;
  */
 public interface DoResult {
 
-    Result doResult(int count,Throwable e);
+    Result doResult(int count, Throwable e);
 }

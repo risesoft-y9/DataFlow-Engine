@@ -7,12 +7,12 @@ package net.risedata.jdbc.exception;
  */
 public class ProxyException extends RuntimeException {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
-	public ProxyException(String msg) {
-		super(msg);
-	}
+    public ProxyException(String msg) {
+        super(msg);
+    }
 }

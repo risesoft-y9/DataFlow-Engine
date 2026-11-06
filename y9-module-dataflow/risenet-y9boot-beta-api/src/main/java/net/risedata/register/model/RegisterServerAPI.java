@@ -14,7 +14,7 @@ import net.risedata.register.service.IServiceInstance;
  */
 public interface RegisterServerAPI {
 
-    public static final String GET_ALL="register/getServices";
+    public static final String GET_ALL = "register/getServices";
 
     /**
      * 拿到当前的所有服务信息
@@ -23,14 +23,12 @@ public interface RegisterServerAPI {
      */
     Object getServiceName();
 
-
     /**
      * 根据名字获取实例
      *
      * @return
      */
     List<IServiceInstance> getServiceByName(String name);
-
 
     /**
      * 获取所有实例
@@ -46,15 +44,15 @@ public interface RegisterServerAPI {
      * @return 返回当前服务器是否存在信息
      */
 
-    boolean register( IServiceInstance serviceInstance);
+    boolean register(IServiceInstance serviceInstance);
 
     /**
      * 删除一个服务
      *
-     * @param name       服务名
+     * @param name 服务名
      * @param instanceId 实例id
      * @return
      */
-    boolean remove(String name, String instanceId,Long time);
+    boolean remove(String name, String instanceId, Long time);
 
 }

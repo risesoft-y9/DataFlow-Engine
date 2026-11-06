@@ -16,39 +16,39 @@ import net.risedata.jdbc.repository.parse.sql.SqlParseHandle;
  */
 public class ReplaceParseHandle implements SqlParseHandle {
 
-	@Override
-	public boolean isHandle(String instruction) {
-		return instruction.startsWith("#{?");
-	}
+    @Override
+    public boolean isHandle(String instruction) {
+        return instruction.startsWith("#{?");
+    }
 
-	@Override
-	public String parse(Method m, ReturnType returnType, ArgsBuilder argsBuilder, String instruction,
-			StringBuilder methodBody) {
-		int index = Integer.valueOf(instruction.substring(3, instruction.length() - 1));
-		if (index > m.getParameterCount()) {
-			throw new ParseException("index " + index + " parameter size = " + m.getParameterCount());
-		}
-		Class<?> type = m.getParameterTypes()[index - 1];
-		BeanConfig bc = BeanConfigFactory.getInstance(type);
-		argsBuilder.delete(index - 1);
-		if (bc == null) {
-			if (type == Class.class) {
-				String key = getKey(index);
-				if (methodBody.indexOf(key) == -1) {
-					methodBody.append("java.lang.String " + key
-							+ " =  net.risedata.jdbc.factory.BeanConfigFactory.getTableName($" + index + ");");
-				}
-				return   '"'+"+" + key +  "+"+'"' ;
-			} else {
-				return '"' + "+$" + index + "+" + '"';
-			}
-		} else {
-			return bc.getTableName();
-		}
-	}
+    @Override
+    public String parse(Method m, ReturnType returnType, ArgsBuilder argsBuilder, String instruction,
+        StringBuilder methodBody) {
+        int index = Integer.valueOf(instruction.substring(3, instruction.length() - 1));
+        if (index > m.getParameterCount()) {
+            throw new ParseException("index " + index + " parameter size = " + m.getParameterCount());
+        }
+        Class<?> type = m.getParameterTypes()[index - 1];
+        BeanConfig bc = BeanConfigFactory.getInstance(type);
+        argsBuilder.delete(index - 1);
+        if (bc == null) {
+            if (type == Class.class) {
+                String key = getKey(index);
+                if (methodBody.indexOf(key) == -1) {
+                    methodBody.append("java.lang.String " + key
+                        + " =  net.risedata.jdbc.factory.BeanConfigFactory.getTableName($" + index + ");");
+                }
+                return '"' + "+" + key + "+" + '"';
+            } else {
+                return '"' + "+$" + index + "+" + '"';
+            }
+        } else {
+            return bc.getTableName();
+        }
+    }
 
-	private static String getKey(int index) {
-		return "$parameter_" + index;
-	}
+    private static String getKey(int index) {
+        return "$parameter_" + index;
+    }
 
 }

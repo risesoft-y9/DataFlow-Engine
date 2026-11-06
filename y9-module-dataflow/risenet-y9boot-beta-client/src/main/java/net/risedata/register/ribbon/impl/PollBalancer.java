@@ -1,11 +1,11 @@
 package net.risedata.register.ribbon.impl;
 
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.springframework.cloud.client.ServiceInstance;
 
 import net.risedata.register.ribbon.LBalancer;
-
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @Description : 轮询的算法
@@ -21,10 +21,9 @@ public class PollBalancer implements LBalancer {
      */
     private AtomicInteger index = new AtomicInteger(0);
 
-
     private int getIndex(List<ServiceInstance> services) {
         int concurrent, i;
-        for (; ; ) {
+        for (;;) {
             concurrent = index.get();
             i = ((concurrent + 1) % services.size());
             if (index.compareAndSet(concurrent, i)) {

@@ -11,19 +11,18 @@ import java.io.OutputStream;
  * @author lb
  */
 public interface Stream {
-	/**
-	 * 获取流数据
-	 * 
-	 * @return
-	 */
-	byte[] getBytes();
+    /**
+     * 获取流数据
+     * 
+     * @return
+     */
+    byte[] getBytes();
 
-	/**
-	 * 将数据输出到输出流
-	 * 
-	 * @param outputStream
-	 */
-	void writer(OutputStream outputStream);
-
+    /**
+     * 将数据输出到输出流
+     * 
+     * @param outputStream
+     */
+    void writer(OutputStream outputStream);
 
 }

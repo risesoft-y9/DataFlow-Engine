@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
 
 /**
  * 升序排序
- * @author libo
- *2020年10月15日
+ * 
+ * @author libo 2020年10月15日
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -19,14 +19,16 @@ import java.lang.annotation.Target;
 @Inherited
 @Repeatable(Ascs.class)
 public @interface Asc {
-	/**
-	 * 排序级别
-	 * @return
-	 */
+    /**
+     * 排序级别
+     * 
+     * @return
+     */
     int leve() default 0;
-    
+
     /**
      * 表达式什么情况下生效
+     * 
      * @return
      */
     String expression() default "";

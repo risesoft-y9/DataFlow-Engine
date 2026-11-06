@@ -18,23 +18,23 @@ import net.risesoft.base.BaseEntity;
 @Data
 public class DataApiOnlineEntity extends BaseEntity {
 
-	private static final long serialVersionUID = -4109523700335204141L;
+    private static final long serialVersionUID = -4109523700335204141L;
 
-	@Id
-	@Column(name = "ID", length = 38, nullable = false)
-	@Comment(value = "主键")
-	private String id;
+    @Id
+    @Column(name = "ID", length = 38, nullable = false)
+    @Comment(value = "主键")
+    private String id;
 
-	@Column(name = "NAME", length = 500, nullable = false)
-	@Comment(value = "名称")
-	private String name;
-	
-	@Column(name = "PARENTID", length = 50, nullable = false)
-	@Comment(value = "父节点ID")
-	private String parentId;
-	
-	@Column(name = "TYPE", length = 50, nullable = false)
-	@Comment(value = "类别：folder/api")
-	private String type;
+    @Column(name = "NAME", length = 500, nullable = false)
+    @Comment(value = "名称")
+    private String name;
+
+    @Column(name = "PARENTID", length = 50, nullable = false)
+    @Comment(value = "父节点ID")
+    private String parentId;
+
+    @Column(name = "TYPE", length = 50, nullable = false)
+    @Comment(value = "类别：folder/api")
+    private String type;
 
 }

@@ -9,12 +9,9 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
 
 /**
  * 通过包名获取class
@@ -61,7 +58,7 @@ public class ClassTools {
                     JarFile jar;
                     try {
                         // 获取jar
-                        jar = ((JarURLConnection) url.openConnection()).getJarFile();
+                        jar = ((JarURLConnection)url.openConnection()).getJarFile();
                         // 从此jar包 得到一个枚举类
                         Enumeration<JarEntry> entries = jar.entries();
                         // 同样的进行循环迭代
@@ -92,8 +89,8 @@ public class ClassTools {
                                             // 添加到classes
                                             list.add(Class.forName(packageName + '.' + className));
 
-
-                                            //            list.add(ClassLoader.getSystemClassLoader().loadClass(packageName + '.' + className));
+                                            // list.add(ClassLoader.getSystemClassLoader().loadClass(packageName + '.' +
+                                            // className));
                                         } catch (ClassNotFoundException e) {
                                             // log
                                             // .error("添加用户自定义视图类错误 找不到此类的.class文件");
@@ -124,11 +121,8 @@ public class ClassTools {
      * @param recursive
      * @param classes
      */
-    public static void findAndAddClassesInPackageByFile(
-            String packageName,
-            String packagePath,
-            final boolean recursive,
-            List<Class<?>> classes) {
+    public static void findAndAddClassesInPackageByFile(String packageName, String packagePath, final boolean recursive,
+        List<Class<?>> classes) {
         // 获取此包的目录 建立一个File
         File dir = new File(packagePath);
         // 如果不存在或者 也不是目录就直接返回
@@ -148,7 +142,8 @@ public class ClassTools {
         for (File file : dirfiles) {
             // 如果是目录 则继续扫描
             if (file.isDirectory()) {
-                findAndAddClassesInPackageByFile(packageName + "." + file.getName(), file.getAbsolutePath(), recursive, classes);
+                findAndAddClassesInPackageByFile(packageName + "." + file.getName(), file.getAbsolutePath(), recursive,
+                    classes);
             } else {
                 // 如果是java类文件 去掉后面的.class 只留下类名
                 String className = file.getName().substring(0, file.getName().length() - 6);
@@ -159,7 +154,8 @@ public class ClassTools {
                     // classes.add(Class.forName(packageName + '.' +
                     // className));
                     // 经过回复同学的提醒，这里用forName有一些不好，会触发static方法，没有使用classLoader的load干净
-                    // classes.add(Thread.currentThread().getContextClassLoader().loadClass(packageName + '.' + className));
+                    // classes.add(Thread.currentThread().getContextClassLoader().loadClass(packageName + '.' +
+                    // className));
                 } catch (ClassNotFoundException e) {
                     // log.error("添加用户自定义视图类错误 找不到此类的.class文件");
                     e.printStackTrace();
@@ -168,9 +164,8 @@ public class ClassTools {
         }
     }
 
-    public static boolean isBaseType(Class<?> type){
-        return type.isPrimitive()||type== BigDecimal.class||type.isArray()||type==String.class;
+    public static boolean isBaseType(Class<?> type) {
+        return type.isPrimitive() || type == BigDecimal.class || type.isArray() || type == String.class;
     }
-
 
 }

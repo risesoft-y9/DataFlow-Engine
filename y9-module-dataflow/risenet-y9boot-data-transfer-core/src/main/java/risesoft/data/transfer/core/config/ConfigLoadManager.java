@@ -15,30 +15,30 @@ import risesoft.data.transfer.core.util.Configuration;
  */
 public class ConfigLoadManager {
 
-	private static final List<ConfigLoad> CONFIG_LOADS = new ArrayList<ConfigLoad>();
+    private static final List<ConfigLoad> CONFIG_LOADS = new ArrayList<ConfigLoad>();
 
-	/**
-	 * 解析配置
-	 * 
-	 * @param config
-	 * @param jobContext
-	 * @return
-	 */
-	public static Configuration loadConfig(Configuration config,JobContext jobContext) {
-		for (ConfigLoad configLoad : CONFIG_LOADS) {
-			config = configLoad.laod(config,jobContext);
-		}
-		return config;
-	}
+    /**
+     * 解析配置
+     * 
+     * @param config
+     * @param jobContext
+     * @return
+     */
+    public static Configuration loadConfig(Configuration config, JobContext jobContext) {
+        for (ConfigLoad configLoad : CONFIG_LOADS) {
+            config = configLoad.laod(config, jobContext);
+        }
+        return config;
+    }
 
-	/**
-	 * 从指令中解析配置
-	 * 
-	 * @param config
-	 * @return
-	 */
-	public static void addLoad(ConfigLoad configLoad) {
-		CONFIG_LOADS.add(configLoad);
-	}
+    /**
+     * 从指令中解析配置
+     * 
+     * @param config
+     * @return
+     */
+    public static void addLoad(ConfigLoad configLoad) {
+        CONFIG_LOADS.add(configLoad);
+    }
 
 }

@@ -11,14 +11,14 @@ import net.risedata.jdbc.repository.parse.handles.method.MethodNameBuilder;
  */
 public class SizeInstructionHandle implements SectionInstructionHandle {
 
-	@Override
-	public String handleInstruction() {
-		return "Size";
-	}
+    @Override
+    public String handleInstruction() {
+        return "Size";
+    }
 
-	@Override
-	public void handle(MethodNameBuilder builder, ClassBuild classBuild) {
-		builder.nextAndReturn().appendSql(" count(*) ");
-	}
+    @Override
+    public void handle(MethodNameBuilder builder, ClassBuild classBuild) {
+        builder.nextAndReturn().appendSql(" count(*) ");
+    }
 
 }

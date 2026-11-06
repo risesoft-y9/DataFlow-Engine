@@ -10,13 +10,13 @@ import net.risedata.jdbc.repository.parse.handles.method.MethodNameBuilder;
  */
 public class FalseInstructionHandle extends ConditionInstructionHandleAdapter {
 
-	public FalseInstructionHandle() {
-		super("False", null);
-	}
+    public FalseInstructionHandle() {
+        super("False", null);
+    }
 
-	@Override
-	public void handle(MethodNameBuilder builder, String backField, String condition) {
-		builder.getSqlbuilder().where(builder.getColumn(backField) + " = False ");
-	}
+    @Override
+    public void handle(MethodNameBuilder builder, String backField, String condition) {
+        builder.getSqlbuilder().where(builder.getColumn(backField) + " = False ");
+    }
 
 }

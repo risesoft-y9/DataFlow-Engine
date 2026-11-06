@@ -2,7 +2,6 @@ package net.risedata.rpc.consumer.task;
 
 import net.risedata.rpc.Task.Task;
 import net.risedata.rpc.consumer.config.ConsumerApplication;
-import net.risedata.rpc.consumer.config.LoadingConfig;
 import net.risedata.rpc.consumer.core.ConnectionManager;
 import net.risedata.rpc.provide.config.Application;
 
@@ -16,13 +15,11 @@ public class ManagerAndIpAndPortTask implements Task {
     private String host;
     private int port;
 
-
     public ManagerAndIpAndPortTask(ConnectionManager connectionManager, String host, int port) {
         this.connectionManager = connectionManager;
         this.host = host;
         this.port = port;
     }
-
 
     public ConnectionManager getConnectionManager() {
         return connectionManager;
@@ -35,7 +32,6 @@ public class ManagerAndIpAndPortTask implements Task {
     public int getPort() {
         return port;
     }
-
 
     @Override
     public void run() {

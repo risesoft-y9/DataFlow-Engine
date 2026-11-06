@@ -6,9 +6,9 @@ public final class Constant {
     public static final Object PK_TYPE_STRING = "pkTypeString";
 
     public static final Object PK_TYPE_LONG = "pkTypeLong";
-    
+
     public static final Object PK_TYPE_MONTECARLO = "pkTypeMonteCarlo";
-    
+
     public static final String SPLIT_MODE_RANDOMSAMPLE = "randomSampling";
 
     public static String CONN_MARK = "connection";

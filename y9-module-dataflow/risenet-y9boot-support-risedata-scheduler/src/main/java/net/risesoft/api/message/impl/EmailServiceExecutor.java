@@ -1,16 +1,15 @@
 package net.risesoft.api.message.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.util.PatternMatchUtils;
 
 import net.risesoft.api.message.MessageServiceExecutor;
 import net.risesoft.api.utils.RegexUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @Description : 用邮箱的形式发送
@@ -20,7 +19,6 @@ import java.util.List;
  * @Version 1.0
  */
 public class EmailServiceExecutor implements MessageServiceExecutor {
-
 
     @Value("${spring.mail.username:}")
     private String from;

@@ -12,15 +12,15 @@ import risesoft.data.transfer.core.exception.TransferException;
  */
 public class ValueUtils {
 
-	public static <T> T getRequired(T value, String message) {
-		if (value == null) {
-			throw TransferException.as(CommonErrorCode.CONFIG_ERROR, message);
-		}
-		return value;
-	}
+    public static <T> T getRequired(T value, String message) {
+        if (value == null) {
+            throw TransferException.as(CommonErrorCode.CONFIG_ERROR, message);
+        }
+        return value;
+    }
 
-	public static <T> T getDefault(T value, T defaultValue) {
-		return value == null ? defaultValue : value;
-	}
+    public static <T> T getDefault(T value, T defaultValue) {
+        return value == null ? defaultValue : value;
+    }
 
 }

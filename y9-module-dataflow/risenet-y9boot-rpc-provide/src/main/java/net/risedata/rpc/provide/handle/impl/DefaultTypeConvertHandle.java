@@ -1,15 +1,13 @@
 package net.risedata.rpc.provide.handle.impl;
 
+import java.util.List;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import net.risedata.rpc.model.Request;
 import net.risedata.rpc.provide.context.RPCRequestContext;
-import net.risedata.rpc.provide.defined.ParameterDefined;
 import net.risedata.rpc.provide.handle.TypeConvertHandle;
 import net.risedata.rpc.utils.LParameter;
-
-import java.util.List;
 
 public class DefaultTypeConvertHandle implements TypeConvertHandle {
     @Override
@@ -18,9 +16,10 @@ public class DefaultTypeConvertHandle implements TypeConvertHandle {
     }
 
     @Override
-    public <T> T handleArray(JSONArray jsonArray, int index, Class<T> returnType, LParameter parameterDefined, RPCRequestContext request) {
-        if(parameterDefined.isGeneral()){
-            if (List.class.isAssignableFrom(returnType)){
+    public <T> T handleArray(JSONArray jsonArray, int index, Class<T> returnType, LParameter parameterDefined,
+        RPCRequestContext request) {
+        if (parameterDefined.isGeneral()) {
+            if (List.class.isAssignableFrom(returnType)) {
                 List res = jsonArray.getJSONArray(index).toJavaList(parameterDefined.getGeneralType()[0]);
                 return returnType.cast(res);
             }
@@ -31,9 +30,10 @@ public class DefaultTypeConvertHandle implements TypeConvertHandle {
     }
 
     @Override
-    public <T> T handleMap(JSONObject jsonObject, String name, Class<T> returnType, LParameter parameterDefined, RPCRequestContext request) {
-        if(parameterDefined.isGeneral()){
-            if (List.class.isAssignableFrom(returnType)){
+    public <T> T handleMap(JSONObject jsonObject, String name, Class<T> returnType, LParameter parameterDefined,
+        RPCRequestContext request) {
+        if (parameterDefined.isGeneral()) {
+            if (List.class.isAssignableFrom(returnType)) {
                 List res = jsonObject.getJSONArray(name).toJavaList(parameterDefined.getGeneralType()[0]);
                 return returnType.cast(res);
             }

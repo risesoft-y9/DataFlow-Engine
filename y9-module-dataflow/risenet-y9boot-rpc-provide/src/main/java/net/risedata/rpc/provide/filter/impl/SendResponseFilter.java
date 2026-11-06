@@ -1,6 +1,5 @@
 package net.risedata.rpc.provide.filter.impl;
 
-
 import net.risedata.rpc.model.Response;
 import net.risedata.rpc.provide.context.RPCRequestContext;
 import net.risedata.rpc.provide.context.Send;
@@ -19,6 +18,5 @@ public class SendResponseFilter extends FilterAdapter {
     public void doAfter(Response response, RPCRequestContext context, FilterContext filterContext, Send send) {
         send.send(response);
     }
-
 
 }

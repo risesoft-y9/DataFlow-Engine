@@ -1,12 +1,6 @@
 package net.risesoft.controller.security;
 
-import net.risedata.jdbc.search.LPageable;
-import net.risesoft.api.aop.CheckHttpForArgs;
-import net.risesoft.api.aop.CheckResult;
-import net.risesoft.dto.NetworkWhiteListDTO;
-import net.risesoft.pojo.Y9Result;
-import net.risesoft.security.model.NetworkWhiteList;
-import net.risesoft.security.service.NetworkWhiteListService;
+import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +10,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
+import net.risedata.jdbc.search.LPageable;
+import net.risesoft.api.aop.CheckHttpForArgs;
+import net.risesoft.api.aop.CheckResult;
+import net.risesoft.dto.NetworkWhiteListDTO;
+import net.risesoft.pojo.Y9Result;
+import net.risesoft.security.model.NetworkWhiteList;
+import net.risesoft.security.service.NetworkWhiteListService;
 
 /**
  * @Description : rpc 服务注册/获取白名单
@@ -29,60 +29,61 @@ import javax.validation.Valid;
 @RequestMapping("/api/rest/system/networkWhiteList")
 public class NetworkWhiteListController {
 
-	@Autowired
-	NetworkWhiteListService networkWhiteListService;
-	
-	@Autowired
-	private ModelMapper modelMapper;
+    @Autowired
+    NetworkWhiteListService networkWhiteListService;
 
-	/**
-	 * 保存/修改
-	 *
-	 * @param networkWhiteList
-	 * @return
-	 */
-	@PostMapping("save")
-	@CheckResult
-	@CheckHttpForArgs
-	public Y9Result<Object> save(@Valid NetworkWhiteListDTO networkWhiteListDTO, BindingResult result) {
-		NetworkWhiteList networkWhiteList = modelMapper.map(networkWhiteListDTO, NetworkWhiteList.class);
-		networkWhiteListService.saveNetworkWhiteList(networkWhiteList);
-		return Y9Result.success("ok");
-	}
+    @Autowired
+    private ModelMapper modelMapper;
 
-	/**
-	 * 根据id 删除
-	 *
-	 * @param id
-	 * @return
-	 */
-	@PostMapping("delById")
-	public Y9Result<Object> delById(String id) {
-		networkWhiteListService.delById(id);
-		return Y9Result.success("ok");
-	}
+    /**
+     * 保存/修改
+     *
+     * @param networkWhiteList
+     * @return
+     */
+    @PostMapping("save")
+    @CheckResult
+    @CheckHttpForArgs
+    public Y9Result<Object> save(@Valid NetworkWhiteListDTO networkWhiteListDTO, BindingResult result) {
+        NetworkWhiteList networkWhiteList = modelMapper.map(networkWhiteListDTO, NetworkWhiteList.class);
+        networkWhiteListService.saveNetworkWhiteList(networkWhiteList);
+        return Y9Result.success("ok");
+    }
 
-	/**
-	 * 查询 此处需要判断查询条件类
-	 *
-	 * @param networkWhiteList
-	 * @param pageable
-	 * @return
-	 */
-	@GetMapping("searchForPage")
-	@CheckHttpForArgs
-	public Y9Result<Object> searchForPage(NetworkWhiteListDTO networkWhiteListDTO, LPageable pageable) {
-		NetworkWhiteList networkWhiteList = modelMapper.map(networkWhiteListDTO, NetworkWhiteList.class);
-		return Y9Result.success(networkWhiteListService.searchByNetworkWhiteList(networkWhiteList, pageable));
-	}
-	
-	/**
-	 * 根据id获取对象
-	 * @param id
-	 * @return
-	 */
-	@GetMapping("findById")
-	public Y9Result<Object> findById(String id) {
-		return Y9Result.success(networkWhiteListService.findById(id));
-	}
+    /**
+     * 根据id 删除
+     *
+     * @param id
+     * @return
+     */
+    @PostMapping("delById")
+    public Y9Result<Object> delById(String id) {
+        networkWhiteListService.delById(id);
+        return Y9Result.success("ok");
+    }
+
+    /**
+     * 查询 此处需要判断查询条件类
+     *
+     * @param networkWhiteList
+     * @param pageable
+     * @return
+     */
+    @GetMapping("searchForPage")
+    @CheckHttpForArgs
+    public Y9Result<Object> searchForPage(NetworkWhiteListDTO networkWhiteListDTO, LPageable pageable) {
+        NetworkWhiteList networkWhiteList = modelMapper.map(networkWhiteListDTO, NetworkWhiteList.class);
+        return Y9Result.success(networkWhiteListService.searchByNetworkWhiteList(networkWhiteList, pageable));
+    }
+
+    /**
+     * 根据id获取对象
+     * 
+     * @param id
+     * @return
+     */
+    @GetMapping("findById")
+    public Y9Result<Object> findById(String id) {
+        return Y9Result.success(networkWhiteListService.findById(id));
+    }
 }

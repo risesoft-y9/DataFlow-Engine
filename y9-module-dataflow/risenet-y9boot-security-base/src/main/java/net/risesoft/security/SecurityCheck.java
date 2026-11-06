@@ -11,12 +11,13 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface SecurityCheck {
     /**
-     *  检查
+     * 检查
+     * 
      * @param config 配置
      * @param security 当前安全用户
      * @param url url
      * @param request request
      * @return 返回是否通过
      */
-    boolean check(SecurityConfig config, ConcurrentSecurity security,String url, HttpServletRequest request);
+    boolean check(SecurityConfig config, ConcurrentSecurity security, String url, HttpServletRequest request);
 }

@@ -15,19 +15,19 @@ import risesoft.data.transfer.core.stream.DataStream;
  */
 public interface DataOutputStream extends DataStream {
 
-	/**
-	 * 输出一批数据返回输出结果
-	 * 
-	 * @param records
-	 * @return
-	 */
-	void writer(List<Record> records,Ack ack);
+    /**
+     * 输出一批数据返回输出结果
+     * 
+     * @param records
+     * @return
+     */
+    void writer(List<Record> records, Ack ack);
 
-	/**
-	 * 输出一条数据
-	 * 
-	 * @param record
-	 */
-	void writer(Record record,Ack ack);
+    /**
+     * 输出一条数据
+     * 
+     * @param record
+     */
+    void writer(Record record, Ack ack);
 
 }

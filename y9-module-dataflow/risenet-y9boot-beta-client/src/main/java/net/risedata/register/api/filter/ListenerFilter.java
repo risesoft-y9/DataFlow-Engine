@@ -1,13 +1,18 @@
 package net.risedata.register.api.filter;
 
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import net.risedata.register.api.filter.listener.HttpListener;
-
-import javax.servlet.*;
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @Description :
@@ -20,16 +25,14 @@ public class ListenerFilter implements Filter {
     @Autowired
     private List<HttpListener> httpListeners;
 
-
-
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException {
 
         for (HttpListener httpListener : httpListeners) {
             httpListener.onStart(request, response);
@@ -38,24 +41,20 @@ public class ListenerFilter implements Filter {
             chain.doFilter(request, response);
         } catch (IOException e) {
             for (HttpListener httpListener : httpListeners) {
-                httpListener.onError(request, response,e);
+                httpListener.onError(request, response, e);
             }
             throw e;
         } catch (ServletException e) {
             for (HttpListener httpListener : httpListeners) {
-                httpListener.onError(request, response,e);
+                httpListener.onError(request, response, e);
             }
             throw e;
-        }finally {
+        } finally {
             for (HttpListener httpListener : httpListeners) {
                 httpListener.onEnd(request, response);
             }
         }
 
-
-
     }
-
-
 
 }

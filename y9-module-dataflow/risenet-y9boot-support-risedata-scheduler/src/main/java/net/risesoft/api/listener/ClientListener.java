@@ -1,18 +1,18 @@
 package net.risesoft.api.listener;
 
-import net.risedata.rpc.provide.listener.Listener;
-import net.risedata.rpc.provide.net.ClientConnection;
-import net.risesoft.api.api.RegisterApi;
-import net.risesoft.api.persistence.iservice.IServiceService;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import net.risedata.rpc.provide.listener.Listener;
+import net.risedata.rpc.provide.net.ClientConnection;
+import net.risesoft.api.api.RegisterApi;
+import net.risesoft.api.persistence.iservice.IServiceService;
 
 /**
  * @Description : 监听连接的建立
@@ -23,12 +23,9 @@ import java.util.Map;
  */
 public class ClientListener implements Listener {
 
-
     private static final Logger LOG = LoggerFactory.getLogger(ClientListener.class);
 
     public static final List<ClientConnection> connections = new ArrayList<>();
-
-
 
     @Override
     public void onConnection(ClientConnection clinetConnection) {
@@ -44,7 +41,7 @@ public class ClientListener implements Listener {
     @Autowired
     IServiceService iServiceService;
 
-    //判断连接数量有几个连接
+    // 判断连接数量有几个连接
     @Override
     public void onClosed(ClientConnection clinetConnection) {
 
@@ -73,7 +70,8 @@ public class ClientListener implements Listener {
         return null;
     }
 
-    public static void pushListener(String name, Map<String, Object> value, String serviceName, String instanceId, String environment) {
+    public static void pushListener(String name, Map<String, Object> value, String serviceName, String instanceId,
+        String environment) {
         Map<Object, Object> sendedMap = new HashMap<>();
         synchronized (connections) {
             for (ClientConnection connection : connections) {

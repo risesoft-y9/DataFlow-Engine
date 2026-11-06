@@ -25,10 +25,9 @@ public class RuntimeAvailability implements ServiceAvailability {
             runnable.run();
             return true;
         } catch (Exception e) {
-            Application.logger.error("error : "+e.getMessage());
+            Application.logger.error("error : " + e.getMessage());
             return false;
         }
     }
-
 
 }

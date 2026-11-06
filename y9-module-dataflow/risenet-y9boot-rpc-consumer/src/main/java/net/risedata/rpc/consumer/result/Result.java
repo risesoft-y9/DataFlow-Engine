@@ -21,10 +21,9 @@ public interface Result {
      * 拿到list 类型的值
      *
      * @param returnType 返回值类型
-     * @param <T>        list
+     * @param <T> list
      * @return 返回值
      */
     <T> List<T> getList(Class<T> returnType);
-
 
 }

@@ -1,5 +1,7 @@
 package net.risedata.rpc.provide.start;
 
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.StringUtils;
 
 import net.risedata.rpc.provide.annotation.RPCServer;
 import net.risedata.rpc.provide.config.ApplicationConfig;
@@ -12,9 +14,6 @@ import net.risedata.rpc.provide.listener.Listener;
 import net.risedata.rpc.provide.net.ClientConnection;
 import net.risedata.rpc.provide.net.Server;
 import net.risedata.rpc.service.patientia.FixedExecutorService;
-
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * @description: 在没有spring boot 的环境下启动服务端
@@ -40,7 +39,7 @@ public class ServerBootStart extends ApplicationConfig {
 
     }
 
-    public static void start(){
+    public static void start() {
         server.start();
     }
 

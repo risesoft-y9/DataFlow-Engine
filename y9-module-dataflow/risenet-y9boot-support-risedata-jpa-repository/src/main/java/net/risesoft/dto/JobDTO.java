@@ -1,64 +1,64 @@
 package net.risesoft.dto;
 
+import java.util.Date;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
 
 @NoArgsConstructor
 @Data
 public class JobDTO {
 
-	private Integer id;
+    private Integer id;
 
-	private String serviceId;
+    private String serviceId;
 
-	private String type;
+    private String type;
 
-	private String source;
+    private String source;
 
-	private String speed;
+    private String speed;
 
-	private String dispatchType;
+    private String dispatchType;
 
-	private String blockingStrategy;
+    private String blockingStrategy;
 
-	private String dispatchMethod;
+    private String dispatchMethod;
 
-	private String dispatchArgs;
+    private String dispatchArgs;
 
-	private String manager;
+    private String manager;
 
-	private String email;
+    private String email;
 
-	private String args;
+    private String args;
 
-	private String childJobs;
+    private String childJobs;
 
-	private Integer timeOut;
+    private Integer timeOut;
 
-	private Integer sourceTimeOut;
+    private Integer sourceTimeOut;
 
-	private Integer errorCount;
+    private Integer errorCount;
 
-	private Long updateTime;
+    private Long updateTime;
 
-	private Date createDate;
+    private Date createDate;
 
-	private String environment;
+    private String environment;
 
-	private Integer status;
+    private Integer status;
 
-	private String dispatchServer;
+    private String dispatchServer;
 
-	private String description;
+    private String description;
 
-	private String jobType;
+    private String jobType;
 
-	private String jobTypeName;
+    private String jobTypeName;
 
-	private String name;
+    private String name;
 
-	private String jobSource;
-	
+    private String jobSource;
+
 }

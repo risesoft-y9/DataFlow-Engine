@@ -1,11 +1,11 @@
 package net.risesoft.api.persistence.dao.job;
 
+import java.util.List;
+
 import net.risedata.jdbc.annotations.repository.Modify;
 import net.risedata.jdbc.annotations.repository.Search;
 import net.risedata.jdbc.repository.Repository;
 import net.risesoft.api.persistence.model.job.JobInfo;
-
-import java.util.List;
 
 /**
  * @Description :

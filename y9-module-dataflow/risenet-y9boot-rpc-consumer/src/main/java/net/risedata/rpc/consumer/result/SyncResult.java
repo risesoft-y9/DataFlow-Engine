@@ -44,6 +44,7 @@ public interface SyncResult {
 
     /**
      * 拿到 result
+     * 
      * @return result
      */
     Result getResult();

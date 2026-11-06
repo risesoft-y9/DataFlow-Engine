@@ -1,135 +1,135 @@
 package net.risesoft.dto;
 
 public class JobLogDTO {
-	
-	private String id;
-	
-	private Integer status;
-	
-	private Integer jobId;
-	
-	private String result;
-	
-	private String dispatchServer;
 
-	private String dispatchSource;
-	
-	private Long dispatchTime;
-	
-	private Long endTime;
-	
-	private String logConsole = "";
-	
-	private String environment;
-	
-	private String childJobId;
+    private String id;
 
-	private String jobName;
+    private Integer status;
 
-	public String getJobName() {
-		return jobName;
-	}
+    private Integer jobId;
 
-	public void setJobName(String jobName) {
-		this.jobName = jobName;
-	}
+    private String result;
 
-	public String getChildJobId() {
-		return childJobId;
-	}
+    private String dispatchServer;
 
-	public void setChildJobId(String childJobId) {
-		this.childJobId = childJobId;
-	}
+    private String dispatchSource;
 
-	public String getEnvironment() {
-		return environment;
-	}
+    private Long dispatchTime;
 
-	public void setEnvironment(String environment) {
-		this.environment = environment;
-	}
+    private Long endTime;
 
-	public String getId() {
-		return id;
-	}
+    private String logConsole = "";
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    private String environment;
 
-	public Integer getStatus() {
-		return status;
-	}
+    private String childJobId;
 
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
+    private String jobName;
 
-	public Integer getJobId() {
-		return jobId;
-	}
+    public String getJobName() {
+        return jobName;
+    }
 
-	public void setJobId(Integer jobId) {
-		this.jobId = jobId;
-	}
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
+    }
 
-	public String getResult() {
-		return result;
-	}
+    public String getChildJobId() {
+        return childJobId;
+    }
 
-	public void setResult(String result) {
-		this.result = result;
-	}
+    public void setChildJobId(String childJobId) {
+        this.childJobId = childJobId;
+    }
 
-	public String getDispatchServer() {
-		return dispatchServer;
-	}
+    public String getEnvironment() {
+        return environment;
+    }
 
-	public String getDispatchSource() {
-		return dispatchSource;
-	}
+    public void setEnvironment(String environment) {
+        this.environment = environment;
+    }
 
-	public void setDispatchSource(String dispatchSource) {
-		this.dispatchSource = dispatchSource;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setDispatchServer(String dispatchServer) {
-		this.dispatchServer = dispatchServer;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public Long getDispatchTime() {
-		return dispatchTime;
-	}
+    public Integer getStatus() {
+        return status;
+    }
 
-	public void setDispatchTime(Long dispatchTime) {
-		this.dispatchTime = dispatchTime;
-	}
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
 
-	public Long getEndTime() {
-		return endTime;
-	}
+    public Integer getJobId() {
+        return jobId;
+    }
 
-	public void setEndTime(Long endTime) {
-		this.endTime = endTime;
-	}
+    public void setJobId(Integer jobId) {
+        this.jobId = jobId;
+    }
 
-	public String getLogConsole() {
-		return logConsole;
-	}
+    public String getResult() {
+        return result;
+    }
 
-	public void setLogConsole(String logConsole) {
-		this.logConsole = logConsole;
-	}
+    public void setResult(String result) {
+        this.result = result;
+    }
 
-	public void appendConsole(String logConsole) {
-		this.logConsole += logConsole;
-	}
+    public String getDispatchServer() {
+        return dispatchServer;
+    }
 
-	@Override
-	public String toString() {
-		return "JobLog{" + "id='" + id + '\'' + ", status=" + status + ", jobId=" + jobId + ", result='" + result + '\''
-				+ ", dispatchServer='" + dispatchServer + '\'' + ", dispatchTime=" + dispatchTime + ", endTime="
-				+ endTime + ", logConsole='" + logConsole + '\'' + '}';
-	}
+    public String getDispatchSource() {
+        return dispatchSource;
+    }
+
+    public void setDispatchSource(String dispatchSource) {
+        this.dispatchSource = dispatchSource;
+    }
+
+    public void setDispatchServer(String dispatchServer) {
+        this.dispatchServer = dispatchServer;
+    }
+
+    public Long getDispatchTime() {
+        return dispatchTime;
+    }
+
+    public void setDispatchTime(Long dispatchTime) {
+        this.dispatchTime = dispatchTime;
+    }
+
+    public Long getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Long endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getLogConsole() {
+        return logConsole;
+    }
+
+    public void setLogConsole(String logConsole) {
+        this.logConsole = logConsole;
+    }
+
+    public void appendConsole(String logConsole) {
+        this.logConsole += logConsole;
+    }
+
+    @Override
+    public String toString() {
+        return "JobLog{" + "id='" + id + '\'' + ", status=" + status + ", jobId=" + jobId + ", result='" + result + '\''
+            + ", dispatchServer='" + dispatchServer + '\'' + ", dispatchTime=" + dispatchTime + ", endTime=" + endTime
+            + ", logConsole='" + logConsole + '\'' + '}';
+    }
 }

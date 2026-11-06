@@ -12,52 +12,52 @@ import net.risedata.jdbc.config.model.FieldConfig;
  * @author libo 2020年10月10日
  */
 public class SectionOperation extends SimpleOperation {
-	private Object max;
-	private Object min;
+    private Object max;
+    private Object min;
 
-	/**
-	 * @param maxDate 最大区间
-	 */
-	public SectionOperation(Object max) {
-		this.max = max;
-	}
+    /**
+     * @param maxDate 最大区间
+     */
+    public SectionOperation(Object max) {
+        this.max = max;
+    }
 
-	/**
-	 * 区间
-	 * 
-	 * @param maxDate  最大区间
-	 * @param miniDate 最小区间
-	 */
-	public SectionOperation(Object mini, Object max) {
-		this.max = max;
-		this.min = mini;
-	}
+    /**
+     * 区间
+     * 
+     * @param maxDate 最大区间
+     * @param miniDate 最小区间
+     */
+    public SectionOperation(Object mini, Object max) {
+        this.max = max;
+        this.min = mini;
+    }
 
-	@Override
-	public boolean where(FieldConfig field, List<Object> args, StringBuilder sql, Map<String, Object> valueMap,
-			BeanConfig bc, Map<String, Object> excludeMap) {
-		Object ovalue = min == null ? getValue(field, valueMap) : min;
-		if (isNotNull(ovalue)) {
-			sql.append(field.getColumn() + ">=" + "? ");
-			args.add(ovalue);
-			if (max != null) {
-				sql.append(" and " + field.getColumn() + "<=" + "? ");
-				args.add(max);
-			}
-			return true;
-		} else if (max != null) {
-			if (max != null) {
-				sql.append(field.getColumn() + "<=" + "? ");
-				args.add(max);
-			}
-			return true;
-		}
-		return false;
-	}
+    @Override
+    public boolean where(FieldConfig field, List<Object> args, StringBuilder sql, Map<String, Object> valueMap,
+        BeanConfig bc, Map<String, Object> excludeMap) {
+        Object ovalue = min == null ? getValue(field, valueMap) : min;
+        if (isNotNull(ovalue)) {
+            sql.append(field.getColumn() + ">=" + "? ");
+            args.add(ovalue);
+            if (max != null) {
+                sql.append(" and " + field.getColumn() + "<=" + "? ");
+                args.add(max);
+            }
+            return true;
+        } else if (max != null) {
+            if (max != null) {
+                sql.append(field.getColumn() + "<=" + "? ");
+                args.add(max);
+            }
+            return true;
+        }
+        return false;
+    }
 
-	@Override
-	public int getOperate() {
-		return 6;
-	}
+    @Override
+    public int getOperate() {
+        return 6;
+    }
 
 }

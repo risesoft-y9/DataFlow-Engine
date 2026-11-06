@@ -1,9 +1,5 @@
 package net.risesoft.util.sqlddl;
 
-import org.apache.commons.lang3.StringUtils;
-
-import net.risesoft.pojo.Y9Page;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -14,10 +10,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
+import net.risesoft.pojo.Y9Page;
+
 public class SqlPaginationUtil {
-	
-	public static Y9Page<Map<String, Object>> listTableData(String dataId, Connection connection, String columnNameAndValues, String tableName, 
-			int pageNum, int pageSize) {
+
+    public static Y9Page<Map<String, Object>> listTableData(String dataId, Connection connection,
+        String columnNameAndValues, String tableName, int pageNum, int pageSize) {
         List<Map<String, Object>> tableDataList = new ArrayList<>();
         int totalRecords = 0;
         int totalPages = 0;
@@ -45,7 +45,8 @@ public class SqlPaginationUtil {
                 }
             }
 
-            if ("oracle".equalsIgnoreCase(dialect) || "dm".equalsIgnoreCase(dialect) || "kingbase".equalsIgnoreCase(dialect)) {
+            if ("oracle".equalsIgnoreCase(dialect) || "dm".equalsIgnoreCase(dialect)
+                || "kingbase".equalsIgnoreCase(dialect)) {
                 sqlStr = new StringBuilder("SELECT * FROM \"" + tableName + "\"  T WHERE ");
                 if (StringUtils.isNotBlank(conditionSql)) {
                     sqlStr.append(conditionSql).append(" AND ");
@@ -83,21 +84,21 @@ public class SqlPaginationUtil {
             // 计算总页数
             totalPages = (int)Math.ceil((double)totalRecords / pageSize);
         } catch (Exception ex) {
-        	return Y9Page.failure(0, 0, 0, null, "获取数据失败：" + ex.getMessage(), 500);
+            return Y9Page.failure(0, 0, 0, null, "获取数据失败：" + ex.getMessage(), 500);
         } finally {
             if (rs != null) {
                 try {
-					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+                    rs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
             if (connection != null) {
-            	try {
-					connection.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         }
         return Y9Page.success(pageNum, totalPages, totalRecords, tableDataList, "获取数据成功");

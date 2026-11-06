@@ -20,44 +20,44 @@ import net.risedata.jdbc.repository.parse.sql.SqlParseFactory;
 
 public class SearchParseHandle implements MethodParseHandle {
 
-	private static List<SearchReturnHandle> HANDLES = new ArrayList<SearchReturnHandle>();
-	static {
-		HANDLES.add(new ListSearchReturnHandle());
-		HANDLES.add(new MapSearchReturnHandle());
-		HANDLES.add(new DefaultSearchReturnHandle());
-	}
+    private static List<SearchReturnHandle> HANDLES = new ArrayList<SearchReturnHandle>();
+    static {
+        HANDLES.add(new ListSearchReturnHandle());
+        HANDLES.add(new MapSearchReturnHandle());
+        HANDLES.add(new DefaultSearchReturnHandle());
+    }
 
-	@Override
-	public boolean isHandle(Method m) {
-		return AnnotationUtils.findAnnotation(m, Search.class) != null;
-	}
+    @Override
+    public boolean isHandle(Method m) {
+        return AnnotationUtils.findAnnotation(m, Search.class) != null;
+    }
 
-	@Override
-	public String parse(Method m, ReturnType returnType, ClassBuild properties) {
-		Search search = AnnotationUtils.findAnnotation(m, Search.class);
-		if (returnType.isVoid()) {
-			throw new ParseException("search " + m.getName() + " returnType is null ");
-		}
+    @Override
+    public String parse(Method m, ReturnType returnType, ClassBuild properties) {
+        Search search = AnnotationUtils.findAnnotation(m, Search.class);
+        if (returnType.isVoid()) {
+            throw new ParseException("search " + m.getName() + " returnType is null ");
+        }
 
-		return parseBody(m, returnType, properties, search.value());
+        return parseBody(m, returnType, properties, search.value());
 
-	}
+    }
 
-	public static String parseBody(Method m, ReturnType returnType, ClassBuild properties, String sql) {
-		ArgsBuilder args = new ArgsBuilder(m);
-		StringBuilder body = new StringBuilder(SqlParseFactory.parseSql(returnType, m, args, sql));
-		body.append(args.toBody());
-		body.append(parseReturnValue(returnType, properties, args));
-		return body.toString();
-	}
+    public static String parseBody(Method m, ReturnType returnType, ClassBuild properties, String sql) {
+        ArgsBuilder args = new ArgsBuilder(m);
+        StringBuilder body = new StringBuilder(SqlParseFactory.parseSql(returnType, m, args, sql));
+        body.append(args.toBody());
+        body.append(parseReturnValue(returnType, properties, args));
+        return body.toString();
+    }
 
-	private static String parseReturnValue(ReturnType type, ClassBuild properties, ArgsBuilder argsBuilder) {
-		for (SearchReturnHandle searchReturnHandle : HANDLES) {
-			if (searchReturnHandle.isHandle(type)) {
-				return searchReturnHandle.parse(type, properties, argsBuilder);
-			}
-		}
-		throw new ParseException("search you return type " + type.getReturnType() + " is unidentifiable");
-	}
+    private static String parseReturnValue(ReturnType type, ClassBuild properties, ArgsBuilder argsBuilder) {
+        for (SearchReturnHandle searchReturnHandle : HANDLES) {
+            if (searchReturnHandle.isHandle(type)) {
+                return searchReturnHandle.parse(type, properties, argsBuilder);
+            }
+        }
+        throw new ParseException("search you return type " + type.getReturnType() + " is unidentifiable");
+    }
 
 }

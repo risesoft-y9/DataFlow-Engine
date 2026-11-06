@@ -7,7 +7,8 @@ import net.risedata.jdbc.repository.model.ReturnType;
 
 public interface SqlParseHandle {
 
-	boolean isHandle(String instruction);
+    boolean isHandle(String instruction);
 
-	String parse(Method m, ReturnType returnType, ArgsBuilder argsBuilder, String instruction,StringBuilder methodBody);
+    String parse(Method m, ReturnType returnType, ArgsBuilder argsBuilder, String instruction,
+        StringBuilder methodBody);
 }

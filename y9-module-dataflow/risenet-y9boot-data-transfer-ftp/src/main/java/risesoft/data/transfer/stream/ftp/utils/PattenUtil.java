@@ -1,6 +1,5 @@
 package risesoft.data.transfer.stream.ftp.utils;
 
-
 import java.util.List;
 
 /**
@@ -12,11 +11,9 @@ import java.util.List;
  */
 public class PattenUtil {
 
-
     public static boolean hasMatch(String source, String compare) {
         return PatternMatchUtils.simpleMatch(source, compare);
     }
-
 
     public static boolean hasMatch(List<String> source, String compare) {
         for (String s : source) {
@@ -26,6 +23,7 @@ public class PattenUtil {
         }
         return false;
     }
+
     public static boolean hasMatch(String[] source, String compare) {
         for (String s : source) {
             if (hasMatch(s, compare)) {

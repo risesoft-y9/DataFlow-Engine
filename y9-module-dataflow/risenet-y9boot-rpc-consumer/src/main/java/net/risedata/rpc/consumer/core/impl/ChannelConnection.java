@@ -1,9 +1,12 @@
 package net.risedata.rpc.consumer.core.impl;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+
 import com.alibaba.fastjson.JSON;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
 import net.risedata.rpc.consumer.config.ConsumerApplication;
 import net.risedata.rpc.consumer.core.Connection;
 import net.risedata.rpc.consumer.core.ConnectionManager;
@@ -27,10 +30,8 @@ import net.risedata.rpc.model.Response;
 import net.risedata.rpc.provide.config.Application;
 import net.risedata.rpc.utils.IdUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
 
 /**
  * @description: 通道实现
@@ -44,7 +45,6 @@ public class ChannelConnection extends AutoIdConnection implements Connection {
     private Channel ctx;
 
     private PortAndHost portAndHost;
-
 
     private ConnectionManager connectionManager;
     /**
@@ -66,7 +66,11 @@ public class ChannelConnection extends AutoIdConnection implements Connection {
      */
     private ConnectionPool connectionPool;
 
-    public ChannelConnection(String host, int port, ConnectionPool connectionPool, ConnectionManager connectionManager) {
+    public ChannelConnection(
+        String host,
+        int port,
+        ConnectionPool connectionPool,
+        ConnectionManager connectionManager) {
         this.portAndHost = new PortAndHost(host, port);
         this.connectionPool = connectionPool;
         this.connectionManager = connectionManager;
@@ -77,7 +81,6 @@ public class ChannelConnection extends AutoIdConnection implements Connection {
         this.listener = listener;
     }
 
-
     @Override
     public PortAndHost getPortAndHost() {
         return portAndHost;
@@ -85,11 +88,11 @@ public class ChannelConnection extends AutoIdConnection implements Connection {
 
     private SyncResult fusingExecution(String mapping, int timeOut, Object... args) {
         if (connectionPool.size() < 1) {
-            throw new RpcException("After the message is sent, the connection is broken and no connections are available");
+            throw new RpcException(
+                "After the message is sent, the connection is broken and no connections are available");
         }
-        return ((Connection) connectionPool.getConnection()).executionSync(mapping, timeOut, args);
+        return ((Connection)connectionPool.getConnection()).executionSync(mapping, timeOut, args);
     }
-
 
     @Override
     public <T> T execution(String service, String api, Class<T> returnType, int timeOut, Object... args) {
@@ -107,12 +110,14 @@ public class ChannelConnection extends AutoIdConnection implements Connection {
     }
 
     @Override
-    public <T> GenericitySyncResult<T> executionSyncAs(String service, String api, int timeOut, Class<T> type, Object... args) {
+    public <T> GenericitySyncResult<T> executionSyncAs(String service, String api, int timeOut, Class<T> type,
+        Object... args) {
         return executionSync(service, api, timeOut, args).as(type);
     }
 
     @Override
-    public <T> ListGenericitySyncResult<T> executionSyncAsList(String service, String api, int timeOut, Class<T> type, Object... args) {
+    public <T> ListGenericitySyncResult<T> executionSyncAsList(String service, String api, int timeOut, Class<T> type,
+        Object... args) {
         return executionSync(service, api, timeOut, args).asList(type);
     }
 
@@ -162,10 +167,10 @@ public class ChannelConnection extends AutoIdConnection implements Connection {
     }
 
     @Override
-    public <T> ListGenericitySyncResult<T> executionSyncAsList(String mapping, int timeOut, Class<T> type, Object... args) {
+    public <T> ListGenericitySyncResult<T> executionSyncAsList(String mapping, int timeOut, Class<T> type,
+        Object... args) {
         return executionSync(mapping, timeOut, args).asList(type);
     }
-
 
     @Override
     public ConnectionManager getConnectionManager() {
@@ -200,7 +205,6 @@ public class ChannelConnection extends AutoIdConnection implements Connection {
         }
         return false;
     }
-
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Msg msg) throws Exception {
@@ -256,7 +260,6 @@ public class ChannelConnection extends AutoIdConnection implements Connection {
                 throw new RpcException("未知的类型" + response);
         }
 
-
     }
 
     @Override
@@ -272,7 +275,6 @@ public class ChannelConnection extends AutoIdConnection implements Connection {
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
 
     }
-
 
     private void listenerClose() {
 
@@ -302,9 +304,6 @@ public class ChannelConnection extends AutoIdConnection implements Connection {
 
     @Override
     public String toString() {
-        return "ChannelConnection{" +
-                "portAndHost=" + portAndHost +
-                ", isRemove=" + isRemove +
-                '}';
+        return "ChannelConnection{" + "portAndHost=" + portAndHost + ", isRemove=" + isRemove + '}';
     }
 }

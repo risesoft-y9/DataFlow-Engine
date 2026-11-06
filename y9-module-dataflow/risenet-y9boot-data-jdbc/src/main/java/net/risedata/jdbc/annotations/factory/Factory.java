@@ -11,8 +11,8 @@ import net.risedata.jdbc.factory.InstanceFactory;
 
 /**
  * 增加的此注解的bean 会在bean工厂中选择对应的工厂进行初始化
- * @author libo
- *2021年2月9日
+ * 
+ * @author libo 2021年2月9日
  */
 @Target(TYPE)
 @Retention(RetentionPolicy.RUNTIME)

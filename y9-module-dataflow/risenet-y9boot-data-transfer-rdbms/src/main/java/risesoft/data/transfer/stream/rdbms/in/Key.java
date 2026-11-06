@@ -11,12 +11,12 @@ public final class Key {
     public final static String PASSWORD = "password";
 
     public final static String TABLE = "table";
-    
+
     public final static String MANDATORY_ENCODING = "mandatoryEncoding";
 
     // 是数组配置
     public final static String COLUMN = "column";
-    
+
     public final static String COLUMN_LIST = "columnList";
 
     public final static String WHERE = "where";
@@ -24,15 +24,14 @@ public final class Key {
     public final static String HINT = "hint";
 
     public final static String SPLIT_PK = "splitPk";
-    
+
     public final static String SPLIT_MODE = "splitMode";
-    
+
     public final static String SAMPLE_PERCENTAGE = "samplePercentage";
 
     public final static String QUERY_SQL = "querySql";
 
     public final static String SPLIT_PK_SQL = "splitPkSql";
-
 
     public final static String PRE_SQL = "preSql";
 
@@ -40,9 +39,9 @@ public final class Key {
 
     public final static String CHECK_SLAVE = "checkSlave";
 
-	public final static String SESSION = "session";
+    public final static String SESSION = "session";
 
-	public final static String DBNAME = "dbName";
+    public final static String DBNAME = "dbName";
 
     public final static String DRYRUN = "dryRun";
 

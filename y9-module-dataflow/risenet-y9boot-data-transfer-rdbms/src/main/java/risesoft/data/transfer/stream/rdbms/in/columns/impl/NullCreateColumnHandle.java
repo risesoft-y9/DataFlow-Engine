@@ -17,21 +17,21 @@ import risesoft.data.transfer.stream.rdbms.in.columns.CreateColumnHandle;
  */
 public class NullCreateColumnHandle implements CreateColumnHandle {
 
-	@Override
-	public boolean isHandle(int type) {
-		return Types.NULL == type;
+    @Override
+    public boolean isHandle(int type) {
+        return Types.NULL == type;
 
-	}
+    }
 
-	@Override
-	public Column getColumn(ResultSet rs, ResultSetMetaData metaData, int index, String mandatoryEncoding)
-			throws Exception {
-		String stringData = null;
-		if (rs.getObject(index) != null) {
-			stringData = rs.getObject(index).toString();
-		}
-		return new StringColumn(stringData, metaData.getColumnLabel(index));
+    @Override
+    public Column getColumn(ResultSet rs, ResultSetMetaData metaData, int index, String mandatoryEncoding)
+        throws Exception {
+        String stringData = null;
+        if (rs.getObject(index) != null) {
+            stringData = rs.getObject(index).toString();
+        }
+        return new StringColumn(stringData, metaData.getColumnLabel(index));
 
-	}
+    }
 
 }

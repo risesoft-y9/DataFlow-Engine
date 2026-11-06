@@ -1,16 +1,10 @@
 package net.risedata.rpc.consumer.factory;
 
-import net.risedata.rpc.annotation.RPCScan;
-import net.risedata.rpc.consumer.annotation.RPCClient;
-import net.risedata.rpc.consumer.config.ConsumerApplication;
-import net.risedata.rpc.consumer.config.LoadingConfig;
-import net.risedata.rpc.consumer.core.BasedConnectionManager;
-import net.risedata.rpc.consumer.core.ConnectionManager;
-import net.risedata.rpc.consumer.invoke.ProxyInvoke;
-import net.risedata.rpc.consumer.listener.ExceptionListener;
-import net.risedata.rpc.consumer.utils.ConsumerUtils;
-import net.risedata.rpc.provide.config.Application;
-import net.risedata.rpc.utils.LClassLoader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -24,7 +18,17 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.PropertyResolver;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import net.risedata.rpc.annotation.RPCScan;
+import net.risedata.rpc.consumer.annotation.RPCClient;
+import net.risedata.rpc.consumer.config.ConsumerApplication;
+import net.risedata.rpc.consumer.config.LoadingConfig;
+import net.risedata.rpc.consumer.core.BasedConnectionManager;
+import net.risedata.rpc.consumer.core.ConnectionManager;
+import net.risedata.rpc.consumer.invoke.ProxyInvoke;
+import net.risedata.rpc.consumer.listener.ExceptionListener;
+import net.risedata.rpc.consumer.utils.ConsumerUtils;
+import net.risedata.rpc.provide.config.Application;
+import net.risedata.rpc.utils.LClassLoader;
 
 /**
  * @description: 此工厂用于实现预加载的bean的加载
@@ -41,7 +45,8 @@ public class ClientBeanFactory implements BeanFactoryPostProcessor, ApplicationC
         RPCClient rpcClinet;
         ProxyInvoke proxyInvoke;
         Object proxy;
-        DefaultListableBeanFactory factory = (DefaultListableBeanFactory) ConsumerApplication.applicationContext.getAutowireCapableBeanFactory();
+        DefaultListableBeanFactory factory =
+            (DefaultListableBeanFactory)ConsumerApplication.applicationContext.getAutowireCapableBeanFactory();
         invokeMap = new HashMap<>(rpcClass.size());
         BeanDefinition beanDefinition;
         String apiName;
@@ -57,9 +62,9 @@ public class ClientBeanFactory implements BeanFactoryPostProcessor, ApplicationC
             rpcClinet = AnnotationUtils.findAnnotation(type, RPCClient.class);
             apiName = StringUtils.isEmpty(rpcClinet.name()) ? type.getName() : ConsumerUtils.getValue(rpcClinet.name());
             proxyInvoke = new ProxyInvoke(apiName);
-            proxy = ProxyFactory.getProxy(new Class[]{type}, proxyInvoke);
+            proxy = ProxyFactory.getProxy(new Class[] {type}, proxyInvoke);
             beanFactory.registerResolvableDependency(type, proxy);
-            //将熔断的bean 也加载到工厂中
+            // 将熔断的bean 也加载到工厂中
             if (rpcClinet.degrade() != ExceptionListener.class) {
                 beanDefinition = new GenericBeanDefinition();
                 beanDefinition.setBeanClassName(rpcClinet.degrade().getName());
@@ -67,14 +72,14 @@ public class ClientBeanFactory implements BeanFactoryPostProcessor, ApplicationC
                 factory.registerBeanDefinition(rpcClinet.degrade().getName(), beanDefinition);
             }
             invokeMap.put(type, proxyInvoke);
-            managerName = StringUtils.isEmpty(rpcClinet.managerName()) ? type.getName() + "Manager" : ConsumerUtils.getValue(rpcClinet.managerName());
-            //加载我自己动态代理的bean
+            managerName = StringUtils.isEmpty(rpcClinet.managerName()) ? type.getName() + "Manager"
+                : ConsumerUtils.getValue(rpcClinet.managerName());
+            // 加载我自己动态代理的bean
             ConnectionManager connectionManager = ConnectionManagerFactory.getInstance(managerName);
             if (connectionManager == null) {
                 connectionManager = LoadingConfig.getNullConnectionManager();
                 registerManager(beanFactory, connectionManager, managerName, type);
             }
-
 
         }
 
@@ -84,13 +89,14 @@ public class ClientBeanFactory implements BeanFactoryPostProcessor, ApplicationC
      * 将connectionManager 放到spring 工厂中以及自己的工厂
      *
      * @param beanFactory spring 工厂
-     * @param manager     manager
-     * @param name        对应的名字
+     * @param manager manager
+     * @param name 对应的名字
      */
-    private void registerManager(ConfigurableListableBeanFactory beanFactory, BasedConnectionManager manager, String name, Class<?> cla) {
+    private void registerManager(ConfigurableListableBeanFactory beanFactory, BasedConnectionManager manager,
+        String name, Class<?> cla) {
         ConnectionManagerFactory.registerManage(name, manager);
         if (cla != null) {
-            ConnectionManagerFactory.registerManage(cla, (ConnectionManager) manager);
+            ConnectionManagerFactory.registerManage(cla, (ConnectionManager)manager);
         }
         beanFactory.registerSingleton(name, manager);
     }

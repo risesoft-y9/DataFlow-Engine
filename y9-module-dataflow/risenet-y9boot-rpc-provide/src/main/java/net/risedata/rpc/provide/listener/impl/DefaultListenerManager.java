@@ -1,11 +1,11 @@
 package net.risedata.rpc.provide.listener.impl;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import net.risedata.rpc.provide.listener.Listener;
 import net.risedata.rpc.provide.listener.ListenerManager;
 import net.risedata.rpc.provide.net.ClientConnection;
-
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @description: 安全管理器默认的实现

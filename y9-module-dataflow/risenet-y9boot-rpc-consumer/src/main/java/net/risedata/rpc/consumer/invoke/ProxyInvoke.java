@@ -1,18 +1,17 @@
 package net.risedata.rpc.consumer.invoke;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Map;
+
 import net.risedata.rpc.consumer.core.Connection;
 import net.risedata.rpc.consumer.core.ConnectionManager;
 import net.risedata.rpc.consumer.exceptions.CarryRequestedException;
 import net.risedata.rpc.consumer.listener.ExceptionListener;
 import net.risedata.rpc.consumer.model.APIDescription;
 import net.risedata.rpc.consumer.result.value.ReturnValueHandle;
-import net.risedata.rpc.consumer.result.value.impl.SyncResultHandle;
 import net.risedata.rpc.model.Request;
-
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Map;
 
 /**
  * @description: 动态代理类时的实现
@@ -41,7 +40,6 @@ public class ProxyInvoke implements InvocationHandler, InvokeHandle {
      */
     private ExceptionListener exceptionListener;
 
-
     public void setExceptionListener(ExceptionListener exceptionListener) {
         this.exceptionListener = exceptionListener;
     }
@@ -57,7 +55,6 @@ public class ProxyInvoke implements InvocationHandler, InvokeHandle {
 
     }
 
-
     private Object toException(Method method, Object[] args, Exception e) throws Throwable {
         Object res = null;
         if (fusing != null) {
@@ -66,7 +63,7 @@ public class ProxyInvoke implements InvocationHandler, InvokeHandle {
         if (exceptionListener != null) {
             Request request = null;
             if (e instanceof CarryRequestedException) {
-                request = ((CarryRequestedException) e).getRequest();
+                request = ((CarryRequestedException)e).getRequest();
             }
             if (res != null) {
                 exceptionListener.onException(e, method.getReturnType(), request);
@@ -92,16 +89,16 @@ public class ProxyInvoke implements InvocationHandler, InvokeHandle {
         this.fusing = fusing;
     }
 
-
     @Override
-    public Object invoke(ConnectionManager connectionManager, APIDescription apiDescription, Method method, Object[] args) throws Throwable {
+    public Object invoke(ConnectionManager connectionManager, APIDescription apiDescription, Method method,
+        Object[] args) throws Throwable {
 
         try {
             ReturnValueHandle returnValueHandle = apiDescription.getReturnValueHandle();
             Connection connection = connectionManager.getConnection();
-            return returnValueHandle.getValue(connection.executionSync(apiDescription.getMapping()
-                            , apiDescription.getTimeOut(), args)
-                            , apiDescription.getReturnType(), args);
+            return returnValueHandle.getValue(
+                connection.executionSync(apiDescription.getMapping(), apiDescription.getTimeOut(), args),
+                apiDescription.getReturnType(), args);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(apiDescription);

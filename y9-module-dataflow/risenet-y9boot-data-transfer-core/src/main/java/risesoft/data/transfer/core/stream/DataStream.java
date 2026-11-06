@@ -11,5 +11,4 @@ import risesoft.data.transfer.core.close.Closed;
  */
 public interface DataStream extends Closed {
 
-
 }

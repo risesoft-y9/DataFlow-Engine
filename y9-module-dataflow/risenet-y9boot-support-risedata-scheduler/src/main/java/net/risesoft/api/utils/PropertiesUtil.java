@@ -1,15 +1,19 @@
 package net.risesoft.api.utils;
 
-import com.alibaba.fastjson.JSONObject;
-
-import net.risesoft.api.persistence.model.config.Config;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.*;
-import java.util.Properties;
-import java.util.Map;
-import java.util.HashMap;
+import com.alibaba.fastjson.JSONObject;
+
+import net.risesoft.api.persistence.model.config.Config;
 
 /**
  * @author gyn
@@ -18,15 +22,14 @@ import java.util.HashMap;
 public class PropertiesUtil {
     private final static String PATH = System.getProperty("user.dir");
 
-
-
     public static Map<String, String> stringToMap(String content) throws Exception {
         Properties properties = new Properties();
         properties.load(new ByteArrayInputStream("ss:':'".getBytes()));
-        Map<String, String> map = new HashMap<String, String>((Map) properties);
+        Map<String, String> map = new HashMap<String, String>((Map)properties);
         return map;
     }
-    public  static Map<String, Object> getMap(Config config) throws Exception {
+
+    public static Map<String, Object> getMap(Config config) throws Exception {
         String content = config.getContent();
         switch (config.getType()) {
             case Config.YAML_TYPE:
@@ -44,10 +47,11 @@ public class PropertiesUtil {
         }
         return null;
     }
+
     public static Map<String, String> getMap(String path) {
         Properties properties = new Properties();
         properties = readFile(PATH + path);
-        Map<String, String> map = new HashMap<String, String>((Map) properties);
+        Map<String, String> map = new HashMap<String, String>((Map)properties);
         return map;
     }
 

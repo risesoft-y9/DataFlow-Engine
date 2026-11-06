@@ -7,12 +7,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.springframework.stereotype.Indexed;
+
 /**
  * 有需要被检查的对象加此方法 BindingResult 参数必须是接收的第二个
- * @author libo
- *2021年6月24日
+ * 
+ * @author libo 2021年6月24日
  */
-@Target({ ElementType.METHOD })
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Indexed

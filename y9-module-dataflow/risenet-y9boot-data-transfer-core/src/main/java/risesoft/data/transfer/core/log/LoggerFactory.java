@@ -9,19 +9,19 @@ package risesoft.data.transfer.core.log;
  */
 public interface LoggerFactory {
 
-	/**
-	 * 获取日志类
-	 * 
-	 * @param type
-	 * @return
-	 */
-	Logger getLogger(String name);
+    /**
+     * 获取日志类
+     * 
+     * @param type
+     * @return
+     */
+    Logger getLogger(String name);
 
-	/**
-	 * 类型
-	 * 
-	 * @param type
-	 * @return
-	 */
-	Logger getLogger(Class<?> type);
+    /**
+     * 类型
+     * 
+     * @param type
+     * @return
+     */
+    Logger getLogger(Class<?> type);
 }

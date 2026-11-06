@@ -14,14 +14,13 @@ public class LinkedConnectionListener implements ConnectionListener {
         listeners.add(listener);
     }
 
-
-    public void addListener(Collection<ConnectionListener> listeners){
+    public void addListener(Collection<ConnectionListener> listeners) {
         listeners.addAll(listeners);
     }
 
     @Override
     public void onConnection(HostAndPortConnection connection) {
-        if (listeners.size()>0){
+        if (listeners.size() > 0) {
             for (ConnectionListener listener : listeners) {
                 listener.onConnection(connection);
             }
@@ -30,7 +29,7 @@ public class LinkedConnectionListener implements ConnectionListener {
 
     @Override
     public void onClose(HostAndPortConnection connection) {
-        if (listeners.size()>0){
+        if (listeners.size() > 0) {
             for (ConnectionListener listener : listeners) {
                 listener.onClose(connection);
             }

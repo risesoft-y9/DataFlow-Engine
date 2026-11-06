@@ -1,6 +1,5 @@
 package net.risedata.rpc.consumer.result.value;
 
-
 import net.risedata.rpc.consumer.result.SyncResult;
 import net.risedata.rpc.factory.model.ReturnType;
 
@@ -12,6 +11,7 @@ import net.risedata.rpc.factory.model.ReturnType;
 public interface ReturnValueHandle {
     /**
      * 是否为此处理器处理
+     * 
      * @param returnType 返回值包装类
      * @return 是/否
      */

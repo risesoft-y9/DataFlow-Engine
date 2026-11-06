@@ -14,16 +14,12 @@ public class WeightPollBalancer extends AbstractWeightBalancer {
      */
     private int index = 0;
 
-
-     synchronized int getIndex(int maxIndex) {
+    synchronized int getIndex(int maxIndex) {
 
         if (index + 1 > maxIndex) {
             index = 0;
         }
         return index++;
     }
-
-
-
 
 }

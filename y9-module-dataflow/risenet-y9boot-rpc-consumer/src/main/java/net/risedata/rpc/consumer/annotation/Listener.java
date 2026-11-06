@@ -1,10 +1,14 @@
 package net.risedata.rpc.consumer.annotation;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 import org.springframework.stereotype.Indexed;
 
 import net.risedata.rpc.consumer.listener.ListenerBack;
-
-import java.lang.annotation.*;
 
 /**
  * @Description : 此注解表示这是一个监听器
@@ -20,12 +24,14 @@ import java.lang.annotation.*;
 public @interface Listener {
     /**
      * 事件名字
+     * 
      * @return
      */
     String value();
 
     /**
      * 当事件回调出现异常时
+     * 
      * @return
      */
     Class<ListenerBack> backError() default ListenerBack.class;

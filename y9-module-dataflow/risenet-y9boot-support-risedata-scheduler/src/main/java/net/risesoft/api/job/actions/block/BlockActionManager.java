@@ -1,5 +1,10 @@
 package net.risesoft.api.job.actions.block;
 
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import net.risesoft.api.exceptions.JobException;
 import net.risesoft.api.job.JobContext;
 import net.risesoft.api.job.TaskExecutorService;
@@ -7,10 +12,6 @@ import net.risesoft.api.job.actions.JobAction;
 import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.api.utils.LResult;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 /**
  * @Description : 阻塞策略分发器

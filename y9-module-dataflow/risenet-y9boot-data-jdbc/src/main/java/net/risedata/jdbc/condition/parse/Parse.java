@@ -7,5 +7,6 @@ import net.risedata.jdbc.config.model.BeanConfig;
 
 public interface Parse {
     Pattern getPattern();
-    String parse(String group,BeanConfig bc,Matcher m);
+
+    String parse(String group, BeanConfig bc, Matcher m);
 }

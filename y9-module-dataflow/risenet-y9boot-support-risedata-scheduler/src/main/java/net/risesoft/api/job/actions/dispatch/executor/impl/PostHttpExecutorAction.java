@@ -1,6 +1,5 @@
 package net.risesoft.api.job.actions.dispatch.executor.impl;
 
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.springframework.stereotype.Component;

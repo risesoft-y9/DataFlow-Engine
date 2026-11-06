@@ -1,10 +1,14 @@
 package net.risedata.rpc.consumer.annotation;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 import org.springframework.stereotype.Indexed;
 
 import net.risedata.rpc.consumer.invoke.InvokeHandle;
-
-import java.lang.annotation.*;
 
 /**
  * 放到方法上提示该方法为api
@@ -22,17 +26,15 @@ public @interface API {
     String name() default "";
 
     /**
-     * 超时时间 当 为 负数的时候则 不会使用此超时时间
-     * 如果不需要超时时间 则设置为 0
+     * 超时时间 当 为 负数的时候则 不会使用此超时时间 如果不需要超时时间 则设置为 0
      */
     int timeOut() default -1;
 
     /**
-     * 此api 对应的执行invoke 的handle
-     * 此handle 必须在spring 工厂中
+     * 此api 对应的执行invoke 的handle 此handle 必须在spring 工厂中
+     * 
      * @return invoke handle
      */
     Class<? extends InvokeHandle> invokeHandle() default InvokeHandle.class;
-
 
 }

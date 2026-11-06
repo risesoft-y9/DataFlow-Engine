@@ -9,25 +9,28 @@ import net.risesoft.y9public.entity.DataApiOnlineInfoEntity;
 
 public interface DataApiOnlineService {
 
-	/**
-	 * 根据id删除接口数据
-	 * @param id
-	 * @return
-	 */
-	Y9Result<List<String>> deleteData(String id);
+    /**
+     * 根据id删除接口数据
+     * 
+     * @param id
+     * @return
+     */
+    Y9Result<List<String>> deleteData(String id);
 
-	/**
-	 * 保存接口信息
-	 * @param entity
-	 * @return
-	 */
-	Y9Result<DataApiOnlineEntity> saveData(DataApiOnlineEntity entity, DataApiOnlineInfoEntity infoEntity);
-	
-	/**
-	 * 获取tree
-	 * @param id
-	 * @return
-	 */
-	List<Map<String, Object>> getTree(String id);
-	
+    /**
+     * 保存接口信息
+     * 
+     * @param entity
+     * @return
+     */
+    Y9Result<DataApiOnlineEntity> saveData(DataApiOnlineEntity entity, DataApiOnlineInfoEntity infoEntity);
+
+    /**
+     * 获取tree
+     * 
+     * @param id
+     * @return
+     */
+    List<Map<String, Object>> getTree(String id);
+
 }

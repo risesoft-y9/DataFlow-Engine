@@ -10,11 +10,11 @@ import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
  * @date 2024年12月11日
  * @author lb
  */
-public abstract class NullCharValuePreparedStatementHandle implements PreparedStatementHandle{
+public abstract class NullCharValuePreparedStatementHandle implements PreparedStatementHandle {
 
-	@Override
-	public String nullValue(DataBaseType dataBaseType) {
-		return "''";
-	}
+    @Override
+    public String nullValue(DataBaseType dataBaseType) {
+        return "''";
+    }
 
 }

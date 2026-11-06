@@ -1,7 +1,5 @@
 package net.risedata.rpc.provide.listener;
 
-
-
 /**
  * @description: 返回值异步操作接口
  * @Author lb176
@@ -27,6 +25,7 @@ public interface SyncResult {
 
     /**
      * 拿到 result
+     * 
      * @return result
      */
     Result getResult();

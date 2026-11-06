@@ -8,8 +8,8 @@ package risesoft.data.transfer.core.close;
  * @author lb
  */
 public interface Closed {
-	/**
-	 * 关闭 通常代表着上游处理任务结束
-	 */
-	void close() throws Exception;
+    /**
+     * 关闭 通常代表着上游处理任务结束
+     */
+    void close() throws Exception;
 }

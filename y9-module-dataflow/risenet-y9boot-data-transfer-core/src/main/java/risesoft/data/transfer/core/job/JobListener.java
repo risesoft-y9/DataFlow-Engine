@@ -10,24 +10,24 @@ import risesoft.data.transfer.core.context.JobContext;
  * @author lb
  */
 public interface JobListener {
-	/**
-	 * 当有异常时触发
-	 * 
-	 * @param e
-	 */
-	void onError(Throwable e);
+    /**
+     * 当有异常时触发
+     * 
+     * @param e
+     */
+    void onError(Throwable e);
 
-	/**
-	 * 失败触发
-	 * 
-	 * @param jobContext
-	 */
-	void onFailed(JobContext jobContext);
+    /**
+     * 失败触发
+     * 
+     * @param jobContext
+     */
+    void onFailed(JobContext jobContext);
 
-	/**
-	 * 任务执行成功触发
-	 * 
-	 * @param jobContext
-	 */
-	void onSuccess(JobContext jobContext);
+    /**
+     * 任务执行成功触发
+     * 
+     * @param jobContext
+     */
+    void onSuccess(JobContext jobContext);
 }

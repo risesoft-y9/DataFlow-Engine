@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
 
 /**
  * 降序排序
- * @author libo
- *2020年10月15日
+ * 
+ * @author libo 2020年10月15日
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -19,18 +19,20 @@ import java.lang.annotation.Target;
 @Inherited
 @Repeatable(Descs.class)
 public @interface Desc {
-	/**
-	 * 排序级别 越小越优先
-	 * @return
-	 */
+    /**
+     * 排序级别 越小越优先
+     * 
+     * @return
+     */
     int leve() default 0;
-    
+
     /**
      * 表达式什么情况下生效
+     * 
      * @return
      */
     String expression() default "";
-    
+
     /**
      * 根据表达式返回级别 (未实现)
      */

@@ -10,16 +10,16 @@ import net.risedata.jdbc.repository.parse.handles.method.MethodNameBuilder;
  */
 public class ContainingInstructionHandle extends ConditionInstructionHandleAdapter {
 
-	public ContainingInstructionHandle() {
-		super("Containing", null);
-	}
+    public ContainingInstructionHandle() {
+        super("Containing", null);
+    }
 
-	@Override
-	public void handle(MethodNameBuilder builder, String backField, String condition) {
-		int index = builder.getParameterIndex(backField);
-		builder.appendBody("$"+index+"+=\"%\";");
-		builder.appendBody("$" + index + "= $" + index + "\"%\";");
-		builder.getSqlbuilder().where(builder.getColumn(backField) + " like " + builder.getParameterArgs(backField));
-	}
+    @Override
+    public void handle(MethodNameBuilder builder, String backField, String condition) {
+        int index = builder.getParameterIndex(backField);
+        builder.appendBody("$" + index + "+=\"%\";");
+        builder.appendBody("$" + index + "= $" + index + "\"%\";");
+        builder.getSqlbuilder().where(builder.getColumn(backField) + " like " + builder.getParameterArgs(backField));
+    }
 
 }

@@ -1,7 +1,15 @@
 package net.risedata.rpc.provide.filter;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import ch.qos.logback.core.joran.spi.ElementSelector;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.annotation.AnnotationUtils;
+
 import net.risedata.rpc.model.Request;
 import net.risedata.rpc.provide.annotation.RPCFilter;
 import net.risedata.rpc.provide.config.Application;
@@ -10,14 +18,6 @@ import net.risedata.rpc.provide.filter.impl.AfterLinkedRequestFilter;
 import net.risedata.rpc.provide.filter.impl.BeforeLinkedRequestFilter;
 import net.risedata.rpc.provide.filter.impl.FilterNodeApplication;
 import net.risedata.rpc.utils.AntPathMatcher;
-
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextClosedEvent;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.core.annotation.AnnotationUtils;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Description :管理过滤器的操作
@@ -28,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class FilterManager implements ApplicationListener<ContextRefreshedEvent> {
 
-
     public static final String ALL = "**";
 
     private static final AfterLinkedRequestFilter AFTER_LINKED_REQUEST_FILTER = new AfterLinkedRequestFilter();
@@ -38,10 +37,7 @@ public class FilterManager implements ApplicationListener<ContextRefreshedEvent>
     private static List<FilterConfig> filterConfigs = new ArrayList<>();
     private static final AntPathMatcher MATCHER = new AntPathMatcher();
 
-
     private static final Map<String, FilterContextCache> FILTER_CONTEXT_CACHE_MAP = new ConcurrentHashMap<>();
-
-
 
     public static FilterContextCache createFilterContext(String url, Request request) {
         FilterContextCache cache = FILTER_CONTEXT_CACHE_MAP.get(url);
@@ -65,8 +61,9 @@ public class FilterManager implements ApplicationListener<ContextRefreshedEvent>
                         }
 
                         if (filters.size() > 0) {
-                            //添加一个linked过滤器
-                            FilterNodeApplication filterNodeApplication = new FilterNodeApplication(AFTER_LINKED_REQUEST_FILTER, BEFORE_LINKED_REQUEST_FILTER);
+                            // 添加一个linked过滤器
+                            FilterNodeApplication filterNodeApplication =
+                                new FilterNodeApplication(AFTER_LINKED_REQUEST_FILTER, BEFORE_LINKED_REQUEST_FILTER);
                             for (Filter filter : filters) {
                                 filterNodeApplication.addFilter(filter);
                             }
@@ -88,11 +85,10 @@ public class FilterManager implements ApplicationListener<ContextRefreshedEvent>
 
     }
 
-    public static void clear(){
+    public static void clear() {
         filterConfigs.clear();
         FILTER_CONTEXT_CACHE_MAP.clear();
     }
-
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -124,7 +120,5 @@ public class FilterManager implements ApplicationListener<ContextRefreshedEvent>
         }
 
     }
-
-
 
 }

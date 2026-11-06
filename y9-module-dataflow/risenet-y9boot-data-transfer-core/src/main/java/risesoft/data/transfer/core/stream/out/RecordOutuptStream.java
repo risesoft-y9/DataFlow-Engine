@@ -13,20 +13,20 @@ import risesoft.data.transfer.core.record.Record;
  * @author lb
  */
 public interface RecordOutuptStream extends Closed {
-	/**
-	 * 输出一条record
-	 * 
-	 * @param record
-	 */
-	void writer(Record record);
+    /**
+     * 输出一条record
+     * 
+     * @param record
+     */
+    void writer(Record record);
 
-	/**
-	 * 批量输出数据
-	 * 
-	 * @param record
-	 */
-	void writer(List<Record> record);
-	
-	void flush();
+    /**
+     * 批量输出数据
+     * 
+     * @param record
+     */
+    void writer(List<Record> record);
+
+    void flush();
 
 }

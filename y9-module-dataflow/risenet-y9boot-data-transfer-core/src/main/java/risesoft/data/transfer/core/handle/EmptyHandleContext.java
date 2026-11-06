@@ -1,7 +1,5 @@
 package risesoft.data.transfer.core.handle;
 
-
-
 /**
  * 空的上下文
  * 
@@ -13,11 +11,11 @@ package risesoft.data.transfer.core.handle;
 @SuppressWarnings("rawtypes")
 public class EmptyHandleContext extends HandleContext {
 
-	public static EmptyHandleContext EMPTY = new EmptyHandleContext();
+    public static EmptyHandleContext EMPTY = new EmptyHandleContext();
 
-	@Override
-	public void handle(DoHandle doHandle) {
+    @Override
+    public void handle(DoHandle doHandle) {
 
-	}
+    }
 
 }

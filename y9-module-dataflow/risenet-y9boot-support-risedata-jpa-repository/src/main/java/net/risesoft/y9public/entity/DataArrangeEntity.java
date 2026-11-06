@@ -20,45 +20,45 @@ import net.risesoft.base.BaseEntity;
 @Data
 public class DataArrangeEntity extends BaseEntity {
 
-	private static final long serialVersionUID = -62125486228679758L;
+    private static final long serialVersionUID = -62125486228679758L;
 
-	@Id
-	@Column(name = "ID", length = 38, nullable = false)
-	@Comment(value = "主键")
-	private String id;
+    @Id
+    @Column(name = "ID", length = 38, nullable = false)
+    @Comment(value = "主键")
+    private String id;
 
-	@Column(name = "NAME", length = 600, nullable = false)
-	@Comment(value = "名称")
-	private String name;
-	
-	@Column(name = "CONTENT", length = 1200)
-	@Comment(value = "编排描述")
-	private String content;
-	
-	@Lob
-	@Column(name = "XMLDATA")
-	@Comment(value = "流程内容")
-	private String xmlData;
-	
-	@Column(name = "PATTERN", nullable = false)
-	@Comment(value = "状态：1-开启，0-关闭")
-	@ColumnDefault("0")
-	private Integer pattern;
-	
-	@Column(name = "USERID", length = 50)
-	@Comment(value = "创建者ID")
-	private String userId;
-	
-	@Column(name = "USERNAME", length = 50)
-	@Comment(value = "创建者")
-	private String userName;
-	
-	@Column(name = "TENANTID", length = 50)
-	@Comment(value = "租户ID")
-	private String tenantId;
-	
-	@Column(name = "CRON", length = 50)
-	@Comment(value = "定时表达式")
-	private String cron;
+    @Column(name = "NAME", length = 600, nullable = false)
+    @Comment(value = "名称")
+    private String name;
+
+    @Column(name = "CONTENT", length = 1200)
+    @Comment(value = "编排描述")
+    private String content;
+
+    @Lob
+    @Column(name = "XMLDATA")
+    @Comment(value = "流程内容")
+    private String xmlData;
+
+    @Column(name = "PATTERN", nullable = false)
+    @Comment(value = "状态：1-开启，0-关闭")
+    @ColumnDefault("0")
+    private Integer pattern;
+
+    @Column(name = "USERID", length = 50)
+    @Comment(value = "创建者ID")
+    private String userId;
+
+    @Column(name = "USERNAME", length = 50)
+    @Comment(value = "创建者")
+    private String userName;
+
+    @Column(name = "TENANTID", length = 50)
+    @Comment(value = "租户ID")
+    private String tenantId;
+
+    @Column(name = "CRON", length = 50)
+    @Comment(value = "定时表达式")
+    private String cron;
 
 }

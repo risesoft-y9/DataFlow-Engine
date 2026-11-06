@@ -12,6 +12,5 @@ import net.risedata.rpc.model.Response;
 @FunctionalInterface
 public interface SendFunction {
 
-
-    void send( Response response,Send send) throws  Exception;
+    void send(Response response, Send send) throws Exception;
 }

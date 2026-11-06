@@ -11,13 +11,13 @@ import risesoft.data.transfer.core.util.strings.handles.StringCastValueHandle;
  */
 public class StringToShortHandle implements StringCastValueHandle<Short> {
 
-	public Class<?>[] getTypes() {
-		return new Class<?>[] { short.class, Short.class };
-	}
+    public Class<?>[] getTypes() {
+        return new Class<?>[] {short.class, Short.class};
+    }
 
-	@Override
-	public Short getValue(String value) {
-		return Short.valueOf(value);
-	}
+    @Override
+    public Short getValue(String value) {
+        return Short.valueOf(value);
+    }
 
 }

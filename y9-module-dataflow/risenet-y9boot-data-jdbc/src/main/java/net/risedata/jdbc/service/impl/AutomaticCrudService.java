@@ -17,49 +17,49 @@ import net.risedata.jdbc.executor.update.UpdateExecutor;
  * @param <ID>
  */
 public class AutomaticCrudService<T, ID> extends CrudServiceImpl<T, ID> {
-	@Autowired
-	private SearchExecutor searchExecutor;
-	@Autowired
-	private InsertExecutor insertExecutor;
-	@Autowired
-	private UpdateExecutor updateExecutor;
-	@Autowired
-	private DeleteExecutor deleteExecutor;
+    @Autowired
+    private SearchExecutor searchExecutor;
+    @Autowired
+    private InsertExecutor insertExecutor;
+    @Autowired
+    private UpdateExecutor updateExecutor;
+    @Autowired
+    private DeleteExecutor deleteExecutor;
 
-	@Override
-	public SearchExecutor getSearchExecutor() {
-		return searchExecutor;
-	}
+    @Override
+    public SearchExecutor getSearchExecutor() {
+        return searchExecutor;
+    }
 
-	@Override
-	public InsertExecutor getInsertExecutor() {
-		return insertExecutor;
-	}
+    @Override
+    public InsertExecutor getInsertExecutor() {
+        return insertExecutor;
+    }
 
-	@Override
-	public DeleteExecutor getDeleteExecutor() {
-		return deleteExecutor;
-	}
+    @Override
+    public DeleteExecutor getDeleteExecutor() {
+        return deleteExecutor;
+    }
 
-	@Override
-	public UpdateExecutor getUpdateExecutor() {
-		return updateExecutor;
-	}
+    @Override
+    public UpdateExecutor getUpdateExecutor() {
+        return updateExecutor;
+    }
 
-	@Override
-	public Class<T> getT() {
-		return T;
-	}
+    @Override
+    public Class<T> getT() {
+        return T;
+    }
 
-	@Override
-	public List<T> searchAll() {
-		return getSearchExecutor().searchForList(T, T);
-	}
+    @Override
+    public List<T> searchAll() {
+        return getSearchExecutor().searchForList(T, T);
+    }
 
-	@Override
-	public List<T> findByIds(ID... ids) {
-		// TODO Auto-generated method stub
-		return getSearchExecutor().findByIds(T, T, ids);
-	}
+    @Override
+    public List<T> findByIds(ID... ids) {
+        // TODO Auto-generated method stub
+        return getSearchExecutor().findByIds(T, T, ids);
+    }
 
 }

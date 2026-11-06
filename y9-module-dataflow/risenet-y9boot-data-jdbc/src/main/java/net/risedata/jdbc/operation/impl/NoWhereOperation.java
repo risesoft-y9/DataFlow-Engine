@@ -13,15 +13,15 @@ import net.risedata.jdbc.config.model.FieldConfig;
  */
 public class NoWhereOperation extends SimpleOperation {
 
-	@Override
-	public boolean where(FieldConfig field, List<Object> args, StringBuilder sql, Map<String, Object> valueMap,
-			BeanConfig bc, Map<String, Object> excludeMap) {
-		return false;
-	}
+    @Override
+    public boolean where(FieldConfig field, List<Object> args, StringBuilder sql, Map<String, Object> valueMap,
+        BeanConfig bc, Map<String, Object> excludeMap) {
+        return false;
+    }
 
-	@Override
-	public int getOperate() {
-		return 6;
-	}
+    @Override
+    public int getOperate() {
+        return 6;
+    }
 
 }

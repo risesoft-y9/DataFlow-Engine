@@ -1,7 +1,8 @@
 package net.risedata.rpc.consumer.core;
 
-import io.netty.channel.ChannelFuture;
 import net.risedata.rpc.consumer.listener.ConnectionListener;
+
+import io.netty.channel.ChannelFuture;
 
 /**
  * @description: 基础的连接管理器
@@ -10,10 +11,9 @@ import net.risedata.rpc.consumer.listener.ConnectionListener;
  */
 public interface BasedConnectionManager {
     /**
-     * ps:每个connectionManger的实现有不同的格式
-     * 根据一个特定的地址进行连接
+     * ps:每个connectionManger的实现有不同的格式 根据一个特定的地址进行连接
      *
-     * @param url  url
+     * @param url url
      */
     ChannelFuture connection(String url);
 
@@ -26,7 +26,6 @@ public interface BasedConnectionManager {
      */
     ChannelFuture connectionToHost(String host, int port);
 
-
     /**
      * 根据 host和port进行连接
      *
@@ -35,7 +34,6 @@ public interface BasedConnectionManager {
      * @return 返回是否成功连接
      */
     boolean connectionAwait(String host, int port);
-
 
     /**
      * 添加一个连接的监听器

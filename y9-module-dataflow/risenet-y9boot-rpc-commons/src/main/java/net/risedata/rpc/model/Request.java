@@ -1,11 +1,12 @@
 package net.risedata.rpc.model;
 
+import java.util.Arrays;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import io.netty.util.CharsetUtil;
 
-import java.util.Arrays;
+import io.netty.util.CharsetUtil;
 
 /**
  * 执行的参数
@@ -38,14 +39,12 @@ public class Request {
      */
     private long id;
 
-
     public static Request as(Msg msg) {
         return new Request(msg.getMsg());
 
     }
 
-    public Request() {
-    }
+    public Request() {}
 
     /**
      * 使用jsonstring的byte转换为对象
@@ -68,12 +67,11 @@ public class Request {
         this.type = type;
     }
 
-
     public Request(String url, long id, Object... args) {
-        this(url,RPC,id,args);
+        this(url, RPC, id, args);
     }
 
-    public Request(String url,int type, long id, Object... args) {
+    public Request(String url, int type, long id, Object... args) {
         this(url);
         this.type = type;
         if (args != null && args.length > 0) {
@@ -105,11 +103,9 @@ public class Request {
         return JSON.toJSONString(this).getBytes(CharsetUtil.UTF_8);
     }
 
-
     public Long getId() {
         return id;
     }
-
 
     public String getUrl() {
         return url;
@@ -121,11 +117,6 @@ public class Request {
 
     @Override
     public String toString() {
-        return "Request{" +
-                "url='" + url + '\'' +
-                ", type=" + type +
-                ", args=" + args +
-                ", id=" + id +
-                '}';
+        return "Request{" + "url='" + url + '\'' + ", type=" + type + ", args=" + args + ", id=" + id + '}';
     }
 }

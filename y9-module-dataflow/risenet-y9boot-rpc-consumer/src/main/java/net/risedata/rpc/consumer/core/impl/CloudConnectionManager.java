@@ -1,6 +1,13 @@
 package net.risedata.rpc.consumer.core.impl;
 
-import io.netty.channel.ChannelFuture;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+
 import net.risedata.rpc.consumer.config.ConsumerApplication;
 import net.risedata.rpc.consumer.core.Connection;
 import net.risedata.rpc.consumer.core.HostAndPortConnection;
@@ -9,13 +16,7 @@ import net.risedata.rpc.consumer.task.CloudTask;
 import net.risedata.rpc.consumer.task.RepetitionedTask;
 import net.risedata.rpc.provide.config.Application;
 
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import io.netty.channel.ChannelFuture;
 
 /**
  * @description: 与springCloud 整合的连接管理器
@@ -54,11 +55,9 @@ public class CloudConnectionManager extends HostAndPortConnectionManager {
         this.discoveryClient = discovery;
     }
 
-
     public void setDiscoveryClient(DiscoveryClient discoveryClient) {
         this.discoveryClient = discoveryClient;
     }
-
 
     /**
      * 注意服务需要加前缀 cloud: 连接一个服务放到此管理器的连接池
@@ -75,7 +74,8 @@ public class CloudConnectionManager extends HostAndPortConnectionManager {
         Integer port = serviceUrl.indexOf(":");
         boolean isFixedPort = false;
         int portEnd = serviceUrl.indexOf("/");
-        String serviceId = port != -1 ? serviceUrl.substring(0, port) : portEnd == -1 ? serviceUrl : serviceUrl.substring(0, portEnd);
+        String serviceId =
+            port != -1 ? serviceUrl.substring(0, port) : portEnd == -1 ? serviceUrl : serviceUrl.substring(0, portEnd);
         if (port == -1) {
             port = null;
         } else {
@@ -98,10 +98,15 @@ public class CloudConnectionManager extends HostAndPortConnectionManager {
                 port = ipAndPortMap.get(id);
                 if (port == null) {
                     try {
-                        port = ConsumerApplication.REST_TEMPLATE.getForObject("http://" + instance.getHost() + ":" + instance.getPort() + serviceUrl.substring(serviceId.length()) + Application.GET_PORT_URL, Integer.class);
+                        port =
+                            ConsumerApplication.REST_TEMPLATE.getForObject(
+                                "http://" + instance.getHost() + ":" + instance.getPort()
+                                    + serviceUrl.substring(serviceId.length()) + Application.GET_PORT_URL,
+                                Integer.class);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        System.out.println("http://" + instance.getHost() + ":" + instance.getPort() + serviceUrl.substring(serviceId.length()) + Application.GET_PORT_URL);
+                        System.out.println("http://" + instance.getHost() + ":" + instance.getPort()
+                            + serviceUrl.substring(serviceId.length()) + Application.GET_PORT_URL);
                         continue;
                     }
                     ipAndPortMap.put(id, port);
@@ -129,10 +134,10 @@ public class CloudConnectionManager extends HostAndPortConnectionManager {
                 }
             }
             cloudTaskMap.put(instanceId, Byte.MIN_VALUE);
-            //标记这个实例已经有连接过
-            //如果连接了一次就不要再次连接了
+            // 标记这个实例已经有连接过
+            // 如果连接了一次就不要再次连接了
             if (unEnableMap.containsKey(instanceId)) {
-                Connection connection = (Connection) unEnableMap.remove(instanceId);
+                Connection connection = (Connection)unEnableMap.remove(instanceId);
                 if (connection.enable()) {
                     if (!isFixedPort) {
                         port = null;
@@ -142,7 +147,7 @@ public class CloudConnectionManager extends HostAndPortConnectionManager {
             }
             this.connectionToHost(instance.getHost(), port).addListener((r) -> {
                 if (!r.isSuccess()) {
-                    //连接失败从缓存中删除port的信息除此之外会自动添加端口重连信息
+                    // 连接失败从缓存中删除port的信息除此之外会自动添加端口重连信息
                     ipAndPortMap.remove(id);
                 }
             });
@@ -152,7 +157,7 @@ public class CloudConnectionManager extends HostAndPortConnectionManager {
             }
 
         }
-        //添加定时轮询机制
+        // 添加定时轮询机制
         if (!cloudTaskMap.containsKey(serviceName)) {
             cloudTaskMap.put(serviceName, Byte.MIN_VALUE);
             ConsumerApplication.scheduleTask.addTask(new RepetitionedTask(10, new CloudTask(this, serviceName)));
@@ -161,14 +166,16 @@ public class CloudConnectionManager extends HostAndPortConnectionManager {
         if (connectionSize == 0) {
             Application.logger.warn(serviceName + " connection size : " + connectionSize);
         }
-        //上次连接上的去这次的判断如果发现上次连接的不存在的就弃用掉连接
+        // 上次连接上的去这次的判断如果发现上次连接的不存在的就弃用掉连接
         for (String key : connectionMap.keySet()) {
             String id = connectionNewMap.get(key);
-            if (id == null) {//为空说明这次连接的里面没有他
+            if (id == null) {// 为空说明这次连接的里面没有他
                 instanceId = connectionMap.get(key);
                 cloudTaskMap.remove(instanceId);
                 ipAndPortMap.remove(instanceId);
-                HostAndPortConnection[] connections = this.getConnectionPool().getConnections().toArray(new HostAndPortConnection[this.getConnectionPool().getConnections().size()]);
+                HostAndPortConnection[] connections = this.getConnectionPool()
+                    .getConnections()
+                    .toArray(new HostAndPortConnection[this.getConnectionPool().getConnections().size()]);
                 for (HostAndPortConnection connection : connections) {
                     portAndHost = connection.getPortAndHost();
 

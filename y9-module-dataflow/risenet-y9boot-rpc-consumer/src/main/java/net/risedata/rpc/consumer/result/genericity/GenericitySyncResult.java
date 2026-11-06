@@ -1,7 +1,6 @@
 package net.risedata.rpc.consumer.result.genericity;
 
 import net.risedata.rpc.consumer.result.Error;
-import net.risedata.rpc.consumer.result.Result;
 
 /**
  * @description: 返回值异步操作接口
@@ -26,9 +25,9 @@ public interface GenericitySyncResult<T> {
      */
     GenericitySyncResult<T> onError(Error error);
 
-
     /**
      * 以同步的方式拿到返回值
+     * 
      * @return 返回值
      */
     <T> T getResult();

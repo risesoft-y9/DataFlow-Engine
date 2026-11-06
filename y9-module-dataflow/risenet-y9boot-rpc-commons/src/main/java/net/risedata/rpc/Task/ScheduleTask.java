@@ -1,13 +1,10 @@
 package net.risedata.rpc.Task;
 
-import org.springframework.beans.factory.annotation.Value;
-
-import net.risedata.rpc.provide.config.Application;
-
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ScheduledExecutorService;
+
+import net.risedata.rpc.provide.config.Application;
 
 /**
  * 用来重新连接服务器的任务
@@ -40,7 +37,7 @@ public class ScheduleTask extends TimerTask {
         Object[] tasks = null;
         synchronized (taskS) {
             if (taskS.size() > 0) {
-                synchronized (taskS) {//任务按批次执行
+                synchronized (taskS) {// 任务按批次执行
                     tasks = taskS.toArray();
                     taskS.clear();
                 }
@@ -51,13 +48,11 @@ public class ScheduleTask extends TimerTask {
         for (Object task : tasks) {
             try {
 
-
-                ((Task) task).run();
+                ((Task)task).run();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-
 
     }
 
@@ -68,4 +63,3 @@ public class ScheduleTask extends TimerTask {
     }
 
 }
-

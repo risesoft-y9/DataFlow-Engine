@@ -10,10 +10,10 @@ import risesoft.data.transfer.core.util.Configuration;
  * @author lb
  */
 public interface InitApplicationConfigHandle extends Handle {
-	/**
-	 * 初始化全局配置
-	 * 
-	 * @param configuration
-	 */
-	void initApplicationConfig(Configuration configuration);
+    /**
+     * 初始化全局配置
+     * 
+     * @param configuration
+     */
+    void initApplicationConfig(Configuration configuration);
 }

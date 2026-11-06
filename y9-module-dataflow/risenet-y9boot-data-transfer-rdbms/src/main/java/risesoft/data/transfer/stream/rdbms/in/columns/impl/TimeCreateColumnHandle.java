@@ -17,16 +17,16 @@ import risesoft.data.transfer.stream.rdbms.in.columns.CreateColumnHandle;
  */
 public class TimeCreateColumnHandle implements CreateColumnHandle {
 
-	@Override
-	public boolean isHandle(int type) {
-		return Types.TIME == type;
+    @Override
+    public boolean isHandle(int type) {
+        return Types.TIME == type;
 
-	}
+    }
 
-	@Override
-	public Column getColumn(ResultSet rs, ResultSetMetaData metaData, int index, String mandatoryEncoding)
-			throws Exception {
-		return new DateColumn(rs.getTime(index), metaData.getColumnLabel(index));
-	}
+    @Override
+    public Column getColumn(ResultSet rs, ResultSetMetaData metaData, int index, String mandatoryEncoding)
+        throws Exception {
+        return new DateColumn(rs.getTime(index), metaData.getColumnLabel(index));
+    }
 
 }

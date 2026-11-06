@@ -1,16 +1,17 @@
 package net.risesoft.api.persistence.model.log;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import net.risedata.jdbc.annotations.order.Desc;
+import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.Serializable;
-import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import net.risedata.jdbc.annotations.order.Desc;
 
 /**
  * @Description : 操作日志
@@ -47,12 +48,11 @@ public class Log implements Serializable {
     @Column(name = "ENVIRONMENT", length = 100)
     private String environment;
 
-
     /**
      * 创建时间
      */
     @Desc
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone ="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "CREATE_DATE", length = 100)
     private Date createDate;
     /**
@@ -125,13 +125,7 @@ public class Log implements Serializable {
 
     @Override
     public String toString() {
-        return "Log{" +
-                "id='" + id + '\'' +
-                ", insId='" + insId + '\'' +
-                ", ip='" + ip + '\'' +
-                ", createDate=" + createDate +
-                ", context='" + context + '\'' +
-                ", type='" + type + '\'' +
-                '}';
+        return "Log{" + "id='" + id + '\'' + ", insId='" + insId + '\'' + ", ip='" + ip + '\'' + ", createDate="
+            + createDate + ", context='" + context + '\'' + ", type='" + type + '\'' + '}';
     }
 }

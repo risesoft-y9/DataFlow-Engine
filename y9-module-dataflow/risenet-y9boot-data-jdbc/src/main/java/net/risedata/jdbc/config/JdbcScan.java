@@ -12,5 +12,5 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface JdbcScan {
-	String[] value() default { "" };
+    String[] value() default {""};
 }

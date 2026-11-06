@@ -19,7 +19,6 @@ public abstract class AbstractLoadBalancerFactory implements LoadBalancerFactory
 
     abstract LBalancer createInstance(String name);
 
-
     @Override
     public LBalancer selectorBalancer(String name) {
         LBalancer balancer = balancerMap.get(name);

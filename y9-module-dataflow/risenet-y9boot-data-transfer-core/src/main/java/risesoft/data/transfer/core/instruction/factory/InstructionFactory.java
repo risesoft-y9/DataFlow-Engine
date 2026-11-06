@@ -10,19 +10,19 @@ package risesoft.data.transfer.core.instruction.factory;
  */
 public interface InstructionFactory {
 
-	/**
-	 * 获取工厂名字用于函数名
-	 * 
-	 * @return
-	 */
-	String getName();
+    /**
+     * 获取工厂名字用于函数名
+     * 
+     * @return
+     */
+    String getName();
 
-	/**
-	 * 获取指令
-	 * 
-	 * @param args 参数
-	 * @param config 整个配置文件
-	 * @return
-	 */
-	Instruction getInstance(String[] args,String config);
+    /**
+     * 获取指令
+     * 
+     * @param args 参数
+     * @param config 整个配置文件
+     * @return
+     */
+    Instruction getInstance(String[] args, String config);
 }

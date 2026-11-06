@@ -14,51 +14,51 @@ import risesoft.data.transfer.core.plug.RootPlug;
  * @author lb
  */
 public interface CacheHandle extends RootPlug, Handle {
-	@Override
-	default boolean register(JobContext jobContext) {
-		return true;
-	}
+    @Override
+    default boolean register(JobContext jobContext) {
+        return true;
+    }
 
-	/**
-	 * 根据key获取一个参数
-	 * 
-	 * @param key key
-	 * @return
-	 */
-	<T> T get(String key, Class<T> returnClass);
+    /**
+     * 根据key获取一个参数
+     * 
+     * @param key key
+     * @return
+     */
+    <T> T get(String key, Class<T> returnClass);
 
-	/**
-	 * 添加一个参数
-	 * 
-	 * @param key   key
-	 * @param value value
-	 */
-	void put(String key, Object value);
+    /**
+     * 添加一个参数
+     * 
+     * @param key key
+     * @param value value
+     */
+    void put(String key, Object value);
 
-	/**
-	 * 追加一个值，使用这个方法时为数组队列模式
-	 * 
-	 * @param key   key
-	 * @param value value
-	 * @return 返回数组大小
-	 */
-	int push(String key, Object value);
+    /**
+     * 追加一个值，使用这个方法时为数组队列模式
+     * 
+     * @param key key
+     * @param value value
+     * @return 返回数组大小
+     */
+    int push(String key, Object value);
 
-	/**
-	 * 将key中的值出栈
-	 * 
-	 * @param key  key
-	 * @param size 拉取的数量
-	 * @return
-	 */
-	<T> List<T> poll(String key, int size, Class<T> returnClass);
+    /**
+     * 将key中的值出栈
+     * 
+     * @param key key
+     * @param size 拉取的数量
+     * @return
+     */
+    <T> List<T> poll(String key, int size, Class<T> returnClass);
 
-	/**
-	 * 删除一个key
-	 * 
-	 * @param key
-	 * @return 是否存在
-	 */
-	boolean remove(String key);
+    /**
+     * 删除一个key
+     * 
+     * @param key
+     * @return 是否存在
+     */
+    boolean remove(String key);
 
 }

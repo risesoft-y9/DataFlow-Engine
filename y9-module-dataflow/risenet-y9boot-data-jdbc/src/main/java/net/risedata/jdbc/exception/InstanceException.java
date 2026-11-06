@@ -7,12 +7,12 @@ package net.risedata.jdbc.exception;
  */
 public class InstanceException extends RuntimeException {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
-	public InstanceException(String msg) {
-		super(msg);
-	}
+    public InstanceException(String msg) {
+        super(msg);
+    }
 }

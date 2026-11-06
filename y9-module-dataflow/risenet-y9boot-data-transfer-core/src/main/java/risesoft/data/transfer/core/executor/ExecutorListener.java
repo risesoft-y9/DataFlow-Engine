@@ -9,20 +9,20 @@ package risesoft.data.transfer.core.executor;
  */
 public interface ExecutorListener {
 
-	void onError(Throwable e);
+    void onError(Throwable e);
 
-	/**
-	 * 任务消费结束触发的事件
-	 */
-	void taskEnd(Object task);
+    /**
+     * 任务消费结束触发的事件
+     */
+    void taskEnd(Object task);
 
-	/**
-	 * 启动执行器
-	 */
-	void start();
+    /**
+     * 启动执行器
+     */
+    void start();
 
-	/**
-	 * 一个任务启动
-	 */
-	void taskStart(Object task);
+    /**
+     * 一个任务启动
+     */
+    void taskStart(Object task);
 }

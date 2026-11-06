@@ -1,5 +1,12 @@
 package net.risesoft.api.persistence.config.impl;
 
+import java.util.Date;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
 import net.risedata.jdbc.commons.LPage;
 import net.risedata.jdbc.search.LPageable;
 import net.risedata.jdbc.service.impl.AutomaticCrudService;
@@ -8,15 +15,8 @@ import net.risesoft.api.persistence.dao.ConfigHisDao;
 import net.risesoft.api.persistence.log.LogService;
 import net.risesoft.api.persistence.model.config.Config;
 import net.risesoft.api.persistence.model.config.ConfigHis;
-import net.risesoft.security.SecurityManager;
 import net.risesoft.api.utils.AutoIdUtil;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-
-import java.util.Date;
-import java.util.Map;
+import net.risesoft.security.SecurityManager;
 
 /**
  * @Description :
@@ -49,9 +49,10 @@ public class ConfigHisServiceImpl extends AutomaticCrudService<ConfigHis, String
     }
 
     @Override
-    public LPage<Map<String,Object>> search(ConfigHis config, LPageable pageable) {
-        return getSearchExecutor().searchForPage(config,"ID id,NAME name,TYPE config_type,GROUP_NAME config_group,ENVIRONMENT environment,UPDATETIME updateTime,OP_NAME opName ,OP_TYPE opType,CONFIG_ID configId"
-                ,pageable);
+    public LPage<Map<String, Object>> search(ConfigHis config, LPageable pageable) {
+        return getSearchExecutor().searchForPage(config,
+            "ID id,NAME name,TYPE config_type,GROUP_NAME config_group,ENVIRONMENT environment,UPDATETIME updateTime,OP_NAME opName ,OP_TYPE opType,CONFIG_ID configId",
+            pageable);
     }
 
     @Override

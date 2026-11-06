@@ -7,13 +7,13 @@ package net.risedata.jdbc.executor.page;
  * @author libo 2021年2月8日
  */
 public interface PageExecutor {
-	/**
-	 * 返回分页后的sql
-	 * 
-	 * @param sql      分页前的sql
-	 * @param pageNo   当前页数
-	 * @param pageSize 大小
-	 * @return
-	 */
-	String getPageSql(String sql, int pageNo, int pageSize);
+    /**
+     * 返回分页后的sql
+     * 
+     * @param sql 分页前的sql
+     * @param pageNo 当前页数
+     * @param pageSize 大小
+     * @return
+     */
+    String getPageSql(String sql, int pageNo, int pageSize);
 }

@@ -16,7 +16,6 @@ public class DefaultGenericitySyncResult<T> implements GenericitySyncResult<T> {
 
     private DefaultSyncParseResult parseResult;
 
-
     private Class<T> returnType;
 
     public DefaultGenericitySyncResult(DefaultSyncParseResult parseResult, Class<T> returnType) {
@@ -38,22 +37,22 @@ public class DefaultGenericitySyncResult<T> implements GenericitySyncResult<T> {
         return this;
     }
 
-
     public static <T> GenericitySyncResult<T> asSuccess(Object res, Class<T> returnType) {
-        DefaultGenericitySyncResult<T> result = new DefaultGenericitySyncResult<>(new DefaultSyncParseResult(null), returnType);
+        DefaultGenericitySyncResult<T> result =
+            new DefaultGenericitySyncResult<>(new DefaultSyncParseResult(null), returnType);
         result.parseResult.success(JSON.toJSONString(res));
         return result;
     }
 
-
     public static <T> GenericitySyncResult<T> asError(RuntimeException exception, Class<T> returnType) {
-        DefaultGenericitySyncResult<T> result = new DefaultGenericitySyncResult<>(new DefaultSyncParseResult(null), returnType);
+        DefaultGenericitySyncResult<T> result =
+            new DefaultGenericitySyncResult<>(new DefaultSyncParseResult(null), returnType);
         result.parseResult.error(exception);
         return result;
     }
 
     @Override
     public <T> T getResult() {
-        return (T) parseResult.getResult().getValue(returnType);
+        return (T)parseResult.getResult().getValue(returnType);
     }
 }

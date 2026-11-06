@@ -19,16 +19,16 @@ import net.risesoft.base.BaseEntity;
 @Data
 public class DataCacheEntity extends BaseEntity {
 
-	private static final long serialVersionUID = -4869702601309597124L;
+    private static final long serialVersionUID = -4869702601309597124L;
 
-	@Id
-	@Column(name = "CACHE_KEY", length = 200, nullable = false)
-	@Comment(value = "key值")
-	private String cacheKey;
+    @Id
+    @Column(name = "CACHE_KEY", length = 200, nullable = false)
+    @Comment(value = "key值")
+    private String cacheKey;
 
-	@Lob
-	@Column(name = "CACHE_VALUE")
-	@Comment(value = "value值")
-	private String cacheValue;
+    @Lob
+    @Column(name = "CACHE_VALUE")
+    @Comment(value = "value值")
+    private String cacheValue;
 
 }

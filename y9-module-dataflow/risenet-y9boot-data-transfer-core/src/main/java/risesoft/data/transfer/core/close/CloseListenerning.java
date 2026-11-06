@@ -9,5 +9,5 @@ package risesoft.data.transfer.core.close;
  */
 public interface CloseListenerning {
 
-	void addCloseListener(CloseListener closeListener);
+    void addCloseListener(CloseListener closeListener);
 }

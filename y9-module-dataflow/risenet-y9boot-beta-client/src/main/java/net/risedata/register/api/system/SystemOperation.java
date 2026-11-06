@@ -1,6 +1,23 @@
 package net.risedata.register.api.system;
 
-import cn.hutool.core.date.DateUtil;
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+
 import net.risedata.register.api.filter.listener.CountListener;
 import net.risedata.register.config.ListenerConfigs;
 import net.risedata.register.config.SystemConfig;
@@ -11,15 +28,7 @@ import net.risedata.rpc.consumer.annotation.Listener;
 import net.risedata.rpc.consumer.annotation.Listeners;
 import net.risedata.rpc.consumer.config.ConsumerApplication;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
-import org.springframework.context.*;
-
-import java.io.*;
-import java.util.*;
+import cn.hutool.core.date.DateUtil;
 
 /**
  * @Description :
@@ -36,15 +45,15 @@ public class SystemOperation {
 
     @Autowired
     ConfigurableApplicationContext configurableApplicationContext;
-    
+
     @Autowired
     ApplicationArguments arg;
-    
+
     private Class<?> rootClass;
-    
+
     @Autowired
     ApplicationContext ac;
-    
+
     /**
      * 标记了状态
      */
@@ -66,7 +75,7 @@ public class SystemOperation {
     // 使用重启容器操作 当没有实现哪个ServletWebServerFactory 这个bean 的时候触发
     @Listener(ListenerConfigs.RE_START)
     public int reStart() {
-        System.out.println("重启"+status);
+        System.out.println("重启" + status);
         System.out.println("重启程序");
         if (status != START) {
             return status;
@@ -94,14 +103,14 @@ public class SystemOperation {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
-                    //e.printStackTrace();
+                    // e.printStackTrace();
                 }
                 if (servletWebServerFactory == null) {
                     System.out.println("容器对象为空 走查找-- ");
-                    if (containerManager!=null){
-                        System.out.println("自定义--"+containerManager.getClass());
+                    if (containerManager != null) {
+                        System.out.println("自定义--" + containerManager.getClass());
                         containerManager.reStart();
-                    }else{
+                    } else {
                         SystemConfig system = new SystemConfig();
                         system.containerManager(system.createSystemOperation()).reStart();
                     }
@@ -118,12 +127,12 @@ public class SystemOperation {
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
-                    //e.printStackTrace();
+                    // e.printStackTrace();
                 }
 
                 status = STARTING;
                 ConsumerApplication.LOGGER.info("start for boot " + rootClass);
-                //   SpringApplication.
+                // SpringApplication.
                 configurableApplicationContext = SpringApplication.run(rootClass, arg.getSourceArgs());
                 status = START;
             });
@@ -147,7 +156,7 @@ public class SystemOperation {
     /**
      * 获取系统状态
      *
-     * @return status = 200 成功/500失败    ,menu 内存,cpu:
+     * @return status = 200 成功/500失败 ,menu 内存,cpu:
      */
     @Listener(ListenerConfigs.GET_SYSTEM_STATUS)
     public synchronized Map<String, Object> getSystemStatus() {
@@ -174,12 +183,11 @@ public class SystemOperation {
     }
 
     /**
-     * 读取文件
-     * maxDate or maxName 是必备的
+     * 读取文件 maxDate or maxName 是必备的
      *
-     * @param file       文件匹配 文件匹配格式为maxDate:/logs/{yyyy-MM-dd}/ 可以使用时间格式化 maxName:/logs/{yyyy-MM-dd}/
+     * @param file 文件匹配 文件匹配格式为maxDate:/logs/{yyyy-MM-dd}/ 可以使用时间格式化 maxName:/logs/{yyyy-MM-dd}/
      * @param startIndex 开始索引
-     * @param readSize   读取大小
+     * @param readSize 读取大小
      * @return
      */
     @Listener(ListenerConfigs.GET_READ_FILE)
@@ -255,9 +263,9 @@ public class SystemOperation {
     /**
      * 读取文件
      *
-     * @param file       文件
+     * @param file 文件
      * @param startIndex 起始位置-1则代表更具readSize 来
-     * @param readSize   读取多少
+     * @param readSize 读取多少
      * @return
      * @throws Exception
      */
@@ -265,44 +273,44 @@ public class SystemOperation {
         Map<String, Object> res = new HashMap<>();
         RandomAccessFile randomAccessFile = null;
         try {
-			randomAccessFile = new RandomAccessFile(file, "r");
-			long maxSize = randomAccessFile.length();
-			if (maxSize <= startIndex) {
-			    res.put("data", "");
-			    res.put("nextIndex", maxSize);
-			    return res;
-			}
-			if (readSize == -1) {
-			    readSize = (int) maxSize;
-			}
-			if (startIndex == -1) {
-			    startIndex = randomAccessFile.getChannel().size() - readSize;
-			    if (startIndex < 0) {
-			        startIndex = 0;
-			    }
-			}
+            randomAccessFile = new RandomAccessFile(file, "r");
+            long maxSize = randomAccessFile.length();
+            if (maxSize <= startIndex) {
+                res.put("data", "");
+                res.put("nextIndex", maxSize);
+                return res;
+            }
+            if (readSize == -1) {
+                readSize = (int)maxSize;
+            }
+            if (startIndex == -1) {
+                startIndex = randomAccessFile.getChannel().size() - readSize;
+                if (startIndex < 0) {
+                    startIndex = 0;
+                }
+            }
 
-			if (startIndex + readSize > maxSize) {
-			    res.put("nextIndex", maxSize);
-			    readSize = (int) (maxSize - startIndex);
-			} else {
-			    res.put("nextIndex", startIndex + readSize);
-			}
+            if (startIndex + readSize > maxSize) {
+                res.put("nextIndex", maxSize);
+                readSize = (int)(maxSize - startIndex);
+            } else {
+                res.put("nextIndex", startIndex + readSize);
+            }
 
-			randomAccessFile.seek(startIndex);
-			byte[] bytes = new byte[readSize];
-			res.put("data", new String(bytes, "UTF-8"));
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if(randomAccessFile != null) {
-				try {
-					randomAccessFile.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+            randomAccessFile.seek(startIndex);
+            byte[] bytes = new byte[readSize];
+            res.put("data", new String(bytes, "UTF-8"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (randomAccessFile != null) {
+                try {
+                    randomAccessFile.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         return res;
     }
 

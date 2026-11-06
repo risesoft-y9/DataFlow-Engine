@@ -1,13 +1,13 @@
 package net.risedata.register.watch.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.risedata.register.exceptions.RegisterException;
 import net.risedata.register.system.Cpu;
 import net.risedata.register.system.Mem;
 import net.risedata.register.system.Server;
 import net.risedata.register.watch.ServiceAvailability;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @Description : 保存着系统信息

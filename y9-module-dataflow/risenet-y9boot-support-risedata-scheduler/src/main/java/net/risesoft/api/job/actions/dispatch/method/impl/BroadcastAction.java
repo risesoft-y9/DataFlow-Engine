@@ -1,6 +1,12 @@
 package net.risesoft.api.job.actions.dispatch.method.impl;
 
-import com.alibaba.fastjson.JSON;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.stereotype.Component;
+
 import net.risesoft.api.job.JobContext;
 import net.risesoft.api.job.TaskExecutorService;
 import net.risesoft.api.job.actions.dispatch.DispatchJobAction;
@@ -11,13 +17,6 @@ import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.api.utils.LResult;
 import net.risesoft.api.utils.ResultUtils;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @Description : 分片广播方式
@@ -28,7 +27,6 @@ import java.util.Map;
  */
 @Component("分片广播")
 public class BroadcastAction extends AbstractDispatchAction implements DispatchJobAction {
-
 
     @Override
     public LResult action(Job job, JobLog jobLog, TaskExecutorService taskExecutor, JobContext jobContext) {
@@ -42,9 +40,11 @@ public class BroadcastAction extends AbstractDispatchAction implements DispatchJ
                 try {
                     ServiceInstance instance = instances.get(i);
                     jobContext.put("index", i);
-                    results[i] = onResult(jobLog.getId(), res, taskExecutor, instance, executorActionManager.action(job, jobLog, jobContext.getArgs(), instance,jobContext,null));
+                    results[i] = onResult(jobLog.getId(), res, taskExecutor, instance,
+                        executorActionManager.action(job, jobLog, jobContext.getArgs(), instance, jobContext, null));
                 } catch (Exception e) {
-                    taskExecutor.appendLog(jobLog.getId(), instances.get(i).getInstanceId() + "调度失败原因:" + e.getMessage());
+                    taskExecutor.appendLog(jobLog.getId(),
+                        instances.get(i).getInstanceId() + "调度失败原因:" + e.getMessage());
 
                 }
             }
@@ -53,9 +53,8 @@ public class BroadcastAction extends AbstractDispatchAction implements DispatchJ
             });
         } catch (Exception e) {
             taskExecutor.endJob(job, jobLog, JobLog.ERROR, e.getMessage(), jobContext);
-            return new LResult().end(new Object[]{e});
+            return new LResult().end(new Object[] {e});
         }
     }
-
 
 }

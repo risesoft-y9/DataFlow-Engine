@@ -1,7 +1,5 @@
 package net.risedata.rpc.provide.model;
 
-import com.alibaba.fastjson.JSONObject;
-
 import java.util.Map;
 
 /**
@@ -19,7 +17,7 @@ public class ListenerRequest {
     /**
      * 参数
      */
-    private Map<String,Object> args;
+    private Map<String, Object> args;
 
     /**
      * 监听发送的id
@@ -46,14 +44,13 @@ public class ListenerRequest {
         this.mapping = mapping;
     }
 
-    public Map<String,Object> getArgs() {
+    public Map<String, Object> getArgs() {
         return args;
     }
 
-    public void setArgs(Map<String,Object> args) {
+    public void setArgs(Map<String, Object> args) {
         this.args = args;
     }
-
 
     public long getId() {
         return id;

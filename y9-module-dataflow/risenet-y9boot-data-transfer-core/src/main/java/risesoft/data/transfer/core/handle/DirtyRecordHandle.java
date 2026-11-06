@@ -11,5 +11,5 @@ import risesoft.data.transfer.core.record.Record;
  */
 public interface DirtyRecordHandle extends Handle {
 
-	void collectDirtyRecord(Record record, Throwable t, String errorMessage);
+    void collectDirtyRecord(Record record, Throwable t, String errorMessage);
 }

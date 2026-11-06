@@ -1,12 +1,12 @@
 package net.risesoft.api.persistence.log;
 
+import java.util.Date;
+import java.util.Map;
+
 import net.risedata.jdbc.commons.LPage;
 import net.risedata.jdbc.operation.Operation;
 import net.risedata.jdbc.search.LPageable;
 import net.risesoft.api.persistence.model.log.Log;
-
-import java.util.Date;
-import java.util.Map;
 
 /**
  * @Description : 日志服务
@@ -18,19 +18,21 @@ import java.util.Map;
 public interface LogService {
 
     /**
-     *  添加日志
+     * 添加日志
+     * 
      * @param log 日志
      * @param ip ip
      */
-    void addLog(Log log,String ip);
+    void addLog(Log log, String ip);
 
     /**
      * 查询日志
+     * 
      * @param log
      * @param pageable
      * @return
      */
-     LPage<Log> searchForLog(Log log, LPageable pageable);
+    LPage<Log> searchForLog(Log log, LPageable pageable);
 
     LPage<Log> searchForLog(Log log, LPageable pageable, Map<String, Operation> context);
 

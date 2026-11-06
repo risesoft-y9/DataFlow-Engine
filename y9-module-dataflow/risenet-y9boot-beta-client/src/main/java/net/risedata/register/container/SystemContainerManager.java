@@ -1,6 +1,5 @@
 package net.risedata.register.container;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +24,6 @@ public abstract class SystemContainerManager implements ContainerManager {
         this.rootPath = rootPath;
     }
 
-
     @Override
     public void reStart() {
         SystemContainerManager systemContainerManager = this;
@@ -33,7 +31,7 @@ public abstract class SystemContainerManager implements ContainerManager {
             @Override
             public void run() {
                 try {
-                    System.out.println( systemContainerManager.getClass());
+                    System.out.println(systemContainerManager.getClass());
                     systemContainerManager.start();
                 } catch (Exception e) {
                     System.out.println("启动报错22---");

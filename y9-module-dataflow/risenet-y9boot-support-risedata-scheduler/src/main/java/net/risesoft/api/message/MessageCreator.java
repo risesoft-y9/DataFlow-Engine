@@ -1,6 +1,5 @@
 package net.risesoft.api.message;
 
-
 /**
  * @Description : 消息创建器
  * @ClassName MessageCreator

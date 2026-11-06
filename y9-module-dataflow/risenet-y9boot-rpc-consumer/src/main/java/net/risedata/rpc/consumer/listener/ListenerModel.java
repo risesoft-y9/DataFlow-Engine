@@ -2,7 +2,6 @@ package net.risedata.rpc.consumer.listener;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.List;
 
 import net.risedata.rpc.utils.LParameter;
 
@@ -51,7 +50,6 @@ public class ListenerModel {
         this.args = args;
     }
 
-
     public void setMethod(Method method) {
         this.method = method;
     }
@@ -62,10 +60,7 @@ public class ListenerModel {
 
     @Override
     public String toString() {
-        return "ListenerModel{" +
-                "instance=" + instance +
-                ", args=" + Arrays.toString(args) +
-                ", method=" + method +
-                '}';
+        return "ListenerModel{" + "instance=" + instance + ", args=" + Arrays.toString(args) + ", method=" + method
+            + '}';
     }
 }

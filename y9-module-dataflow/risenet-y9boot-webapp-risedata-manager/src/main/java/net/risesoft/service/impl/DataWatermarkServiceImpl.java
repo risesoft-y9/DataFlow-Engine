@@ -21,42 +21,42 @@ import net.risesoft.y9public.repository.DataWatermarkRepository;
 @Service(value = "dataWatermarkService")
 @RequiredArgsConstructor
 public class DataWatermarkServiceImpl implements DataWatermarkService {
-	
-	private final DataWatermarkRepository dataWatermarkRepository;
-	private final ModelMapper modelMapper;
-	
-	@Override
-	public Page<DataWatermarkEntity> searchPage(int page, int size) {
-		if (page < 0) {
+
+    private final DataWatermarkRepository dataWatermarkRepository;
+    private final ModelMapper modelMapper;
+
+    @Override
+    public Page<DataWatermarkEntity> searchPage(int page, int size) {
+        if (page < 0) {
             page = 1;
         }
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.ASC, "createTime"));
-		return dataWatermarkRepository.findAll(pageable);
-	}
+        return dataWatermarkRepository.findAll(pageable);
+    }
 
-	@Override
-	public DataWatermarkEntity getById(String id) {
-		return dataWatermarkRepository.findById(id).orElse(null);
-	}
+    @Override
+    public DataWatermarkEntity getById(String id) {
+        return dataWatermarkRepository.findById(id).orElse(null);
+    }
 
-	@Override
-	@Transactional(readOnly = false)
-	public Y9Result<String> deleteData(String id) {
-		dataWatermarkRepository.deleteById(id);
-		return Y9Result.successMsg("删除成功");
-	}
+    @Override
+    @Transactional(readOnly = false)
+    public Y9Result<String> deleteData(String id) {
+        dataWatermarkRepository.deleteById(id);
+        return Y9Result.successMsg("删除成功");
+    }
 
-	@Override
-	@Transactional(readOnly = false)
-	public Y9Result<DataWatermarkEntity> saveData(DataWatermarkDTO watermarkDTO) {
-		DataWatermarkEntity entity = modelMapper.map(watermarkDTO, DataWatermarkEntity.class);
-		if (StringUtils.isBlank(entity.getId())) {
-			entity.setId(Y9IdGenerator.genId());
-		}
-		entity.setTenantId(Y9LoginUserHolder.getTenantId());
-		entity.setUserId(Y9LoginUserHolder.getPersonId());
-		entity.setUserName(Y9LoginUserHolder.getUserInfo().getName());
-		return Y9Result.success(dataWatermarkRepository.save(entity), "保存成功");
-	}
+    @Override
+    @Transactional(readOnly = false)
+    public Y9Result<DataWatermarkEntity> saveData(DataWatermarkDTO watermarkDTO) {
+        DataWatermarkEntity entity = modelMapper.map(watermarkDTO, DataWatermarkEntity.class);
+        if (StringUtils.isBlank(entity.getId())) {
+            entity.setId(Y9IdGenerator.genId());
+        }
+        entity.setTenantId(Y9LoginUserHolder.getTenantId());
+        entity.setUserId(Y9LoginUserHolder.getPersonId());
+        entity.setUserName(Y9LoginUserHolder.getUserInfo().getName());
+        return Y9Result.success(dataWatermarkRepository.save(entity), "保存成功");
+    }
 
 }

@@ -19,48 +19,48 @@ import net.risesoft.base.BaseEntity;
 @Data
 public class DataTaskEntity extends BaseEntity {
 
-	private static final long serialVersionUID = -4637563465588220054L;
+    private static final long serialVersionUID = -4637563465588220054L;
 
-	@Id
-	@Column(name = "ID", length = 38, nullable = false)
-	@Comment(value = "主键")
-	private String id;
+    @Id
+    @Column(name = "ID", length = 38, nullable = false)
+    @Comment(value = "主键")
+    private String id;
 
-	@Column(name = "NAME", length = 500, nullable = false)
-	@Comment(value = "任务名称")
-	private String name;
-	
-	@Column(name = "DESCRIPTION", length = 1200)
-	@Comment(value = "描述")
-	private String description;
-	
-	@Column(name = "BUSINESSID", length = 50)
-	@Comment(value = "分类id")
-	private String businessId;
-	
-	@Column(name = "USERID", length = 50)
-	@Comment(value = "创建者id")
-	private String userId;
-	
-	@Column(name = "USERNAME", length = 50)
-	@Comment(value = "创建者")
-	private String userName;
-	
-	@Column(name = "TENANTID", length = 50)
-	@Comment(value = "租户ID")
-	private String tenantId;
-	
-	@Column(name = "TASKTYPE", nullable = false)
-	@Comment(value = "任务类型：1-单节点任务，2-同步任务")
-	@ColumnDefault("2")
-	private Integer taskType;
-	
-	@Column(name = "SYSTEMNAME", length = 50)
-	@Comment(value = "任务来源")
-	private String systemName;
-	
-	@Column(name = "EXTERNALID", length = 50)
-	@Comment(value = "关联ID")
-	private String externalId;
+    @Column(name = "NAME", length = 500, nullable = false)
+    @Comment(value = "任务名称")
+    private String name;
+
+    @Column(name = "DESCRIPTION", length = 1200)
+    @Comment(value = "描述")
+    private String description;
+
+    @Column(name = "BUSINESSID", length = 50)
+    @Comment(value = "分类id")
+    private String businessId;
+
+    @Column(name = "USERID", length = 50)
+    @Comment(value = "创建者id")
+    private String userId;
+
+    @Column(name = "USERNAME", length = 50)
+    @Comment(value = "创建者")
+    private String userName;
+
+    @Column(name = "TENANTID", length = 50)
+    @Comment(value = "租户ID")
+    private String tenantId;
+
+    @Column(name = "TASKTYPE", nullable = false)
+    @Comment(value = "任务类型：1-单节点任务，2-同步任务")
+    @ColumnDefault("2")
+    private Integer taskType;
+
+    @Column(name = "SYSTEMNAME", length = 50)
+    @Comment(value = "任务来源")
+    private String systemName;
+
+    @Column(name = "EXTERNALID", length = 50)
+    @Comment(value = "关联ID")
+    private String externalId;
 
 }

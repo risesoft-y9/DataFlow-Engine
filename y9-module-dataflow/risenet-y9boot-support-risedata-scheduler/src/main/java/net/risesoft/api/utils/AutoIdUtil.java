@@ -7,8 +7,6 @@ package net.risesoft.api.utils;
  */
 public class AutoIdUtil {
 
-
-
     /**
      * 返回一个随机id
      *
@@ -23,7 +21,7 @@ public class AutoIdUtil {
         int random;
         int maxLength = sb.length() + length;
         while (sb.length() < maxLength) {
-            random = (int) (Math.random() * 100);
+            random = (int)(Math.random() * 100);
             sb.append(random);
         }
 

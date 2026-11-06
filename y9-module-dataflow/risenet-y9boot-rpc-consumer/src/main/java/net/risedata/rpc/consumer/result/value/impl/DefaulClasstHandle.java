@@ -1,10 +1,8 @@
 package net.risedata.rpc.consumer.result.value.impl;
 
-
 import net.risedata.rpc.consumer.result.SyncResult;
 import net.risedata.rpc.consumer.result.value.ReturnValueHandle;
 import net.risedata.rpc.factory.model.ReturnType;
-
 
 /**
  * @description: 处理同步的单个类型且类型是class对象
@@ -21,6 +19,5 @@ public class DefaulClasstHandle implements ReturnValueHandle {
     public Object getValue(SyncResult result, ReturnType returnType, Object[] args) {
         return result.getResult().getValue(returnType.getReturnType());
     }
-
 
 }

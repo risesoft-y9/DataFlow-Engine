@@ -9,19 +9,26 @@ import net.risedata.jdbc.search.Operations;
  */
 public enum Operates {
 
-	LIKE(Operations.LIKE), NOTLIKE(Operations.NOTLIKE), EQ(Operations.EQ), NOTEQ(Operations.NOTEQ), LT(Operations.LT),
-	GTANDEQ(Operations.GTANDEQ), LTANDGT(Operations.LTANDGT), IN(Operations.IN), NOTIN(Operations.NOTIN),
-	GT(Operations.GT)
-	/**
-	 * 占位符
-	 */
-	,PLACEHOLDER(Operations.PLACEHOLDER);
+    LIKE(Operations.LIKE),
+    NOTLIKE(Operations.NOTLIKE),
+    EQ(Operations.EQ),
+    NOTEQ(Operations.NOTEQ),
+    LT(Operations.LT),
+    GTANDEQ(Operations.GTANDEQ),
+    LTANDGT(Operations.LTANDGT),
+    IN(Operations.IN),
+    NOTIN(Operations.NOTIN),
+    GT(Operations.GT)
+    /**
+     * 占位符
+     */
+    ,PLACEHOLDER(Operations.PLACEHOLDER);
 
-	public Operation value;
-	public Class<? extends Operation> cla;
+    public Operation value;
+    public Class<? extends Operation> cla;
 
-	Operates(Operation ot) {
-		this.value = ot;
-		this.cla = ot.getClass();
-	}
+    Operates(Operation ot) {
+        this.value = ot;
+        this.cla = ot.getClass();
+    }
 };

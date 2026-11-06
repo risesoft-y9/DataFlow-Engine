@@ -19,91 +19,91 @@ import net.risedata.jdbc.utils.Sqlbuilder;
  * @author libo 2021年2月10日
  */
 public class DefaultDeleteExecutor extends JDBC implements DeleteExecutor {
-	/**
-	 * sql执行器
-	 */
-	private JdbcExecutor jdbcExecutor;
+    /**
+     * sql执行器
+     */
+    private JdbcExecutor jdbcExecutor;
 
-	public DefaultDeleteExecutor(JdbcExecutor jdbcExecutor) {
-		this.jdbcExecutor = jdbcExecutor;
-	}
+    public DefaultDeleteExecutor(JdbcExecutor jdbcExecutor) {
+        this.jdbcExecutor = jdbcExecutor;
+    }
 
-	/**
-	 * @return the jdbcExecutor
-	 */
-	public JdbcExecutor getJdbcExecutor() {
-		return jdbcExecutor;
-	}
+    /**
+     * @return the jdbcExecutor
+     */
+    public JdbcExecutor getJdbcExecutor() {
+        return jdbcExecutor;
+    }
 
-	/**
-	 * @param jdbcExecutor the jdbcExecutor to set
-	 */
-	public void setJdbcExecutor(JdbcExecutor jdbcExecutor) {
-		this.jdbcExecutor = jdbcExecutor;
-	}
+    /**
+     * @param jdbcExecutor the jdbcExecutor to set
+     */
+    public void setJdbcExecutor(JdbcExecutor jdbcExecutor) {
+        this.jdbcExecutor = jdbcExecutor;
+    }
 
-	@Override
-	public int delete(@NotNull Object entiry, Map<String, Object> valueMap, Map<String, Operation> operationMap) {
-		BeanConfig bc = getConfig(entiry);
-		StringBuilder sql = new StringBuilder();
-		List<FieldConfig> fields = bc.getFieldlist();
-		List<Object> args = new ArrayList<Object>();
-		sql.append(bc.getDelSql());
-		createWhereSql(bc, sql, fields, args, operationMap, createValueMap(entiry, valueMap, fields, sql));
-		return jdbcExecutor.update(sql.toString(), args.toArray());
-	}
+    @Override
+    public int delete(@NotNull Object entiry, Map<String, Object> valueMap, Map<String, Operation> operationMap) {
+        BeanConfig bc = getConfig(entiry);
+        StringBuilder sql = new StringBuilder();
+        List<FieldConfig> fields = bc.getFieldlist();
+        List<Object> args = new ArrayList<Object>();
+        sql.append(bc.getDelSql());
+        createWhereSql(bc, sql, fields, args, operationMap, createValueMap(entiry, valueMap, fields, sql));
+        return jdbcExecutor.update(sql.toString(), args.toArray());
+    }
 
-	@Override
-	public int delete(@NotNull Object entiry, Map<String, Object> valueMap) {
-		return delete(entiry, valueMap, null);
-	}
+    @Override
+    public int delete(@NotNull Object entiry, Map<String, Object> valueMap) {
+        return delete(entiry, valueMap, null);
+    }
 
-	@Override
-	public int delete(@NotNull Object entiry) {
-		return delete(entiry, null);
-	}
+    @Override
+    public int delete(@NotNull Object entiry) {
+        return delete(entiry, null);
+    }
 
-	@Override
-	public int deleteById(@NotNull Object entiry, Map<String, Object> valueMap) {
-		BeanConfig bc = getConfig(entiry);
-		StringBuilder sql = new StringBuilder();
-		List<FieldConfig> fields = bc.getIdField();
-		List<Object> args = new ArrayList<Object>();
-		sql.append("delete from " + bc.getTableName());
-		createWhereSql(bc, sql, fields, args, null, createValueMap(entiry, valueMap, fields, sql));
-		return jdbcExecutor.update(sql.toString(), args);
-	}
+    @Override
+    public int deleteById(@NotNull Object entiry, Map<String, Object> valueMap) {
+        BeanConfig bc = getConfig(entiry);
+        StringBuilder sql = new StringBuilder();
+        List<FieldConfig> fields = bc.getIdField();
+        List<Object> args = new ArrayList<Object>();
+        sql.append("delete from " + bc.getTableName());
+        createWhereSql(bc, sql, fields, args, null, createValueMap(entiry, valueMap, fields, sql));
+        return jdbcExecutor.update(sql.toString(), args);
+    }
 
-	@Override
-	public int deleteById(@NotNull Object entiry) {
-		return deleteById(entiry, null);
-	}
+    @Override
+    public int deleteById(@NotNull Object entiry) {
+        return deleteById(entiry, null);
+    }
 
-	@Override
-	public int deleteById(@NotNull Class<?> id, Object... ids) {
-		BeanConfig bc = getConfig(id);
-		List<FieldConfig> fields = bc.getIdField();
-		Sqlbuilder sql = new Sqlbuilder("delete from " + bc.getTableName());
-		for (FieldConfig fieldConfig : fields) {
-			sql.where(fieldConfig.getColumn() + " = ? ");
-		}
-		return jdbcExecutor.update(sql.toString(), ids);
-	}
+    @Override
+    public int deleteById(@NotNull Class<?> id, Object... ids) {
+        BeanConfig bc = getConfig(id);
+        List<FieldConfig> fields = bc.getIdField();
+        Sqlbuilder sql = new Sqlbuilder("delete from " + bc.getTableName());
+        for (FieldConfig fieldConfig : fields) {
+            sql.where(fieldConfig.getColumn() + " = ? ");
+        }
+        return jdbcExecutor.update(sql.toString(), ids);
+    }
 
-	@Override
-	public int deleteByIds(@NotNull Class<?> id, Object... ids) {
-		BeanConfig bc = getConfig(id);
-		List<FieldConfig> fields = bc.getIdField();
-		Sqlbuilder sql = new Sqlbuilder("delete from " + bc.getTableName());
-		sql.where(fields.get(0).getColumn() + " in ( ");
-		for (int i = 0; i < ids.length; i++) {
-			sql.getBuilder().append("?");
-			if (i != ids.length - 1) {
-				sql.getBuilder().append(",");
-			}
-		}
-		sql.getBuilder().append(")");
-		return jdbcExecutor.update(sql.toString(), ids);
-	}
+    @Override
+    public int deleteByIds(@NotNull Class<?> id, Object... ids) {
+        BeanConfig bc = getConfig(id);
+        List<FieldConfig> fields = bc.getIdField();
+        Sqlbuilder sql = new Sqlbuilder("delete from " + bc.getTableName());
+        sql.where(fields.get(0).getColumn() + " in ( ");
+        for (int i = 0; i < ids.length; i++) {
+            sql.getBuilder().append("?");
+            if (i != ids.length - 1) {
+                sql.getBuilder().append(",");
+            }
+        }
+        sql.getBuilder().append(")");
+        return jdbcExecutor.update(sql.toString(), ids);
+    }
 
 }

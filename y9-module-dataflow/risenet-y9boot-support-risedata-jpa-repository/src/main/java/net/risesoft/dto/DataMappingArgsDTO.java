@@ -7,20 +7,20 @@ import lombok.NoArgsConstructor;
 @Data
 public class DataMappingArgsDTO {
 
-	private String id;
-	
-	private String mappingId;
-	
-	private String upName;
+    private String id;
 
-	private String name;
-	
-	private String description;
-	
-	private String defaultValue;
-	
-	private String type;
-	
-	private Integer dataType;
+    private String mappingId;
+
+    private String upName;
+
+    private String name;
+
+    private String description;
+
+    private String defaultValue;
+
+    private String type;
+
+    private Integer dataType;
 
 }

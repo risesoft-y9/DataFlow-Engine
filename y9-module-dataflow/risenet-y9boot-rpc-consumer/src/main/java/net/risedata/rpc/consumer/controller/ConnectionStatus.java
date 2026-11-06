@@ -1,5 +1,11 @@
 package net.risedata.rpc.consumer.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,8 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import net.risedata.rpc.consumer.core.Connection;
 import net.risedata.rpc.consumer.core.ConnectionManager;
 import net.risedata.rpc.consumer.factory.ConnectionManagerFactory;
-
-import java.util.*;
 
 /**
  * @description: 返回连接的数据控制器
@@ -27,8 +31,7 @@ public class ConnectionStatus {
         } else {
             Set<String> keys = ConnectionManagerFactory.getInstances().keySet();
             List<Map<String, Object>> res = new ArrayList<>();
-            for (String key : keys
-            ) {
+            for (String key : keys) {
                 res.add(getDetail(key));
             }
             return res;

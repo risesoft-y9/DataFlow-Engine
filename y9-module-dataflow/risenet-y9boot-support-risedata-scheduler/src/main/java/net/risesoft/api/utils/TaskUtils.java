@@ -1,14 +1,14 @@
 package net.risesoft.api.utils;
 
-import org.springframework.scheduling.support.CronSequenceGenerator;
-
-import net.risedata.jdbc.commons.utils.DateUtils;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.springframework.scheduling.support.CronSequenceGenerator;
+
+import net.risedata.jdbc.commons.utils.DateUtils;
 
 /**
  * @Description :
@@ -18,8 +18,7 @@ import java.util.List;
  * @Version 1.0
  */
 public class TaskUtils {
-    private static final long ONETIME = 1000 * 60 * 60 * 23 + 1000 * 60 * 59 + 59 * 1000+999;
-
+    private static final long ONETIME = 1000 * 60 * 60 * 23 + 1000 * 60 * 59 + 59 * 1000 + 999;
 
     public static List<String> getDateForOne(NextTime next, String format) {
         Date start = null;
@@ -39,7 +38,6 @@ public class TaskUtils {
         }
         return res;
     }
-
 
     public static List<String> getDayTaskOfSpped(int speed, String format) throws ParseException {
         final int speedTime = speed * 1000;

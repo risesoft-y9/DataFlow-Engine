@@ -1,9 +1,9 @@
 package net.risesoft.api.job.log;
 
-import net.risesoft.api.persistence.model.log.LogAnalyse;
-
 import java.util.List;
 import java.util.Map;
+
+import net.risesoft.api.persistence.model.log.LogAnalyse;
 
 /**
  * @Description : 对日志进行分析的服务接口对调用所有分析服务
@@ -15,10 +15,11 @@ import java.util.Map;
 public interface LogAnalyseService {
     /**
      * 开始进行分析 map 内包含日志
+     * 
      * @param jobId 任务id
      * @param log 任务日志
      * @param jobName 任务名
      * @param logAnalyseList
      */
-    void doAnalyse(Integer jobId,String log,String jobName, List<LogAnalyse> logAnalyseList,Map<String, Object> map);
+    void doAnalyse(Integer jobId, String log, String jobName, List<LogAnalyse> logAnalyseList, Map<String, Object> map);
 }

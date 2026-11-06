@@ -1,6 +1,5 @@
 package risesoft.data.transfer.core.stream.out;
 
-
 import risesoft.data.transfer.core.stream.DataStreamFactory;
 
 /**
@@ -11,6 +10,5 @@ import risesoft.data.transfer.core.stream.DataStreamFactory;
  * @author lb
  */
 public interface DataOutputStreamFactory extends DataStreamFactory<DataOutputStream> {
-
 
 }

@@ -1,13 +1,13 @@
 package net.risedata.rpc.consumer.listener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.risedata.rpc.consumer.core.impl.ChannelConnection;
 import net.risedata.rpc.consumer.exceptions.ListenerException;
 import net.risedata.rpc.consumer.model.ListenerRequest;
 import net.risedata.rpc.model.ListenerResponse;
 import net.risedata.rpc.utils.LParameter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @Description : 监听器的执行
@@ -29,7 +29,8 @@ public class ListenerDispatch {
                     LParameter[] parameter = listenerModel.getArgs();
                     Object[] args = new Object[parameter.length];
                     for (int i = 0; i < parameter.length; i++) {
-                        args[i] = request.getArgs().getObject(parameter[i].getParameterName(), parameter[i].getParameterType());
+                        args[i] = request.getArgs()
+                            .getObject(parameter[i].getParameterName(), parameter[i].getParameterType());
                     }
                     try {
                         res.add(listenerModel.getMethod().invoke(listenerModel.getInstance(), args));
@@ -53,9 +54,10 @@ public class ListenerDispatch {
         throw new ListenerException("未找到" + request.getMapping());
     }
 
-    public static void backError(ListenerRequest request , ListenerResponse response, ChannelConnection channelConnection){
+    public static void backError(ListenerRequest request, ListenerResponse response,
+        ChannelConnection channelConnection) {
         for (ListenerBack back : ListenerApplication.LISTENER_BACKS) {
-            back.onBackError(request,response,channelConnection);
+            back.onBackError(request, response, channelConnection);
         }
     }
 }

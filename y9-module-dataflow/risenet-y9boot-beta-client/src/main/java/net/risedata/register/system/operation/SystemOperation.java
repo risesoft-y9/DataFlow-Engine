@@ -11,19 +11,22 @@ public interface SystemOperation {
 
     /**
      * 后台启动指令
+     * 
      * @param sourceOperation 核心指令
      */
     String nohupRun(String sourceOperation);
 
     /**
      * 执行指令集
+     * 
      * @param sourceOperation
      */
-    void execute(boolean isNewThread,String... sourceOperation);
+    void execute(boolean isNewThread, String... sourceOperation);
 
     /**
      * 拿到当前系统分隔符
+     * 
      * @return
      */
-    String  getSeparate();
+    String getSeparate();
 }

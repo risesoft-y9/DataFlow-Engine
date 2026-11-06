@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import net.risedata.register.system.System;
 import net.risedata.register.system.operation.SystemOperation;
-import net.risedata.register.system.operation.linux.LinuxSystemOperation;
 
 /**
  * @Description : windows系统操作系统
@@ -15,14 +14,13 @@ import net.risedata.register.system.operation.linux.LinuxSystemOperation;
  */
 public class WindowsSystemOperation implements SystemOperation {
 
-
     @Override
     public String nohupRun(String sourceOperation) {
-      return "start /b "+sourceOperation;
+        return "start /b " + sourceOperation;
     }
 
     @Override
-    public void execute(boolean isNewThread,String... sourceOperation) {
+    public void execute(boolean isNewThread, String... sourceOperation) {
 
         System.executeAndClose(Arrays.asList(sourceOperation));
     }

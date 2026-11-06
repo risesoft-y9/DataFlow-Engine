@@ -10,14 +10,14 @@ import net.risedata.jdbc.repository.parse.handles.method.MethodNameBuilder;
  */
 public class IgnoreCaseInstructionHandle extends ConditionInstructionHandleAdapter {
 
-	public IgnoreCaseInstructionHandle() {
-		super("IgnoreCase", null);
-	}
+    public IgnoreCaseInstructionHandle() {
+        super("IgnoreCase", null);
+    }
 
-	@Override
-	public void handle(MethodNameBuilder builder, String backField, String condition) {
-		builder.getSqlbuilder().where(
-				"UPPER(" + builder.getColumn(backField) + ") = UPPER( " + builder.getParameterArgs(backField) + ")");
-	}
+    @Override
+    public void handle(MethodNameBuilder builder, String backField, String condition) {
+        builder.getSqlbuilder()
+            .where("UPPER(" + builder.getColumn(backField) + ") = UPPER( " + builder.getParameterArgs(backField) + ")");
+    }
 
 }

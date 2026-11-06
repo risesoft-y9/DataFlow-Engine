@@ -14,40 +14,40 @@ import net.risedata.jdbc.executor.log.PrintExecutor;
  * @author libo 2021年3月26日
  */
 public class DefaultPrintExecutor implements PrintExecutor {
-	public static final String SHOW_ARGS = "net.risedata.jdbc.show.args";
+    public static final String SHOW_ARGS = "net.risedata.jdbc.show.args";
 
-	@Value("${" + SHOW_ARGS + ":false}")
-	private boolean isShowArgs;
+    @Value("${" + SHOW_ARGS + ":false}")
+    private boolean isShowArgs;
 
-	public static final Log logger = LogFactory.getLog(DefaultPrintExecutor.class);
+    public static final Log logger = LogFactory.getLog(DefaultPrintExecutor.class);
 
-	@Override
-	public void print(String msg, Object[] args) {
+    @Override
+    public void print(String msg, Object[] args) {
 
-		logger.info(msg);
-		if (isShowArgs) {
-			for (int i = 1; i < args.length; i++) {
-				if (args[i].getClass().isArray()) {
-					logger.info(Arrays.toString((Object[]) args[i]));
-				} else {
-					logger.info(args[i]);
-				}
-			}
-		}
-	}
+        logger.info(msg);
+        if (isShowArgs) {
+            for (int i = 1; i < args.length; i++) {
+                if (args[i].getClass().isArray()) {
+                    logger.info(Arrays.toString((Object[])args[i]));
+                } else {
+                    logger.info(args[i]);
+                }
+            }
+        }
+    }
 
-	/**
-	 * @return the isShowArgs
-	 */
-	public boolean isShowArgs() {
-		return isShowArgs;
-	}
+    /**
+     * @return the isShowArgs
+     */
+    public boolean isShowArgs() {
+        return isShowArgs;
+    }
 
-	/**
-	 * @param isShowArgs the isShowArgs to set
-	 */
-	public void setShowArgs(boolean isShowArgs) {
-		this.isShowArgs = isShowArgs;
-	}
+    /**
+     * @param isShowArgs the isShowArgs to set
+     */
+    public void setShowArgs(boolean isShowArgs) {
+        this.isShowArgs = isShowArgs;
+    }
 
 }

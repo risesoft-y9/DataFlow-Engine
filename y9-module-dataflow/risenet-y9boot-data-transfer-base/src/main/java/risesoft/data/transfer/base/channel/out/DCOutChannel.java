@@ -11,20 +11,19 @@ import risesoft.data.transfer.core.record.Record;
  * @date 2023年12月11日
  * @author lb
  */
-public class DCOutChannel extends OutputStreamOutChannel{
+public class DCOutChannel extends OutputStreamOutChannel {
 
-	@Override
-	public void writer(Record record) {
-		recordOutuptStream.writer(record);
-	}
+    @Override
+    public void writer(Record record) {
+        recordOutuptStream.writer(record);
+    }
 
-	@Override
-	public void writer(List<Record> record) {
-		recordOutuptStream.writer(record);
-	}
+    @Override
+    public void writer(List<Record> record) {
+        recordOutuptStream.writer(record);
+    }
 
-	@Override
-	public void flush() {
-	}
+    @Override
+    public void flush() {}
 
 }

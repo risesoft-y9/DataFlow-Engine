@@ -17,26 +17,26 @@ import risesoft.data.transfer.stream.rdbms.in.columns.CreateColumnHandle;
  */
 public class BytesCreateColumnHandle implements CreateColumnHandle {
 
-	@Override
-	public boolean isHandle(int type) {
-		switch (type) {
-		case Types.BINARY:
-		case Types.VARBINARY:
-		case Types.BLOB:
-		case Types.LONGVARBINARY:
-			return true;
-		default:
-			return false;
-		}
+    @Override
+    public boolean isHandle(int type) {
+        switch (type) {
+            case Types.BINARY:
+            case Types.VARBINARY:
+            case Types.BLOB:
+            case Types.LONGVARBINARY:
+                return true;
+            default:
+                return false;
+        }
 
-	}
+    }
 
-	@Override
-	public Column getColumn(ResultSet rs, ResultSetMetaData metaData, int index, String mandatoryEncoding)
-			throws Exception {
+    @Override
+    public Column getColumn(ResultSet rs, ResultSetMetaData metaData, int index, String mandatoryEncoding)
+        throws Exception {
 
-		return new BytesColumn(rs.getBytes(index), metaData.getColumnLabel(index));
+        return new BytesColumn(rs.getBytes(index), metaData.getColumnLabel(index));
 
-	}
+    }
 
 }

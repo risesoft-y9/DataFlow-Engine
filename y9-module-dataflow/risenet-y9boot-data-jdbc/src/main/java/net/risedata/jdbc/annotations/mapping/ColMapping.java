@@ -7,7 +7,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 /**
  * 增加的此注解的字段会添加自定义的映射操作
  * 
@@ -18,18 +17,18 @@ import java.lang.annotation.Target;
 @Documented
 @Inherited
 public @interface ColMapping {
-	/**
-	 * 对应的类 类获取方式参考 SpringApplicationFactory
-	 * 
-	 * @return
-	 */
-	Class<? extends net.risedata.jdbc.mapping.ColumnMapping> value();
+    /**
+     * 对应的类 类获取方式参考 SpringApplicationFactory
+     * 
+     * @return
+     */
+    Class<? extends net.risedata.jdbc.mapping.ColumnMapping> value();
 
-	/**
-	 * 调用构建方法传入的参数
-	 * 
-	 * @return
-	 */
-	String[] args() default {};
+    /**
+     * 调用构建方法传入的参数
+     * 
+     * @return
+     */
+    String[] args() default {};
 
 }

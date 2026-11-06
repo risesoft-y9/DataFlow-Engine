@@ -10,7 +10,7 @@ import risesoft.data.transfer.core.handle.Handle;
  * @date 2023年12月29日
  * @author lb
  */
-public interface JobEndHandle extends Handle{
+public interface JobEndHandle extends Handle {
 
-	void onJobEnd(JobContext jobContext);
+    void onJobEnd(JobContext jobContext);
 }

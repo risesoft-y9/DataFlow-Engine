@@ -9,9 +9,9 @@ import net.risedata.jdbc.executor.page.PageExecutor;
  */
 public class MysqlPageExecutor implements PageExecutor {
 
-	@Override
-	public String getPageSql(String sql, int pageIndex, int rows) {
-		return sql + " limit " + ((pageIndex - 1) * rows) + " ," + rows;
-	}
+    @Override
+    public String getPageSql(String sql, int pageIndex, int rows) {
+        return sql + " limit " + ((pageIndex - 1) * rows) + " ," + rows;
+    }
 
 }

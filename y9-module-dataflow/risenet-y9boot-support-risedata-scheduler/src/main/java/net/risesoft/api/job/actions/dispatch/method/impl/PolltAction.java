@@ -1,17 +1,17 @@
 package net.risesoft.api.job.actions.dispatch.method.impl;
 
+import java.util.List;
+
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.stereotype.Component;
+
 import net.risesoft.api.job.JobContext;
 import net.risesoft.api.job.TaskExecutorService;
-import net.risesoft.api.job.actions.dispatch.executor.Result;
 import net.risesoft.api.job.actions.dispatch.method.AbstractDispatchAction;
 import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.api.utils.LResult;
 import net.risesoft.api.utils.ObjectUtils;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * @Description : 轮询
@@ -22,7 +22,6 @@ import java.util.List;
  */
 @Component("轮询")
 public class PolltAction extends AbstractDispatchAction {
-
 
     private static final String KEY = "POLL_INDEX";
 
@@ -36,22 +35,25 @@ public class PolltAction extends AbstractDispatchAction {
                 index = 0;
             }
             final int i = index;
-            executorActionManager.action(job, jobLog, jobContext.getArgs(), instances.get(i),jobContext,(count,ins)->{
-                taskExecutor.getTaskManager().putInfo(job.getId(), KEY, i + 1);
-                return instances.get(taskExecutor.getTaskManager().getInfo(job.getId(),KEY,Integer.class));
-            }).onSuccess((res) -> {
-                res = ObjectUtils.nullOf(res, "NULL");
-                taskExecutor.successJob(job, jobLog, "调度成功:" + res, res.toString(), jobContext);
-                lResult.end(new Object[]{res});
-                taskExecutor.getTaskManager().putInfo(job.getId(), KEY, i + 1);
-            }).onError((e) -> {
-                taskExecutor.endJob(job, jobLog, JobLog.ERROR, e.getMessage(), jobContext);
-                taskExecutor.getTaskManager().putInfo(job.getId(), KEY, i + 1);
-                lResult.end(new Object[]{e});
-            });
+            executorActionManager
+                .action(job, jobLog, jobContext.getArgs(), instances.get(i), jobContext, (count, ins) -> {
+                    taskExecutor.getTaskManager().putInfo(job.getId(), KEY, i + 1);
+                    return instances.get(taskExecutor.getTaskManager().getInfo(job.getId(), KEY, Integer.class));
+                })
+                .onSuccess((res) -> {
+                    res = ObjectUtils.nullOf(res, "NULL");
+                    taskExecutor.successJob(job, jobLog, "调度成功:" + res, res.toString(), jobContext);
+                    lResult.end(new Object[] {res});
+                    taskExecutor.getTaskManager().putInfo(job.getId(), KEY, i + 1);
+                })
+                .onError((e) -> {
+                    taskExecutor.endJob(job, jobLog, JobLog.ERROR, e.getMessage(), jobContext);
+                    taskExecutor.getTaskManager().putInfo(job.getId(), KEY, i + 1);
+                    lResult.end(new Object[] {e});
+                });
         } catch (Exception e) {
             taskExecutor.endJob(job, jobLog, JobLog.ERROR, e.getMessage(), jobContext);
-            lResult.end(new Object[]{e});
+            lResult.end(new Object[] {e});
         }
         return lResult;
     }

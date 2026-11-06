@@ -1,6 +1,5 @@
 package net.risedata.jdbc.annotations.repository;
 
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -18,5 +17,5 @@ import java.lang.annotation.Target;
 @Documented
 @Inherited
 public @interface Modify {
-	String value();
+    String value();
 }

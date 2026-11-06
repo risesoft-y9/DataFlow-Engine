@@ -13,11 +13,11 @@ import risesoft.data.transfer.core.stream.DataStream;
  */
 public interface DataInputStream extends DataStream {
 
-	/**
-	 * 读取数据
-	 * 
-	 * @param data
-	 */
-	void read(Data data,InChannel inChannel);
+    /**
+     * 读取数据
+     * 
+     * @param data
+     */
+    void read(Data data, InChannel inChannel);
 
 }

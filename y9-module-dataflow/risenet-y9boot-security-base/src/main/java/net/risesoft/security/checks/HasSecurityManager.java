@@ -1,12 +1,12 @@
 package net.risesoft.security.checks;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Component;
 
 import net.risesoft.security.ConcurrentSecurity;
 import net.risesoft.security.SecurityCheck;
 import net.risesoft.security.SecurityConfig;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @Description : 检查是否有安全操作权限 安全管理包含,白名单,服务器,环境

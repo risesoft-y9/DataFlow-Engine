@@ -10,5 +10,4 @@ package risesoft.data.transfer.core.util.strings.handles;
  */
 public interface StringCastValueHandle<T> extends CastValueHandle<T, String> {
 
-
 }

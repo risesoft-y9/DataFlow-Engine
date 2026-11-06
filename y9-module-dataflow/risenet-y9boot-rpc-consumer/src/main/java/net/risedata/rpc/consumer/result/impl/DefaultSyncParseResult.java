@@ -1,19 +1,24 @@
 package net.risedata.rpc.consumer.result.impl;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import net.risedata.rpc.consumer.exceptions.RpcException;
-import net.risedata.rpc.consumer.result.*;
 import net.risedata.rpc.consumer.result.Error;
+import net.risedata.rpc.consumer.result.Result;
+import net.risedata.rpc.consumer.result.Success;
+import net.risedata.rpc.consumer.result.SyncParseResult;
+import net.risedata.rpc.consumer.result.SyncResult;
 import net.risedata.rpc.consumer.result.genericity.GenericitySyncResult;
 import net.risedata.rpc.consumer.result.genericity.ListGenericitySyncResult;
 import net.risedata.rpc.consumer.result.genericity.impl.DefaultGenericitySyncResult;
 import net.risedata.rpc.consumer.result.genericity.impl.DefaultListGenericitySyncResult;
 import net.risedata.rpc.model.Request;
-
-import java.util.*;
 
 /**
  * @description: 默认操作的异步操作实现类
@@ -47,7 +52,7 @@ public class DefaultSyncParseResult implements SyncParseResult, Result {
         this.request = request;
     }
 
-    //类型处理以及result 处理
+    // 类型处理以及result 处理
     @Override
     public void success(String res) {
         this.res = res;
@@ -58,12 +63,11 @@ public class DefaultSyncParseResult implements SyncParseResult, Result {
 
     @Override
     public void error(Throwable e) {
-        this.exception = (RuntimeException) e;
+        this.exception = (RuntimeException)e;
         if (this.eror != null) {
             this.eror.error(request, e);
         }
     }
-
 
     @Override
     public Result getResult() {
@@ -79,7 +83,7 @@ public class DefaultSyncParseResult implements SyncParseResult, Result {
                 thread.notify();
             }
         }).onError((error, e) -> {
-            exception = (RuntimeException) e;
+            exception = (RuntimeException)e;
             synchronized (thread) {
                 thread.notify();
             }
@@ -117,7 +121,7 @@ public class DefaultSyncParseResult implements SyncParseResult, Result {
     public SyncResult onError(Error error) {
         this.eror = error;
         if (exception != null) {
-            error((Throwable) exception);
+            error((Throwable)exception);
         }
         return this;
     }
@@ -136,7 +140,6 @@ public class DefaultSyncParseResult implements SyncParseResult, Result {
     public <T> T getValue(Class<T> returnType) {
         return JSON.parseObject(res, returnType);
     }
-
 
     public Object toMap() {
         if (JSON.isValidArray(res)) {
@@ -162,16 +165,14 @@ public class DefaultSyncParseResult implements SyncParseResult, Result {
             return map;
         }
 
-
     }
-
 
     private Object getObject(Object v) {
         if (v == null) {
             return null;
         }
         if (isJson(v.getClass())) {
-            Map<String, Object> data = ((JSONObject) v).getInnerMap();
+            Map<String, Object> data = ((JSONObject)v).getInnerMap();
             data.forEach((k, v2) -> {
                 Object v3 = getObject(v2);
                 if (v3 != null && v3 != v2) {
@@ -181,7 +182,7 @@ public class DefaultSyncParseResult implements SyncParseResult, Result {
             return data;
         }
         if (isJsonArray(v.getClass())) {
-            List<Object> list = Arrays.asList(((JSONArray) v).toArray());
+            List<Object> list = Arrays.asList(((JSONArray)v).toArray());
             Object temp = null;
             Object temp2 = null;
             for (int i = 0; i < list.size(); i++) {
@@ -203,7 +204,6 @@ public class DefaultSyncParseResult implements SyncParseResult, Result {
         }
         return v;
     }
-
 
     private boolean isJson(Class<?> type) {
         return JSONObject.class == type;

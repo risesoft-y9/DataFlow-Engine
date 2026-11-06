@@ -16,5 +16,5 @@ public interface HttpListener {
 
     void onEnd(ServletRequest request, ServletResponse response);
 
-    void onError(ServletRequest request, ServletResponse response,Exception e);
+    void onError(ServletRequest request, ServletResponse response, Exception e);
 }

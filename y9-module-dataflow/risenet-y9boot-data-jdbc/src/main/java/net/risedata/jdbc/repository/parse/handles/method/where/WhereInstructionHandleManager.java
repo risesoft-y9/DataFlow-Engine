@@ -12,10 +12,10 @@ import net.risedata.jdbc.repository.parse.handles.method.MethodNameBuilder;
  */
 public class WhereInstructionHandleManager {
 
-	public static void handle(MethodNameBuilder builder, ClassBuild classBuild) {
-		if (InstructionManager.hasInstruction(WhereInstructionHandle.class,builder.perviewNext())) {
-			InstructionManager.get(WhereInstructionHandle.class, builder.next(), true).handle(builder, classBuild);
-		}
-	}
+    public static void handle(MethodNameBuilder builder, ClassBuild classBuild) {
+        if (InstructionManager.hasInstruction(WhereInstructionHandle.class, builder.perviewNext())) {
+            InstructionManager.get(WhereInstructionHandle.class, builder.next(), true).handle(builder, classBuild);
+        }
+    }
 
 }

@@ -1,13 +1,13 @@
 package net.risedata.register.discover;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Map;
+
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.util.StringUtils;
 
 import net.risedata.register.service.IServiceInstance;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Map;
 
 /**
  * @Description :
@@ -26,12 +26,13 @@ public class IServiceInstanceImpl implements ServiceInstance {
 
     public IServiceInstanceImpl(IServiceInstance iServiceInstance) {
         this.iServiceInstance = iServiceInstance;
-        this.scheme  = iServiceInstance.isSecure()?"https":"http";
+        this.scheme = iServiceInstance.isSecure() ? "https" : "http";
         try {
 
-            this.uri= new URI(scheme+"://"+iServiceInstance.getHost()+":"+iServiceInstance.getPort()+"/"+ (iServiceInstance.getContext()==null?"":iServiceInstance.getContext()));
+            this.uri = new URI(scheme + "://" + iServiceInstance.getHost() + ":" + iServiceInstance.getPort() + "/"
+                + (iServiceInstance.getContext() == null ? "" : iServiceInstance.getContext()));
         } catch (URISyntaxException e) {
-            DiscoveryManager.LOG.error(iServiceInstance +" create uri error"+e.getMessage());
+            DiscoveryManager.LOG.error(iServiceInstance + " create uri error" + e.getMessage());
         }
     }
 
@@ -57,7 +58,7 @@ public class IServiceInstanceImpl implements ServiceInstance {
 
     @Override
     public URI getUri() {
-        return  uri;
+        return uri;
     }
 
     @Override
@@ -81,11 +82,12 @@ public class IServiceInstanceImpl implements ServiceInstance {
 
     public void setIServiceInstance(IServiceInstance iServiceInstance) {
         this.iServiceInstance = iServiceInstance;
-        this.scheme  = iServiceInstance.isSecure()?"https":"http";
+        this.scheme = iServiceInstance.isSecure() ? "https" : "http";
         try {
-            this.uri= new URI(scheme+"://"+iServiceInstance.getHost()+":"+iServiceInstance.getPort()+ (StringUtils.isEmpty(this.iServiceInstance.getContext())?"":this.iServiceInstance.getContext()));
+            this.uri = new URI(scheme + "://" + iServiceInstance.getHost() + ":" + iServiceInstance.getPort()
+                + (StringUtils.isEmpty(this.iServiceInstance.getContext()) ? "" : this.iServiceInstance.getContext()));
         } catch (URISyntaxException e) {
-            DiscoveryManager.LOG.error(iServiceInstance +" create uri error"+e.getMessage());
+            DiscoveryManager.LOG.error(iServiceInstance + " create uri error" + e.getMessage());
         }
     }
 }

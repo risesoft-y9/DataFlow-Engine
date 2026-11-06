@@ -1,6 +1,5 @@
 package net.risesoft.api.job.creator;
 
-
 import net.risesoft.api.job.JobContext;
 
 /**
@@ -10,11 +9,11 @@ import net.risesoft.api.job.JobContext;
  *
  */
 public interface CreatorMethod {
-	/**
-	 * 参数集
-	 * 
-	 * @param args
-	 * @return
-	 */
-	String create(JobContext context, String[] args);
+    /**
+     * 参数集
+     * 
+     * @param args
+     * @return
+     */
+    String create(JobContext context, String[] args);
 }

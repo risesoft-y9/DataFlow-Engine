@@ -1,6 +1,5 @@
 package risesoft.data.transfer.core.util.strings.handles.impl;
 
-
 import risesoft.data.transfer.core.util.strings.handles.StringCastValueHandle;
 
 /**
@@ -12,13 +11,13 @@ import risesoft.data.transfer.core.util.strings.handles.StringCastValueHandle;
  */
 public class StringToByteHandle implements StringCastValueHandle<Byte> {
 
-	public Class<?>[] getTypes() {
-		return new Class<?>[] { byte.class, Byte.class };
-	}
+    public Class<?>[] getTypes() {
+        return new Class<?>[] {byte.class, Byte.class};
+    }
 
-	@Override
-	public Byte getValue(String value) {
-		return Byte.valueOf(value);
-	}
+    @Override
+    public Byte getValue(String value) {
+        return Byte.valueOf(value);
+    }
 
 }

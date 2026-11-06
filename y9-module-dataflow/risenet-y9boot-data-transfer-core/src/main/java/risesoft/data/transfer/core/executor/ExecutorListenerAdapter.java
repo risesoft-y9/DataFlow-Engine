@@ -9,25 +9,25 @@ package risesoft.data.transfer.core.executor;
  */
 public class ExecutorListenerAdapter implements ExecutorListener {
 
-	@Override
-	public void taskEnd(Object task) {
-		
-	}
+    @Override
+    public void taskEnd(Object task) {
 
-	@Override
-	public void start() {
-		
-	}
+    }
 
-	@Override
-	public void onError(Throwable e) {
-		
-	}
+    @Override
+    public void start() {
 
-	@Override
-	public void taskStart(Object task) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
+
+    @Override
+    public void onError(Throwable e) {
+
+    }
+
+    @Override
+    public void taskStart(Object task) {
+        // TODO Auto-generated method stub
+
+    }
 
 }

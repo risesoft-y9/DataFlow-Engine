@@ -6,98 +6,98 @@ import risesoft.data.transfer.stream.ftp.utils.FTPUtils;
 
 @ConfigBean
 public class FtpConfig {
-	@ConfigField(description = "host", required = true)
-	protected String host;
-	@ConfigField(description = "端口", required = true)
-	protected int port;
-	@ConfigField(description = "用户名", required = true)
-	protected String userName;
-	@ConfigField(description = "密码", required = true)
-	protected String password;
-	@ConfigField(description = "路径", required = true)
-	protected String path;
-	/**
-	 * 缓存区大小单位kb 默认为10kb
-	 */
-	@ConfigField(description = "缓存区", value = "10240")
-	protected int buffer;
-	@ConfigField(description = "日志名字", value = "FtpFileIn")
-	protected String name;
-	@ConfigField(description = "编码", value = FTPUtils.DEFAULT_ENCODING)
-	protected String encoding;
-	@ConfigField(description = "主动模式",value = "false", required = false)
-	private boolean activeModel;
-	
+    @ConfigField(description = "host", required = true)
+    protected String host;
+    @ConfigField(description = "端口", required = true)
+    protected int port;
+    @ConfigField(description = "用户名", required = true)
+    protected String userName;
+    @ConfigField(description = "密码", required = true)
+    protected String password;
+    @ConfigField(description = "路径", required = true)
+    protected String path;
+    /**
+     * 缓存区大小单位kb 默认为10kb
+     */
+    @ConfigField(description = "缓存区", value = "10240")
+    protected int buffer;
+    @ConfigField(description = "日志名字", value = "FtpFileIn")
+    protected String name;
+    @ConfigField(description = "编码", value = FTPUtils.DEFAULT_ENCODING)
+    protected String encoding;
+    @ConfigField(description = "主动模式", value = "false", required = false)
+    private boolean activeModel;
 
-	public boolean isActiveModel() {
-		return activeModel;
-	}
+    public boolean isActiveModel() {
+        return activeModel;
+    }
 
-	public void setActiveModel(boolean activeModel) {
-		this.activeModel = activeModel;
-	}
-	public String getHost() {
-		return host;
-	}
+    public void setActiveModel(boolean activeModel) {
+        this.activeModel = activeModel;
+    }
 
-	public void setHost(String host) {
-		this.host = host;
-	}
+    public String getHost() {
+        return host;
+    }
 
-	public int getPort() {
-		return port;
-	}
+    public void setHost(String host) {
+        this.host = host;
+    }
 
-	public void setPort(int port) {
-		this.port = port;
-	}
+    public int getPort() {
+        return port;
+    }
 
-	public String getUserName() {
-		return userName;
-	}
+    public void setPort(int port) {
+        this.port = port;
+    }
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
+    public String getUserName() {
+        return userName;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public String getPath() {
-		return path;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public void setPath(String path) {
-		this.path = path;
-	}
+    public String getPath() {
+        return path;
+    }
 
-	public int getBuffer() {
-		return buffer;
-	}
+    public void setPath(String path) {
+        this.path = path;
+    }
 
-	public void setBuffer(int buffer) {
-		this.buffer = buffer;
-	}
+    public int getBuffer() {
+        return buffer;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setBuffer(int buffer) {
+        this.buffer = buffer;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getEncoding() {
-		return encoding;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setEncoding(String encoding) {
-		this.encoding = encoding;
-	}
+    public String getEncoding() {
+        return encoding;
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
+    }
 
 }

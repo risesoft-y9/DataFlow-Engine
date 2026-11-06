@@ -19,38 +19,39 @@ import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
  * @date 2024年1月25日
  * @author lb
  */
-public class StringPreparedStatementHandle extends NullCharValuePreparedStatementHandle implements PreparedStatementHandle,PreparedStatementHandleFactory {
+public class StringPreparedStatementHandle extends NullCharValuePreparedStatementHandle
+    implements PreparedStatementHandle, PreparedStatementHandleFactory {
 
-	@Override
-	public boolean isHandle(int type) {
-		switch (type) {
-		case Types.CHAR:
-		case Types.NCHAR:
-		case Types.VARCHAR:
-		case Types.LONGVARCHAR:
-		case Types.NVARCHAR:
-		case Types.LONGNVARCHAR:
-			return true;
-		default:
-			return false;
-		}
-	}
+    @Override
+    public boolean isHandle(int type) {
+        switch (type) {
+            case Types.CHAR:
+            case Types.NCHAR:
+            case Types.VARCHAR:
+            case Types.LONGVARCHAR:
+            case Types.NVARCHAR:
+            case Types.LONGNVARCHAR:
+                return true;
+            default:
+                return false;
+        }
+    }
 
-	@Override
-	public boolean isBigType() {
-		return false;
-	}
+    @Override
+    public boolean isBigType() {
+        return false;
+    }
 
-	@Override
-	public void fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, Column column,
-			DataBaseType dataBaseType, Triple<List<String>, List<Integer>, List<String>> resultSetMetaData)
-			throws Exception {
-		preparedStatement.setString(columnIndex, column.asString());
-	}
+    @Override
+    public void fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, Column column,
+        DataBaseType dataBaseType, Triple<List<String>, List<Integer>, List<String>> resultSetMetaData)
+        throws Exception {
+        preparedStatement.setString(columnIndex, column.asString());
+    }
 
-	@Override
-	public PreparedStatementHandle getPreparedStatementHandle(int type) {
-		return this;
-	}
+    @Override
+    public PreparedStatementHandle getPreparedStatementHandle(int type) {
+        return this;
+    }
 
 }

@@ -12,13 +12,13 @@ import risesoft.data.transfer.core.util.Configuration;
  * @author lb
  */
 public interface ConfigLoad {
-	/**
-	 * 加载配置
-	 * 
-	 * @param config
-	 * @param jobContext
-	 * @return
-	 */
-	Configuration laod(Configuration config,JobContext jobContext);
+    /**
+     * 加载配置
+     * 
+     * @param config
+     * @param jobContext
+     * @return
+     */
+    Configuration laod(Configuration config, JobContext jobContext);
 
 }

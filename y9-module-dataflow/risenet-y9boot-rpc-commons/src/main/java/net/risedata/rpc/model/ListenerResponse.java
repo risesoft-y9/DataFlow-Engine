@@ -36,9 +36,6 @@ public class ListenerResponse {
 
     @Override
     public String toString() {
-        return "ListenerResponse{" +
-                "status=" + status +
-                ", msg='" + msg + '\'' +
-                '}';
+        return "ListenerResponse{" + "status=" + status + ", msg='" + msg + '\'' + '}';
     }
 }

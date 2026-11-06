@@ -9,7 +9,6 @@ import net.risesoft.api.persistence.model.IServiceInstanceModel;
  * @Date 2022/8/30 15:03
  * @Version 1.0
  */
-public interface InstanceMessage extends  MessageCreator<IServiceInstanceModel> {
-
+public interface InstanceMessage extends MessageCreator<IServiceInstanceModel> {
 
 }

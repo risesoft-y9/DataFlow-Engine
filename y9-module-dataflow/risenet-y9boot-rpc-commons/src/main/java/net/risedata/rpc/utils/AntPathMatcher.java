@@ -3,8 +3,7 @@ package net.risedata.rpc.utils;
 /**
  * shiro url 匹配算法工具
  */
-public class AntPathMatcher  {
-
+public class AntPathMatcher {
 
     /**
      * Default path separator: "/"
@@ -13,15 +12,12 @@ public class AntPathMatcher  {
 
     private String pathSeparator = DEFAULT_PATH_SEPARATOR;
 
-
     /**
-     * Set the path separator to use for pattern parsing.
-     * Default is "/", as in Ant.
+     * Set the path separator to use for pattern parsing. Default is "/", as in Ant.
      */
     public void setPathSeparator(String pathSeparator) {
         this.pathSeparator = (pathSeparator != null ? pathSeparator : DEFAULT_PATH_SEPARATOR);
     }
-
 
     public boolean isPattern(String path) {
         return (path.indexOf('*') != -1 || path.indexOf('?') != -1);
@@ -39,16 +35,14 @@ public class AntPathMatcher  {
         return doMatch(pattern, path, false);
     }
 
-
     /**
      * Actually match the given <code>path</code> against the given <code>pattern</code>.
      *
-     * @param pattern   the pattern to match against
-     * @param path      the path String to test
-     * @param fullMatch whether a full pattern match is required
-     *                  (else a pattern match as far as the given base path goes is sufficient)
-     * @return <code>true</code> if the supplied <code>path</code> matched,
-     *         <code>false</code> if it didn't
+     * @param pattern the pattern to match against
+     * @param path the path String to test
+     * @param fullMatch whether a full pattern match is required (else a pattern match as far as the given base path
+     *            goes is sufficient)
+     * @return <code>true</code> if the supplied <code>path</code> matched, <code>false</code> if it didn't
      */
     protected boolean doMatch(String pattern, String path, boolean fullMatch) {
         if (path.startsWith(this.pathSeparator) != pattern.startsWith(this.pathSeparator)) {
@@ -79,14 +73,13 @@ public class AntPathMatcher  {
         if (pathIdxStart > pathIdxEnd) {
             // Path is exhausted, only match if rest of pattern is * or **'s
             if (pattIdxStart > pattIdxEnd) {
-                return (pattern.endsWith(this.pathSeparator) ?
-                        path.endsWith(this.pathSeparator) : !path.endsWith(this.pathSeparator));
+                return (pattern.endsWith(this.pathSeparator) ? path.endsWith(this.pathSeparator)
+                    : !path.endsWith(this.pathSeparator));
             }
             if (!fullMatch) {
                 return true;
             }
-            if (pattIdxStart == pattIdxEnd && pattDirs[pattIdxStart].equals("*") &&
-                    path.endsWith(this.pathSeparator)) {
+            if (pattIdxStart == pattIdxEnd && pattDirs[pattIdxStart].equals("*") && path.endsWith(this.pathSeparator)) {
                 return true;
             }
             for (int i = pattIdxStart; i <= pattIdxEnd; i++) {
@@ -147,8 +140,8 @@ public class AntPathMatcher  {
             strLoop:
             for (int i = 0; i <= strLength - patLength; i++) {
                 for (int j = 0; j < patLength; j++) {
-                    String subPat = (String) pattDirs[pattIdxStart + j + 1];
-                    String subStr = (String) pathDirs[pathIdxStart + i + j];
+                    String subPat = (String)pattDirs[pattIdxStart + j + 1];
+                    String subStr = (String)pathDirs[pathIdxStart + i + j];
                     if (!matchStrings(subPat, subStr)) {
                         continue strLoop;
                     }
@@ -175,17 +168,13 @@ public class AntPathMatcher  {
     }
 
     /**
-     * Tests whether or not a string matches against a pattern.
-     * The pattern may contain two special characters:<br>
+     * Tests whether or not a string matches against a pattern. The pattern may contain two special characters:<br>
      * '*' means zero or more characters<br>
      * '?' means one and only one character
      *
-     * @param pattern pattern to match against.
-     *                Must not be <code>null</code>.
-     * @param str     string which must be matched against the pattern.
-     *                Must not be <code>null</code>.
-     * @return <code>true</code> if the string matches against the
-     *         pattern, or <code>false</code> otherwise.
+     * @param pattern pattern to match against. Must not be <code>null</code>.
+     * @param str string which must be matched against the pattern. Must not be <code>null</code>.
+     * @return <code>true</code> if the string matches against the pattern, or <code>false</code> otherwise.
      */
     private boolean matchStrings(String pattern, String str) {
         char[] patArr = pattern.toCharArray();
@@ -219,7 +208,6 @@ public class AntPathMatcher  {
             }
             return true; // String matches against pattern
         }
-
 
         if (patIdxEnd == 0) {
             return true; // Pattern contains only '*', which matches anything
@@ -323,19 +311,22 @@ public class AntPathMatcher  {
 
     /**
      * Given a pattern and a full path, determine the pattern-mapped part.
-     * <p>For example:
+     * <p>
+     * For example:
      * <ul>
      * <li>'<code>/docs/cvs/commit.html</code>' and '<code>/docs/cvs/commit.html</code> -> ''</li>
      * <li>'<code>/docs/*</code>' and '<code>/docs/cvs/commit</code> -> '<code>cvs/commit</code>'</li>
      * <li>'<code>/docs/cvs/*.html</code>' and '<code>/docs/cvs/commit.html</code> -> '<code>commit.html</code>'</li>
      * <li>'<code>/docs/**</code>' and '<code>/docs/cvs/commit</code> -> '<code>cvs/commit</code>'</li>
-     * <li>'<code>/docs/**\/*.html</code>' and '<code>/docs/cvs/commit.html</code> -> '<code>cvs/commit.html</code>'</li>
+     * <li>'<code>/docs/**\/*.html</code>' and '<code>/docs/cvs/commit.html</code> ->
+     * '<code>cvs/commit.html</code>'</li>
      * <li>'<code>/*.html</code>' and '<code>/docs/cvs/commit.html</code> -> '<code>docs/cvs/commit.html</code>'</li>
      * <li>'<code>*.html</code>' and '<code>/docs/cvs/commit.html</code> -> '<code>/docs/cvs/commit.html</code>'</li>
      * <li>'<code>*</code>' and '<code>/docs/cvs/commit.html</code> -> '<code>/docs/cvs/commit.html</code>'</li>
      * </ul>
-     * <p>Assumes that {@link #match} returns <code>true</code> for '<code>pattern</code>'
-     * and '<code>path</code>', but does <strong>not</strong> enforce this.
+     * <p>
+     * Assumes that {@link #match} returns <code>true</code> for '<code>pattern</code>' and '<code>path</code>', but
+     * does <strong>not</strong> enforce this.
      */
     public String extractPathWithinPattern(String pattern, String path) {
         String[] patternParts = StringUtils.tokenizeToStringArray(pattern, this.pathSeparator);

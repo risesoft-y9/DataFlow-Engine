@@ -13,37 +13,40 @@ import net.risesoft.y9.Y9LoginUserHolder;
 @Service
 public class DataBusinessService {
 
-	/**
-	 * 根据ID获取名称
-	 * @return
-	 */
-	public String getNameById(String id) {
-		try {
-			return Y9KernelApiUtil.getNameById(Y9LoginUserHolder.getTenantId(), id);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return "";
-	}
+    /**
+     * 根据ID获取名称
+     * 
+     * @return
+     */
+    public String getNameById(String id) {
+        try {
+            return Y9KernelApiUtil.getNameById(Y9LoginUserHolder.getTenantId(), id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
 
-	/**
-	 * 获取全部数据
-	 * @return
-	 */
-	public List<Map<String, Object>> findAll() {
-		List<Map<String, Object>> listMap = new ArrayList<Map<String,Object>>();
-		try {
-			listMap = Y9KernelApiUtil.getDataCatalogTree(Y9LoginUserHolder.getTenantId(), Y9LoginUserHolder.getPersonId(), true);
-			listMap.stream().map((item) -> {
-	        	if(item.get("parentId") == null) {
-	        		item.put("parentId", "0");
-	        	}
-	            return item;
-	        }).collect(Collectors.toList());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return listMap;
-	}
-	
+    /**
+     * 获取全部数据
+     * 
+     * @return
+     */
+    public List<Map<String, Object>> findAll() {
+        List<Map<String, Object>> listMap = new ArrayList<Map<String, Object>>();
+        try {
+            listMap = Y9KernelApiUtil.getDataCatalogTree(Y9LoginUserHolder.getTenantId(),
+                Y9LoginUserHolder.getPersonId(), true);
+            listMap.stream().map((item) -> {
+                if (item.get("parentId") == null) {
+                    item.put("parentId", "0");
+                }
+                return item;
+            }).collect(Collectors.toList());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return listMap;
+    }
+
 }

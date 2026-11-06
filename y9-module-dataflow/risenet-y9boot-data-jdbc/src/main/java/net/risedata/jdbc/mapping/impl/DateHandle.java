@@ -20,42 +20,42 @@ import net.risedata.jdbc.mapping.HandleMapping;
  */
 public class DateHandle implements HandleMapping<Date>, CastHandleMapping<Date> {
 
-	@Override
-	public boolean isHandle(Class<?> cla) {
-		return cla == Date.class || cla == java.sql.Date.class || cla == Timestamp.class;
-	}
+    @Override
+    public boolean isHandle(Class<?> cla) {
+        return cla == Date.class || cla == java.sql.Date.class || cla == Timestamp.class;
+    }
 
-	@Override
-	public Date getValue(ResultSet set, String field) throws SQLException {
-		//拿到时间而不是date 因为时间才能装换成对应的类
-		return set.getTimestamp(field);
-	}
+    @Override
+    public Date getValue(ResultSet set, String field) throws SQLException {
+        // 拿到时间而不是date 因为时间才能装换成对应的类
+        return set.getTimestamp(field);
+    }
 
-	@Override
-	public Date toValue(Object o) {
-		if (o instanceof Date) {
-			return (Date) o;
-		}
-		if (o instanceof Timestamp) {
-			return new Date(((Timestamp) o).getTime());
-		}
-		return DateUtils.parse(o.toString());
-	}
+    @Override
+    public Date toValue(Object o) {
+        if (o instanceof Date) {
+            return (Date)o;
+        }
+        if (o instanceof Timestamp) {
+            return new Date(((Timestamp)o).getTime());
+        }
+        return DateUtils.parse(o.toString());
+    }
 
-	@Override
-	public void handle(Object o, Field field, SetValueExecutor<Field> setValueExecutor, Class<?> type, Date value)
-			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {   
-		if (value!=null) {
-			if (type==Timestamp.class) {
-			
-				field.set(o, value);
-			}else if (type == java.sql.Date.class) {
-				field.set(o,new java.sql.Date( value.getTime()));
-			}else {
-				field.set(o,(Date) value);
-			}
-		}
+    @Override
+    public void handle(Object o, Field field, SetValueExecutor<Field> setValueExecutor, Class<?> type, Date value)
+        throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        if (value != null) {
+            if (type == Timestamp.class) {
 
-	}
+                field.set(o, value);
+            } else if (type == java.sql.Date.class) {
+                field.set(o, new java.sql.Date(value.getTime()));
+            } else {
+                field.set(o, (Date)value);
+            }
+        }
+
+    }
 
 }

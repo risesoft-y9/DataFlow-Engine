@@ -10,6 +10,7 @@ package net.risesoft.api.job.actions.dispatch.executor;
 public interface Result {
     /**
      * 成功
+     * 
      * @param success
      * @return
      */
@@ -17,6 +18,7 @@ public interface Result {
 
     /**
      * 异常
+     * 
      * @param error
      * @return
      */
@@ -24,10 +26,9 @@ public interface Result {
 
     /**
      * 同步的获取结果
+     * 
      * @return
      */
     Object getValue();
-
-
 
 }

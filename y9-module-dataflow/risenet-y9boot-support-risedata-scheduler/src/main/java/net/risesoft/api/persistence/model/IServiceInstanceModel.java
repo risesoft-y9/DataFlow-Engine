@@ -1,14 +1,19 @@
 package net.risesoft.api.persistence.model;
 
+import java.io.Serializable;
+import java.util.Map;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import net.risedata.register.model.WatchProperties;
 import net.risesoft.security.GetEnvironment;
-
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Map;
 
 /**
  * @Description : 实例数据 实体类
@@ -20,7 +25,7 @@ import java.util.Map;
 @Entity
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer"})
 @Table(name = "Y9_DATASERVICE_ISERVICE")
-public class IServiceInstanceModel implements Serializable, GetEnvironment, GetService{
+public class IServiceInstanceModel implements Serializable, GetEnvironment, GetService {
 
     public static Integer TRUE = 1;
 
@@ -105,7 +110,7 @@ public class IServiceInstanceModel implements Serializable, GetEnvironment, GetS
     @Column(name = "WEIGHT", length = 10)
     private Integer weight;
     /**
-     * 状态，1-等待   0-正常  2-异常   3-暂停
+     * 状态，1-等待 0-正常 2-异常 3-暂停
      */
     @Column(name = "STATUS", length = 1)
     private Integer status;
@@ -140,7 +145,6 @@ public class IServiceInstanceModel implements Serializable, GetEnvironment, GetS
      */
     @Column(name = "WATCH_SERVER", length = 200)
     private String watchServer;
-
 
     public String getWatchServer() {
         return watchServer;
@@ -198,7 +202,6 @@ public class IServiceInstanceModel implements Serializable, GetEnvironment, GetS
         this.logPath = logPath;
     }
 
-
     public String getType() {
         return type;
     }
@@ -207,7 +210,6 @@ public class IServiceInstanceModel implements Serializable, GetEnvironment, GetS
         this.type = type;
     }
 
-
     public String getVersion() {
         return version;
     }
@@ -215,7 +217,6 @@ public class IServiceInstanceModel implements Serializable, GetEnvironment, GetS
     public void setVersion(String version) {
         this.version = version;
     }
-
 
     public String getDescription() {
         return description;
@@ -237,7 +238,6 @@ public class IServiceInstanceModel implements Serializable, GetEnvironment, GetS
         return instanceId;
     }
 
-
     public void setInstanceId(String instanceId) {
         this.instanceId = instanceId;
     }
@@ -257,7 +257,6 @@ public class IServiceInstanceModel implements Serializable, GetEnvironment, GetS
     public void setHost(String host) {
         this.host = host;
     }
-
 
     public String getScheme() {
         return scheme;
@@ -343,27 +342,13 @@ public class IServiceInstanceModel implements Serializable, GetEnvironment, GetS
 
     @Override
     public String toString() {
-        return "IServiceInstanceModel{" +
-                "instanceId='" + instanceId + '\'' +
-                ", serviceId='" + serviceId + '\'' +
-                ", host='" + host + '\'' +
-                ", version='" + version + '\'' +
-                ", description='" + description + '\'' +
-                ", managerInfo='" + managerInfo + '\'' +
-                ", port=" + port +
-                ", secure=" + secure +
-                ", logPath='" + logPath + '\'' +
-                ", scheme='" + scheme + '\'' +
-                ", metadata='" + metadata + '\'' +
-                ", watchInfo='" + watchInfo + '\'' +
-                ", context='" + context + '\'' +
-                ", status=" + status +
-                ", custom=" + custom +
-                ", updateTime=" + updateTime +
-                ", registerTime=" + registerTime +
-                ", environment='" + environment + '\'' +
-                ", type='" + type + '\'' +
-                '}';
+        return "IServiceInstanceModel{" + "instanceId='" + instanceId + '\'' + ", serviceId='" + serviceId + '\''
+            + ", host='" + host + '\'' + ", version='" + version + '\'' + ", description='" + description + '\''
+            + ", managerInfo='" + managerInfo + '\'' + ", port=" + port + ", secure=" + secure + ", logPath='" + logPath
+            + '\'' + ", scheme='" + scheme + '\'' + ", metadata='" + metadata + '\'' + ", watchInfo='" + watchInfo
+            + '\'' + ", context='" + context + '\'' + ", status=" + status + ", custom=" + custom + ", updateTime="
+            + updateTime + ", registerTime=" + registerTime + ", environment='" + environment + '\'' + ", type='" + type
+            + '\'' + '}';
     }
 
     @Override

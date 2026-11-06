@@ -14,81 +14,83 @@ import net.risesoft.security.model.DataUser;
  * @Version 1.0
  */
 public interface UserService {
-	
-	/**
-	 * 登录状态
-	 * 
-	 * @param userName 用户名
-	 * @param password 密码
-	 * @return 返回用户
-	 */
-	DataUser checkLogin(String account, String password);
 
-	/**
-	 * 修改密码 用户id 用户密码
-	 * 
-	 * @param userId
-	 * @param password
-	 */
-	void updatePassword(String userId, String password);
+    /**
+     * 登录状态
+     * 
+     * @param userName 用户名
+     * @param password 密码
+     * @return 返回用户
+     */
+    DataUser checkLogin(String account, String password);
 
-	/**
-	 * 删除用户
-	 * 
-	 * @param userId 用户id
-	 */
-	Integer deleteUser(String userId);
+    /**
+     * 修改密码 用户id 用户密码
+     * 
+     * @param userId
+     * @param password
+     */
+    void updatePassword(String userId, String password);
 
-	/**
-	 * 拿到所有用户
-	 * 
-	 * @return
-	 */
-	List<String> findAll();
+    /**
+     * 删除用户
+     * 
+     * @param userId 用户id
+     */
+    Integer deleteUser(String userId);
 
-	/**
-	 * 根据id 获取用户
-	 * 
-	 * @param id
-	 * @return
-	 */
-	DataUser findOne(String id);
+    /**
+     * 拿到所有用户
+     * 
+     * @return
+     */
+    List<String> findAll();
 
-	/**
-	 * 修改用户信息
-	 * 
-	 * @param user
-	 * @return
-	 */
-	Integer updateInfoById(DataUser user);
+    /**
+     * 根据id 获取用户
+     * 
+     * @param id
+     * @return
+     */
+    DataUser findOne(String id);
 
-	LPage<DataUser> searchForPage(DataUser betaUser, LPageable lPageable);
+    /**
+     * 修改用户信息
+     * 
+     * @param user
+     * @return
+     */
+    Integer updateInfoById(DataUser user);
 
-	/**
-	 * 查询用户是否在某个角色里面/或者排除
-	 * 
-	 * @param betaUser
-	 * @param page
-	 * @param roleId
-	 * @param isNot
-	 * @return
-	 */
-	LPage<DataUser> searchForPageRole(DataUser betaUser, LPageable page, String roleId, boolean isNot);
+    LPage<DataUser> searchForPage(DataUser betaUser, LPageable lPageable);
 
-	String createUser(DataUser dataUser);
-	
-	/**
-	 * 判断人员是否存在
-	 * @param name
-	 * @return
-	 */
-	Integer hasName(String name);
-	
-	/**
-	 * 根据登录名获取用户
-	 * @param account
-	 * @return
-	 */
-	DataUser getByLoginName(String account);
+    /**
+     * 查询用户是否在某个角色里面/或者排除
+     * 
+     * @param betaUser
+     * @param page
+     * @param roleId
+     * @param isNot
+     * @return
+     */
+    LPage<DataUser> searchForPageRole(DataUser betaUser, LPageable page, String roleId, boolean isNot);
+
+    String createUser(DataUser dataUser);
+
+    /**
+     * 判断人员是否存在
+     * 
+     * @param name
+     * @return
+     */
+    Integer hasName(String name);
+
+    /**
+     * 根据登录名获取用户
+     * 
+     * @param account
+     * @return
+     */
+    DataUser getByLoginName(String account);
 
 }

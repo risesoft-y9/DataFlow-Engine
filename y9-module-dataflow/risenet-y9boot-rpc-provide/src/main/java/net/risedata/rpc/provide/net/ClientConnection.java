@@ -1,10 +1,12 @@
 package net.risedata.rpc.provide.net;
 
+import java.net.SocketAddress;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import com.alibaba.fastjson.JSON;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import net.risedata.rpc.model.ListenerResponse;
 import net.risedata.rpc.model.Msg;
 import net.risedata.rpc.model.Request;
@@ -20,11 +22,8 @@ import net.risedata.rpc.provide.model.ListenerRequest;
 import net.risedata.rpc.service.RPCExecutorService;
 import net.risedata.rpc.utils.IdUtils;
 
-import java.net.SocketAddress;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
  * @description: server端的执行器用于执行方法以及返回
@@ -47,13 +46,11 @@ public class ClientConnection extends SimpleChannelInboundHandler<Msg> {
      */
     private Listener listener;
 
-
     public ClientConnection(String id, Listener listener) {
         this.id = id;
         this.listener = listener;
         this.resultMap = new ConcurrentHashMap<>();
     }
-
 
     private volatile Map<String, Object> attributes;
 
@@ -77,10 +74,10 @@ public class ClientConnection extends SimpleChannelInboundHandler<Msg> {
     /**
      * 发送一个事件给该连接
      *
-     * @param name     事件名
-     * @param args     参数
+     * @param name 事件名
+     * @param args 参数
      * @param isResult 是否等待返回值如果为false 则返回空
-     * @param timeOut  等待返回值超时时间
+     * @param timeOut 等待返回值超时时间
      */
     public SyncResult pushListener(String name, Map<String, Object> args, boolean isResult, long timeOut) {
         try {
@@ -138,7 +135,7 @@ public class ClientConnection extends SimpleChannelInboundHandler<Msg> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Msg msg) throws Exception {
         Request request = Request.as(msg);
-        //TODO 此处拿到了请求的id  TODO 调用内部自带的操作方法
+        // TODO 此处拿到了请求的id TODO 调用内部自带的操作方法
         try {
             RPCRequestContext rpcRequestContext = new RPCRequestContext(this, request);
             switch (request.getType()) {
@@ -209,7 +206,6 @@ public class ClientConnection extends SimpleChannelInboundHandler<Msg> {
         return this.attributes.put(key, value);
     }
 
-
     private void initAttributes() {
         if (this.attributes == null) {
             synchronized (id) {
@@ -266,7 +262,7 @@ public class ClientConnection extends SimpleChannelInboundHandler<Msg> {
         super.handlerRemoved(ctx);
         listener.onClosed(this);
         Application.logger.info(ctx.channel().remoteAddress() + " closed :");
-        //关闭所有正在调用的方法
+        // 关闭所有正在调用的方法
         for (SyncListenerResult listenerResult : resultMap.values()) {
             listenerResult.error(new ListenerException("connection remove"));
         }
@@ -293,6 +289,5 @@ public class ClientConnection extends SimpleChannelInboundHandler<Msg> {
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
         Application.logger.info(ctx.channel().remoteAddress() + " connection");
     }
-
 
 }

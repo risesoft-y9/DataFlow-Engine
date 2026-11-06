@@ -21,5 +21,4 @@ public class SyncGenericityResultHandle implements ReturnValueHandle {
         return result.as(returnType.toGenericityClass(args));
     }
 
-
 }

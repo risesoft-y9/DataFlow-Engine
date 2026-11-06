@@ -1,6 +1,5 @@
 package net.risedata.register.container.jar;
 
-
 import java.io.File;
 
 import net.risedata.register.container.SystemContainerManager;
@@ -26,7 +25,7 @@ public class JARContainerManager extends SystemContainerManager {
     public JARContainerManager(SystemOperation systemOperation, String rootPath, String jarName) {
         super(systemOperation, rootPath);
         this.jarName = jarName;
-        LOGGER.info("rootPath: "+rootPath+",jar name"+jarName);
+        LOGGER.info("rootPath: " + rootPath + ",jar name" + jarName);
 
     }
 
@@ -50,13 +49,11 @@ public class JARContainerManager extends SystemContainerManager {
         return null;
     }
 
-
     @Override
     public void start() {
         System.out.println("启动");
-        systemOperation.execute(false,"cd " + rootPath, systemOperation.nohupRun("java -jar " + jarName));
+        systemOperation.execute(false, "cd " + rootPath, systemOperation.nohupRun("java -jar " + jarName));
 
     }
-
 
 }

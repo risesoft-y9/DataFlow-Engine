@@ -15,54 +15,54 @@ import net.risesoft.y9public.entity.DataArrangeEntity;
 
 public class DataArrangeSpecification implements Specification<DataArrangeEntity> {
 
-	private static final long serialVersionUID = 9170391321871431040L;
-	
-	private String name;
-	private Integer pattern;
-	private String tenantId;
-	
-	public DataArrangeSpecification() {
-		super();
-	}
+    private static final long serialVersionUID = 9170391321871431040L;
 
-	public DataArrangeSpecification(String name, Integer pattern, String tenantId) {
-		super();
-		this.name = name;
-		this.pattern = pattern;
-		this.tenantId = tenantId;
-	}
+    private String name;
+    private Integer pattern;
+    private String tenantId;
 
-	@Override
-	public Predicate toPredicate(Root<DataArrangeEntity> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-		Predicate predicate = cb.conjunction();
-		List<Expression<Boolean>> expressions = predicate.getExpressions();
+    public DataArrangeSpecification() {
+        super();
+    }
 
-		if(StringUtils.isNotBlank(name)) {
-			expressions.add(cb.like(root.get("name").as(String.class), "%" + name + "%"));
-		}
-		if(pattern != null) {
-			expressions.add(cb.equal(root.get("pattern").as(Integer.class), pattern));
-		}
-		if(StringUtils.isNotBlank(tenantId)) {
-			expressions.add(cb.equal(root.get("tenantId").as(String.class), tenantId));
-		}
-		return predicate;
-	}
+    public DataArrangeSpecification(String name, Integer pattern, String tenantId) {
+        super();
+        this.name = name;
+        this.pattern = pattern;
+        this.tenantId = tenantId;
+    }
 
-	public String getName() {
-		return name;
-	}
+    @Override
+    public Predicate toPredicate(Root<DataArrangeEntity> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+        Predicate predicate = cb.conjunction();
+        List<Expression<Boolean>> expressions = predicate.getExpressions();
 
-	public void setName(String name) {
-		this.name = name;
-	}
+        if (StringUtils.isNotBlank(name)) {
+            expressions.add(cb.like(root.get("name").as(String.class), "%" + name + "%"));
+        }
+        if (pattern != null) {
+            expressions.add(cb.equal(root.get("pattern").as(Integer.class), pattern));
+        }
+        if (StringUtils.isNotBlank(tenantId)) {
+            expressions.add(cb.equal(root.get("tenantId").as(String.class), tenantId));
+        }
+        return predicate;
+    }
 
-	public Integer getPattern() {
-		return pattern;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setPattern(Integer pattern) {
-		this.pattern = pattern;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getPattern() {
+        return pattern;
+    }
+
+    public void setPattern(Integer pattern) {
+        this.pattern = pattern;
+    }
 
 }

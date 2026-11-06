@@ -1,5 +1,15 @@
 package net.risesoft.security.service.impl;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import net.risedata.jdbc.commons.LPage;
 import net.risedata.jdbc.search.LPageable;
 import net.risedata.jdbc.service.impl.AutomaticCrudService;
@@ -7,12 +17,6 @@ import net.risesoft.security.model.NetworkWhiteList;
 import net.risesoft.security.service.NetworkWhiteListService;
 import net.risesoft.util.AutoIdUtil;
 import net.risesoft.util.PattenUtil;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
 
 /**
  * @Description : 网络操作白名单
@@ -22,8 +26,9 @@ import java.util.*;
  * @Version 1.0
  */
 @Service
-public class NetworkWhiteListServiceImpl extends AutomaticCrudService<NetworkWhiteList, String> implements NetworkWhiteListService {
-	
+public class NetworkWhiteListServiceImpl extends AutomaticCrudService<NetworkWhiteList, String>
+    implements NetworkWhiteListService {
+
     @Override
     public void saveNetworkWhiteList(NetworkWhiteList network) {
         if (StringUtils.isEmpty(network.getId())) {
@@ -65,7 +70,6 @@ public class NetworkWhiteListServiceImpl extends AutomaticCrudService<NetworkWhi
         }
         return lists;
     }
-
 
     @Override
     public List<String> joinService(List<NetworkWhiteList> networkWhiteLists) {
@@ -116,14 +120,14 @@ public class NetworkWhiteListServiceImpl extends AutomaticCrudService<NetworkWhi
         }
     }
 
-	@Override
-	public NetworkWhiteList findById(String id) {
-		return getOne(id);
-	}
+    @Override
+    public NetworkWhiteList findById(String id) {
+        return getOne(id);
+    }
 
-	@Override
-	public List<NetworkWhiteList> findAll() {
-		return searchAll();
-	}
+    @Override
+    public List<NetworkWhiteList> findAll() {
+        return searchAll();
+    }
 
 }

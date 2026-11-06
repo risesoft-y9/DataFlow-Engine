@@ -21,49 +21,49 @@ import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
  */
 public class NumberPreparedStatementHandle implements PreparedStatementHandleFactory {
 
-	@Override
-	public boolean isHandle(int type) {
-		switch (type) {
-		case Types.SMALLINT:
-		case Types.INTEGER:
-		case Types.BIGINT:
-		case Types.NUMERIC:
-		case Types.DECIMAL:
-		case Types.FLOAT:
-		case Types.REAL:
-		case Types.DOUBLE:
-			return true;
-		default:
-			return false;
-		}
-	}
+    @Override
+    public boolean isHandle(int type) {
+        switch (type) {
+            case Types.SMALLINT:
+            case Types.INTEGER:
+            case Types.BIGINT:
+            case Types.NUMERIC:
+            case Types.DECIMAL:
+            case Types.FLOAT:
+            case Types.REAL:
+            case Types.DOUBLE:
+                return true;
+            default:
+                return false;
+        }
+    }
 
+    @Override
+    public PreparedStatementHandle getPreparedStatementHandle(int type) {
+        return new ZeroNullValuePreparedStatementHandle() {
+            @Override
+            public boolean isBigType() {
+                return false;
+            }
 
-	@Override
-	public PreparedStatementHandle getPreparedStatementHandle(int type) {
-		return new ZeroNullValuePreparedStatementHandle() {
-			@Override
-			public boolean isBigType() {
-				return false;
-			}
-			@Override
-			public void fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex,
-					Column column, DataBaseType dataBaseType,
-					Triple<List<String>, List<Integer>, List<String>> resultSetMetaData) throws Exception {
-				Double strValue = column.asDouble();
-				if (strValue == null) {
-					preparedStatement.setNull(columnIndex, type);
-				} else {
-					// 解决double精度问题
-					if (column.asString().indexOf(".") != -1) {
-						preparedStatement.setDouble(columnIndex, strValue);
-					} else {
-						preparedStatement.setBigDecimal(columnIndex, column.asBigDecimal());
-					}
+            @Override
+            public void fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex,
+                Column column, DataBaseType dataBaseType,
+                Triple<List<String>, List<Integer>, List<String>> resultSetMetaData) throws Exception {
+                Double strValue = column.asDouble();
+                if (strValue == null) {
+                    preparedStatement.setNull(columnIndex, type);
+                } else {
+                    // 解决double精度问题
+                    if (column.asString().indexOf(".") != -1) {
+                        preparedStatement.setDouble(columnIndex, strValue);
+                    } else {
+                        preparedStatement.setBigDecimal(columnIndex, column.asBigDecimal());
+                    }
 
-				}
-			}
-		};
-	}
+                }
+            }
+        };
+    }
 
 }

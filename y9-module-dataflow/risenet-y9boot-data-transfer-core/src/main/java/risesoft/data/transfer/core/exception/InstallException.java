@@ -10,12 +10,12 @@ package risesoft.data.transfer.core.exception;
  */
 public class InstallException extends RuntimeException {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
-	public InstallException(String msg) {
-		super(msg);
-	}
+    public InstallException(String msg) {
+        super(msg);
+    }
 }

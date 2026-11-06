@@ -8,16 +8,16 @@ import net.risedata.jdbc.repository.model.ReturnType;
 import net.risedata.jdbc.repository.proxy.RepositoryCreateFactory;
 
 public class MapSearchReturnHandle implements SearchReturnHandle {
-	private final String CODE = "return " + RepositoryCreateFactory.JDBC_TEMPLATE + ".queryForMap(_sql";
+    private final String CODE = "return " + RepositoryCreateFactory.JDBC_TEMPLATE + ".queryForMap(_sql";
 
-	@Override
-	public boolean isHandle(ReturnType type) {
-		return type.getReturnType() == Map.class;
-	}
+    @Override
+    public boolean isHandle(ReturnType type) {
+        return type.getReturnType() == Map.class;
+    }
 
-	@Override
-	public String parse(ReturnType type, ClassBuild properties,ArgsBuilder argsBuilder) {
-		return CODE+argsBuilder.to()+");";
-	}
+    @Override
+    public String parse(ReturnType type, ClassBuild properties, ArgsBuilder argsBuilder) {
+        return CODE + argsBuilder.to() + ");";
+    }
 
 }

@@ -12,16 +12,16 @@ import net.risedata.jdbc.repository.parse.handles.method.MethodNameBuilder;
  */
 public class AllInstructionHandle implements SectionInstructionHandle {
 
-	@Override
-	public String handleInstruction() {
-		return "All";
-	}
+    @Override
+    public String handleInstruction() {
+        return "All";
+    }
 
-	@Override
-	public void handle(MethodNameBuilder builder, ClassBuild classBuild) {
-		builder.nextAndReturn()
-				.appendSql(BeanConfigFactory.getInstance(classBuild.getGenericityClass()).getFieldColumnNames())
-				.appendSql(" ");
-	}
+    @Override
+    public void handle(MethodNameBuilder builder, ClassBuild classBuild) {
+        builder.nextAndReturn()
+            .appendSql(BeanConfigFactory.getInstance(classBuild.getGenericityClass()).getFieldColumnNames())
+            .appendSql(" ");
+    }
 
 }

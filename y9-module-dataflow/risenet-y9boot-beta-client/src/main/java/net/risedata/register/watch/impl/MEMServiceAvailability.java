@@ -3,7 +3,6 @@ package net.risedata.register.watch.impl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import net.risedata.register.system.Cpu;
 import net.risedata.register.system.Mem;
 
 /**
@@ -22,9 +21,9 @@ public class MEMServiceAvailability extends SystemAvailability {
     @Value("${register.discovery.watch.memError:0.0}")
     private Double memError = 0.0;
 
-    public MEMServiceAvailability(){
+    public MEMServiceAvailability() {
 
-     LOGGER.info("create mem");
+        LOGGER.info("create mem");
     }
 
     @Override
@@ -34,7 +33,7 @@ public class MEMServiceAvailability extends SystemAvailability {
         }
         Mem mem = getConcurrentMem();
         if (mem.getUsedScale() > memError) {
-            LOGGER.error("mem error "+mem.getUsedScale());
+            LOGGER.error("mem error " + mem.getUsedScale());
             return false;
         }
         return true;

@@ -11,18 +11,18 @@ import risesoft.data.transfer.core.stream.out.RecordOutuptStream;
  */
 public abstract class OutputStreamOutChannel implements OutChannel {
 
-	protected RecordOutuptStream recordOutuptStream;
+    protected RecordOutuptStream recordOutuptStream;
 
-	@Override
-	public void setOutPutStream(RecordOutuptStream recordOutuptStream) {
-		this.recordOutuptStream = recordOutuptStream;
+    @Override
+    public void setOutPutStream(RecordOutuptStream recordOutuptStream) {
+        this.recordOutuptStream = recordOutuptStream;
 
-	}
+    }
 
-	@Override
-	public void close() throws Exception {
-		recordOutuptStream.close();
+    @Override
+    public void close() throws Exception {
+        recordOutuptStream.close();
 
-	}
+    }
 
 }

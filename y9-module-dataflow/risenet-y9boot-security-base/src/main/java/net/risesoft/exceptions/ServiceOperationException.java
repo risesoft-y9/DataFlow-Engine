@@ -9,9 +9,9 @@ package net.risesoft.exceptions;
  */
 public class ServiceOperationException extends RuntimeException {
 
-	private static final long serialVersionUID = -8820877211760484344L;
+    private static final long serialVersionUID = -8820877211760484344L;
 
-	public ServiceOperationException(String msg){
+    public ServiceOperationException(String msg) {
         super(msg);
     }
 }

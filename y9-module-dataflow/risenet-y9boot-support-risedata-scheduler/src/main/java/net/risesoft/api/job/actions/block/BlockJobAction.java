@@ -11,5 +11,4 @@ import net.risesoft.api.job.actions.JobAction;
  */
 public interface BlockJobAction extends JobAction {
 
-
 }

@@ -1,5 +1,9 @@
 package net.risesoft.api.config;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -9,22 +13,19 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
-import java.util.concurrent.*;
-
 @Configuration
 public class ThreadPoolConfig implements SchedulingConfigurer {
 
-    /** 获取当前系统的CPU 数目*/
+    /** 获取当前系统的CPU 数目 */
     static int cpuNums = Runtime.getRuntime().availableProcessors();
-    /** 线程池核心池的大小*/
-    private static int corePoolSize = cpuNums*2+1;
-    /** 线程池的最大线程数*/
+    /** 线程池核心池的大小 */
+    private static int corePoolSize = cpuNums * 2 + 1;
+    /** 线程池的最大线程数 */
     private static int maximumPoolSize = cpuNums * 5;
 
     /**
-     * @Primary 优先使用该全局配置线程池
-     * 如果不加@primary @async注解默认采用SimpleAsyncTaskExecutor
-     * 不加@primary 可使用@async("threadPoolTaskExecutor")指定线程池
+     * @Primary 优先使用该全局配置线程池 如果不加@primary @async注解默认采用SimpleAsyncTaskExecutor 不加@primary
+     *          可使用@async("threadPoolTaskExecutor")指定线程池
      */
     @Primary
     @Bean
@@ -44,15 +45,15 @@ public class ThreadPoolConfig implements SchedulingConfigurer {
          *
          * AbortPolicy:直接抛出java.util.concurrent.RejectedExecutionException异常
          * CallerRunsPolicy:主线程直接执行该任务，执行完之后尝试添加下一个任务到线程池中，可以有效降低向线程池内添加任务的速度
-         * DiscardOldestPolicy:抛弃旧的任务、暂不支持；会导致被丢弃的任务无法再次被执行
-         * DiscardPolicy:抛弃当前任务、暂不支持；会导致被丢弃的任务无法再次被执行
+         * DiscardOldestPolicy:抛弃旧的任务、暂不支持；会导致被丢弃的任务无法再次被执行 DiscardPolicy:抛弃当前任务、暂不支持；会导致被丢弃的任务无法再次被执行
          */
         threadPoolTaskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         threadPoolTaskExecutor.setThreadNamePrefix("task--thread");
-        //执行初始化会自动执行afterPropertiesSet()初始化
+        // 执行初始化会自动执行afterPropertiesSet()初始化
         threadPoolTaskExecutor.initialize();
         return threadPoolTaskExecutor;
     }
+
     @Bean
     public TaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
@@ -68,8 +69,8 @@ public class ThreadPoolConfig implements SchedulingConfigurer {
 
     }
 
-    @Bean(destroyMethod="shutdown")
-    public Executor setTaskExecutors(){
+    @Bean(destroyMethod = "shutdown")
+    public Executor setTaskExecutors() {
         return Executors.newScheduledThreadPool(corePoolSize);
     }
 }

@@ -5,15 +5,15 @@ import java.util.Date;
 public class NetworkWhiteListDTO {
 
     private String id;
-    
+
     private String description;
-    
+
     private String ipMatch;
 
     private String service;
 
     private String environment;
-    
+
     private Date createDate;
 
     public String getDescription() {

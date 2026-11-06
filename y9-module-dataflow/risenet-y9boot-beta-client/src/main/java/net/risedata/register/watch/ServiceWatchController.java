@@ -1,15 +1,15 @@
 package net.risedata.register.watch;
 
-import net.risedata.register.model.Const;
-import net.risedata.register.model.WatchProperties;
-import net.risedata.register.system.Server;
-import net.risedata.register.watch.impl.SystemAvailability;
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import net.risedata.register.model.Const;
+import net.risedata.register.model.WatchProperties;
+import net.risedata.register.system.Server;
+import net.risedata.register.watch.impl.SystemAvailability;
 
 /**
  * @Description : 监控信息服务

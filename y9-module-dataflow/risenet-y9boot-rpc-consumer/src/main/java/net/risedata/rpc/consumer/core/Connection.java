@@ -15,12 +15,12 @@ public interface Connection extends HostAndPortConnection {
     /**
      * 执行远程调用
      *
-     * @param service    调用的远程服务名
-     * @param api        api 服务名字
+     * @param service 调用的远程服务名
+     * @param api api 服务名字
      * @param returnType 返回值
-     * @param timeOut    超时时间 如果是0 则不会有超时发生会一直等待
-     * @param args       参数
-     * @param <T>        返回值
+     * @param timeOut 超时时间 如果是0 则不会有超时发生会一直等待
+     * @param args 参数
+     * @param <T> 返回值
      * @return 返回 服务端返回的值
      */
     @Deprecated
@@ -29,25 +29,24 @@ public interface Connection extends HostAndPortConnection {
     /**
      * 执行远程调用 返回list类型
      *
-     * @param service    调用的远程服务名
-     * @param api        api 服务名字
+     * @param service 调用的远程服务名
+     * @param api api 服务名字
      * @param returnType 返回值
-     * @param timeOut    超时时间 如果是0 则不会有超时发生会一直等待
-     * @param args       参数
-     * @param <T>        返回值
+     * @param timeOut 超时时间 如果是0 则不会有超时发生会一直等待
+     * @param args 参数
+     * @param <T> 返回值
      * @return 返回 服务端返回的值
      */
     @Deprecated
     <T> List<T> executionList(String service, String api, Class<T> returnType, int timeOut, Object... args);
 
-
     /**
      * 执行远程调用
      *
      * @param service 调用的远程服务名
-     * @param api     api 服务名字
+     * @param api api 服务名字
      * @param timeOut 超时时间 如果是0 则不会有超时发生会一直等待
-     * @param args    参数
+     * @param args 参数
      * @return 返回 服务端返回的值
      */
     @Deprecated
@@ -57,10 +56,10 @@ public interface Connection extends HostAndPortConnection {
      * 远程调用一个服务并装换为对应的类型
      *
      * @param service serviceName
-     * @param api     apiName
+     * @param api apiName
      * @param timeOut 超时时间 小于=0则不生效
-     * @param type    返回值
-     * @param args    参数
+     * @param type 返回值
+     * @param args 参数
      * @param <T>
      * @return 对应的类型返回值
      */
@@ -71,15 +70,16 @@ public interface Connection extends HostAndPortConnection {
      * 远程调用一个服务并装换为对应的lsit类型
      *
      * @param service serviceName
-     * @param api     apiName
+     * @param api apiName
      * @param timeOut 超时时间 小于=0则不生效
-     * @param type    返回值
-     * @param args    参数
+     * @param type 返回值
+     * @param args 参数
      * @param <T>
      * @return 对应的类型返回值
      */
     @Deprecated
-    <T> ListGenericitySyncResult<T> executionSyncAsList(String service, String api, int timeOut, Class<T> type, Object... args);
+    <T> ListGenericitySyncResult<T> executionSyncAsList(String service, String api, int timeOut, Class<T> type,
+        Object... args);
 
     /**
      * 这个连接是否被移除
@@ -96,64 +96,58 @@ public interface Connection extends HostAndPortConnection {
     boolean isHasBeenLinked();
 
     /**
-     * 执行远程调用
-     * service+"/"+api = mapping
+     * 执行远程调用 service+"/"+api = mapping
      *
      * @param mapping
      * @param returnType 返回值
-     * @param timeOut    超时时间 如果是0 则不会有超时发生会一直等待
-     * @param args       参数
-     * @param <T>        返回值
+     * @param timeOut 超时时间 如果是0 则不会有超时发生会一直等待
+     * @param args 参数
+     * @param <T> 返回值
      * @return 返回 服务端返回的值
      */
     <T> T execution(String mapping, Class<T> returnType, int timeOut, Object... args);
 
     /**
-     * 执行远程调用 返回list类型
-     * service+"/"+api = mapping
+     * 执行远程调用 返回list类型 service+"/"+api = mapping
      *
      * @param mapping
      * @param returnType 返回值
-     * @param timeOut    超时时间 如果是0 则不会有超时发生会一直等待
-     * @param args       参数
-     * @param <T>        返回值
+     * @param timeOut 超时时间 如果是0 则不会有超时发生会一直等待
+     * @param args 参数
+     * @param <T> 返回值
      * @return 返回 服务端返回的值
      */
     <T> List<T> executionList(String mapping, Class<T> returnType, int timeOut, Object... args);
 
-
     /**
-     * 执行远程调用
-     * service+"/"+api = mapping
+     * 执行远程调用 service+"/"+api = mapping
      *
      * @param mapping mapping
      * @param timeOut 超时时间 如果是0 则不会有超时发生会一直等待
-     * @param args    参数
+     * @param args 参数
      * @return 返回 服务端返回的值
      */
     SyncResult executionSync(String mapping, int timeOut, Object... args);
 
     /**
-     * 远程调用一个服务并装换为对应的类型
-     * service+"/"+api = mapping
+     * 远程调用一个服务并装换为对应的类型 service+"/"+api = mapping
      *
      * @param mapping mapping
      * @param timeOut 超时时间 小于=0则不生效
-     * @param type    返回值
-     * @param args    参数
+     * @param type 返回值
+     * @param args 参数
      * @param <T>
      * @return 对应的类型返回值
      */
     <T> GenericitySyncResult<T> executionSyncAs(String mapping, int timeOut, Class<T> type, Object... args);
 
     /**
-     * 远程调用一个服务并装换为对应的lsit类型
-     * service+"/"+api = mapping
+     * 远程调用一个服务并装换为对应的lsit类型 service+"/"+api = mapping
      *
      * @param mapping mapping 服务端对于映射
      * @param timeOut 超时时间 小于=0则不生效
-     * @param type    返回值
-     * @param args    参数
+     * @param type 返回值
+     * @param args 参数
      * @param <T>
      * @return 对应的类型返回值
      */

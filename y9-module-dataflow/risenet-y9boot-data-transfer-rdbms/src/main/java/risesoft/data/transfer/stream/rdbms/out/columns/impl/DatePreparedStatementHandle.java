@@ -22,50 +22,51 @@ import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
  * @author lb
  */
 public class DatePreparedStatementHandle extends DateNullValuePreparedStatementHandle
-		implements PreparedStatementHandle, PreparedStatementHandleFactory {
+    implements PreparedStatementHandle, PreparedStatementHandleFactory {
 
-	@Override
-	public boolean isHandle(int type) {
-		return Types.DATE == type;
-	}
+    @Override
+    public boolean isHandle(int type) {
+        return Types.DATE == type;
+    }
 
-	@Override
-	public boolean isBigType() {
-		return false;
-	}
+    @Override
+    public boolean isBigType() {
+        return false;
+    }
 
-	@Override
-	public void fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, Column column,
-			DataBaseType dataBaseType, Triple<List<String>, List<Integer>, List<String>> resultSetMetaData)
-			throws Exception {
-		if (resultSetMetaData.getRight().get(resultSetMetaData.getLeft().indexOf(column.getName()))
-				.equalsIgnoreCase("year")) {
-			if (column.asBigInteger() == null) {
-				preparedStatement.setString(columnIndex, null);
-			} else {
-				preparedStatement.setInt(columnIndex, column.asBigInteger().intValue());
-			}
-		} else {
-			Date utilDate = null;
-			java.sql.Date sqlDate = null;
-			try {
-				utilDate = column.asDate();
-			} catch (Exception e) {
-				throw new SQLException(String.format("Date 类型转换错误：[%s]", column));
-			}
-			if (null != utilDate) {
-				sqlDate = new java.sql.Date(utilDate.getTime());
-			} else {
-				preparedStatement.setNull(columnIndex, Types.DATE);
-				return;
-			}
-			preparedStatement.setDate(columnIndex, sqlDate);
-		}
-	}
+    @Override
+    public void fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, Column column,
+        DataBaseType dataBaseType, Triple<List<String>, List<Integer>, List<String>> resultSetMetaData)
+        throws Exception {
+        if (resultSetMetaData.getRight()
+            .get(resultSetMetaData.getLeft().indexOf(column.getName()))
+            .equalsIgnoreCase("year")) {
+            if (column.asBigInteger() == null) {
+                preparedStatement.setString(columnIndex, null);
+            } else {
+                preparedStatement.setInt(columnIndex, column.asBigInteger().intValue());
+            }
+        } else {
+            Date utilDate = null;
+            java.sql.Date sqlDate = null;
+            try {
+                utilDate = column.asDate();
+            } catch (Exception e) {
+                throw new SQLException(String.format("Date 类型转换错误：[%s]", column));
+            }
+            if (null != utilDate) {
+                sqlDate = new java.sql.Date(utilDate.getTime());
+            } else {
+                preparedStatement.setNull(columnIndex, Types.DATE);
+                return;
+            }
+            preparedStatement.setDate(columnIndex, sqlDate);
+        }
+    }
 
-	@Override
-	public PreparedStatementHandle getPreparedStatementHandle(int type) {
-		return this;
-	}
+    @Override
+    public PreparedStatementHandle getPreparedStatementHandle(int type) {
+        return this;
+    }
 
 }

@@ -11,24 +11,27 @@ import net.risesoft.api.persistence.model.job.JobLog;
  * @Date 2022/8/30 10:26
  * @Version 1.0
  */
-public interface MessageService  {
+public interface MessageService {
 
     /**
      * 发送消息服务
+     * 
      * @param recipients 收消息人
      * @param title 标题
      * @param message 短信
      */
-    void sendMessage(String[] recipients,String title,String message,Object source);
+    void sendMessage(String[] recipients, String title, String message, Object source);
 
     /**
      * 服务改变
+     * 
      * @param serviceInstanceModel
      */
     void onServiceDown(IServiceInstanceModel serviceInstanceModel);
 
     /**
      * job 出错
+     * 
      * @param job
      */
     void onJobError(Job job);

@@ -6,7 +6,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.List;
 
-
 import risesoft.data.transfer.core.channel.InChannel;
 import risesoft.data.transfer.core.data.Data;
 import risesoft.data.transfer.core.data.StringData;
@@ -28,82 +27,87 @@ import risesoft.data.transfer.stream.rdbms.utils.DBUtil;
  */
 public class RdbmsDataInputStream implements DataInputStream {
 
-	private Connection connection;
+    private Connection connection;
 
-	private String selectSql;
+    private String selectSql;
 
-	private int fetchSize;
+    private int fetchSize;
 
-	private List<CreateColumnHandle> createColumnHandles;
+    private List<CreateColumnHandle> createColumnHandles;
 
-	private String encoding;
+    private String encoding;
 
-	private Logger logger;
+    private Logger logger;
 
-	public RdbmsDataInputStream(Connection connection, String selectSql, int fetchSize,
-			List<CreateColumnHandle> createColumnHandles, String encoding, Logger logger) {
-		super();
-		this.connection = connection;
-		this.selectSql = selectSql;
-		this.fetchSize = fetchSize;
-		this.createColumnHandles = createColumnHandles;
-		this.encoding = encoding;
-		this.logger = logger;
-	}
+    public RdbmsDataInputStream(
+        Connection connection,
+        String selectSql,
+        int fetchSize,
+        List<CreateColumnHandle> createColumnHandles,
+        String encoding,
+        Logger logger) {
+        super();
+        this.connection = connection;
+        this.selectSql = selectSql;
+        this.fetchSize = fetchSize;
+        this.createColumnHandles = createColumnHandles;
+        this.encoding = encoding;
+        this.logger = logger;
+    }
 
-	@Override
-	public void close() throws Exception {
-		try {
-			connection.close();
-		} catch (Exception e) {
+    @Override
+    public void close() throws Exception {
+        try {
+            connection.close();
+        } catch (Exception e) {
 
-		}
+        }
 
-		logger.debug(this, "close input stream");
-	}
+        logger.debug(this, "close input stream");
+    }
 
-	@Override
-	public void read(Data data, InChannel inChannel) {
-		ResultSet resultSet;
-		String sql = selectSql + ((StringData) data).getValue();
-		if (logger.isDebug()) {
-			logger.debug(this, "work sql: " + sql);
-		}
-		try {
-			resultSet = DBUtil.query(connection, sql, fetchSize);
-		} catch (SQLException e) {
-			throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "sql 执行报错" + sql, e);
-		}
-		try {
-			logger.debug(this, "readData:");
-			while (resultSet.next()) {
+    @Override
+    public void read(Data data, InChannel inChannel) {
+        ResultSet resultSet;
+        String sql = selectSql + ((StringData)data).getValue();
+        if (logger.isDebug()) {
+            logger.debug(this, "work sql: " + sql);
+        }
+        try {
+            resultSet = DBUtil.query(connection, sql, fetchSize);
+        } catch (SQLException e) {
+            throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "sql 执行报错" + sql, e);
+        }
+        try {
+            logger.debug(this, "readData:");
+            while (resultSet.next()) {
 
-				ResultSetMetaData metaData = resultSet.getMetaData();
-				Record record = new DefaultRecord();
-				try {
-					for (int i = 0; i < createColumnHandles.size(); i++) {
-						CreateColumnHandle createColumnHandle = createColumnHandles.get(i);
-						record.addColumn(createColumnHandle.getColumn(resultSet, metaData, i + 1, encoding));
-					}
-					inChannel.writer(record);
-				} catch (Exception e) {
-					inChannel.collectDirtyRecord(record, e, "脏数据" + e.getMessage());
-				}
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                Record record = new DefaultRecord();
+                try {
+                    for (int i = 0; i < createColumnHandles.size(); i++) {
+                        CreateColumnHandle createColumnHandle = createColumnHandles.get(i);
+                        record.addColumn(createColumnHandle.getColumn(resultSet, metaData, i + 1, encoding));
+                    }
+                    inChannel.writer(record);
+                } catch (Exception e) {
+                    inChannel.collectDirtyRecord(record, e, "脏数据" + e.getMessage());
+                }
 
-			}
-			inChannel.flush();
-			logger.debug(this, "readData end");
-		} catch (Exception e) {
-			throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "读取数据报错", e);
-		}finally {
-			if (resultSet!=null) {
-				try {
-					resultSet.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
+            }
+            inChannel.flush();
+            logger.debug(this, "readData end");
+        } catch (Exception e) {
+            throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "读取数据报错", e);
+        } finally {
+            if (resultSet != null) {
+                try {
+                    resultSet.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
 }

@@ -10,12 +10,11 @@ import risesoft.data.transfer.core.stream.out.RecordOutuptStream;
  * @author lb
  */
 public interface Channel extends RecordOutuptStream {
-	/**
-	 * 设置通道的出口
-	 * 
-	 * @param exchange
-	 */
-	void setOutPutStream(RecordOutuptStream recordOutuptStream);
-	
-	
+    /**
+     * 设置通道的出口
+     * 
+     * @param exchange
+     */
+    void setOutPutStream(RecordOutuptStream recordOutuptStream);
+
 }

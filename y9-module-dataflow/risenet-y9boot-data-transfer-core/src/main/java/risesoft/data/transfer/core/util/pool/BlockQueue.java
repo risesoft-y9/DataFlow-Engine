@@ -18,50 +18,50 @@ import risesoft.data.transfer.core.exception.TransferException;
  */
 public class BlockQueue<T> extends AbstractQueue<T> implements Queue<T> {
 
-	private LinkedBlockingQueue<T> blockQueue;
+    private LinkedBlockingQueue<T> blockQueue;
 
-	public BlockQueue(int size) {
-		this.blockQueue = new LinkedBlockingQueue<T>(size);
-	}
+    public BlockQueue(int size) {
+        this.blockQueue = new LinkedBlockingQueue<T>(size);
+    }
 
-	@Override
-	public boolean offer(T e) {
-		return blockQueue.offer(e);
-	}
+    @Override
+    public boolean offer(T e) {
+        return blockQueue.offer(e);
+    }
 
-	@Override
-	public   boolean add(T e) {
-		try {
-			blockQueue.put(e);
-		} catch (InterruptedException e1) {
-			throw TransferException.as(FrameworkErrorCode.RUNTIME_ERROR, "阻塞队列添加出错", e1);
-		}
-		return true;
-	}
+    @Override
+    public boolean add(T e) {
+        try {
+            blockQueue.put(e);
+        } catch (InterruptedException e1) {
+            throw TransferException.as(FrameworkErrorCode.RUNTIME_ERROR, "阻塞队列添加出错", e1);
+        }
+        return true;
+    }
 
-	@Override
-	public  T poll() {
+    @Override
+    public T poll() {
 
-		try {
-			return blockQueue.take();
-		} catch (InterruptedException e) {
-			throw TransferException.as(FrameworkErrorCode.RUNTIME_ERROR, "阻塞队列获取出错", e);
-		}
-	}
+        try {
+            return blockQueue.take();
+        } catch (InterruptedException e) {
+            throw TransferException.as(FrameworkErrorCode.RUNTIME_ERROR, "阻塞队列获取出错", e);
+        }
+    }
 
-	@Override
-	public  T peek() {
-		return blockQueue.peek();
-	}
+    @Override
+    public T peek() {
+        return blockQueue.peek();
+    }
 
-	@Override
-	public  Iterator<T> iterator() {
-		return blockQueue.iterator();
-	}
+    @Override
+    public Iterator<T> iterator() {
+        return blockQueue.iterator();
+    }
 
-	@Override
-	public  int size() {
-		return blockQueue.size();
-	}
+    @Override
+    public int size() {
+        return blockQueue.size();
+    }
 
 }

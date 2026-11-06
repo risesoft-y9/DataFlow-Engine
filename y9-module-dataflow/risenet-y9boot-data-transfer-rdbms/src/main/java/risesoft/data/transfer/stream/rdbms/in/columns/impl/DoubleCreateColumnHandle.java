@@ -17,25 +17,25 @@ import risesoft.data.transfer.stream.rdbms.in.columns.CreateColumnHandle;
  */
 public class DoubleCreateColumnHandle implements CreateColumnHandle {
 
-	@Override
-	public boolean isHandle(int type) {
-		switch (type) {
-		case Types.NUMERIC:
-		case Types.DECIMAL:
-		case Types.FLOAT:
-		case Types.REAL:
-		case Types.DOUBLE:
-			return true;
-		default:
-			return false;
-		}
+    @Override
+    public boolean isHandle(int type) {
+        switch (type) {
+            case Types.NUMERIC:
+            case Types.DECIMAL:
+            case Types.FLOAT:
+            case Types.REAL:
+            case Types.DOUBLE:
+                return true;
+            default:
+                return false;
+        }
 
-	}
+    }
 
-	@Override
-	public Column getColumn(ResultSet rs, ResultSetMetaData metaData, int index, String mandatoryEncoding)
-			throws Exception {
-		return new DoubleColumn(rs.getString(index), metaData.getColumnLabel(index));
-	}
+    @Override
+    public Column getColumn(ResultSet rs, ResultSetMetaData metaData, int index, String mandatoryEncoding)
+        throws Exception {
+        return new DoubleColumn(rs.getString(index), metaData.getColumnLabel(index));
+    }
 
 }

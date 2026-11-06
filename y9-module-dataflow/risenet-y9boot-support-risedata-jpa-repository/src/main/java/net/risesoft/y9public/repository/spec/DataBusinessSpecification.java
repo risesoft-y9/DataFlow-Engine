@@ -13,56 +13,56 @@ import org.springframework.data.jpa.domain.Specification;
 
 import net.risesoft.y9public.entity.DataBusinessEntity;
 
-public class DataBusinessSpecification implements Specification<DataBusinessEntity>{
+public class DataBusinessSpecification implements Specification<DataBusinessEntity> {
 
-	private static final long serialVersionUID = -8033435846816389785L;
-	
-	private List<String> ids;
-	private String parentId;
-	private String name;
-	
-	public DataBusinessSpecification() {
-		super();
-	}
+    private static final long serialVersionUID = -8033435846816389785L;
 
-	public DataBusinessSpecification(String parentId, String name, List<String> ids) {
-		super();
-		this.parentId = parentId;
-		this.name = name;
-		this.ids = ids;
-	}
+    private List<String> ids;
+    private String parentId;
+    private String name;
 
-	@Override
-	public Predicate toPredicate(Root<DataBusinessEntity> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-		Predicate predicate = cb.conjunction();
-		List<Expression<Boolean>> expressions = predicate.getExpressions();
+    public DataBusinessSpecification() {
+        super();
+    }
 
-		if (StringUtils.isNotBlank(parentId)) {
-			expressions.add(cb.equal(root.get("parentId").as(String.class), parentId));
-		}
-		if (StringUtils.isNotBlank(name)) {
-			expressions.add(cb.like(root.get("name").as(String.class), "%" + name + "%"));
-		}
-		if (ids != null && ids.size() > 0) {
+    public DataBusinessSpecification(String parentId, String name, List<String> ids) {
+        super();
+        this.parentId = parentId;
+        this.name = name;
+        this.ids = ids;
+    }
+
+    @Override
+    public Predicate toPredicate(Root<DataBusinessEntity> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+        Predicate predicate = cb.conjunction();
+        List<Expression<Boolean>> expressions = predicate.getExpressions();
+
+        if (StringUtils.isNotBlank(parentId)) {
+            expressions.add(cb.equal(root.get("parentId").as(String.class), parentId));
+        }
+        if (StringUtils.isNotBlank(name)) {
+            expressions.add(cb.like(root.get("name").as(String.class), "%" + name + "%"));
+        }
+        if (ids != null && ids.size() > 0) {
             expressions.add(root.get("id").in(ids));
         }
-		return predicate;
-	}
+        return predicate;
+    }
 
-	public String getParentId() {
-		return parentId;
-	}
+    public String getParentId() {
+        return parentId;
+    }
 
-	public void setParentId(String parentId) {
-		this.parentId = parentId;
-	}
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
-	
+    public void setName(String name) {
+        this.name = name;
+    }
+
 }

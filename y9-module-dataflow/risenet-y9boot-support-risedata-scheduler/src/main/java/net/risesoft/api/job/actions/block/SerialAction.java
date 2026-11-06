@@ -1,11 +1,12 @@
 package net.risesoft.api.job.actions.block;
 
+import org.springframework.stereotype.Component;
+
 import net.risesoft.api.job.JobContext;
 import net.risesoft.api.job.TaskExecutorService;
 import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.api.utils.LResult;
-import org.springframework.stereotype.Component;
 
 /**
  * 丢弃后续调度
@@ -23,7 +24,7 @@ public class SerialAction implements BlockJobAction {
     public LResult action(Job job, JobLog jobLog, TaskExecutorService taskExecutor, JobContext JobContext) {
         taskExecutor.appendLog(jobLog.getId(), "任务阻塞添加到任务队列中:");
         taskExecutor.getTaskManager().pushTask(job, jobLog);
-        return new LResult().end(new Object[]{});
+        return new LResult().end(new Object[] {});
     }
 
 }

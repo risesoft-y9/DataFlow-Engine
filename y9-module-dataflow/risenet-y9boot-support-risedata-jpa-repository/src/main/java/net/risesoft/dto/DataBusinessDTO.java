@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * 业务分类信息
+ * 
  * @author pzx
  *
  */
@@ -12,10 +13,10 @@ import lombok.NoArgsConstructor;
 @Data
 public class DataBusinessDTO {
 
-	private String id;
+    private String id;
 
-	private String name;
-	
-	private String parentId;
+    private String name;
+
+    private String parentId;
 
 }

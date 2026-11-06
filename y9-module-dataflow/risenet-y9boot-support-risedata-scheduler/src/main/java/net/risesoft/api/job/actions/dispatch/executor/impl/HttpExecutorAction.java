@@ -1,17 +1,11 @@
 package net.risesoft.api.job.actions.dispatch.executor.impl;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import net.risesoft.api.exceptions.JobException;
-import net.risesoft.api.job.JobContext;
-import net.risesoft.api.job.TaskExecutorService;
-import net.risesoft.api.job.actions.dispatch.ExecutorAction;
-import net.risesoft.api.job.actions.dispatch.executor.DoBalance;
-import net.risesoft.api.job.actions.dispatch.executor.Result;
-import net.risesoft.api.job.actions.dispatch.executor.ResultError;
-import net.risesoft.api.job.actions.dispatch.executor.ResultSuccess;
 import org.apache.http.HttpResponse;
-import net.risesoft.api.persistence.model.job.Job;
-import net.risesoft.api.persistence.model.job.JobLog;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.concurrent.FutureCallback;
@@ -25,10 +19,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import net.risesoft.api.exceptions.JobException;
+import net.risesoft.api.job.JobContext;
+import net.risesoft.api.job.TaskExecutorService;
+import net.risesoft.api.job.actions.dispatch.ExecutorAction;
+import net.risesoft.api.job.actions.dispatch.executor.DoBalance;
+import net.risesoft.api.job.actions.dispatch.executor.Result;
+import net.risesoft.api.job.actions.dispatch.executor.ResultError;
+import net.risesoft.api.job.actions.dispatch.executor.ResultSuccess;
+import net.risesoft.api.persistence.model.job.Job;
+import net.risesoft.api.persistence.model.job.JobLog;
 
 /**
  * @Description : 用rpc 的方式执行
@@ -52,7 +52,8 @@ public abstract class HttpExecutorAction implements ExecutorAction, DisposableBe
     private static CloseableHttpAsyncClient httpclient = HttpAsyncClients.createDefault();
 
     @Override
-    public Result action(Job job, JobLog jobLog, Map<String, Object> args, ServiceInstance iServiceInstance, JobContext jobContext, DoBalance doBalance) {
+    public Result action(Job job, JobLog jobLog, Map<String, Object> args, ServiceInstance iServiceInstance,
+        JobContext jobContext, DoBalance doBalance) {
         String url = iServiceInstance.getUri().toString();
         url += job.getSource();
 
@@ -60,7 +61,6 @@ public abstract class HttpExecutorAction implements ExecutorAction, DisposableBe
     }
 
     abstract HttpRequestBase getRequest(String url);
-
 
     public Result sendTo(String url, Map<String, Object> args, int timeOut) {
         HttpCoreContext context = HttpCoreContext.create();
@@ -72,16 +72,15 @@ public abstract class HttpExecutorAction implements ExecutorAction, DisposableBe
             request.setConfig(defaultRequestConfig);
         } else {
             request.setConfig(RequestConfig.custom()
-                    .setSocketTimeout(timeOut * 1000)
-                    .setConnectTimeout(timeOut * 1000)
-                    .setConnectionRequestTimeout(timeOut * 1000)
-                    .build());
+                .setSocketTimeout(timeOut * 1000)
+                .setConnectTimeout(timeOut * 1000)
+                .setConnectionRequestTimeout(timeOut * 1000)
+                .build());
         }
         HttpRequest httpRequest = new HttpRequest(url);
         httpclient.execute(request, context, httpRequest);
         return httpRequest;
     }
-
 
     @Override
     public void destroy() throws Exception {
@@ -96,10 +95,10 @@ public abstract class HttpExecutorAction implements ExecutorAction, DisposableBe
         if (!httpclient.isRunning()) {
             httpclient.start();
             defaultRequestConfig = RequestConfig.custom()
-                    .setSocketTimeout(this.defaultTimeOut * 1000)
-                    .setConnectTimeout(this.defaultTimeOut * 1000)
-                    .setConnectionRequestTimeout(this.defaultTimeOut * 1000)
-                    .build();
+                .setSocketTimeout(this.defaultTimeOut * 1000)
+                .setConnectTimeout(this.defaultTimeOut * 1000)
+                .setConnectionRequestTimeout(this.defaultTimeOut * 1000)
+                .build();
         }
 
     }
@@ -109,8 +108,7 @@ class HttpRequest implements FutureCallback<HttpResponse>, Result {
 
     private String url;
 
-    public HttpRequest() {
-    }
+    public HttpRequest() {}
 
     public HttpRequest(String url) {
         this.url = url;

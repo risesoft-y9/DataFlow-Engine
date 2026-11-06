@@ -13,20 +13,20 @@ import net.risedata.jdbc.executor.log.PrintExecutor;
  */
 public class LoggerFactory {
 
-	@SuppressWarnings("unchecked")
-	public static final <T> T getInstance(Object obj, Class<T> interfaceClass, PrintExecutor print) {
+    @SuppressWarnings("unchecked")
+    public static final <T> T getInstance(Object obj, Class<T> interfaceClass, PrintExecutor print) {
 
-		return (T) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-				new Class[] { interfaceClass }, new InvocationHandler() {
-					@Override
-					public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-						if (args != null && args.length > 0) {
-							print.print(args[0].toString(), args);
-						}
-						return method.invoke(obj, args);
-					}
-				});
+        return (T)Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class[] {interfaceClass},
+            new InvocationHandler() {
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                    if (args != null && args.length > 0) {
+                        print.print(args[0].toString(), args);
+                    }
+                    return method.invoke(obj, args);
+                }
+            });
 
-	}
+    }
 
 }

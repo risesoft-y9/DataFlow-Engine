@@ -21,48 +21,50 @@ import risesoft.data.transfer.core.util.CloseUtils;
  */
 public class OutChannelExecutor implements Executor, Ack {
 
-	private DataOutputStream dataOutputStream;
-	private Communication communication;
-	private HandleManager handleManager;
+    private DataOutputStream dataOutputStream;
+    private Communication communication;
+    private HandleManager handleManager;
 
-	public OutChannelExecutor(DataOutputStream dataOutputStream, Communication communication,
-			HandleManager handleManager) {
-		this.dataOutputStream = dataOutputStream;
-		this.communication = communication;
-		this.handleManager = handleManager;
-	}
+    public OutChannelExecutor(
+        DataOutputStream dataOutputStream,
+        Communication communication,
+        HandleManager handleManager) {
+        this.dataOutputStream = dataOutputStream;
+        this.communication = communication;
+        this.handleManager = handleManager;
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void run(Object records) {
-		this.dataOutputStream.writer((List<Record>) records, this);
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public void run(Object records) {
+        this.dataOutputStream.writer((List<Record>)records, this);
+    }
 
-	public void close() {
-		CloseUtils.close(this.dataOutputStream);
-	}
+    public void close() {
+        CloseUtils.close(this.dataOutputStream);
+    }
 
-	@Override
-	public void confirm(Record record) {
-		communication.increaseCounter(CommunicationTool.WRITE_RECEIVED_BYTES, record.getByteSize());
-		communication.increaseCounter(CommunicationTool.WRITE_RECEIVED_RECORDS, 1);
-	}
+    @Override
+    public void confirm(Record record) {
+        communication.increaseCounter(CommunicationTool.WRITE_RECEIVED_BYTES, record.getByteSize());
+        communication.increaseCounter(CommunicationTool.WRITE_RECEIVED_RECORDS, 1);
+    }
 
-	@Override
-	public void confirm(List<Record> record) {
-		communication.increaseCounter(CommunicationTool.WRITE_RECEIVED_RECORDS, record.size());
-		communication.increaseCounter(CommunicationTool.WRITE_RECEIVED_BYTES, CommunicationTool.getRecordSize(record));
+    @Override
+    public void confirm(List<Record> record) {
+        communication.increaseCounter(CommunicationTool.WRITE_RECEIVED_RECORDS, record.size());
+        communication.increaseCounter(CommunicationTool.WRITE_RECEIVED_BYTES, CommunicationTool.getRecordSize(record));
 
-	}
+    }
 
-	@Override
-	public void cancel(Record record, Throwable e, String errorMag) {
-		// 目前是cancel 的是会处理接受任务标识任务处理好之后会交由脏数据收集器去处理脏数据
-		confirm(record);
-		communication.increaseCounter(CommunicationTool.WRITE_FAILED_RECORDS, 1);
-		communication.increaseCounter(CommunicationTool.WRITE_FAILED_BYTES, record.getByteSize());
-		handleManager.doHandle(DirtyRecordHandle.class, (handle) -> {
-			handle.collectDirtyRecord(record, e, errorMag);
-		});
-	}
+    @Override
+    public void cancel(Record record, Throwable e, String errorMag) {
+        // 目前是cancel 的是会处理接受任务标识任务处理好之后会交由脏数据收集器去处理脏数据
+        confirm(record);
+        communication.increaseCounter(CommunicationTool.WRITE_FAILED_RECORDS, 1);
+        communication.increaseCounter(CommunicationTool.WRITE_FAILED_BYTES, record.getByteSize());
+        handleManager.doHandle(DirtyRecordHandle.class, (handle) -> {
+            handle.collectDirtyRecord(record, e, errorMag);
+        });
+    }
 }

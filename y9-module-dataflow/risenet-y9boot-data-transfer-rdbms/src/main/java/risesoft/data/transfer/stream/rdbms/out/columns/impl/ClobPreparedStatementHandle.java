@@ -20,41 +20,40 @@ import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
  * @date 2024年1月25日
  * @author lb
  */
-public class ClobPreparedStatementHandle extends NullCharValuePreparedStatementHandle implements PreparedStatementHandle,PreparedStatementHandleFactory {
+public class ClobPreparedStatementHandle extends NullCharValuePreparedStatementHandle
+    implements PreparedStatementHandle, PreparedStatementHandleFactory {
 
-	@Override
-	public boolean isHandle(int type) {
-		switch (type) {
-		case Types.CLOB:
-		case Types.NCLOB:
-			return true;
-		default:
-			return false;
-		}
-	}
+    @Override
+    public boolean isHandle(int type) {
+        switch (type) {
+            case Types.CLOB:
+            case Types.NCLOB:
+                return true;
+            default:
+                return false;
+        }
+    }
 
-	@Override
-	public boolean isBigType() {
-		return true;
-	}
+    @Override
+    public boolean isBigType() {
+        return true;
+    }
 
-	@Override
-	public void fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, Column column,
-			DataBaseType dataBaseType, Triple<List<String>, List<Integer>, List<String>> resultSetMetaData)
-			throws Exception {
-		String data = column.asString();
-		if (data == null) {
-			preparedStatement.setClob(columnIndex, new StringReader(""));
-		} else {
-			preparedStatement.setClob(columnIndex, new StringReader(data));
-		}
-	}
+    @Override
+    public void fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, Column column,
+        DataBaseType dataBaseType, Triple<List<String>, List<Integer>, List<String>> resultSetMetaData)
+        throws Exception {
+        String data = column.asString();
+        if (data == null) {
+            preparedStatement.setClob(columnIndex, new StringReader(""));
+        } else {
+            preparedStatement.setClob(columnIndex, new StringReader(data));
+        }
+    }
 
-	@Override
-	public PreparedStatementHandle getPreparedStatementHandle(int type) {
-		return this;
-	}
-
-	
+    @Override
+    public PreparedStatementHandle getPreparedStatementHandle(int type) {
+        return this;
+    }
 
 }

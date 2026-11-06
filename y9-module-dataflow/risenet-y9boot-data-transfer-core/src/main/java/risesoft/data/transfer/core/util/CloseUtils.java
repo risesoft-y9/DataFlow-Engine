@@ -11,10 +11,10 @@ import risesoft.data.transfer.core.close.Closed;
  */
 public class CloseUtils {
 
-	public static void close(Closed closed) {
-		try {
-			closed.close();
-		} catch (Exception e) {
-		}
-	}
+    public static void close(Closed closed) {
+        try {
+            closed.close();
+        } catch (Exception e) {
+        }
+    }
 }

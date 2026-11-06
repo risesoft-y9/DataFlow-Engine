@@ -14,47 +14,48 @@ import net.risesoft.security.model.Role;
  * @Version 1.0
  */
 public interface RoleService {
-	/**
-	 * 查询
-	 * 
-	 * @return
-	 */
-	LPage<Role> searchForPage(Role role, LPageable pageable);
+    /**
+     * 查询
+     * 
+     * @return
+     */
+    LPage<Role> searchForPage(Role role, LPageable pageable);
 
-	/**
-	 * 保存
-	 * 
-	 * @param role
-	 */
-	void saveRole(Role role);
+    /**
+     * 保存
+     * 
+     * @param role
+     */
+    void saveRole(Role role);
 
-	/**
-	 * 删除
-	 * 
-	 * @param role
-	 */
-	void deleteByRoleId(String id);
+    /**
+     * 删除
+     * 
+     * @param role
+     */
+    void deleteByRoleId(String id);
 
-	/**
-	 * 拿到用户的所有权限
-	 * 
-	 * @param id
-	 * @return
-	 */
-	List<Role> getRolesByUser(String id);
+    /**
+     * 拿到用户的所有权限
+     * 
+     * @param id
+     * @return
+     */
+    List<Role> getRolesByUser(String id);
 
-	/**
-	 * 根据id获取角色
-	 * 
-	 * @param id
-	 * @return
-	 */
-	Role findById(String id);
-	
-	/**
-	 * 判断管理员角色是否存在
-	 * @return
-	 */
-	Integer hasAdminRole();
+    /**
+     * 根据id获取角色
+     * 
+     * @param id
+     * @return
+     */
+    Role findById(String id);
+
+    /**
+     * 判断管理员角色是否存在
+     * 
+     * @return
+     */
+    Integer hasAdminRole();
 
 }

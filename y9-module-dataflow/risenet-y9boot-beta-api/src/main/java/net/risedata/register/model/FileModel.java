@@ -8,12 +8,12 @@ package net.risedata.register.model;
  * @Version 1.0
  */
 public class FileModel {
-    //name
+    // name
     private String name;
 
     // path
     private String path;
-    //是否为文件夹
+    // 是否为文件夹
     private boolean isDirectory;
     /**
      * 最后修改时间
@@ -21,7 +21,8 @@ public class FileModel {
     private long lastModified;
 
     private long size;
-    public FileModel(String name, String path, boolean isDirectory, long lastModified,long size) {
+
+    public FileModel(String name, String path, boolean isDirectory, long lastModified, long size) {
         this.name = name;
         this.path = path;
         this.size = size;
@@ -71,11 +72,7 @@ public class FileModel {
 
     @Override
     public String toString() {
-        return "FileModel{" +
-                "name='" + name + '\'' +
-                ", path='" + path + '\'' +
-                ", isDirectory='" + isDirectory + '\'' +
-                ", lastModified=" + lastModified +
-                '}';
+        return "FileModel{" + "name='" + name + '\'' + ", path='" + path + '\'' + ", isDirectory='" + isDirectory + '\''
+            + ", lastModified=" + lastModified + '}';
     }
 }

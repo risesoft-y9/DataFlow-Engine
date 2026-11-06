@@ -1,6 +1,5 @@
 package risesoft.data.transfer.core.executor.out;
 
-
 import risesoft.data.transfer.core.context.JobContext;
 import risesoft.data.transfer.core.executor.Executor;
 import risesoft.data.transfer.core.executor.ExecutorFacotry;
@@ -16,23 +15,24 @@ import risesoft.data.transfer.core.util.CloseUtils;
  */
 public class JobOutputExecutorFactory implements ExecutorFacotry {
 
-	private DataOutputStreamFactory dataOutputStreamFactory;
-	private JobContext jobContext;
+    private DataOutputStreamFactory dataOutputStreamFactory;
+    private JobContext jobContext;
 
-	public JobOutputExecutorFactory(DataOutputStreamFactory dataOutputStreamFactory, JobContext jobContext) {
-		this.dataOutputStreamFactory = dataOutputStreamFactory;
-		this.jobContext = jobContext;
-	}
+    public JobOutputExecutorFactory(DataOutputStreamFactory dataOutputStreamFactory, JobContext jobContext) {
+        this.dataOutputStreamFactory = dataOutputStreamFactory;
+        this.jobContext = jobContext;
+    }
 
-	@Override
-	public Executor getInstance() {
-		return new OutChannelExecutor(dataOutputStreamFactory.getStream(),jobContext.getCommunication(),jobContext.getHandles());
-	}
+    @Override
+    public Executor getInstance() {
+        return new OutChannelExecutor(dataOutputStreamFactory.getStream(), jobContext.getCommunication(),
+            jobContext.getHandles());
+    }
 
-	@Override
-	public void close() {
-		CloseUtils.close(dataOutputStreamFactory);
+    @Override
+    public void close() {
+        CloseUtils.close(dataOutputStreamFactory);
 
-	}
+    }
 
 }

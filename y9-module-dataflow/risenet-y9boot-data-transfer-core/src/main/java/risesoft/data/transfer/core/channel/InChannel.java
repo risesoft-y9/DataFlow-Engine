@@ -10,12 +10,12 @@ import risesoft.data.transfer.core.record.Record;
  * @author lb
  */
 public interface InChannel extends Channel {
-	/**
-	 * 收集脏数据脏数据推往这
-	 * 
-	 * @param record
-	 * @param t
-	 * @param errorMessage
-	 */
-	void collectDirtyRecord(Record record, Throwable t, String errorMessage);
+    /**
+     * 收集脏数据脏数据推往这
+     * 
+     * @param record
+     * @param t
+     * @param errorMessage
+     */
+    void collectDirtyRecord(Record record, Throwable t, String errorMessage);
 }

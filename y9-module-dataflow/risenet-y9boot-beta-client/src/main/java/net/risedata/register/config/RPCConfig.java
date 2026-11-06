@@ -13,5 +13,4 @@ import net.risedata.rpc.annotation.RPCScan;
  */
 @Component
 @RPCScan("net.risedata.register.rpc")
-public class RPCConfig {
-}
+public class RPCConfig {}

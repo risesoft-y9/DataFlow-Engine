@@ -1,9 +1,9 @@
 package net.risesoft.api.persistence.iservice;
 
-import net.risesoft.api.persistence.model.IServiceInstanceModel;
-
 import java.util.List;
 import java.util.Map;
+
+import net.risesoft.api.persistence.model.IServiceInstanceModel;
 
 /**
  * @Description : 作为 持久化iservice的 接口
@@ -19,12 +19,14 @@ public interface IServiceService {
      * @param id
      */
     boolean delById(String id);
+
     /**
      * 根据 id 删除实例
      *
      * @param id
      */
     boolean instanceClose(String id);
+
     /**
      * 保存一个实例
      */
@@ -39,18 +41,23 @@ public interface IServiceService {
 
     /**
      * 根据id 获取
+     * 
      * @param id
      * @return
      */
     IServiceInstanceModel findById(String id);
+
     /**
      * 查找增加监控过滤
+     * 
      * @param id
      * @return
      */
     IServiceInstanceModel findWatchById(String id);
+
     /**
      * 修改最近更新时间
+     * 
      * @param id
      * @return
      */
@@ -58,37 +65,42 @@ public interface IServiceService {
 
     /**
      * 拿到所有服务 名
+     * 
      * @return
      */
     List<String> getServices(String environment);
 
     /**
      * 根据服务名获取
+     * 
      * @param name
      * @return
      */
-    List<IServiceInstanceModel> getService(String name,String environment);
+    List<IServiceInstanceModel> getService(String name, String environment);
 
     /**
      * 修改状态
+     * 
      * @param id
      * @param status
      * @return
      */
     boolean setStatus(String id, int status);
 
-    List<IServiceInstanceModel> findWatch( String watchServer,String environment,String serviceId);
+    List<IServiceInstanceModel> findWatch(String watchServer, String environment, String serviceId);
 
     /**
      * 修改监控信息
+     * 
      * @param instanceId 修改的id
      * @param watchServer 条件服务
      * @return
      */
-    boolean updateWatch(String instanceId, String watchServer,String id);
+    boolean updateWatch(String instanceId, String watchServer, String id);
 
     /**
      * 查找不存在的
+     * 
      * @param instanceId 当前实例id
      * @param ids key 集合
      * @return
@@ -97,6 +109,7 @@ public interface IServiceService {
 
     /**
      * 将不属于该服务器监控的给update掉
+     * 
      * @param ids
      */
     Integer updateNoWatch(String[] ids);
@@ -104,6 +117,6 @@ public interface IServiceService {
     List<String> getUseAllSearch(String environment, String service);
 
     List<String> getAllForName(String environment, String[] services);
-    
+
     List<IServiceInstanceModel> findAll(Integer status, String environment);
 }

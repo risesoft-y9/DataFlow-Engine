@@ -18,20 +18,20 @@ import risesoft.data.transfer.stream.rdbms.in.columns.CreateColumnHandle;
  */
 public class DateCreateColumnHandle implements CreateColumnHandle {
 
-	@Override
-	public boolean isHandle(int type) {
-		return Types.DATE == type;
+    @Override
+    public boolean isHandle(int type) {
+        return Types.DATE == type;
 
-	}
+    }
 
-	@Override
-	public Column getColumn(ResultSet rs, ResultSetMetaData metaData, int index, String mandatoryEncoding)
-			throws Exception {
-		if (metaData.getColumnTypeName(index).equalsIgnoreCase("year")) {
-           return new LongColumn(rs.getInt(index),metaData.getColumnLabel(index));
+    @Override
+    public Column getColumn(ResultSet rs, ResultSetMetaData metaData, int index, String mandatoryEncoding)
+        throws Exception {
+        if (metaData.getColumnTypeName(index).equalsIgnoreCase("year")) {
+            return new LongColumn(rs.getInt(index), metaData.getColumnLabel(index));
         } else {
-        	return new DateColumn(rs.getDate(index),metaData.getColumnLabel(index));
+            return new DateColumn(rs.getDate(index), metaData.getColumnLabel(index));
         }
-	}
+    }
 
 }

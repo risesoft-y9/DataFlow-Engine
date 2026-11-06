@@ -1,6 +1,5 @@
 package net.risedata.register.config;
 
-
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.type.AnnotationMetadata;
 
@@ -21,8 +20,7 @@ public class SystemConfigSelector implements ImportSelector {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return new String[]{SystemConfig.class.getName()};
+        return new String[] {SystemConfig.class.getName()};
     }
-
 
 }

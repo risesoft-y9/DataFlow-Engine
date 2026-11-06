@@ -1,5 +1,10 @@
 package net.risesoft.api.job.actions.dispatch.method.impl;
 
+import java.util.List;
+
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.stereotype.Component;
+
 import net.risesoft.api.exceptions.JobException;
 import net.risesoft.api.job.JobContext;
 import net.risesoft.api.job.TaskExecutorService;
@@ -9,10 +14,6 @@ import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.api.utils.LResult;
 import net.risesoft.api.utils.ObjectUtils;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * @Description : 永远第一个
@@ -33,14 +34,18 @@ public class AssignAction extends AbstractDispatchAction implements DispatchJobA
                 List<ServiceInstance> instances = getService(job);
                 for (ServiceInstance instance : instances) {
                     if (instance.getInstanceId().equals(serverKey)) {
-                        executorActionManager.action(job, jobLog, jobContext.getArgs(), instance,jobContext,(count,ins)-> instance).onSuccess((res) -> {
-                            res = ObjectUtils.nullOf(res, "NULL");
-                            taskExecutor.successJob(job, jobLog, "调度成功:" + res, res.toString(), jobContext);
-                            lResult.end(new Object[]{res});
-                        }).onError((e) -> {
-                            taskExecutor.endJob(job, jobLog, JobLog.ERROR, instance.getInstanceId() + "调度失败原因:" + e.getMessage(), jobContext);
-                            lResult.end(new Object[]{e});
-                        });
+                        executorActionManager
+                            .action(job, jobLog, jobContext.getArgs(), instance, jobContext, (count, ins) -> instance)
+                            .onSuccess((res) -> {
+                                res = ObjectUtils.nullOf(res, "NULL");
+                                taskExecutor.successJob(job, jobLog, "调度成功:" + res, res.toString(), jobContext);
+                                lResult.end(new Object[] {res});
+                            })
+                            .onError((e) -> {
+                                taskExecutor.endJob(job, jobLog, JobLog.ERROR,
+                                    instance.getInstanceId() + "调度失败原因:" + e.getMessage(), jobContext);
+                                lResult.end(new Object[] {e});
+                            });
                         return lResult;
                     }
                 }
@@ -48,12 +53,12 @@ public class AssignAction extends AbstractDispatchAction implements DispatchJobA
 
             } catch (Exception e) {
                 taskExecutor.endJob(job, jobLog, JobLog.ERROR, "调度失败原因:" + e.getMessage(), jobContext);
-                lResult.end(new Object[]{e});
+                lResult.end(new Object[] {e});
             }
 
         } catch (Exception e) {
             taskExecutor.endJob(job, jobLog, JobLog.ERROR, e.getMessage(), jobContext);
-            lResult.end(new Object[]{e});
+            lResult.end(new Object[] {e});
         }
         return lResult;
     }

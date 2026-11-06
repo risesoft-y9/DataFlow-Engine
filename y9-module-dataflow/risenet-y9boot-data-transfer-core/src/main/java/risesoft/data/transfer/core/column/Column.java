@@ -1,10 +1,10 @@
 package risesoft.data.transfer.core.column;
 
-import com.alibaba.fastjson.JSON;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * 一列数据
@@ -15,76 +15,85 @@ import java.util.Date;
  */
 public abstract class Column {
 
-	private Type type;
+    private Type type;
 
-	private Object rawData;
+    private Object rawData;
 
-	private long byteSize;
+    private long byteSize;
 
-	private String name;
+    private String name;
 
-	public Column(final Object object, final Type type, long byteSize, String name) {
-		this.rawData = object;
-		this.type = type;
-		this.byteSize = byteSize;
-		this.name = name;
-		
-	}
+    public Column(final Object object, final Type type, long byteSize, String name) {
+        this.rawData = object;
+        this.type = type;
+        this.byteSize = byteSize;
+        this.name = name;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    }
 
-	public Object getRawData() {
-		return this.rawData;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public Type getType() {
-		return this.type;
-	}
+    public Object getRawData() {
+        return this.rawData;
+    }
 
-	public long getByteSize() {
-		return this.byteSize;
-	}
+    public Type getType() {
+        return this.type;
+    }
 
-	protected void setType(Type type) {
-		this.type = type;
-	}
+    public long getByteSize() {
+        return this.byteSize;
+    }
 
-	protected void setRawData(Object rawData) {
-		this.rawData = rawData;
-	}
+    protected void setType(Type type) {
+        this.type = type;
+    }
 
-	protected void setByteSize(int byteSize) {
-		this.byteSize = byteSize;
-	}
+    protected void setRawData(Object rawData) {
+        this.rawData = rawData;
+    }
 
-	public abstract Long asLong();
+    protected void setByteSize(int byteSize) {
+        this.byteSize = byteSize;
+    }
 
-	public abstract Double asDouble();
+    public abstract Long asLong();
 
-	public abstract String asString();
+    public abstract Double asDouble();
 
-	public abstract Date asDate();
+    public abstract String asString();
 
-	public abstract byte[] asBytes();
+    public abstract Date asDate();
 
-	public abstract Boolean asBoolean();
+    public abstract byte[] asBytes();
 
-	public abstract BigDecimal asBigDecimal();
+    public abstract Boolean asBoolean();
 
-	public abstract BigInteger asBigInteger();
+    public abstract BigDecimal asBigDecimal();
 
-	@Override
-	public String toString() {
-		return JSON.toJSONString(this);
-	}
+    public abstract BigInteger asBigInteger();
 
-	public enum Type {
-		BAD, NULL, INT, LONG, DOUBLE, STRING, BOOL, DATE, BYTES, STREAM
-	}
+    @Override
+    public String toString() {
+        return JSON.toJSONString(this);
+    }
 
-	public String getName() {
-		return this.name;
-	}
+    public enum Type {
+        BAD,
+        NULL,
+        INT,
+        LONG,
+        DOUBLE,
+        STRING,
+        BOOL,
+        DATE,
+        BYTES,
+        STREAM
+    }
+
+    public String getName() {
+        return this.name;
+    }
 }

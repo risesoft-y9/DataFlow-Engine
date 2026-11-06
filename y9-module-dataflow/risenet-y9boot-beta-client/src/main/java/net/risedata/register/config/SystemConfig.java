@@ -1,10 +1,7 @@
 package net.risedata.register.config;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import net.risedata.register.container.ContainerManager;
 import net.risedata.register.container.UnknownContainerManager;
@@ -24,9 +21,8 @@ import net.risedata.register.system.operation.windows.WindowsSystemOperation;
  * @Date 2021/12/22 17:45
  * @Version 1.0
  */
-//@Configuration
+// @Configuration
 public class SystemConfig {
-
 
     @Bean
     @ConditionalOnMissingBean(SystemOperation.class)
@@ -43,7 +39,7 @@ public class SystemConfig {
     @ConditionalOnMissingBean(ContainerManager.class)
     public ContainerManager containerManager(SystemOperation systemOperation) {
         Class<?> rootClass = SystemConfigSelector.rootClass;
-        String rootPath = rootClass.getResource("").getPath().replace("file:/","");
+        String rootPath = rootClass.getResource("").getPath().replace("file:/", "");
 
         ContainerManager containerManager = JARContainerManager.create(rootPath, systemOperation);
         if (containerManager == null) {
@@ -57,8 +53,6 @@ public class SystemConfig {
         }
         return containerManager == null ? new UnknownContainerManager(systemOperation, rootPath) : containerManager;
     }
-
-
 
     @Bean
     SystemListener systemListener() {

@@ -7,20 +7,20 @@ import lombok.NoArgsConstructor;
 @Data
 public class DataTableDTO {
 
-	private String id;
+    private String id;
 
-	private String name;
-	
-	private String cname;
-	
-	private String baseId;
-	
-	private Integer tableCount;
-	
-	private Integer status;
-	
-	private Integer serviceTable;
-	
-	private String oldName;
+    private String name;
+
+    private String cname;
+
+    private String baseId;
+
+    private Integer tableCount;
+
+    private Integer status;
+
+    private Integer serviceTable;
+
+    private String oldName;
 
 }

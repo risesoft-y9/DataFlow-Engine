@@ -14,38 +14,38 @@ import net.risedata.jdbc.operation.Operation;
  */
 public class Delete {
 
-	private static DeleteExecutor DELETE;
+    private static DeleteExecutor DELETE;
 
-	public static void setDeleteExecutor(DeleteExecutor delete) {
-		DELETE = delete;
-	}
+    public static void setDeleteExecutor(DeleteExecutor delete) {
+        DELETE = delete;
+    }
 
-	public static int delete(@NotNull Object entiry, Map<String, Object> valueMap,
-			Map<String, Operation> operationMap) {
-		return DELETE.delete(entiry, valueMap, operationMap);
-	}
+    public static int delete(@NotNull Object entiry, Map<String, Object> valueMap,
+        Map<String, Operation> operationMap) {
+        return DELETE.delete(entiry, valueMap, operationMap);
+    }
 
-	public static int delete(@NotNull Object entiry, Map<String, Object> valueMap) {
-		return DELETE.delete(entiry, valueMap);
-	}
+    public static int delete(@NotNull Object entiry, Map<String, Object> valueMap) {
+        return DELETE.delete(entiry, valueMap);
+    }
 
-	public static int delete(@NotNull Object entiry) {
+    public static int delete(@NotNull Object entiry) {
 
-		return DELETE.delete(entiry);
-	}
+        return DELETE.delete(entiry);
+    }
 
-	public static int deleteById(@NotNull Object entiry, Map<String, Object> valueMap) {
-		return DELETE.deleteById(entiry, valueMap);
-	}
+    public static int deleteById(@NotNull Object entiry, Map<String, Object> valueMap) {
+        return DELETE.deleteById(entiry, valueMap);
+    }
 
-	public static int deleteById(@NotNull Object entiry) {
+    public static int deleteById(@NotNull Object entiry) {
 
-		return DELETE.deleteById(entiry);
-	}
+        return DELETE.deleteById(entiry);
+    }
 
-	public static int deleteById(@NotNull Class<?> id, Object... ids) {
+    public static int deleteById(@NotNull Class<?> id, Object... ids) {
 
-		return DELETE.deleteById(id, ids);
-	}
+        return DELETE.deleteById(id, ids);
+    }
 
 }

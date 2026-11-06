@@ -7,40 +7,40 @@ import lombok.NoArgsConstructor;
 @Data
 public class DataSourceDTO {
 
-	private String id;
+    private String id;
 
-	private String baseName;
-	
-	private String baseType;
-	
-	private String driver;
+    private String baseName;
 
-	private String url;
+    private String baseType;
 
-	private String username;
+    private String driver;
 
-	private String password;
+    private String url;
 
-	private Integer initialSize;
+    private String username;
 
-	private Integer maxActive;
+    private String password;
 
-	private Integer minIdle;
-	
-	private String baseSchema;
-	
-	private String directory;
-	
-	private Integer runType;
-	
-	private String remark;
-	
-	private Integer isLook;
-	
-	private Integer type;
-	
-	private String tenantId;
-	
-	private String userId;
+    private Integer initialSize;
+
+    private Integer maxActive;
+
+    private Integer minIdle;
+
+    private String baseSchema;
+
+    private String directory;
+
+    private Integer runType;
+
+    private String remark;
+
+    private Integer isLook;
+
+    private Integer type;
+
+    private String tenantId;
+
+    private String userId;
 
 }

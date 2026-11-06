@@ -1,5 +1,7 @@
 package net.risesoft.api.message.impl;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,8 +15,6 @@ import net.risesoft.api.message.MessageServiceExecutor;
 import net.risesoft.api.persistence.model.IServiceInstanceModel;
 import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
-
-import java.util.List;
 
 /**
  * @Description : 消息发送服务器
@@ -42,9 +42,9 @@ public class DefaultMessageService implements MessageService {
 
     @Override
     public void sendMessage(String[] recipients, String title, String message, Object source) {
-        if (serviceExecutors==null) {
-			return;
-		}
+        if (serviceExecutors == null) {
+            return;
+        }
         for (MessageServiceExecutor serviceExecutor : serviceExecutors) {
             serviceExecutor.sendMessage(recipients, title, message, source);
         }
@@ -54,7 +54,8 @@ public class DefaultMessageService implements MessageService {
     public void onServiceDown(IServiceInstanceModel serviceInstanceModel) {
         String message = instanceMessage.createContent(serviceInstanceModel);
         String title = instanceMessage.createTitle(serviceInstanceModel);
-        sendMessage(serviceInstanceModel.getManagerInfo() != null ? serviceInstanceModel.getManagerInfo().split(",") : new String[]{}, title, message, serviceInstanceModel);
+        sendMessage(serviceInstanceModel.getManagerInfo() != null ? serviceInstanceModel.getManagerInfo().split(",")
+            : new String[] {}, title, message, serviceInstanceModel);
 
     }
 
@@ -62,14 +63,15 @@ public class DefaultMessageService implements MessageService {
     public void onJobError(Job job) {
         String message = jobMessage.createContent(job);
         String title = jobMessage.createTitle(job);
-        sendMessage(!StringUtils.isEmpty(job.getEmail()) ? job.getEmail().split(",") : !StringUtils.isEmpty(contacts) ? contacts.split(",") : new String[]{}, title, message, job);
+        sendMessage(!StringUtils.isEmpty(job.getEmail()) ? job.getEmail().split(",")
+            : !StringUtils.isEmpty(contacts) ? contacts.split(",") : new String[] {}, title, message, job);
     }
 
     @Override
     public void onJobEnd(Job job, JobLog jobLog) {
-        if (jobListeners!=null){
+        if (jobListeners != null) {
             for (JobListener jobListener : jobListeners) {
-                jobListener.endJob(job,jobLog);
+                jobListener.endJob(job, jobLog);
             }
         }
 

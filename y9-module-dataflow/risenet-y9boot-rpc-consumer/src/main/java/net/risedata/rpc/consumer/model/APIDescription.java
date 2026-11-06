@@ -88,6 +88,7 @@ public class APIDescription {
 
     /**
      * 拿到映射
+     * 
      * @return
      */
     public String getMapping() {
@@ -96,13 +97,8 @@ public class APIDescription {
 
     @Override
     public String toString() {
-        return "APIDescription{" +
-                "timeOut=" + timeOut +
-                ", mapping='" + mapping + '\'' +
-                ", isSync=" + isSync +
-                ", returnType=" + returnType +
-                ", returnValueHandle=" + returnValueHandle +
-                ", invokeHandle=" + invokeHandle +
-                '}';
+        return "APIDescription{" + "timeOut=" + timeOut + ", mapping='" + mapping + '\'' + ", isSync=" + isSync
+            + ", returnType=" + returnType + ", returnValueHandle=" + returnValueHandle + ", invokeHandle="
+            + invokeHandle + '}';
     }
 }

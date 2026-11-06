@@ -12,7 +12,5 @@ import net.risesoft.api.persistence.model.job.JobLog;
  */
 public interface JobListener {
 
-
-
     void endJob(Job job, JobLog jobLog);
 }

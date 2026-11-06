@@ -1,6 +1,5 @@
 package net.risedata.rpc.model;
 
-
 import com.alibaba.fastjson.JSONObject;
 import io.netty.util.CharsetUtil;
 
@@ -26,8 +25,7 @@ public class Response {
 
     private long id;
 
-
-    public static Response as(Msg msg){
+    public static Response as(Msg msg) {
         return new Response(msg.getMsg());
     }
 
@@ -49,7 +47,6 @@ public class Response {
         return JSONObject.toJSONString(this).getBytes(CharsetUtil.UTF_8);
     }
 
-
     public int getType() {
         return type;
     }
@@ -63,9 +60,11 @@ public class Response {
         this.message = message;
         this.id = id;
     }
+
     public Response() {
 
     }
+
     public static int getSUCCESS() {
         return SUCCESS;
     }
@@ -90,8 +89,6 @@ public class Response {
         this.message = message;
     }
 
-    
-
     public Msg asMsg() {
         byte[] bytes = this.toBytes();
         return new Msg(bytes.length, bytes);
@@ -99,12 +96,8 @@ public class Response {
 
     @Override
     public String toString() {
-        return "Response{" +
-                "type=" + type +
-                ", status=" + status +
-                ", message='" + message + '\'' +
-                ", id=" + id +
-                '}';
+        return "Response{" + "type=" + type + ", status=" + status + ", message='" + message + '\'' + ", id=" + id
+            + '}';
     }
 
     public long getId() {

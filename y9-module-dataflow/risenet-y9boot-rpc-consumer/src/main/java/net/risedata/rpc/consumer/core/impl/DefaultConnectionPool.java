@@ -23,10 +23,9 @@ class DefaultConnectionPool implements ConnectionPool {
      */
     private AtomicInteger index = new AtomicInteger(0);
 
-
     private int getIndex() {
         int concurrent, i;
-        for (; ; ) {
+        for (;;) {
             concurrent = index.get();
             i = ((concurrent + 1) % connections.size());
             if (index.compareAndSet(concurrent, i)) {
@@ -50,14 +49,14 @@ class DefaultConnectionPool implements ConnectionPool {
 
     @Override
     public Connection getConnection() {
-        //TODO 负载均衡策略 当前是轮询 应使用获取请求数堆积较少的来进行请求
-//       return getIndexOfAction();
+        // TODO 负载均衡策略 当前是轮询 应使用获取请求数堆积较少的来进行请求
+        // return getIndexOfAction();
         return connections.get(getIndex());
     }
 
-
     /**
      * 根据请求数据获取连接
+     * 
      * @return
      */
     public Connection getIndexOfAction() {
@@ -75,7 +74,6 @@ class DefaultConnectionPool implements ConnectionPool {
         return connection;
     }
 
-
     @Override
     public List<Connection> getConnections() {
         return connections;
@@ -85,6 +83,5 @@ class DefaultConnectionPool implements ConnectionPool {
     public int size() {
         return connections.size();
     }
-
 
 }

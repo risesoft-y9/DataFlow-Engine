@@ -1,14 +1,9 @@
 package net.risedata.rpc.provide.config;
 
-import net.risedata.rpc.annotation.RPCScan;
-import net.risedata.rpc.provide.annotation.EnableRequestParam;
-import net.risedata.rpc.provide.annotation.RPCServer;
-import net.risedata.rpc.provide.config.Application;
-import net.risedata.rpc.provide.defined.ClassDefined;
-import net.risedata.rpc.provide.handle.impl.DefaultParameterHandle;
-import net.risedata.rpc.provide.handle.impl.ParamParameterHandle;
-import net.risedata.rpc.provide.handle.impl.RequestParamParameterHandle;
-import net.risedata.rpc.utils.LClassLoader;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +16,14 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.StringUtils;
 
-import java.lang.reflect.Method;
-import java.util.*;
+import net.risedata.rpc.annotation.RPCScan;
+import net.risedata.rpc.provide.annotation.EnableRequestParam;
+import net.risedata.rpc.provide.annotation.RPCServer;
+import net.risedata.rpc.provide.defined.ClassDefined;
+import net.risedata.rpc.provide.handle.impl.DefaultParameterHandle;
+import net.risedata.rpc.provide.handle.impl.ParamParameterHandle;
+import net.risedata.rpc.provide.handle.impl.RequestParamParameterHandle;
+import net.risedata.rpc.utils.LClassLoader;
 
 /**
  * @description: 用于处理bean的提前加载
@@ -41,7 +42,6 @@ public class ServerBeanFactory implements BeanFactoryPostProcessor, ApplicationC
             loadConfig(aClass);
         }
     }
-
 
     public static void loadConfig(Class<?> loadType) {
         RPCServer rpcServer = AnnotationUtils.findAnnotation(loadType, RPCServer.class);

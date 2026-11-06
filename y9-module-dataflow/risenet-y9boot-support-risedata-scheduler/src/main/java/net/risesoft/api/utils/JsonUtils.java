@@ -1,14 +1,12 @@
 package net.risesoft.api.utils;
 
-import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import org.yaml.snakeyaml.Yaml;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.*;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * @Description :
@@ -43,7 +41,8 @@ public class JsonUtils {
      * @Title: json2prop
      * @Description: 递归解析
      */
-    private static void json2prop(JSONObject jsonObject, String tmpKey, String tmpKeyPre, Map<String, Object> configMap) {
+    private static void json2prop(JSONObject jsonObject, String tmpKey, String tmpKeyPre,
+        Map<String, Object> configMap) {
         Iterator<String> iterator = jsonObject.keySet().iterator();
         while (iterator.hasNext()) {
             // 获得key
@@ -59,19 +58,18 @@ public class JsonUtils {
             }
             // 如果是集合，需要特殊解析
             if (valueObject instanceof Collection<?>) {
-                List<?> list = (List<?>) valueObject;
+                List<?> list = (List<?>)valueObject;
                 tmpKeyPre = tmpKey;
                 for (int i = 0; i < list.size(); i++) {
                     String itemKey = tmpKey + key + "[" + i + "]";
                     Object o = list.get(i);
                     if (o instanceof JSONObject) {
                         itemKey += ".";
-                        JSONObject itemValue = (JSONObject) list.get(i);
+                        JSONObject itemValue = (JSONObject)list.get(i);
                         json2prop(itemValue, itemKey, tmpKeyPre, configMap);
                     } else {
-                        configMap.put(itemKey,o);
+                        configMap.put(itemKey, o);
                     }
-
 
                 }
             } else if (valueObject instanceof JSONObject) {
@@ -86,6 +84,5 @@ public class JsonUtils {
             }
         }
     }
-
 
 }

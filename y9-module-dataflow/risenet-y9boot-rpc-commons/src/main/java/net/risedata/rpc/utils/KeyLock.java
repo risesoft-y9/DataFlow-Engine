@@ -22,7 +22,7 @@ public class KeyLock<K> {
         if (lock == null) {
             createLock.acquireUninterruptibly();
             lock = keys.get(k);
-            if (lock==null){
+            if (lock == null) {
                 lock = new Semaphore(1);
                 keys.put(k, lock);
             }
@@ -30,7 +30,6 @@ public class KeyLock<K> {
         }
         lock.acquireUninterruptibly();
     }
-
 
     public void unLock(K k) {
         Semaphore lock = keys.get(k);

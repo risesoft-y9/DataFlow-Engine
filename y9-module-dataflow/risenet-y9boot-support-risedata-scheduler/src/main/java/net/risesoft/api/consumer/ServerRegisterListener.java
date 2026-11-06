@@ -1,5 +1,10 @@
 package net.risesoft.api.consumer;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import net.risedata.register.model.Const;
 import net.risedata.register.rpc.RegisterAPI;
 import net.risedata.register.service.IServiceInstance;
@@ -12,11 +17,6 @@ import net.risedata.rpc.service.RPCExecutorService;
 import net.risesoft.api.config.model.ServiceConfigModel;
 import net.risesoft.api.listener.ClientListener;
 import net.risesoft.api.persistence.model.IServiceInstanceModel;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @Description : 监听客户端与服务端连接的建立 此处是与其他RpcServer 进行建立连接用于服务的同步监控与发现
@@ -51,7 +51,8 @@ public class ServerRegisterListener implements ConnectionListener {
             map.put("environment", environment);
             map.put("level", 1);
 
-            ClientListener.pushListener(Const.REMOVE_LISTENER, map, serviceConfigModel.getMyService(), null, environment);
+            ClientListener.pushListener(Const.REMOVE_LISTENER, map, serviceConfigModel.getMyService(), null,
+                environment);
         }
     }
 
@@ -65,7 +66,8 @@ public class ServerRegisterListener implements ConnectionListener {
             map.put("instance", instance);
             map.put("environment", environment);
             map.put("level", 1);
-            ClientListener.pushListener(Const.REGISTER_LISTENER, map, serviceConfigModel.getMyService(), null, environment);
+            ClientListener.pushListener(Const.REGISTER_LISTENER, map, serviceConfigModel.getMyService(), null,
+                environment);
         }
 
     }
@@ -73,7 +75,7 @@ public class ServerRegisterListener implements ConnectionListener {
     @Listener(value = Const.CHANGE_LISTENER)
     public void change(IServiceInstance instance, Integer status) {
 
-        //根据状态广播
+        // 根据状态广播
 
     }
 

@@ -19,28 +19,28 @@ import net.risesoft.base.BaseEntity;
 @Data
 public class DataLogEntity extends BaseEntity {
 
-	private static final long serialVersionUID = 3547142462523521585L;
+    private static final long serialVersionUID = 3547142462523521585L;
 
-	@Id
-	@Column(name = "ID", length = 38, nullable = false)
-	@Comment(value = "主键")
-	private String id;
+    @Id
+    @Column(name = "ID", length = 38, nullable = false)
+    @Comment(value = "主键")
+    private String id;
 
-	@Column(name = "JOBID", length = 50, nullable = false)
-	@Comment(value = "本次任务执行的id")
-	private String jobId;
+    @Column(name = "JOBID", length = 50, nullable = false)
+    @Comment(value = "本次任务执行的id")
+    private String jobId;
 
-	@Lob
-	@Column(name = "RECORD")
-	@Comment(value = "数据内容")
-	private String record;
+    @Lob
+    @Column(name = "RECORD")
+    @Comment(value = "数据内容")
+    private String record;
 
-	@Column(name = "DATE")
-	@Comment(value = "任务时间")
-	private long date;
+    @Column(name = "DATE")
+    @Comment(value = "任务时间")
+    private long date;
 
-	@Column(name = "MSG", length = 1000)
-	@Comment(value = "异常信息")
-	private String msg;
+    @Column(name = "MSG", length = 1000)
+    @Comment(value = "异常信息")
+    private String msg;
 
 }

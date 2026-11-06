@@ -3,9 +3,8 @@ package net.risedata.rpc.utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Arrays;
+
+import net.risedata.rpc.exceptions.ConfigException;
 
 import javassist.ClassClassPath;
 import javassist.ClassPool;
@@ -15,7 +14,6 @@ import javassist.NotFoundException;
 import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.LocalVariableAttribute;
 import javassist.bytecode.MethodInfo;
-import net.risedata.rpc.exceptions.ConfigException;
 
 public class MethodUtils {
     /**
@@ -41,8 +39,7 @@ public class MethodUtils {
         CtMethod cm = cc.getDeclaredMethod(m.getName());
         MethodInfo methodInfo = cm.getMethodInfo();
         CodeAttribute codeAttribute = methodInfo.getCodeAttribute();
-        LocalVariableAttribute attr =
-                (LocalVariableAttribute) codeAttribute.getAttribute(LocalVariableAttribute.tag);
+        LocalVariableAttribute attr = (LocalVariableAttribute)codeAttribute.getAttribute(LocalVariableAttribute.tag);
         if (attr == null) {
             return null;
         }
@@ -96,9 +93,4 @@ public class MethodUtils {
 
     }
 
-
 }
-
-
-
-

@@ -16,7 +16,7 @@ public class ConnectionConfig {
     /**
      * 添加一个连接管理器
      *
-     * @param id   id 这个连接管理器的id
+     * @param id id 这个连接管理器的id
      * @param urls urls 连接管理器所管理的url
      */
     public void addConfig(String id, List<String> urls) {
@@ -26,6 +26,5 @@ public class ConnectionConfig {
     public Map<String, List<String>> getConfigs() {
         return configs;
     }
-
 
 }

@@ -9,9 +9,9 @@ package net.risesoft.exceptions;
  */
 public class TokenException extends RuntimeException {
 
-	private static final long serialVersionUID = 5338676510040885569L;
+    private static final long serialVersionUID = 5338676510040885569L;
 
-	public TokenException(String msg){
+    public TokenException(String msg) {
         super(msg);
     }
 }

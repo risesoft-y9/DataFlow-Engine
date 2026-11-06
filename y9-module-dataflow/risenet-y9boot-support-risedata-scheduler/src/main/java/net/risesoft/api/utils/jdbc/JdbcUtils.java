@@ -1,11 +1,6 @@
 
 package net.risesoft.api.utils.jdbc;
 
-
-import javax.sql.DataSource;
-
-import com.alibaba.druid.util.HexBin;
-
 import java.io.Closeable;
 import java.io.PrintStream;
 import java.sql.Connection;
@@ -25,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.sql.DataSource;
+
+import com.alibaba.druid.util.HexBin;
 
 public final class JdbcUtils {
 
@@ -73,7 +71,6 @@ public final class JdbcUtils {
     public static final String KINGBASE = "kingbase";
     public static final String KINGBASE_DRIVER = "com.kingbase.Driver";
 
-
     public static final String ODPS = "odps";
 
     /**
@@ -82,7 +79,6 @@ public final class JdbcUtils {
     public static final String LOG4JDBC = "log4jdbc";
     public static final String LOG4JDBC_DRIVER = "net.sf.log4jdbc.DriverSpy";
     private static final Properties DRIVER_URL_MAPPING = new Properties();
-
 
     public static void close(Connection x) {
         if (x == null) {
@@ -137,7 +133,8 @@ public final class JdbcUtils {
         printResultSet(rs, out, true, "\t");
     }
 
-    public static void printResultSet(ResultSet rs, PrintStream out, boolean printHeader, String seperator) throws SQLException {
+    public static void printResultSet(ResultSet rs, PrintStream out, boolean printHeader, String seperator)
+        throws SQLException {
         ResultSetMetaData metadata = rs.getMetaData();
         int columnCount = metadata.getColumnCount();
         if (printHeader) {
@@ -242,7 +239,7 @@ public final class JdbcUtils {
                         out.print("null");
                     } else {
                         if (object instanceof byte[]) {
-                            byte[] bytes = (byte[]) object;
+                            byte[] bytes = (byte[])object;
                             String text = HexBin.encode(bytes);
                             out.print(text);
                         } else {
@@ -375,7 +372,7 @@ public final class JdbcUtils {
         } else if (rawUrl.startsWith("jdbc:mariadb:")) {
             return MARIADB_DRIVER;
         } else if (rawUrl.startsWith("jdbc:oracle:") //
-                || rawUrl.startsWith("JDBC:oracle:")) {
+            || rawUrl.startsWith("JDBC:oracle:")) {
             return ORACLE_DRIVER;
         } else if (rawUrl.startsWith("jdbc:alibaba:oracle:")) {
             return ALI_ORACLE_DRIVER;
@@ -444,7 +441,7 @@ public final class JdbcUtils {
         if (rawUrl.startsWith("jdbc:derby:") || rawUrl.startsWith("jdbc:log4jdbc:derby:")) {
             return DERBY;
         } else if (rawUrl.startsWith("jdbc:mysql:") || rawUrl.startsWith("jdbc:cobar:")
-                || rawUrl.startsWith("jdbc:log4jdbc:mysql:")) {
+            || rawUrl.startsWith("jdbc:log4jdbc:mysql:")) {
             return MYSQL;
         } else if (rawUrl.startsWith("jdbc:mariadb:")) {
             return MARIADB;
@@ -545,7 +542,7 @@ public final class JdbcUtils {
         }
 
         try {
-            return (Driver) clazz.newInstance();
+            return (Driver)clazz.newInstance();
         } catch (IllegalAccessException e) {
             throw new SQLException(e.getMessage(), e);
         } catch (InstantiationException e) {
@@ -613,12 +610,12 @@ public final class JdbcUtils {
     }
 
     public static List<Map<String, Object>> executeQuery(DataSource dataSource, String sql, Object... parameters)
-            throws SQLException {
+        throws SQLException {
         return executeQuery(dataSource, sql, Arrays.asList(parameters));
     }
 
     public static List<Map<String, Object>> executeQuery(DataSource dataSource, String sql, List<Object> parameters)
-            throws SQLException {
+        throws SQLException {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
@@ -629,7 +626,7 @@ public final class JdbcUtils {
     }
 
     public static List<Map<String, Object>> executeQuery(Connection conn, String sql, List<Object> parameters)
-            throws SQLException {
+        throws SQLException {
         List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
 
         PreparedStatement stmt = null;
@@ -670,7 +667,7 @@ public final class JdbcUtils {
     }
 
     public static void insertToTable(DataSource dataSource, String tableName, Map<String, Object> data)
-            throws SQLException {
+        throws SQLException {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
@@ -688,9 +685,9 @@ public final class JdbcUtils {
 
     public static String makeInsertToTableSql(String tableName, Collection<String> names) {
         StringBuilder sql = new StringBuilder() //
-                .append("insert into ") //
-                .append(tableName) //
-                .append("("); //
+            .append("insert into ") //
+            .append(tableName) //
+            .append("("); //
 
         int nameCount = 0;
         for (String name : names) {

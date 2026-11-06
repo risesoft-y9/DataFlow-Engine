@@ -15,68 +15,68 @@ import net.risesoft.y9public.entity.DataInterfaceEntity;
 
 public class DataInterfaceSpecification implements Specification<DataInterfaceEntity> {
 
-	private static final long serialVersionUID = 4032299954629222163L;
-	
-	private String search;
-	private String requestType;
-	private Integer dataType;
-	private String tenantId;
-	
-	public DataInterfaceSpecification() {
-		super();
-	}
+    private static final long serialVersionUID = 4032299954629222163L;
 
-	public DataInterfaceSpecification(String search, String requestType, Integer dataType, String tenantId) {
-		super();
-		this.search = search;
-		this.requestType = requestType;
-		this.dataType = dataType;
-		this.tenantId = tenantId;
-	}
+    private String search;
+    private String requestType;
+    private Integer dataType;
+    private String tenantId;
 
-	@Override
-	public Predicate toPredicate(Root<DataInterfaceEntity> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-		Predicate predicate = cb.conjunction();
-		List<Expression<Boolean>> expressions = predicate.getExpressions();
+    public DataInterfaceSpecification() {
+        super();
+    }
 
-		if(StringUtils.isNotBlank(requestType)) {
-			expressions.add(cb.equal(root.get("requestType").as(String.class), requestType));
-		}
-		if(StringUtils.isNotBlank(search)) {
-			expressions.add(cb.or(cb.like(root.get("interfaceName").as(String.class), "%" + search + "%"), 
-					cb.like(root.get("interfaceUrl").as(String.class), "%" + search + "%")));
-		}
-		if(dataType != null) {
-			expressions.add(cb.equal(root.get("dataType").as(Integer.class), dataType));
-		}
-		if(StringUtils.isNotBlank(tenantId)) {
-			expressions.add(cb.equal(root.get("tenantId").as(String.class), tenantId));
-		}
-		return predicate;
-	}
+    public DataInterfaceSpecification(String search, String requestType, Integer dataType, String tenantId) {
+        super();
+        this.search = search;
+        this.requestType = requestType;
+        this.dataType = dataType;
+        this.tenantId = tenantId;
+    }
 
-	public String getSearch() {
-		return search;
-	}
+    @Override
+    public Predicate toPredicate(Root<DataInterfaceEntity> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+        Predicate predicate = cb.conjunction();
+        List<Expression<Boolean>> expressions = predicate.getExpressions();
 
-	public void setSearch(String search) {
-		this.search = search;
-	}
+        if (StringUtils.isNotBlank(requestType)) {
+            expressions.add(cb.equal(root.get("requestType").as(String.class), requestType));
+        }
+        if (StringUtils.isNotBlank(search)) {
+            expressions.add(cb.or(cb.like(root.get("interfaceName").as(String.class), "%" + search + "%"),
+                cb.like(root.get("interfaceUrl").as(String.class), "%" + search + "%")));
+        }
+        if (dataType != null) {
+            expressions.add(cb.equal(root.get("dataType").as(Integer.class), dataType));
+        }
+        if (StringUtils.isNotBlank(tenantId)) {
+            expressions.add(cb.equal(root.get("tenantId").as(String.class), tenantId));
+        }
+        return predicate;
+    }
 
-	public String getRequestType() {
-		return requestType;
-	}
+    public String getSearch() {
+        return search;
+    }
 
-	public void setRequestType(String requestType) {
-		this.requestType = requestType;
-	}
+    public void setSearch(String search) {
+        this.search = search;
+    }
 
-	public Integer getDataType() {
-		return dataType;
-	}
+    public String getRequestType() {
+        return requestType;
+    }
 
-	public void setDataType(Integer dataType) {
-		this.dataType = dataType;
-	}
+    public void setRequestType(String requestType) {
+        this.requestType = requestType;
+    }
+
+    public Integer getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(Integer dataType) {
+        this.dataType = dataType;
+    }
 
 }

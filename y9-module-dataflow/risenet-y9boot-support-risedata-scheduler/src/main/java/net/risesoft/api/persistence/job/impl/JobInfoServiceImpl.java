@@ -1,16 +1,17 @@
 package net.risesoft.api.persistence.job.impl;
 
-import cn.hutool.core.date.DateUtil;
-import net.risesoft.api.persistence.dao.job.JobInfoDao;
-import net.risesoft.api.persistence.job.JobInfoService;
-import net.risesoft.api.persistence.model.job.JobInfo;
+import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
+import net.risesoft.api.persistence.dao.job.JobInfoDao;
+import net.risesoft.api.persistence.job.JobInfoService;
+import net.risesoft.api.persistence.model.job.JobInfo;
+
+import cn.hutool.core.date.DateUtil;
 
 /**
  * @Description :
@@ -61,7 +62,6 @@ public class JobInfoServiceImpl implements JobInfoService {
         }
     }
 
-
     private void create(String environment) {
         dao.create(getDate(), environment);
     }
@@ -73,6 +73,5 @@ public class JobInfoServiceImpl implements JobInfoService {
             dao.addError(getDate(), environment);
         }
     }
-
 
 }

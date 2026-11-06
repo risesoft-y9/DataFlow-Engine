@@ -10,12 +10,12 @@ package risesoft.data.transfer.core.executor;
  */
 public abstract class AbstractExecutor<T> implements Executor {
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void run(Object task) {
-		runExecutor((T) task);
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public void run(Object task) {
+        runExecutor((T)task);
+    }
 
-	public abstract void runExecutor(T task);
+    public abstract void runExecutor(T task);
 
 }

@@ -13,11 +13,9 @@ import risesoft.data.transfer.stream.Stream;
  */
 public class LocalFileInfoColumn extends FileInfoColumn {
 
-	public LocalFileInfoColumn(Stream stream, long byteSize, String name, String path, long lastUpdateTime) {
-		super(stream, byteSize, name, path, lastUpdateTime);
-		
-	}
+    public LocalFileInfoColumn(Stream stream, long byteSize, String name, String path, long lastUpdateTime) {
+        super(stream, byteSize, name, path, lastUpdateTime);
 
-	
+    }
 
 }

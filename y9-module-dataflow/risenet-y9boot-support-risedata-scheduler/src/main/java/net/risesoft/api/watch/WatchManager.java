@@ -1,9 +1,10 @@
 package net.risesoft.api.watch;
 
-import io.netty.util.HashedWheelTimer;
-import net.risedata.register.service.IServiceInstanceFactory;
-import net.risesoft.api.persistence.iservice.IServiceService;
-import net.risesoft.api.persistence.model.IServiceInstanceModel;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +15,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import net.risedata.register.service.IServiceInstanceFactory;
+import net.risesoft.api.persistence.iservice.IServiceService;
+import net.risesoft.api.persistence.model.IServiceInstanceModel;
+
+import io.netty.util.HashedWheelTimer;
 
 /**
  * @Description :
@@ -34,7 +35,6 @@ public class WatchManager implements ApplicationContextAware {
      */
     private static final Map<String, CheckStatusTask> WATCH_TASK = new ConcurrentHashMap<>();
 
-
     private static HashedWheelTimer hashedWheelTimer = new HashedWheelTimer();
 
     public static final Logger LOGGER = LoggerFactory.getLogger(WatchManager.class);
@@ -47,7 +47,6 @@ public class WatchManager implements ApplicationContextAware {
 
     @Autowired
     private IServiceService iServiceService;
-
 
     @Autowired
     IServiceInstanceFactory iServiceInstanceFactory;
@@ -68,16 +67,20 @@ public class WatchManager implements ApplicationContextAware {
 
     }
 
-
     /**
      * 查询后加载定时任务 监控 60 秒一次
      */
-    @Scheduled(fixedDelayString = "${beta.service.watch.refreshTime:60000}", initialDelayString = "${beta.service.watch.refreshTime:60000}")
+    @Scheduled(fixedDelayString = "${beta.service.watch.refreshTime:60000}",
+        initialDelayString = "${beta.service.watch.refreshTime:60000}")
     public void onRefresh() {
 
-        List<IServiceInstanceModel> instanceModels = iServiceService.findWatch(iServiceInstanceFactory.getIsntance().getInstanceId(), iServiceInstanceFactory.getIsntance().getEnvironment(), iServiceInstanceFactory.getIsntance().getServiceId());
+        List<IServiceInstanceModel> instanceModels =
+            iServiceService.findWatch(iServiceInstanceFactory.getIsntance().getInstanceId(),
+                iServiceInstanceFactory.getIsntance().getEnvironment(),
+                iServiceInstanceFactory.getIsntance().getServiceId());
         for (IServiceInstanceModel instanceModel : instanceModels) {
-            iServiceService.updateWatch(iServiceInstanceFactory.getIsntance().getInstanceId(), instanceModel.getWatchServer(), instanceModel.getInstanceId());
+            iServiceService.updateWatch(iServiceInstanceFactory.getIsntance().getInstanceId(),
+                instanceModel.getWatchServer(), instanceModel.getInstanceId());
         }
         checkTask();
     }
@@ -95,7 +98,7 @@ public class WatchManager implements ApplicationContextAware {
     /**
      * 确保任务唯一性
      *
-     * @param task       任务
+     * @param task 任务
      * @param instanceId 实例 id
      * @return
      */
@@ -105,15 +108,14 @@ public class WatchManager implements ApplicationContextAware {
         }
     }
 
-
     public void addTask(String instanceId) {
-        CheckStatusTask checkStatusTask = new CheckStatusTask(instanceId, iServiceInstanceFactory.getIsntance().getInstanceId(), iServiceService);
+        CheckStatusTask checkStatusTask =
+            new CheckStatusTask(instanceId, iServiceInstanceFactory.getIsntance().getInstanceId(), iServiceService);
         synchronized (WATCH_TASK) {
             WATCH_TASK.put(instanceId, checkStatusTask);
         }
         hashedWheelTimer.newTimeout(checkStatusTask, startTime, TimeUnit.MILLISECONDS);
     }
-
 
     public static boolean get(String id) {
         return WATCH_TASK.containsKey(id);

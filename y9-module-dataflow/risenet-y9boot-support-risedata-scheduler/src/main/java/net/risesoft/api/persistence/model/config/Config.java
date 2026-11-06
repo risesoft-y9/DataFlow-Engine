@@ -1,5 +1,15 @@
 package net.risesoft.api.persistence.model.config;
 
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import net.risedata.jdbc.annotations.operation.Operate;
@@ -7,11 +17,6 @@ import net.risedata.jdbc.annotations.order.Desc;
 import net.risedata.jdbc.operation.Operates;
 import net.risesoft.security.GetEnvironment;
 import net.risesoft.security.LikeOperation;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @Description : 配置文件
@@ -103,6 +108,7 @@ public class Config implements Serializable, GetEnvironment {
      */
     @Column(name = "UPDATE_DATE")
     private Date updateDate;
+
     public Date getCreateDate() {
         return createDate;
     }
@@ -123,7 +129,6 @@ public class Config implements Serializable, GetEnvironment {
         return id;
     }
 
-
     public String getDescription() {
         return description;
     }
@@ -143,7 +148,6 @@ public class Config implements Serializable, GetEnvironment {
     public void setId(String id) {
         this.id = id;
     }
-
 
     public String getName() {
         return name;
@@ -179,13 +183,7 @@ public class Config implements Serializable, GetEnvironment {
 
     @Override
     public String toString() {
-        return "Config{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", type='" + type + '\'' +
-                ", group='" + group + '\'' +
-                ", environment='" + environment + '\'' +
-                ", content='" + content + '\'' +
-                '}';
+        return "Config{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", type='" + type + '\'' + ", group='"
+            + group + '\'' + ", environment='" + environment + '\'' + ", content='" + content + '\'' + '}';
     }
 }

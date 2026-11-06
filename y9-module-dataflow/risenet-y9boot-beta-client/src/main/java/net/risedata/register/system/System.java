@@ -1,14 +1,17 @@
 package net.risedata.register.system;
 
-import java.io.*;
-import java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.SequenceInputStream;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  * 系统信息
  */
-public class System{
+public class System {
     /**
      * 服务器名称
      */
@@ -34,53 +37,43 @@ public class System{
      */
     private String osArch;
 
-    public String getComputerName()
-    {
+    public String getComputerName() {
         return computerName;
     }
 
-    public void setComputerName(String computerName)
-    {
+    public void setComputerName(String computerName) {
         this.computerName = computerName;
     }
 
-    public String getComputerIp()
-    {
+    public String getComputerIp() {
         return computerIp;
     }
 
-    public void setComputerIp(String computerIp)
-    {
+    public void setComputerIp(String computerIp) {
         this.computerIp = computerIp;
     }
 
-    public String getUserDir()
-    {
+    public String getUserDir() {
         return userDir;
     }
 
-    public void setUserDir(String userDir)
-    {
+    public void setUserDir(String userDir) {
         this.userDir = userDir;
     }
 
-    public String getOsName()
-    {
+    public String getOsName() {
         return osName;
     }
 
-    public void setOsName(String osName)
-    {
+    public void setOsName(String osName) {
         this.osName = osName;
     }
 
-    public String getOsArch()
-    {
+    public String getOsArch() {
         return osArch;
     }
 
-    public void setOsArch(String osArch)
-    {
+    public void setOsArch(String osArch) {
         this.osArch = osArch;
     }
 
@@ -102,7 +95,7 @@ public class System{
             OutputStreamWriter osw = new OutputStreamWriter(process.getOutputStream());
             BufferedWriter bw = new BufferedWriter(osw);
             for (int i = 0; i < cmds.size(); i++) {
-                java.lang.System.out.println("执行命令:"+cmds.get(i));
+                java.lang.System.out.println("执行命令:" + cmds.get(i));
                 bw.write(cmds.get(i));
                 bw.newLine();
             }
@@ -119,7 +112,7 @@ public class System{
                 }
 
             }
-          /*  process.destroy();
+            /*  process.destroy();
             br.close();
             isr.close();
             process.destroy();*/

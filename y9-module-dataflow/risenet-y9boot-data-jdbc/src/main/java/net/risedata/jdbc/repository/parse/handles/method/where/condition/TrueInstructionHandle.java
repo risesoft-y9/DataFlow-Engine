@@ -10,13 +10,13 @@ import net.risedata.jdbc.repository.parse.handles.method.MethodNameBuilder;
  */
 public class TrueInstructionHandle extends ConditionInstructionHandleAdapter {
 
-	public TrueInstructionHandle() {
-		super("True", null);
-	}
+    public TrueInstructionHandle() {
+        super("True", null);
+    }
 
-	@Override
-	public void handle(MethodNameBuilder builder, String backField, String condition) {
-		builder.getSqlbuilder().where(builder.getColumn(backField) + " = True ");
-	}
+    @Override
+    public void handle(MethodNameBuilder builder, String backField, String condition) {
+        builder.getSqlbuilder().where(builder.getColumn(backField) + " = True ");
+    }
 
 }

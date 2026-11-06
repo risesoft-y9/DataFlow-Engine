@@ -13,5 +13,5 @@ import risesoft.data.transfer.core.handle.Handle;
 @FunctionalInterface
 public interface ColumnDisposeHandle extends Handle {
 
-	Column dispose(Column column, Record record,int index);
+    Column dispose(Column column, Record record, int index);
 }

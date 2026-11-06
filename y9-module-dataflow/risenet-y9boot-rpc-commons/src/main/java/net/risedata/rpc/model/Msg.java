@@ -1,6 +1,5 @@
 package net.risedata.rpc.model;
 
-
 import java.util.Arrays;
 
 /**
@@ -32,12 +31,8 @@ public class Msg {
         this.msg = msg;
     }
 
-
     @Override
     public String toString() {
-        return "Msg{" +
-                "length=" + length +
-                ", msg=" + Arrays.toString(msg) +
-                '}';
+        return "Msg{" + "length=" + length + ", msg=" + Arrays.toString(msg) + '}';
     }
 }

@@ -13,16 +13,16 @@ import net.risedata.jdbc.config.model.FieldConfig;
  */
 public class NullOperation extends SimpleOperation {
 
-	@Override
-	public boolean where(FieldConfig field, List<Object> args, StringBuilder sql, Map<String, Object> valueMap,
-			BeanConfig bc, Map<String, Object> excludeMap) {
+    @Override
+    public boolean where(FieldConfig field, List<Object> args, StringBuilder sql, Map<String, Object> valueMap,
+        BeanConfig bc, Map<String, Object> excludeMap) {
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public int getOperate() {
-		return 0;
-	}
+    @Override
+    public int getOperate() {
+        return 0;
+    }
 
 }

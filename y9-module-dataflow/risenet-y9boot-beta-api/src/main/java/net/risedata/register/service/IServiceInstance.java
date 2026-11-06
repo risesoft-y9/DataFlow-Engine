@@ -311,27 +311,12 @@ public class IServiceInstance {
 
     @Override
     public String toString() {
-        return "IServiceInstance{" +
-                "instanceId='" + instanceId + '\'' +
-                ", serviceId='" + serviceId + '\'' +
-                ", host='" + host + '\'' +
-                ", version='" + version + '\'' +
-                ", description='" + description + '\'' +
-                ", managerInfo='" + managerInfo + '\'' +
-                ", port=" + port +
-                ", secure=" + secure +
-                ", logPath='" + logPath + '\'' +
-                ", scheme='" + scheme + '\'' +
-                ", metadata=" + metadata +
-                ", watchInfo=" + watchInfo +
-                ", context='" + context + '\'' +
-                ", status=" + status +
-                ", custom=" + custom +
-                ", updateTime=" + updateTime +
-                ", registerTime=" + registerTime +
-                ", environment='" + environment + '\'' +
-                ", expiresTime=" + expiresTime +
-                ", type='" + type + '\'' +
-                '}';
+        return "IServiceInstance{" + "instanceId='" + instanceId + '\'' + ", serviceId='" + serviceId + '\''
+            + ", host='" + host + '\'' + ", version='" + version + '\'' + ", description='" + description + '\''
+            + ", managerInfo='" + managerInfo + '\'' + ", port=" + port + ", secure=" + secure + ", logPath='" + logPath
+            + '\'' + ", scheme='" + scheme + '\'' + ", metadata=" + metadata + ", watchInfo=" + watchInfo
+            + ", context='" + context + '\'' + ", status=" + status + ", custom=" + custom + ", updateTime="
+            + updateTime + ", registerTime=" + registerTime + ", environment='" + environment + '\'' + ", expiresTime="
+            + expiresTime + ", type='" + type + '\'' + '}';
     }
 }

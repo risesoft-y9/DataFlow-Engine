@@ -11,14 +11,14 @@ import net.risedata.jdbc.repository.parse.handles.method.MethodNameBuilder;
  */
 public class DistinctInstructionHandle implements SectionInstructionHandle {
 
-	@Override
-	public String handleInstruction() {
-		return "$distinct";
-	}
+    @Override
+    public String handleInstruction() {
+        return "$distinct";
+    }
 
-	@Override
-	public void handle(MethodNameBuilder builder, ClassBuild classBuild) {
-		builder.nextAndReturn().appendSql(" distinct " + builder.next(false, null));
-	}
+    @Override
+    public void handle(MethodNameBuilder builder, ClassBuild classBuild) {
+        builder.nextAndReturn().appendSql(" distinct " + builder.next(false, null));
+    }
 
 }

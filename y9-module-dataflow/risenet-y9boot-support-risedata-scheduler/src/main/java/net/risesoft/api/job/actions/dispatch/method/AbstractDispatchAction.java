@@ -1,5 +1,13 @@
 package net.risesoft.api.job.actions.dispatch.method;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+
 import net.risedata.register.discover.IServiceInstanceImpl;
 import net.risedata.register.service.IServiceInstance;
 import net.risedata.register.service.IServiceInstanceFactory;
@@ -11,14 +19,6 @@ import net.risesoft.api.job.actions.dispatch.executor.ExecutorActionManager;
 import net.risesoft.api.job.actions.dispatch.executor.Result;
 import net.risesoft.api.persistence.model.IServiceInstanceModel;
 import net.risesoft.api.persistence.model.job.Job;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @Description :
@@ -40,12 +40,13 @@ public abstract class AbstractDispatchAction implements DispatchJobAction {
     RegisterApi registerApi;
 
     protected List<ServiceInstance> getService(Job job) {
-        //如果环境和当前环境相符合则调度当前环境
+        // 如果环境和当前环境相符合则调度当前环境
         List<ServiceInstance> instances = null;
         if (iServiceInstanceFactory.getIsntance().getEnvironment().equals(job.getEnvironment())) {
             instances = discoveryClient.getInstances(job.getServiceId());
         } else {
-            List<IServiceInstanceModel> iServiceInstanceModels = registerApi.getServices(job.getEnvironment()).get(job.getService());
+            List<IServiceInstanceModel> iServiceInstanceModels =
+                registerApi.getServices(job.getEnvironment()).get(job.getService());
             if (iServiceInstanceModels != null) {
                 instances = new ArrayList<>();
                 IServiceInstance iServiceInstance;
@@ -75,9 +76,10 @@ public abstract class AbstractDispatchAction implements DispatchJobAction {
         return instances;
     }
 
-    protected Result onResult(String jobId, Map<String, Object> res, TaskExecutorService taskExecutor, ServiceInstance instance, Result result) {
+    protected Result onResult(String jobId, Map<String, Object> res, TaskExecutorService taskExecutor,
+        ServiceInstance instance, Result result) {
 
-       return  result.onSuccess((object) -> {
+        return result.onSuccess((object) -> {
             taskExecutor.appendLog(jobId, instance.getInstanceId() + "调度成功返回值:" + object);
             res.put(instance.getInstanceId(), object);
         }).onError((e) -> {

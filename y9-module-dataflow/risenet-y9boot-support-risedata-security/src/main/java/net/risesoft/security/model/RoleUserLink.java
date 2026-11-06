@@ -21,45 +21,45 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * @author lb
  */
 @Entity
-@JsonIgnoreProperties(value = { "hibernateLazyInitializer" })
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer"})
 @Table(name = "Y9_DATASERVICE_ROLE_USER_LINK")
 @IdClass(RoleUserLink.class)
-public class RoleUserLink implements Serializable{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * 角色id
-	 */
+public class RoleUserLink implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    /**
+     * 角色id
+     */
     @Comment(value = "角色id")
-	@Id
-	@NotBlank(message = "角色id不能为空")
-	@Column(name = "ROLE_ID", length = 26)
-	private String roleId;
-	/**
-	 * 用户id
-	 */
-	@Id
+    @Id
+    @NotBlank(message = "角色id不能为空")
+    @Column(name = "ROLE_ID", length = 26)
+    private String roleId;
+    /**
+     * 用户id
+     */
+    @Id
     @Comment(value = "用户id")
-	@NotBlank(message = "用户id不能为空")
-	@Column(name = "USER_ID", length = 26)
-	private String userId;
+    @NotBlank(message = "用户id不能为空")
+    @Column(name = "USER_ID", length = 26)
+    private String userId;
 
-	public String getRoleId() {
-		return roleId;
-	}
+    public String getRoleId() {
+        return roleId;
+    }
 
-	public void setRoleId(String roleId) {
-		this.roleId = roleId;
-	}
+    public void setRoleId(String roleId) {
+        this.roleId = roleId;
+    }
 
-	public String getUserId() {
-		return userId;
-	}
+    public String getUserId() {
+        return userId;
+    }
 
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
 }

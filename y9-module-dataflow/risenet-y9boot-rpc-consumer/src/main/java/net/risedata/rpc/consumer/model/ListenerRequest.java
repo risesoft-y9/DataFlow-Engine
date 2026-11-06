@@ -2,10 +2,6 @@ package net.risedata.rpc.consumer.model;
 
 import com.alibaba.fastjson.JSONObject;
 
-import net.risedata.rpc.utils.IdUtils;
-
-import java.util.Map;
-
 /**
  * @Description : 监听发送到包
  * @ClassName ListenerRequest
@@ -32,7 +28,6 @@ public class ListenerRequest {
      */
     private long id;
 
-
     public boolean isBack() {
         return isBack;
     }
@@ -57,7 +52,6 @@ public class ListenerRequest {
         this.args = args;
     }
 
-
     public long getId() {
         return id;
     }
@@ -68,11 +62,7 @@ public class ListenerRequest {
 
     @Override
     public String toString() {
-        return "ListenerRequest{" +
-                "mapping='" + mapping + '\'' +
-                ", args=" + args +
-                ", isBack=" + isBack +
-                ", id=" + id +
-                '}';
+        return "ListenerRequest{" + "mapping='" + mapping + '\'' + ", args=" + args + ", isBack=" + isBack + ", id="
+            + id + '}';
     }
 }

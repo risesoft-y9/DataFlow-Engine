@@ -1,17 +1,17 @@
 package net.risedata.rpc.consumer.factory;
 
-import net.risedata.rpc.consumer.config.ConsumerApplication;
-import net.risedata.rpc.consumer.config.LoadingConfig;
-import net.risedata.rpc.consumer.core.BasedConnectionManager;
-import net.risedata.rpc.consumer.core.ConnectionManager;
-import net.risedata.rpc.exceptions.ConfigException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import java.util.HashMap;
-import java.util.Map;
+import net.risedata.rpc.consumer.config.ConsumerApplication;
+import net.risedata.rpc.consumer.config.LoadingConfig;
+import net.risedata.rpc.consumer.core.BasedConnectionManager;
+import net.risedata.rpc.consumer.core.ConnectionManager;
+import net.risedata.rpc.exceptions.ConfigException;
 
 /**
  * @description: 管理着当前项目存在的connectionManager
@@ -20,12 +20,12 @@ import java.util.Map;
  */
 public class ConnectionManagerFactory implements ApplicationContextAware {
 
-    private static  Map<String, BasedConnectionManager> CONNECTION_MANAGER_MAP = new HashMap<>();
+    private static Map<String, BasedConnectionManager> CONNECTION_MANAGER_MAP = new HashMap<>();
 
     private static LoadingConfig loadingConfig;
 
     public static ConnectionManager getInstance(String id) {
-        return (ConnectionManager) CONNECTION_MANAGER_MAP.get(id);
+        return (ConnectionManager)CONNECTION_MANAGER_MAP.get(id);
     }
 
     public static ConnectionManager createManager() {
@@ -72,7 +72,7 @@ public class ConnectionManagerFactory implements ApplicationContextAware {
         applicationContext.getBean(LoadingConfig.class);
     }
 
-    public static void close(){
+    public static void close() {
         ConsumerApplication.LOGGER.info("clear CONNECTION_MANAGER_MAP");
         CONNECTION_MANAGER_MAP = new HashMap<>();
     }

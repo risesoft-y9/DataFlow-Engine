@@ -11,22 +11,22 @@ import net.risedata.jdbc.executor.set.SetValueExecutor;
  */
 public class FieldSetValueExecutor implements SetValueExecutor<Field> {
 
-	@Override
-	public void setValue(Object o, Object value, Field field) {
-		if (value == null) {
-			return;
-		}
-		try {
-		
-			field.set(o, value);
-		} catch (IllegalArgumentException e) {
+    @Override
+    public void setValue(Object o, Object value, Field field) {
+        if (value == null) {
+            return;
+        }
+        try {
 
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-         
-			e.printStackTrace();
-		}
+            field.set(o, value);
+        } catch (IllegalArgumentException e) {
 
-	}
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+
+            e.printStackTrace();
+        }
+
+    }
 
 }

@@ -1,12 +1,13 @@
 package net.risesoft.api.job.actions.block;
 
+import org.springframework.stereotype.Component;
+
 import net.risesoft.api.job.JobContext;
 import net.risesoft.api.job.TaskExecutorService;
 import net.risesoft.api.job.actions.dispatch.method.DispatchActionManager;
 import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.api.utils.LResult;
-import org.springframework.stereotype.Component;
 
 /**
  * @Description : 并行阻塞操作:执行继续执行调度

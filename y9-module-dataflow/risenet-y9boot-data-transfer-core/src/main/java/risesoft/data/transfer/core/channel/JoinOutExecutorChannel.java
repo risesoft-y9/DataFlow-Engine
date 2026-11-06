@@ -19,37 +19,37 @@ import risesoft.data.transfer.core.util.CloseUtils;
  */
 public class JoinOutExecutorChannel implements OutChannel {
 
-	private ExecutorTaskQueue outExecutor;
+    private ExecutorTaskQueue outExecutor;
 
-	public JoinOutExecutorChannel(ExecutorTaskQueue outExecutor) {
-		super();
-		this.outExecutor = outExecutor;
-	}
+    public JoinOutExecutorChannel(ExecutorTaskQueue outExecutor) {
+        super();
+        this.outExecutor = outExecutor;
+    }
 
-	@Override
-	public void setOutPutStream(RecordOutuptStream recordOutuptStream) {
-		throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "底层通道无法修改连接器");
+    @Override
+    public void setOutPutStream(RecordOutuptStream recordOutuptStream) {
+        throw TransferException.as(CommonErrorCode.RUNTIME_ERROR, "底层通道无法修改连接器");
 
-	}
+    }
 
-	@Override
-	public void writer(Record record) {
-		this.outExecutor.add(Arrays.asList(record));
-	}
+    @Override
+    public void writer(Record record) {
+        this.outExecutor.add(Arrays.asList(record));
+    }
 
-	@Override
-	public void writer(List<Record> record) {
-		this.outExecutor.add(record);
-	}
+    @Override
+    public void writer(List<Record> record) {
+        this.outExecutor.add(record);
+    }
 
-	@Override
-	public void close() {
-		CloseUtils.close(this.outExecutor);
-	}
+    @Override
+    public void close() {
+        CloseUtils.close(this.outExecutor);
+    }
 
-	@Override
-	public void flush() {
-		
-	}
+    @Override
+    public void flush() {
+
+    }
 
 }

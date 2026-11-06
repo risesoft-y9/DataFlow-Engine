@@ -16,11 +16,10 @@ public enum DataBaseType {
     PostgreSQL("postgresql", "org.postgresql.Driver"),
     RDBMS("rdbms", "net.risesoft.api.utils.jdbc.DataBaseType"),
     DB2("db2", "com.ibm.db2.jcc.DB2Driver"),
-    ADS("ads","com.mysql.cj.jdbc.Driver"),
+    ADS("ads", "com.mysql.cj.jdbc.Driver"),
     ClickHouse("clickhouse", "ru.yandex.clickhouse.ClickHouseDriver"),
     KingbaseES("kingbasees", "com.kingbase8.Driver"),
     Oscar("oscar", "com.oscar.Driver");
- 
 
     private String typeName;
     private String driverClassName;
@@ -40,7 +39,8 @@ public enum DataBaseType {
         switch (this) {
             case MySql:
             case DRDS:
-                suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&rewriteBatchedStatements=true";
+                suffix =
+                    "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&rewriteBatchedStatements=true";
                 if (jdbc.contains("?")) {
                     result = jdbc + "&" + suffix;
                 } else {
@@ -75,7 +75,8 @@ public enum DataBaseType {
         String suffix = null;
         switch (this) {
             case MySql:
-                suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true&tinyInt1isBit=false";
+                suffix =
+                    "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true&tinyInt1isBit=false";
                 if (jdbc.contains("?")) {
                     result = jdbc + "&" + suffix;
                 } else {
@@ -139,7 +140,6 @@ public enum DataBaseType {
 
         return result;
     }
-
 
     public String quoteColumnName(String columnName) {
         String result = columnName;
@@ -208,6 +208,7 @@ public enum DataBaseType {
         }
         return null;
     }
+
     public String getTypeName() {
         return typeName;
     }

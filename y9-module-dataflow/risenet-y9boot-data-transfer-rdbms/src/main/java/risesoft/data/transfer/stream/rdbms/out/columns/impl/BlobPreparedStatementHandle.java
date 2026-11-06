@@ -21,35 +21,35 @@ import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
  * @author lb
  */
 public class BlobPreparedStatementHandle extends NullCharValuePreparedStatementHandle
-		implements PreparedStatementHandle, PreparedStatementHandleFactory {
+    implements PreparedStatementHandle, PreparedStatementHandleFactory {
 
-	@Override
-	public boolean isHandle(int type) {
+    @Override
+    public boolean isHandle(int type) {
 
-		return Types.BLOB == type;
+        return Types.BLOB == type;
 
-	}
+    }
 
-	@Override
-	public boolean isBigType() {
-		return true;
-	}
+    @Override
+    public boolean isBigType() {
+        return true;
+    }
 
-	@Override
-	public void fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, Column column,
-			DataBaseType dataBaseType, Triple<List<String>, List<Integer>, List<String>> resultSetMetaData)
-			throws Exception {
-		byte[] bytes = column.asBytes();
-		if (bytes == null) {
-			preparedStatement.setNull(columnIndex, Types.BLOB);
-		} else {
-			preparedStatement.setBlob(columnIndex, new ByteArrayInputStream(column.asBytes()));
-		}
-	}
+    @Override
+    public void fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, Column column,
+        DataBaseType dataBaseType, Triple<List<String>, List<Integer>, List<String>> resultSetMetaData)
+        throws Exception {
+        byte[] bytes = column.asBytes();
+        if (bytes == null) {
+            preparedStatement.setNull(columnIndex, Types.BLOB);
+        } else {
+            preparedStatement.setBlob(columnIndex, new ByteArrayInputStream(column.asBytes()));
+        }
+    }
 
-	@Override
-	public PreparedStatementHandle getPreparedStatementHandle(int type) {
-		return this;
-	}
+    @Override
+    public PreparedStatementHandle getPreparedStatementHandle(int type) {
+        return this;
+    }
 
 }

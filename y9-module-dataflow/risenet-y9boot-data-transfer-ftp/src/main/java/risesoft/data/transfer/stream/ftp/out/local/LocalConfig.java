@@ -6,33 +6,32 @@ import risesoft.data.transfer.core.factory.annotations.ConfigField;
 @ConfigBean
 public class LocalConfig {
 
-	@ConfigField(description = "路径", required = true)
-	private String path;
-	@ConfigField(description = "日志名字", value = "FTPFileOutLocal")
-	private String name;
+    @ConfigField(description = "路径", required = true)
+    private String path;
+    @ConfigField(description = "日志名字", value = "FTPFileOutLocal")
+    private String name;
 
-	@ConfigField(description = "缓存大小/kb", value = "1024")
-	private int bufferSize;
-	public LocalConfig() {
-		super();
-	}
+    @ConfigField(description = "缓存大小/kb", value = "1024")
+    private int bufferSize;
 
-	public String getPath() {
-		return path;
-	}
+    public LocalConfig() {
+        super();
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getPath() {
+        return path;
+    }
 
-	public int getBufferSize() {
-		return bufferSize;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setBufferSize(int bufferSize) {
-		this.bufferSize = bufferSize;
-	}
-	
-	
+    public int getBufferSize() {
+        return bufferSize;
+    }
+
+    public void setBufferSize(int bufferSize) {
+        this.bufferSize = bufferSize;
+    }
 
 }

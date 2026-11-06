@@ -14,9 +14,14 @@ public class DefaultInstanceMessage implements InstanceMessage {
     @Override
     public String createContent(IServiceInstanceModel serviceInstanceModel) {
         StringBuilder content = new StringBuilder("【下线警告】:");
-        content.append("服务名:").append(serviceInstanceModel.getServiceId()).append(":")
-                .append(serviceInstanceModel.getDescription()).append("--ip地址:").append(serviceInstanceModel.getHost())
-                .append("--端口:").append(serviceInstanceModel.getPort());
+        content.append("服务名:")
+            .append(serviceInstanceModel.getServiceId())
+            .append(":")
+            .append(serviceInstanceModel.getDescription())
+            .append("--ip地址:")
+            .append(serviceInstanceModel.getHost())
+            .append("--端口:")
+            .append(serviceInstanceModel.getPort());
         return content.toString();
     }
 

@@ -17,57 +17,57 @@ import risesoft.data.transfer.core.util.Configuration;
  * @author lb
  */
 public class DCExchange extends OutChannelExchange {
-	/**
-	 * 日志
-	 */
-	private Logger logger;
+    /**
+     * 日志
+     */
+    private Logger logger;
 
-	/**
-	 * 是否关闭
-	 */
-	private volatile boolean isShutdown = false;
+    /**
+     * 是否关闭
+     */
+    private volatile boolean isShutdown = false;
 
-	public DCExchange(Configuration configuration, LoggerFactory loggerFactory) {
-		logger = loggerFactory.getLogger(configuration.getString("name", "DCExchange"));
-	}
+    public DCExchange(Configuration configuration, LoggerFactory loggerFactory) {
+        logger = loggerFactory.getLogger(configuration.getString("name", "DCExchange"));
+    }
 
-	@Override
-	public void writer(Record record) {
-		if (isShutdown) {
-			return;
-		}
-		if (this.logger.isDebug()) {
-			this.logger.debug(this, "writer: " + record);
-		}
-		this.channel.writer(record);
-	}
+    @Override
+    public void writer(Record record) {
+        if (isShutdown) {
+            return;
+        }
+        if (this.logger.isDebug()) {
+            this.logger.debug(this, "writer: " + record);
+        }
+        this.channel.writer(record);
+    }
 
-	@Override
-	public void writer(List<Record> record) {
-		if (isShutdown) {
-			return;
-		}
-		if (this.logger.isDebug()) {
-			this.logger.debug(this, "writer: " + record.size());
-		}
-		this.channel.writer(new ArrayList<Record>(record));
-	}
+    @Override
+    public void writer(List<Record> record) {
+        if (isShutdown) {
+            return;
+        }
+        if (this.logger.isDebug()) {
+            this.logger.debug(this, "writer: " + record.size());
+        }
+        this.channel.writer(new ArrayList<Record>(record));
+    }
 
-	@Override
-	public void shutdown() {
-		this.isShutdown = true;
-		logger.info(this, "shutdown");
-	}
+    @Override
+    public void shutdown() {
+        this.isShutdown = true;
+        logger.info(this, "shutdown");
+    }
 
-	@Override
-	public void flush() {
-		if (isShutdown) {
-			return;
-		}
-		if (logger.isDebug()) {
-			logger.debug(this, "flush ");
-		}
-		this.channel.flush();
-	}
+    @Override
+    public void flush() {
+        if (isShutdown) {
+            return;
+        }
+        if (logger.isDebug()) {
+            logger.debug(this, "flush ");
+        }
+        this.channel.flush();
+    }
 
 }

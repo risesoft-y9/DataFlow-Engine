@@ -7,14 +7,14 @@ import lombok.NoArgsConstructor;
 @Data
 public class DataWatermarkDTO {
 
-	private String id;
-	
-	private String content;
-	
-	private String userId;
-	
-	private String userName;
-	
-	private String tenantId;
+    private String id;
+
+    private String content;
+
+    private String userId;
+
+    private String userName;
+
+    private String tenantId;
 
 }

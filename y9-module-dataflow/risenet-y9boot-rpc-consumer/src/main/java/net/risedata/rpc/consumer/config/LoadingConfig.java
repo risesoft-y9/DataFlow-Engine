@@ -1,5 +1,20 @@
 package net.risedata.rpc.consumer.config;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.annotation.Order;
+import org.springframework.util.StringUtils;
+
 import net.risedata.rpc.Task.Task;
 import net.risedata.rpc.consumer.annotation.API;
 import net.risedata.rpc.consumer.annotation.ManagerListener;
@@ -14,7 +29,9 @@ import net.risedata.rpc.consumer.factory.ConnectionManagerFactory;
 import net.risedata.rpc.consumer.factory.ReturnValueHandleFactory;
 import net.risedata.rpc.consumer.invoke.InvokeHandle;
 import net.risedata.rpc.consumer.invoke.ProxyInvoke;
-import net.risedata.rpc.consumer.listener.*;
+import net.risedata.rpc.consumer.listener.ConnectionListener;
+import net.risedata.rpc.consumer.listener.ExceptionListener;
+import net.risedata.rpc.consumer.listener.RPCStartListener;
 import net.risedata.rpc.consumer.listener.impl.LinkedConnectionListener;
 import net.risedata.rpc.consumer.model.APIDescription;
 import net.risedata.rpc.consumer.result.SyncResult;
@@ -23,28 +40,13 @@ import net.risedata.rpc.exceptions.ConfigException;
 import net.risedata.rpc.factory.ReturnTypeFactory;
 import net.risedata.rpc.provide.config.Application;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.core.annotation.Order;
-import org.springframework.util.StringUtils;
-
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @description: 加载的config
  * @Author lb176
  * @Date 2021/4/29==15:20
  */
 @Order(value = 2)
-public class LoadingConfig implements  ApplicationListener<ContextRefreshedEvent> {
+public class LoadingConfig implements ApplicationListener<ContextRefreshedEvent> {
 
     /**
      * 客户端启动器
@@ -79,13 +81,14 @@ public class LoadingConfig implements  ApplicationListener<ContextRefreshedEvent
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
-        if (event.getApplicationContext().getParent() == null || event.getApplicationContext().getParent().getParent() == null) {
-            if (isInit){
+        if (event.getApplicationContext().getParent() == null
+            || event.getApplicationContext().getParent().getParent() == null) {
+            if (isInit) {
                 return;
             }
 
             isInit = true;
-            refreshListener(event.getApplicationContext(),true);
+            refreshListener(event.getApplicationContext(), true);
             Application.logger.info(" cloud " + (discoveryClient != null));
             ClientBeanFactory.invokeMap.forEach(this::registerClinet);
             ConsumerApplication.scheduleTask.addTask(() -> {
@@ -102,8 +105,9 @@ public class LoadingConfig implements  ApplicationListener<ContextRefreshedEvent
 
                 });
             });
-            refreshListener(event.getApplicationContext(),false);
-            Map<String, RPCStartListener> listeners = event.getApplicationContext().getBeansOfType(RPCStartListener.class);
+            refreshListener(event.getApplicationContext(), false);
+            Map<String, RPCStartListener> listeners =
+                event.getApplicationContext().getBeansOfType(RPCStartListener.class);
             if (listeners != null && listeners.size() > 0) {
                 for (RPCStartListener value : listeners.values()) {
                     value.run();
@@ -115,7 +119,6 @@ public class LoadingConfig implements  ApplicationListener<ContextRefreshedEvent
         }
     }
 
-
     public ConnectionManager getConnectionManager() {
         if (isDiscoveryClient) {
             return new CloudConnectionManager(clientBootStrap, discoveryClient);
@@ -123,7 +126,6 @@ public class LoadingConfig implements  ApplicationListener<ContextRefreshedEvent
             return new HostAndPortConnectionManager(clientBootStrap);
         }
     }
-
 
     public static ConnectionManager getNullConnectionManager() {
         if (isDiscoveryClient) {
@@ -133,11 +135,10 @@ public class LoadingConfig implements  ApplicationListener<ContextRefreshedEvent
         }
     }
 
-
     /**
      * 将 此客户端接口注册到 连接池中
      *
-     * @param type  类型
+     * @param type 类型
      * @param proxy 代理
      */
     private void registerClinet(Class<?> type, ProxyInvoke proxy) {
@@ -149,7 +150,7 @@ public class LoadingConfig implements  ApplicationListener<ContextRefreshedEvent
             String apiName = ConsumerUtils.getManagerName(type, rpcClinet);
 
             Map<Method, APIDescription> methodMap = new HashMap<>();
-            //接口中都是public 既然代理接口则应为public
+            // 接口中都是public 既然代理接口则应为public
             Method[] methods = type.getMethods();
             API api;
             String n;
@@ -165,14 +166,12 @@ public class LoadingConfig implements  ApplicationListener<ContextRefreshedEvent
                 } else {
                     n = method.getName();
                 }
-                apiDescription = new APIDescription(
-                        (api == null || api.timeOut() < 0) ?
-                                rpcClinet.timeOut() < 0 ?
-                                        timeOut
-                                        : rpcClinet.timeOut()
-                                : api.timeOut(), ConsumerUtils.getValue(rpcClinet.name()) + "/" + n);
+                apiDescription = new APIDescription((api == null || api.timeOut() < 0)
+                    ? rpcClinet.timeOut() < 0 ? timeOut : rpcClinet.timeOut() : api.timeOut(),
+                    ConsumerUtils.getValue(rpcClinet.name()) + "/" + n);
                 apiDescription.setReturnType(ReturnTypeFactory.parseInstance(method));
-                apiDescription.setReturnValueHandle(ReturnValueHandleFactory.getInstance(apiDescription.getReturnType()));
+                apiDescription
+                    .setReturnValueHandle(ReturnValueHandleFactory.getInstance(apiDescription.getReturnType()));
 
                 if (apiDescription.getReturnValueHandle() == null) {
                     throw new ConfigException(method + " 无法识别的类型");
@@ -216,19 +215,19 @@ public class LoadingConfig implements  ApplicationListener<ContextRefreshedEvent
 
     public void initConnectionManager(BasedConnectionManager connectionManager) {
         if (connectionManager instanceof HostAndPortConnectionManager) {
-            HostAndPortConnectionManager hostManager = ((HostAndPortConnectionManager) connectionManager);
+            HostAndPortConnectionManager hostManager = ((HostAndPortConnectionManager)connectionManager);
             hostManager.setBootstrap(clientBootStrap);
             hostManager.setScheduleTask(ConsumerApplication.scheduleTask);
         }
         if (connectionManager instanceof CloudConnectionManager) {
-            CloudConnectionManager cloudManager = ((CloudConnectionManager) connectionManager);
+            CloudConnectionManager cloudManager = ((CloudConnectionManager)connectionManager);
             cloudManager.setDiscoveryClient(discoveryClient);
         }
     }
 
-
-    private void refreshListener(ApplicationContext applicationContext,boolean isApplication) {
-        Map<String, ConnectionListener> connectionListeners = applicationContext.getBeansOfType(ConnectionListener.class);
+    private void refreshListener(ApplicationContext applicationContext, boolean isApplication) {
+        Map<String, ConnectionListener> connectionListeners =
+            applicationContext.getBeansOfType(ConnectionListener.class);
         LinkedConnectionListener linkedConnectionListener = new LinkedConnectionListener();
         if (connectionListeners.size() > 0) {
 
@@ -237,16 +236,15 @@ public class LoadingConfig implements  ApplicationListener<ContextRefreshedEvent
             ConnectionManager connectionManager = null;
             String[] names = null;
             Class<?>[] classes = null;
-            for (ConnectionListener listener :
-                    connectionListenerss) {
+            for (ConnectionListener listener : connectionListenerss) {
                 managerListener = AnnotationUtils.findAnnotation(listener.getClass(), ManagerListener.class);
                 if (managerListener == null) {
-                    if (isApplication){
+                    if (isApplication) {
 
                         linkedConnectionListener.addListener(listener);
                     }
                 } else {
-                    if(isApplication){
+                    if (isApplication) {
                         continue;
                     }
 

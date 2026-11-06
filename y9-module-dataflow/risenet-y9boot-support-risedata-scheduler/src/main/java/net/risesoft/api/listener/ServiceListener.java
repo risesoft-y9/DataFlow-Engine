@@ -12,12 +12,14 @@ import net.risedata.register.service.IServiceInstance;
 public interface ServiceListener {
     /**
      * 当有服务停止的时候触发
+     * 
      * @param iServiceInstance
      */
     void onStop(IServiceInstance iServiceInstance);
 
     /**
      * 当有服务启动的时候触发
+     * 
      * @param iServiceInstance
      */
     void onStart(IServiceInstance iServiceInstance);

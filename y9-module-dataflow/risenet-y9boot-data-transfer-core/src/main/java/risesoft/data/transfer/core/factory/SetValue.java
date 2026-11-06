@@ -14,6 +14,7 @@ import risesoft.data.transfer.core.util.Configuration;
  */
 public interface SetValue {
 
-	void set(Object source, Object valueObject, Map<Class<?>, Object> instanceMap, Configuration configuration) throws Exception;
+    void set(Object source, Object valueObject, Map<Class<?>, Object> instanceMap, Configuration configuration)
+        throws Exception;
 
 }

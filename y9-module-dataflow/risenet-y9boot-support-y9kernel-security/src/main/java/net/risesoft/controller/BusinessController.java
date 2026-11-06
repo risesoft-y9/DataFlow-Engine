@@ -17,16 +17,17 @@ import net.risesoft.service.DataBusinessService;
 @RequestMapping(value = "/api/rest/business", produces = "application/json")
 @RequiredArgsConstructor
 public class BusinessController {
-	
-	private final DataBusinessService dataBusinessService;
 
-	/**
-	 * 获取业务分类列表
-	 * @return
-	 */
-	@GetMapping("/findAll")
-	public Y9Result<List<Map<String, Object>>> findAll() {
+    private final DataBusinessService dataBusinessService;
+
+    /**
+     * 获取业务分类列表
+     * 
+     * @return
+     */
+    @GetMapping("/findAll")
+    public Y9Result<List<Map<String, Object>>> findAll() {
         return Y9Result.success(dataBusinessService.findAll(), "获取数据成功");
     }
-	
+
 }

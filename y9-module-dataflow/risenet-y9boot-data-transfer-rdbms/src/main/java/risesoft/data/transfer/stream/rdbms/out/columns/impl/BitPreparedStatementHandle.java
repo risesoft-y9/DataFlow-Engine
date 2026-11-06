@@ -20,37 +20,37 @@ import risesoft.data.transfer.stream.rdbms.utils.DataBaseType;
  * @author lb
  */
 public class BitPreparedStatementHandle extends ZeroNullValuePreparedStatementHandle
-		implements PreparedStatementHandle, PreparedStatementHandleFactory {
+    implements PreparedStatementHandle, PreparedStatementHandleFactory {
 
-	@Override
-	public boolean isHandle(int type) {
-		return Types.BIT == type;
+    @Override
+    public boolean isHandle(int type) {
+        return Types.BIT == type;
 
-	}
+    }
 
-	@Override
-	public boolean isBigType() {
-		return false;
-	}
+    @Override
+    public boolean isBigType() {
+        return false;
+    }
 
-	@Override
-	public void fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, Column column,
-			DataBaseType dataBaseType, Triple<List<String>, List<Integer>, List<String>> resultSetMetaData)
-			throws Exception {
-		if (column.getRawData() == null) {
-			preparedStatement.setNull(columnIndex, Types.BIT);
-			return;
-		}
-		if (dataBaseType == DataBaseType.MySql) {
-			preparedStatement.setBoolean(columnIndex, column.asBoolean());
-		} else {
-			preparedStatement.setString(columnIndex, column.asString());
-		}
-	}
+    @Override
+    public void fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, Column column,
+        DataBaseType dataBaseType, Triple<List<String>, List<Integer>, List<String>> resultSetMetaData)
+        throws Exception {
+        if (column.getRawData() == null) {
+            preparedStatement.setNull(columnIndex, Types.BIT);
+            return;
+        }
+        if (dataBaseType == DataBaseType.MySql) {
+            preparedStatement.setBoolean(columnIndex, column.asBoolean());
+        } else {
+            preparedStatement.setString(columnIndex, column.asString());
+        }
+    }
 
-	@Override
-	public PreparedStatementHandle getPreparedStatementHandle(int type) {
-		return this;
-	}
+    @Override
+    public PreparedStatementHandle getPreparedStatementHandle(int type) {
+        return this;
+    }
 
 }

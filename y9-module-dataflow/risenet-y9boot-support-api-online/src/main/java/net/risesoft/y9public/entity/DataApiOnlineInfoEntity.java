@@ -19,16 +19,16 @@ import net.risesoft.base.BaseEntity;
 @Data
 public class DataApiOnlineInfoEntity extends BaseEntity {
 
-	private static final long serialVersionUID = -8854294421940798800L;
+    private static final long serialVersionUID = -8854294421940798800L;
 
-	@Id
-	@Column(name = "ID", length = 38, nullable = false)
-	@Comment(value = "主键")
-	private String id;
+    @Id
+    @Column(name = "ID", length = 38, nullable = false)
+    @Comment(value = "主键")
+    private String id;
 
-	@Lob
-	@Column(name = "FORMDATA")
-	@Comment(value = "内容")
-	private String formData;
+    @Lob
+    @Column(name = "FORMDATA")
+    @Comment(value = "内容")
+    private String formData;
 
 }

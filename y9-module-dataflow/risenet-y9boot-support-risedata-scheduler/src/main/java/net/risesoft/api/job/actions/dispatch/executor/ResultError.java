@@ -10,11 +10,10 @@ package net.risesoft.api.job.actions.dispatch.executor;
 public interface ResultError {
     /**
      * 成功
+     * 
      * @param throwable
      * @return
      */
     void onError(Throwable throwable);
-
-
 
 }

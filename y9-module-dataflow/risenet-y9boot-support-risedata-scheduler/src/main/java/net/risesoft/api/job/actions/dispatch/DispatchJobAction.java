@@ -9,5 +9,4 @@ import net.risesoft.api.job.actions.JobAction;
  * @Date 2022/9/14 17:18
  * @Version 1.0
  */
-public interface DispatchJobAction extends JobAction {
-}
+public interface DispatchJobAction extends JobAction {}

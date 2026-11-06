@@ -14,9 +14,10 @@ import net.risesoft.api.utils.LResult;
  * @Version 1.0
  */
 public interface JobAction {
-	
+
     /**
      * 执行步骤
+     * 
      * @param job 任务
      * @param jobLog 日志
      */

@@ -17,8 +17,7 @@ public class DefaulGenericityHandle implements ReturnValueHandle {
 
     @Override
     public Object getValue(SyncResult result, ReturnType returnType, Object[] args) {
-        return result.getResult().getValue((Class<?>) args[returnType.getIndex()]);
+        return result.getResult().getValue((Class<?>)args[returnType.getIndex()]);
     }
-
 
 }

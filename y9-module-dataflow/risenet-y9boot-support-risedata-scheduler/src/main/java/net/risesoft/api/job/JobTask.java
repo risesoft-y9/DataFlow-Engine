@@ -1,18 +1,15 @@
 package net.risesoft.api.job;
 
-import cn.hutool.core.date.DateUtil;
-import net.risedata.jdbc.commons.utils.DateUtils;
-import net.risesoft.api.exceptions.JobException;
-import net.risesoft.api.persistence.model.job.Job;
-
-import org.springframework.scheduling.Trigger;
-import org.springframework.scheduling.TriggerContext;
-import org.springframework.scheduling.support.CronSequenceGenerator;
-import org.springframework.scheduling.support.CronTrigger;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.scheduling.Trigger;
+import org.springframework.scheduling.TriggerContext;
+import org.springframework.scheduling.support.CronTrigger;
+
+import net.risesoft.api.exceptions.JobException;
+import net.risesoft.api.persistence.model.job.Job;
 
 /**
  * @Description :
@@ -38,7 +35,6 @@ public class JobTask implements Runnable, Trigger {
         this.taskManager = taskManager;
     }
 
-
     public synchronized void putInfo(String key, Object value) {
         if (metaInfo == null) {
             metaInfo = new HashMap<>();
@@ -55,7 +51,6 @@ public class JobTask implements Runnable, Trigger {
         }
     }
 
-   
     @Override
     public synchronized Date nextExecutionTime(TriggerContext triggerContext) {
         switch (job.getDispatchType()) {
@@ -70,7 +65,6 @@ public class JobTask implements Runnable, Trigger {
         }
 
     }
-
 
     /**
      * 当任务改变时

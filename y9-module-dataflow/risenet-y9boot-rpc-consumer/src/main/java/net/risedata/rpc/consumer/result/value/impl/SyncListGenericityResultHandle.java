@@ -1,7 +1,6 @@
 package net.risedata.rpc.consumer.result.value.impl;
 
 import net.risedata.rpc.consumer.result.SyncResult;
-import net.risedata.rpc.consumer.result.genericity.GenericitySyncResult;
 import net.risedata.rpc.consumer.result.genericity.ListGenericitySyncResult;
 import net.risedata.rpc.consumer.result.value.ReturnValueHandle;
 import net.risedata.rpc.factory.model.ReturnType;
@@ -22,6 +21,5 @@ public class SyncListGenericityResultHandle implements ReturnValueHandle {
     public Object getValue(SyncResult result, ReturnType returnType, Object[] args) {
         return result.asList(returnType.toGenericityClass(args));
     }
-
 
 }

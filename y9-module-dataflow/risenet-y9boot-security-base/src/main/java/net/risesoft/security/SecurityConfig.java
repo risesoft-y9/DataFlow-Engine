@@ -17,11 +17,11 @@ public class SecurityConfig {
     /**
      * 检查的url
      */
-   private List<String> checkUrl;
+    private List<String> checkUrl;
     /**
      * 检查器
      */
-   private SecurityCheck securityCheck;
+    private SecurityCheck securityCheck;
 
     public List<String> getWhiteList() {
         return whiteList;
@@ -49,11 +49,7 @@ public class SecurityConfig {
 
     @Override
     public String toString() {
-        return "SecurityConfig{" +
-                "whiteList=" + whiteList +
-                ", checkUrl=" + checkUrl +
-                ", securityCheck=" + securityCheck +
-                '}';
+        return "SecurityConfig{" + "whiteList=" + whiteList + ", checkUrl=" + checkUrl + ", securityCheck="
+            + securityCheck + '}';
     }
 }
-

@@ -6,34 +6,34 @@ import net.risedata.jdbc.repository.parse.handles.method.MethodNameBuilder;
 
 public class ConditionInstructionHandleAdapter implements ConditionInstructionHandle {
 
-	private String condition;
+    private String condition;
 
-	private String conditionKey;
+    private String conditionKey;
 
-	/**
-	 * @param condition
-	 * @param conditionKey
-	 */
-	public ConditionInstructionHandleAdapter(String conditionKey, String condition) {
-		this.condition = condition;
-		this.conditionKey = conditionKey;
-	}
+    /**
+     * @param condition
+     * @param conditionKey
+     */
+    public ConditionInstructionHandleAdapter(String conditionKey, String condition) {
+        this.condition = condition;
+        this.conditionKey = conditionKey;
+    }
 
-	@Override
-	public String handleInstruction() {
-		return conditionKey;
-	}
+    @Override
+    public String handleInstruction() {
+        return conditionKey;
+    }
 
-	@Override
-	public void handle(MethodNameBuilder builder, ClassBuild classBuild) {
-		throw new ProxyException("Condition no handle");
+    @Override
+    public void handle(MethodNameBuilder builder, ClassBuild classBuild) {
+        throw new ProxyException("Condition no handle");
 
-	}
+    }
 
-	@Override
-	public void handle(MethodNameBuilder builder, String backField, String condition) {
-		builder.getSqlbuilder()
-				.where(builder.getColumn(backField) + " " + this.condition + builder.getParameterArgs(backField));
-	}
+    @Override
+    public void handle(MethodNameBuilder builder, String backField, String condition) {
+        builder.getSqlbuilder()
+            .where(builder.getColumn(backField) + " " + this.condition + builder.getParameterArgs(backField));
+    }
 
 }

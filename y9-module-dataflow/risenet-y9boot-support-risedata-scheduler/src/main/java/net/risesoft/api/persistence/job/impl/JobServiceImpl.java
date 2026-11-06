@@ -44,264 +44,264 @@ import net.risesoft.security.ConcurrentSecurity;
 @Service
 public class JobServiceImpl extends AutomaticCrudService<Job, Integer> implements JobService {
 
-	@Autowired
-	private JobDao jobDao;
-	
-	@Autowired
-	private JobLogDao jobLogDao;
+    @Autowired
+    private JobDao jobDao;
 
-	@Autowired
-	private IServiceInstanceFactory iServiceInstanceFactory;
+    @Autowired
+    private JobLogDao jobLogDao;
 
-	@Autowired(required = false)
-	private TaskManager taskManager;
+    @Autowired
+    private IServiceInstanceFactory iServiceInstanceFactory;
 
-	@Autowired
-	private JobChangeService jobChangeService;
+    @Autowired(required = false)
+    private TaskManager taskManager;
 
-	@Autowired
-	private JobLogService jobLogService;
+    @Autowired
+    private JobChangeService jobChangeService;
 
-	@Autowired(required = false)
-	private TaskExecutorService taskExecutorService;
+    @Autowired
+    private JobLogService jobLogService;
 
-	@Override
-	@Transactional
-	public boolean saveJob(Job job) {
-		job.setUpdateTime(System.currentTimeMillis());
-		if (job.getDispatchType().equals("cron")) {
-			try {
-				CronExpression.parse(job.getSpeed()).next(LocalDateTime.now());
-			} catch (Exception e) {
-				throw new RuntimeException("cron 表达式错误!");
-			}
-		}
-		if (job.getId() == null || job.getId() == 0) {
-			job.setDispatchServer("");
-			job.setCreateDate(new Date());
-			job.setId(getMaxId());
-			if (job.getStatus() == 1) {
-				job.setDispatchServer(iServiceInstanceFactory.getIsntance().getInstanceId());
-			}
+    @Autowired(required = false)
+    private TaskExecutorService taskExecutorService;
 
-			insert(job);
-			if (job.getStatus() == 1) {
-				taskManager.addTask(job);
-			}
-			return true;
-		} else {
-			updateById(job);
-			if (job.getStatus() == 1 && taskManager != null) {
-				jobChangeService.insertChange(job.getId());
-				taskManager.pushJobChange(job.getId());
-			}
-			return true;
-		}
-	}
+    @Override
+    @Transactional
+    public boolean saveJob(Job job) {
+        job.setUpdateTime(System.currentTimeMillis());
+        if (job.getDispatchType().equals("cron")) {
+            try {
+                CronExpression.parse(job.getSpeed()).next(LocalDateTime.now());
+            } catch (Exception e) {
+                throw new RuntimeException("cron 表达式错误!");
+            }
+        }
+        if (job.getId() == null || job.getId() == 0) {
+            job.setDispatchServer("");
+            job.setCreateDate(new Date());
+            job.setId(getMaxId());
+            if (job.getStatus() == 1) {
+                job.setDispatchServer(iServiceInstanceFactory.getIsntance().getInstanceId());
+            }
 
-	private Integer getMaxId() {
-		Integer maxId = jobDao.getMaxId();
-		return maxId == null ? 1 : maxId + 1;
-	}
+            insert(job);
+            if (job.getStatus() == 1) {
+                taskManager.addTask(job);
+            }
+            return true;
+        } else {
+            updateById(job);
+            if (job.getStatus() == 1 && taskManager != null) {
+                jobChangeService.insertChange(job.getId());
+                taskManager.pushJobChange(job.getId());
+            }
+            return true;
+        }
+    }
 
-	@Override
-	public Job findByJobId(Integer jobId) {
-		return jobDao.findById(jobId);
-	}
+    private Integer getMaxId() {
+        Integer maxId = jobDao.getMaxId();
+        return maxId == null ? 1 : maxId + 1;
+    }
 
-	@Override
-	public boolean deleteByJobId(Integer id) {
-		jobLogDao.deleteJobLog(id);
-		return deleteById(id) > 0;
-	}
+    @Override
+    public Job findByJobId(Integer jobId) {
+        return jobDao.findById(jobId);
+    }
 
-	@Override
-	public List<Job> findDispatchJob(String watchServer, String environment, String serviceId) {
-		return jobDao.findWatch(watchServer, environment, serviceId);
-	}
+    @Override
+    public boolean deleteByJobId(Integer id) {
+        jobLogDao.deleteJobLog(id);
+        return deleteById(id) > 0;
+    }
 
-	@Override
-	public LPage<Job> search(Job job, LPageable pageable, ConcurrentSecurity jurisdiction) {
-		return searchForPage(job, pageable, null, createBuilder("serviceId", jurisdiction));
-	}
+    @Override
+    public List<Job> findDispatchJob(String watchServer, String environment, String serviceId) {
+        return jobDao.findWatch(watchServer, environment, serviceId);
+    }
 
-	/**
-	 * 获取权限的操作方法 根据任务类型区分权限 会在sql后面追加JOB_TYPE IN ????
-	 * 
-	 * @param field
-	 * @param jurisdiction
-	 * @return
-	 */
-	public static OperationBuilder createBuilder(String field, ConcurrentSecurity jurisdiction) {
-		return OperationBuilderFactory.builder(field, new CustomOperation((where) -> {
-			if (jurisdiction.getJobTypes().isEmpty()) {
-				return false;
-			}
+    @Override
+    public LPage<Job> search(Job job, LPageable pageable, ConcurrentSecurity jurisdiction) {
+        return searchForPage(job, pageable, null, createBuilder("serviceId", jurisdiction));
+    }
 
-			where.append("SERVICE_JOB_TYPE in  ");
-			SqlUtils.appendIn(jurisdiction.getJobTypes(), where);
-			return true;
-		}));
-	}
+    /**
+     * 获取权限的操作方法 根据任务类型区分权限 会在sql后面追加JOB_TYPE IN ????
+     * 
+     * @param field
+     * @param jurisdiction
+     * @return
+     */
+    public static OperationBuilder createBuilder(String field, ConcurrentSecurity jurisdiction) {
+        return OperationBuilderFactory.builder(field, new CustomOperation((where) -> {
+            if (jurisdiction.getJobTypes().isEmpty()) {
+                return false;
+            }
 
-	@Override
-	public List<Job> findMiss(String instanceId, Integer[] ids, Map<Integer, JobTask> jobTask) {
+            where.append("SERVICE_JOB_TYPE in  ");
+            SqlUtils.appendIn(jurisdiction.getJobTypes(), where);
+            return true;
+        }));
+    }
 
-		if (ids.length == 0) {
-			return jobDao.findMiss(instanceId);
-		}
-		if (ids.length > 999) {
-			List<Integer> jobIds = jobDao.findJobIds(instanceId);
-			List<Job> jobs = new ArrayList<>();
-			for (Integer jobId : jobIds) {
-				if (!jobTask.containsKey(jobId)) {
-					jobs.add(jobDao.findById(jobId));
-				}
-			}
-			return jobs;
-		}
-		return jobDao.findMiss(instanceId, ids);
-	}
+    @Override
+    public List<Job> findMiss(String instanceId, Integer[] ids, Map<Integer, JobTask> jobTask) {
 
-	@Override
-	public void setStatus(Integer id, int status) {
-		jobDao.updateStatus(id, status);
-		if (status == 1 && taskManager != null) {
-			jobChangeService.insertChange(id);
-			taskManager.pushJobChange(id);
-		}
-	}
+        if (ids.length == 0) {
+            return jobDao.findMiss(instanceId);
+        }
+        if (ids.length > 999) {
+            List<Integer> jobIds = jobDao.findJobIds(instanceId);
+            List<Job> jobs = new ArrayList<>();
+            for (Integer jobId : jobIds) {
+                if (!jobTask.containsKey(jobId)) {
+                    jobs.add(jobDao.findById(jobId));
+                }
+            }
+            return jobs;
+        }
+        return jobDao.findMiss(instanceId, ids);
+    }
 
-	@Override
-	public List<Job> findWatch(String instanceId, String environment, String serviceId) {
-		return jobDao.findWatch(instanceId, environment, serviceId);
-	}
+    @Override
+    public void setStatus(Integer id, int status) {
+        jobDao.updateStatus(id, status);
+        if (status == 1 && taskManager != null) {
+            jobChangeService.insertChange(id);
+            taskManager.pushJobChange(id);
+        }
+    }
 
-	@Override
-	public boolean updateWatch(Integer id, String watchServer, String ovlInstanceId) {
-		return jobDao.updateWatch(id, watchServer, ovlInstanceId) > 0;
-	}
+    @Override
+    public List<Job> findWatch(String instanceId, String environment, String serviceId) {
+        return jobDao.findWatch(instanceId, environment, serviceId);
+    }
 
-	@Override
-	public void updateNoWatch(Integer[] ids) {
-		if (ids == null || ids.length == 0) {
-			return;
-		}
-		if (ids.length > 999) {
-			int split = ids.length % 999 == 0 ? ids.length / 999 : ((ids.length / 999) + 1);
-			for (int i = 0; i < split; i++) {
-				jobDao.updateNoWatch(iServiceInstanceFactory.getIsntance().getInstanceId(),
-						Arrays.copyOfRange(ids, i * 999, i == split - 1 ? ids.length : (i + 1) * 999),
-						iServiceInstanceFactory.getIsntance().getServiceId(),
-						iServiceInstanceFactory.getIsntance().getEnvironment());
-			}
-			return;
+    @Override
+    public boolean updateWatch(Integer id, String watchServer, String ovlInstanceId) {
+        return jobDao.updateWatch(id, watchServer, ovlInstanceId) > 0;
+    }
 
-		}
-		jobDao.updateNoWatch(iServiceInstanceFactory.getIsntance().getInstanceId(), ids,
-				iServiceInstanceFactory.getIsntance().getServiceId(),
-				iServiceInstanceFactory.getIsntance().getEnvironment());
-	}
+    @Override
+    public void updateNoWatch(Integer[] ids) {
+        if (ids == null || ids.length == 0) {
+            return;
+        }
+        if (ids.length > 999) {
+            int split = ids.length % 999 == 0 ? ids.length / 999 : ((ids.length / 999) + 1);
+            for (int i = 0; i < split; i++) {
+                jobDao.updateNoWatch(iServiceInstanceFactory.getIsntance().getInstanceId(),
+                    Arrays.copyOfRange(ids, i * 999, i == split - 1 ? ids.length : (i + 1) * 999),
+                    iServiceInstanceFactory.getIsntance().getServiceId(),
+                    iServiceInstanceFactory.getIsntance().getEnvironment());
+            }
+            return;
 
-	@Override
-	public Job findByJobIdAndUse(Integer id) {
-		return jobDao.findByJobIdAndUse(iServiceInstanceFactory.getIsntance().getInstanceId(), id);
-	}
+        }
+        jobDao.updateNoWatch(iServiceInstanceFactory.getIsntance().getInstanceId(), ids,
+            iServiceInstanceFactory.getIsntance().getServiceId(),
+            iServiceInstanceFactory.getIsntance().getEnvironment());
+    }
 
-	@Override
-	public boolean hasTask(Integer id) {
-		return jobDao.hasTask(iServiceInstanceFactory.getIsntance().getInstanceId(), id) > 0;
-	}
+    @Override
+    public Job findByJobIdAndUse(Integer id) {
+        return jobDao.findByJobIdAndUse(iServiceInstanceFactory.getIsntance().getInstanceId(), id);
+    }
 
-	@Override
-	public List<Map<String, Object>> searchJob(Job job, ConcurrentSecurity securityJurisdiction) {
-		return getSearchExecutor().searchForList(job, "ID,JOB_NAME",
-				createBuilder("dispatchServer", securityJurisdiction), null, false);
-	}
+    @Override
+    public boolean hasTask(Integer id) {
+        return jobDao.hasTask(iServiceInstanceFactory.getIsntance().getInstanceId(), id) > 0;
+    }
 
-	@Override
-	public List<String> searchJobService(Job job, ConcurrentSecurity securityJurisdiction) {
-		return getSearchExecutor().searchForList(job, "distinct SERVICE_ID",
-				createBuilder("dispatchServer", securityJurisdiction), null, false, String.class);
-	}
+    @Override
+    public List<Map<String, Object>> searchJob(Job job, ConcurrentSecurity securityJurisdiction) {
+        return getSearchExecutor().searchForList(job, "ID,JOB_NAME",
+            createBuilder("dispatchServer", securityJurisdiction), null, false);
+    }
 
-	@Override
-	public int searchCountByEnvironment(String environment) {
-		return jobDao.getJobCount(environment);
-	}
+    @Override
+    public List<String> searchJobService(Job job, ConcurrentSecurity securityJurisdiction) {
+        return getSearchExecutor().searchForList(job, "distinct SERVICE_ID",
+            createBuilder("dispatchServer", securityJurisdiction), null, false, String.class);
+    }
 
-	@Override
-	public boolean killAwaitJob(Integer jobId) {
-		return jobLogService.killAwaitJob(jobId);
-	}
+    @Override
+    public int searchCountByEnvironment(String environment) {
+        return jobDao.getJobCount(environment);
+    }
 
-	@Override
-	public boolean endJob(Integer jobId, String jobLogId, String result, String msg, Integer status) {
-		// 先获取对象 //后将此任务绑定到当前服务器//再执行endJob方法
-		// 找到对应的服务器后发起停止操作
-		Job job = jobDao.findById(jobId);
-		if (job != null) {
-			JobLog jobLog = jobLogService.findById(jobLogId);
-			if (jobLog != null) {
-				if (!job.getDispatchServer().equals(iServiceInstanceFactory.getIsntance().getInstanceId())) {
-					updateWatch(jobId, iServiceInstanceFactory.getIsntance().getInstanceId(), job.getDispatchServer());
-				}
-				JobContext jobContext = new JobContext(new HashMap<>());
-				jobContext.setChildrenJob(false);
-				taskExecutorService.appendLog(jobLogId, "rpc连接异常主动结束任务!");
-				taskExecutorService.endJob(job, jobLog, status, msg, result, jobContext);
-				return true;
-			}
-			return false;
-		}
-		return false;
-	}
+    @Override
+    public boolean killAwaitJob(Integer jobId) {
+        return jobLogService.killAwaitJob(jobId);
+    }
 
-	@Override
-	public List<Job> findJobsByServiceId(String serviceId, String environment) {
-		return jobDao.findJobsByServiceId(serviceId, environment);
-	}
+    @Override
+    public boolean endJob(Integer jobId, String jobLogId, String result, String msg, Integer status) {
+        // 先获取对象 //后将此任务绑定到当前服务器//再执行endJob方法
+        // 找到对应的服务器后发起停止操作
+        Job job = jobDao.findById(jobId);
+        if (job != null) {
+            JobLog jobLog = jobLogService.findById(jobLogId);
+            if (jobLog != null) {
+                if (!job.getDispatchServer().equals(iServiceInstanceFactory.getIsntance().getInstanceId())) {
+                    updateWatch(jobId, iServiceInstanceFactory.getIsntance().getInstanceId(), job.getDispatchServer());
+                }
+                JobContext jobContext = new JobContext(new HashMap<>());
+                jobContext.setChildrenJob(false);
+                taskExecutorService.appendLog(jobLogId, "rpc连接异常主动结束任务!");
+                taskExecutorService.endJob(job, jobLog, status, msg, result, jobContext);
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
 
-	@Override
-	public List<Job> searchJobByArgs(String args) {
-		return jobDao.searchJobByArgs(args);
-	}
+    @Override
+    public List<Job> findJobsByServiceId(String serviceId, String environment) {
+        return jobDao.findJobsByServiceId(serviceId, environment);
+    }
 
-	@Override
-	public int findCountJobByArgs(String args) {
-		return jobDao.findCountJobByArgs(args);
-	}
+    @Override
+    public List<Job> searchJobByArgs(String args) {
+        return jobDao.searchJobByArgs(args);
+    }
 
-	@Override
-	public List<String> findArgsById(String id) {
-		return Arrays.asList(jobDao.findArgsById(id).split(","));
-	}
-	
-	@Override
-	public int getTaskCountByStatus(String environment, Integer status, List<String> jobType, boolean isAdmin) {
-		if(isAdmin) {
-			return jobDao.getJobCountByStatus(status, environment);
-		}
-		if(jobType != null && jobType.size() > 0) {
-			return jobDao.getJobCountByStatus(status, environment, jobType);
-		}
-		return 0;
-	}
+    @Override
+    public int findCountJobByArgs(String args) {
+        return jobDao.findCountJobByArgs(args);
+    }
 
-	@Override
-	public Job findByArgsAndTypeAndEnvironmentAndServiceId(String args, String type, String environment,
-			String serviceId) {
-		return jobDao.findByArgsAndTypeAndEnvironmentAndServiceId(args, type, environment, serviceId);
-	}
+    @Override
+    public List<String> findArgsById(String id) {
+        return Arrays.asList(jobDao.findArgsById(id).split(","));
+    }
 
-	@Override
-	public int countByEnvironmentAndJobType(String environment, List<String> jobType, boolean isAdmin) {
-		if(isAdmin) {
-			return jobDao.getJobCount(environment);
-		}
-		if(jobType != null && jobType.size() > 0) {
-			return jobDao.searchCountByJobType(jobType, environment);
-		}
-		return 0;
-	}
+    @Override
+    public int getTaskCountByStatus(String environment, Integer status, List<String> jobType, boolean isAdmin) {
+        if (isAdmin) {
+            return jobDao.getJobCountByStatus(status, environment);
+        }
+        if (jobType != null && jobType.size() > 0) {
+            return jobDao.getJobCountByStatus(status, environment, jobType);
+        }
+        return 0;
+    }
+
+    @Override
+    public Job findByArgsAndTypeAndEnvironmentAndServiceId(String args, String type, String environment,
+        String serviceId) {
+        return jobDao.findByArgsAndTypeAndEnvironmentAndServiceId(args, type, environment, serviceId);
+    }
+
+    @Override
+    public int countByEnvironmentAndJobType(String environment, List<String> jobType, boolean isAdmin) {
+        if (isAdmin) {
+            return jobDao.getJobCount(environment);
+        }
+        if (jobType != null && jobType.size() > 0) {
+            return jobDao.searchCountByJobType(jobType, environment);
+        }
+        return 0;
+    }
 }

@@ -1,8 +1,12 @@
 package net.risedata.rpc.consumer.annotation;
 
-import org.springframework.stereotype.Indexed;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.lang.annotation.*;
+import org.springframework.stereotype.Indexed;
 
 /**
  * @description: 监听器所监听的连接管理器的名字
@@ -17,6 +21,7 @@ public @interface ManagerListener {
 
     /**
      * 监听管理器的名字
+     * 
      * @return
      */
     String[] name() default {};

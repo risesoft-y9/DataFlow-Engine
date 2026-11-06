@@ -13,19 +13,19 @@ import risesoft.data.transfer.core.util.strings.handles.CastValueHandle;
  */
 public class CastValueToStringHandle implements CastValueHandle<String, Object> {
 
-	public Class<?>[] getTypes() {
-		return new Class<?>[0];
-	}
+    public Class<?>[] getTypes() {
+        return new Class<?>[0];
+    }
 
-	@Override
-	public String getValue(Object value) {
-		String val = null;
-		if (value instanceof Date) {
-			val = DateUtils.format((Date) value);
-		} else {
-			val = String.valueOf(value);
-		}
-		return val;
-	}
+    @Override
+    public String getValue(Object value) {
+        String val = null;
+        if (value instanceof Date) {
+            val = DateUtils.format((Date)value);
+        } else {
+            val = String.valueOf(value);
+        }
+        return val;
+    }
 
 }

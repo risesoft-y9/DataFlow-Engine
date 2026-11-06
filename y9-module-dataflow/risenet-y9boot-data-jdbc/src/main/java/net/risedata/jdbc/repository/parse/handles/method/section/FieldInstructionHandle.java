@@ -11,14 +11,14 @@ import net.risedata.jdbc.repository.parse.handles.method.MethodNameBuilder;
  */
 public class FieldInstructionHandle implements SectionInstructionHandle {
 
-	@Override
-	public String handleInstruction() {
-		return "$";
-	}
+    @Override
+    public String handleInstruction() {
+        return "$";
+    }
 
-	@Override
-	public void handle(MethodNameBuilder builder, ClassBuild classBuild) {
-		builder.nextAndReturn().appendSql(" #{" + builder.getParameterArgs(builder.next(false, null)) + "} ");
-	}
+    @Override
+    public void handle(MethodNameBuilder builder, ClassBuild classBuild) {
+        builder.nextAndReturn().appendSql(" #{" + builder.getParameterArgs(builder.next(false, null)) + "} ");
+    }
 
 }

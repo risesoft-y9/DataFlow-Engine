@@ -1,13 +1,14 @@
 package net.risedata.register.api.system;
 
-import cn.hutool.core.io.FileUtil;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.risedata.register.model.FileModel;
 import net.risedata.rpc.consumer.annotation.Listener;
 import net.risedata.rpc.consumer.annotation.Listeners;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import cn.hutool.core.io.FileUtil;
 
 /**
  * @Description : 文件更新
@@ -34,10 +35,12 @@ public class FileOperation {
         Byte[] bytes = new Byte[bytesPrim.length];
 
         int i = 0;
-        for (byte b : bytesPrim) bytes[i++] = b; // Autoboxing
+        for (byte b : bytesPrim)
+            bytes[i++] = b; // Autoboxing
 
         return bytes;
     }
+
     /**
      * 获取底下文件根据rootUrl
      *
@@ -51,7 +54,8 @@ public class FileOperation {
         if (f.isDirectory()) {
             File[] files = f.listFiles();
             for (File file : files) {
-                res.add(new FileModel(file.getName(), file.getAbsolutePath(), file.isDirectory(), file.lastModified(), file.length()));
+                res.add(new FileModel(file.getName(), file.getAbsolutePath(), file.isDirectory(), file.lastModified(),
+                    file.length()));
             }
         } else {
             throw new RuntimeException("不是文件夹");
@@ -63,7 +67,6 @@ public class FileOperation {
     public boolean deleteFile(String url) {
         return new File(url).delete();
     }
-
 
     @Listener("replaceFile")
     public boolean replaceFile(String url, byte[] data) throws Exception {
@@ -91,7 +94,8 @@ public class FileOperation {
             }
         } else {
             if (file.getName().equals(name)) {
-                res.add(new FileModel(file.getName(), file.getAbsolutePath(), file.isDirectory(), file.lastModified(), file.length()));
+                res.add(new FileModel(file.getName(), file.getAbsolutePath(), file.isDirectory(), file.lastModified(),
+                    file.length()));
             }
         }
     }

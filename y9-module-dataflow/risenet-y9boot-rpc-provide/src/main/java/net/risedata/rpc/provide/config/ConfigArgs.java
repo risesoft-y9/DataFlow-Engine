@@ -15,8 +15,7 @@ public class ConfigArgs {
     public int port;
     /**
      * 工作线程<br/>
-     * ps:这些线程只是netty工作的线程数量这些线程只用于维护连接,
-     * 读取数据,交给执行器执行,不负责执行具体业务无需给太多
+     * ps:这些线程只是netty工作的线程数量这些线程只用于维护连接, 读取数据,交给执行器执行,不负责执行具体业务无需给太多
      */
     @Value("${rpc.workSize:0}")
     public int workSize;

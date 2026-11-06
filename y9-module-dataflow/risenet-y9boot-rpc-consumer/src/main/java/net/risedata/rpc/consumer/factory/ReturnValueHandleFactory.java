@@ -1,11 +1,16 @@
 package net.risedata.rpc.consumer.factory;
 
-import net.risedata.rpc.consumer.result.value.ReturnValueHandle;
-import net.risedata.rpc.consumer.result.value.impl.*;
-import net.risedata.rpc.factory.model.ReturnType;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import net.risedata.rpc.consumer.result.value.ReturnValueHandle;
+import net.risedata.rpc.consumer.result.value.impl.DefaulClasstHandle;
+import net.risedata.rpc.consumer.result.value.impl.DefaulGenericityHandle;
+import net.risedata.rpc.consumer.result.value.impl.ListHandle;
+import net.risedata.rpc.consumer.result.value.impl.SyncGenericityResultHandle;
+import net.risedata.rpc.consumer.result.value.impl.SyncListGenericityResultHandle;
+import net.risedata.rpc.consumer.result.value.impl.SyncResultHandle;
+import net.risedata.rpc.factory.model.ReturnType;
 
 /**
  * @description: 返回值处理工厂
@@ -25,10 +30,8 @@ public class ReturnValueHandleFactory {
         RETURN_VALUE_HANDLES.add(new DefaulClasstHandle());
     }
 
-
     public static ReturnValueHandle getInstance(ReturnType returnType) {
-        for (ReturnValueHandle re :
-                RETURN_VALUE_HANDLES) {
+        for (ReturnValueHandle re : RETURN_VALUE_HANDLES) {
             if (re.isHandle(returnType)) {
 
                 return re;

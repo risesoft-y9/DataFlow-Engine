@@ -16,17 +16,17 @@ import risesoft.data.transfer.core.util.strings.handles.StringCastValueHandle;
  */
 public class StringToDateHandle implements StringCastValueHandle<Date> {
 
-	
-	public Class<?>[] getTypes() {
-		return new Class<?>[] { Date.class};
-	}
-	@Override
-	public Date getValue(String value) {
-		try {
-			return DateUtils.parseDate(value);
-		} catch (ParseException e) {
-			throw new RuntimeException("转时间失败!");
-		}
-	}
+    public Class<?>[] getTypes() {
+        return new Class<?>[] {Date.class};
+    }
+
+    @Override
+    public Date getValue(String value) {
+        try {
+            return DateUtils.parseDate(value);
+        } catch (ParseException e) {
+            throw new RuntimeException("转时间失败!");
+        }
+    }
 
 }

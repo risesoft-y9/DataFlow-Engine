@@ -20,13 +20,14 @@ import net.risesoft.y9public.repository.DataLogRepository;
 @RequiredArgsConstructor
 public class DataLogController {
 
-	private final DataLogRepository dataLogRepository;
+    private final DataLogRepository dataLogRepository;
 
-	@GetMapping(value = "/get")
-	public Y9Page<DataLogEntity> get(String jobId, Integer page, Integer size) {
-		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createTime"));
-		Page<DataLogEntity> pageList = dataLogRepository.findByJobId(jobId, pageable);
-		return Y9Page.success(page, pageList.getTotalPages(), pageList.getTotalElements(), pageList.getContent(), "获取数据成功");
-	}
+    @GetMapping(value = "/get")
+    public Y9Page<DataLogEntity> get(String jobId, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createTime"));
+        Page<DataLogEntity> pageList = dataLogRepository.findByJobId(jobId, pageable);
+        return Y9Page.success(page, pageList.getTotalPages(), pageList.getTotalElements(), pageList.getContent(),
+            "获取数据成功");
+    }
 
 }

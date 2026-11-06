@@ -1,6 +1,5 @@
 package risesoft.data.transfer.core.channel;
 
-
 /**
  * 通道 下链接输出器上链接交换机,输出通道标识这是个输出通道
  * 
@@ -10,6 +9,4 @@ package risesoft.data.transfer.core.channel;
  */
 public interface OutChannel extends Channel {
 
-	
-	
 }

@@ -19,32 +19,32 @@ import net.risesoft.base.BaseEntity;
 @Data
 public class DataProcessEntity extends BaseEntity {
 
-	private static final long serialVersionUID = 5321083921118473218L;
+    private static final long serialVersionUID = 5321083921118473218L;
 
-	@Id
-	@Column(name = "ID", length = 38, nullable = false)
-	@Comment(value = "主键")
-	private String id;
+    @Id
+    @Column(name = "ID", length = 38, nullable = false)
+    @Comment(value = "主键")
+    private String id;
 
-	@Column(name = "ARRANGEID", length = 50, nullable = false)
-	@Comment(value = "任务编排ID")
-	private String arrangeId;
-	
-	@Column(name = "STEP", nullable = false)
-	@Comment(value = "步骤序号")
-	private Integer step;
-	
-	@Column(name = "JOBIDS", length = 500, nullable = false)
-	@Comment(value = "任务ID")
-	private String jobIds;
-	
-	@Column(name = "SUBJOBS", length = 500)
-	@Comment(value = "副任务ID，并行副网关设置的任务")
-	private String subJobs;
-	
-	@Column(name = "GATEWAY", nullable = false)
-	@Comment(value = "网关类型：0-无，1-与，2-或")
-	@ColumnDefault("0")
-	private Integer gateway;
+    @Column(name = "ARRANGEID", length = 50, nullable = false)
+    @Comment(value = "任务编排ID")
+    private String arrangeId;
+
+    @Column(name = "STEP", nullable = false)
+    @Comment(value = "步骤序号")
+    private Integer step;
+
+    @Column(name = "JOBIDS", length = 500, nullable = false)
+    @Comment(value = "任务ID")
+    private String jobIds;
+
+    @Column(name = "SUBJOBS", length = 500)
+    @Comment(value = "副任务ID，并行副网关设置的任务")
+    private String subJobs;
+
+    @Column(name = "GATEWAY", nullable = false)
+    @Comment(value = "网关类型：0-无，1-与，2-或")
+    @ColumnDefault("0")
+    private Integer gateway;
 
 }

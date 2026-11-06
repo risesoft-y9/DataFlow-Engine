@@ -9,6 +9,5 @@ package net.risesoft.api.utils;
  */
 public interface CommitFunction<T> {
 
-
     void commit(T value);
 }

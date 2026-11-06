@@ -1,17 +1,5 @@
 package net.risedata.rpc.consumer.config;
 
-import net.risedata.rpc.Task.ScheduleTask;
-import net.risedata.rpc.consumer.config.model.Managers;
-import net.risedata.rpc.consumer.controller.ConnectionStatus;
-import net.risedata.rpc.consumer.core.impl.ClientBootStrap;
-import net.risedata.rpc.consumer.factory.ClientBeanFactory;
-import net.risedata.rpc.consumer.factory.ConnectionManagerFactory;
-import net.risedata.rpc.consumer.invoke.impl.ForBooleanTrueInvokeHandle;
-import net.risedata.rpc.consumer.listener.ListenerApplication;
-import net.risedata.rpc.service.RPCExecutorService;
-import net.risedata.rpc.service.patientia.FixedExecutorService;
-import net.risedata.rpc.utils.IdUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -25,6 +13,18 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.PropertyResolver;
 import org.springframework.web.client.RestTemplate;
+
+import net.risedata.rpc.Task.ScheduleTask;
+import net.risedata.rpc.consumer.config.model.Managers;
+import net.risedata.rpc.consumer.controller.ConnectionStatus;
+import net.risedata.rpc.consumer.core.impl.ClientBootStrap;
+import net.risedata.rpc.consumer.factory.ClientBeanFactory;
+import net.risedata.rpc.consumer.factory.ConnectionManagerFactory;
+import net.risedata.rpc.consumer.invoke.impl.ForBooleanTrueInvokeHandle;
+import net.risedata.rpc.consumer.listener.ListenerApplication;
+import net.risedata.rpc.service.RPCExecutorService;
+import net.risedata.rpc.service.patientia.FixedExecutorService;
+import net.risedata.rpc.utils.IdUtils;
 
 /**
  * @description: consumer 全局配置
@@ -42,14 +42,12 @@ public class ConsumerApplication implements ApplicationListener {
     public static ClinetConfig CLINET_CONFIG;
     public static RPCExecutorService EXECUTOR_SERVICE;
 
-
     private ClientBootStrap clinetBootStrap;
 
     @Bean
     public ClientBeanFactory getClinetBeanFactory() {
         return new ClientBeanFactory();
     }
-
 
     @Bean
     public ForBooleanTrueInvokeHandle getForBooleanTrueInvokeHandle() {
@@ -95,6 +93,7 @@ public class ConsumerApplication implements ApplicationListener {
     public ConnectionConfig getConnectionConfig() {
         return new ConnectionConfig();
     }
+
     @ConditionalOnMissingBean(ConnectionStatus.class)
     @Bean
     public ConnectionStatus getConnectionStatus() {
@@ -105,7 +104,6 @@ public class ConsumerApplication implements ApplicationListener {
     public ConnectionManagerFactory getConnectionManagerFactory() {
         return new ConnectionManagerFactory();
     }
-
 
     @Bean
     public ListenerApplication getListenerApplication() {
@@ -142,14 +140,10 @@ public class ConsumerApplication implements ApplicationListener {
             scheduleTask = null;
         }
 
-
     }
-
 
     public static boolean isInfo() {
         return LOGGER.isInfoEnabled();
     }
 
 }
-
-

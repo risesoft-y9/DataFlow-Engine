@@ -13,24 +13,23 @@ import risesoft.data.transfer.core.column.Column;
  * @author lb
  */
 public interface CreateColumnHandle {
-	/**
-	 * 是否被这个handle处理
-	 * 
-	 * @param type
-	 * @return
-	 */
-	boolean isHandle(int type);
+    /**
+     * 是否被这个handle处理
+     * 
+     * @param type
+     * @return
+     */
+    boolean isHandle(int type);
 
-	/**
-	 * 获取列数据
-	 * 
-	 * @param rs       返回值
-	 * @param metaData 元数据
-	 * @param index    index
-	 * @param encoding 编码
-	 * @return
-	 */
-	Column getColumn(ResultSet rs, ResultSetMetaData metaData, int index, String mandatoryEncoding) throws Exception;
-
+    /**
+     * 获取列数据
+     * 
+     * @param rs 返回值
+     * @param metaData 元数据
+     * @param index index
+     * @param encoding 编码
+     * @return
+     */
+    Column getColumn(ResultSet rs, ResultSetMetaData metaData, int index, String mandatoryEncoding) throws Exception;
 
 }

@@ -18,36 +18,36 @@ import risesoft.data.transfer.core.util.Configuration;
  */
 public class TimerPrintTaskStatus implements Plug, JobStartHandle {
 
-	private Communication communication;
-	private int timer;
-	private Logger logger;
+    private Communication communication;
+    private int timer;
+    private Logger logger;
 
-	public TimerPrintTaskStatus(Communication communication, Configuration configuration, LoggerFactory loggerFactory) {
-		this.communication = communication;
-		this.timer = configuration.getInt("timer", 5) * 1000;
-		this.logger = loggerFactory.getLogger(TimerPrintTaskStatus.class);
-	}
+    public TimerPrintTaskStatus(Communication communication, Configuration configuration, LoggerFactory loggerFactory) {
+        this.communication = communication;
+        this.timer = configuration.getInt("timer", 5) * 1000;
+        this.logger = loggerFactory.getLogger(TimerPrintTaskStatus.class);
+    }
 
-	@Override
-	public boolean register(JobContext jobContext) {
-		return true;
-	}
+    @Override
+    public boolean register(JobContext jobContext) {
+        return true;
+    }
 
-	@Override
-	public void onJobStart(JobContext jobContext) {
-		System.out.println("启动");
-		new Thread(() -> {
-			while (!communication.isFinished()) {
-				logger.info(this, CommunicationTool.getStateInfo(communication, jobContext));
-				try {
-					Thread.sleep(timer);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
+    @Override
+    public void onJobStart(JobContext jobContext) {
+        System.out.println("启动");
+        new Thread(() -> {
+            while (!communication.isFinished()) {
+                logger.info(this, CommunicationTool.getStateInfo(communication, jobContext));
+                try {
+                    Thread.sleep(timer);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
 
-		}).start();
+        }).start();
 
-	}
+    }
 
 }

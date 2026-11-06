@@ -1,8 +1,8 @@
 package net.risedata.rpc.provide.listener;
 
-import com.alibaba.fastjson.JSONArray;
-
 import java.util.List;
+
+import com.alibaba.fastjson.JSONArray;
 
 /**
  * @description: 返回值
@@ -12,6 +12,7 @@ import java.util.List;
 public interface Result {
     /**
      * 根据类型拿到对应的值
+     * 
      * @return
      */
     JSONArray getValue();
@@ -20,10 +21,9 @@ public interface Result {
      * 拿到list 类型的值
      *
      * @param returnType 返回值类型
-     * @param <T>        list
+     * @param <T> list
      * @return 返回值
      */
     <T> List<T> getList(Class<T> returnType);
-
 
 }

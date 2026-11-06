@@ -11,5 +11,5 @@ import risesoft.data.transfer.core.statistics.Communication;
  */
 public interface JobListener {
 
-	void end(Communication communication);
+    void end(Communication communication);
 }

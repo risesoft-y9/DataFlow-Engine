@@ -1,11 +1,6 @@
 package net.risedata.rpc.consumer.config.model;
 
-
-import net.risedata.rpc.consumer.config.ConsumerApplication;
-import net.risedata.rpc.consumer.config.LoadingConfig;
-import net.risedata.rpc.consumer.core.BasedConnectionManager;
-import net.risedata.rpc.consumer.factory.ConnectionManagerFactory;
-import net.risedata.rpc.exceptions.ConfigException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -13,13 +8,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
+import net.risedata.rpc.consumer.config.ConsumerApplication;
+import net.risedata.rpc.consumer.config.LoadingConfig;
+import net.risedata.rpc.consumer.core.BasedConnectionManager;
+import net.risedata.rpc.consumer.factory.ConnectionManagerFactory;
+import net.risedata.rpc.exceptions.ConfigException;
 
 /**
- * @description: 连接的配置用于springboot properties 自动配置
- * 注意一种连接管理器只能配置一种类型的连接
- * 配置格式为: managerName=cloud:name,rpc:ip:host
- * 如果是异步操作的连接器则为: sync:managerName = cloud:name,rpc:ip:host
+ * @description: 连接的配置用于springboot properties 自动配置 注意一种连接管理器只能配置一种类型的连接 配置格式为: managerName=cloud:name,rpc:ip:host
+ *               如果是异步操作的连接器则为: sync:managerName = cloud:name,rpc:ip:host
  * @Author lb176
  * @Date 2021/7/30==15:19
  */
@@ -31,7 +28,6 @@ public class Managers implements ApplicationListener<ApplicationReadyEvent> {
      */
     private List<String> managers;
 
-
     public List<String> getManagers() {
         return managers;
     }
@@ -42,15 +38,12 @@ public class Managers implements ApplicationListener<ApplicationReadyEvent> {
 
     @Override
     public String toString() {
-        return "Managers{" +
-                "managers=" + managers +
-                '}';
+        return "Managers{" + "managers=" + managers + '}';
     }
-
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        //读取配置进行连接的操作
+        // 读取配置进行连接的操作
         if (managers == null) {
             return;
         }

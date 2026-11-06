@@ -17,26 +17,26 @@ import net.risedata.jdbc.repository.parse.handles.UpdateParseHandle;
  */
 public class MethodParseFactory {
 
-	private static List<MethodParseHandle> HANDLES = new ArrayList<>();
-	static {
-		HANDLES.add(new SearchParseHandle());
-		HANDLES.add(new UpdateParseHandle());
-		HANDLES.add(new MethodNameParseHandle());
-	}
+    private static List<MethodParseHandle> HANDLES = new ArrayList<>();
+    static {
+        HANDLES.add(new SearchParseHandle());
+        HANDLES.add(new UpdateParseHandle());
+        HANDLES.add(new MethodNameParseHandle());
+    }
 
-	/**
-	 * 解析一个方法返回code
-	 * 
-	 * @param m
-	 * @return
-	 */
-	public static String parseMethod(Method m, ClassBuild properties) {
-		ReturnType returnType = ReturnTypeFactory.parseInstance(m, properties);
-		for (MethodParseHandle methodParseHandle : HANDLES) {
-			if (methodParseHandle.isHandle(m)) {
-				return methodParseHandle.parse(m, returnType, properties);
-			}
-		}
-		return null;
-	}
+    /**
+     * 解析一个方法返回code
+     * 
+     * @param m
+     * @return
+     */
+    public static String parseMethod(Method m, ClassBuild properties) {
+        ReturnType returnType = ReturnTypeFactory.parseInstance(m, properties);
+        for (MethodParseHandle methodParseHandle : HANDLES) {
+            if (methodParseHandle.isHandle(m)) {
+                return methodParseHandle.parse(m, returnType, properties);
+            }
+        }
+        return null;
+    }
 }

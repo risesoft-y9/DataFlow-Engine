@@ -23,14 +23,15 @@ public class AASV10ContainerManager extends SystemContainerManager {
      */
     public AASV10ContainerManager(SystemOperation systemOperation, String rootPath) {
         super(systemOperation, rootPath);
-        LOGGER.info("rootPath: "+rootPath);
+        LOGGER.info("rootPath: " + rootPath);
     }
 
     private static String DOMAINS = "/AAMS-V10";
 
     public static void main(String[] args) {
-        AASV10ContainerManager.create("/opt/aas10/AAMS-V102/bin",new WindowsSystemOperation());
+        AASV10ContainerManager.create("/opt/aas10/AAMS-V102/bin", new WindowsSystemOperation());
     }
+
     /**
      * 创建当前容器管理器
      *
@@ -43,10 +44,10 @@ public class AASV10ContainerManager extends SystemContainerManager {
         if (domainsIndex != -1) {
             domainsIndex = contextPath.indexOf("/", domainsIndex + DOMAINS.length());
             if (domainsIndex != -1) {
-                String path = contextPath.substring(0,domainsIndex);
-                System.out.println("执行指令"+path + "/bin/apusic.sh run ");
+                String path = contextPath.substring(0, domainsIndex);
+                System.out.println("执行指令" + path + "/bin/apusic.sh run ");
                 if (new File(path + "/bin").exists()) {
-                    if (systemOperation instanceof WindowsSystemOperation){
+                    if (systemOperation instanceof WindowsSystemOperation) {
                         path = path.substring(1);
                     }
                     System.out.println("create AASV10");
@@ -58,18 +59,17 @@ public class AASV10ContainerManager extends SystemContainerManager {
         return null;
     }
 
-
-
-
     @Override
     public void start() {
         try {
             if (systemOperation instanceof LinuxSystemOperation) {
-                systemOperation.execute(true,"cd " + rootPath + "/bin", systemOperation.nohupRun(rootPath + "/bin/apusic.sh run >>nohup.out "));
+                systemOperation.execute(true, "cd " + rootPath + "/bin",
+                    systemOperation.nohupRun(rootPath + "/bin/apusic.sh run >>nohup.out "));
             } else {
-                systemOperation.execute(true,"cd " + rootPath + "/bin", systemOperation.nohupRun(rootPath + "/bin/startapusic.cmd"));
+                systemOperation.execute(true, "cd " + rootPath + "/bin",
+                    systemOperation.nohupRun(rootPath + "/bin/startapusic.cmd"));
             }
-        }catch ( Exception e){
+        } catch (Exception e) {
             System.out.println("启动报错");
             e.printStackTrace();
         }
@@ -78,9 +78,6 @@ public class AASV10ContainerManager extends SystemContainerManager {
 
     @Override
     public String toString() {
-        return "AASV9ContainerManager{" +
-                "systemOperation=" + systemOperation +
-                ", rootPath='" + rootPath + '\'' +
-                '}';
+        return "AASV9ContainerManager{" + "systemOperation=" + systemOperation + ", rootPath='" + rootPath + '\'' + '}';
     }
 }

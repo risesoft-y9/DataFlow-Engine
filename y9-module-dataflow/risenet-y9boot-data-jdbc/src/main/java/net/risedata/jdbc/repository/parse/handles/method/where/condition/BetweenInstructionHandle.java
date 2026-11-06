@@ -10,14 +10,15 @@ import net.risedata.jdbc.repository.parse.handles.method.MethodNameBuilder;
  */
 public class BetweenInstructionHandle extends ConditionInstructionHandleAdapter {
 
-	public BetweenInstructionHandle() {
-		super("Between", null);
-	}
+    public BetweenInstructionHandle() {
+        super("Between", null);
+    }
 
-	@Override
-	public void handle(MethodNameBuilder builder, String backField, String condition) {
-		builder.getSqlbuilder().where(builder.getColumn(backField) + " Between " + builder.getParameterArgs(backField)
-				+ "and ?" + builder.getParameterIndex(backField) + 1);
-	}
+    @Override
+    public void handle(MethodNameBuilder builder, String backField, String condition) {
+        builder.getSqlbuilder()
+            .where(builder.getColumn(backField) + " Between " + builder.getParameterArgs(backField) + "and ?"
+                + builder.getParameterIndex(backField) + 1);
+    }
 
 }

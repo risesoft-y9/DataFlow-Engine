@@ -15,23 +15,25 @@ import net.risedata.rpc.model.Response;
 public class ResponseBuilder {
     /**
      * 创建一个异常的返回值
+     * 
      * @param msg 异常信息
      * @param request request
      * @return
      */
-    public static Response createError(Object msg, Request request){
-      Response res = new Response(Response.ERROR, JSON.toJSONString(msg),request.getId());
-      return res;
+    public static Response createError(Object msg, Request request) {
+        Response res = new Response(Response.ERROR, JSON.toJSONString(msg), request.getId());
+        return res;
     }
 
     /**
      * 创建一个成功的回调
+     * 
      * @param msg 数据
      * @param request request
      * @return
      */
-    public static Response createSuccess(Object msg, Request request){
-        Response res = new Response(Response.SUCCESS, JSON.toJSONString(msg),request.getId());
+    public static Response createSuccess(Object msg, Request request) {
+        Response res = new Response(Response.SUCCESS, JSON.toJSONString(msg), request.getId());
         return res;
     }
 

@@ -1,8 +1,8 @@
 package net.risedata.rpc.consumer.core.impl;
 
+import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import net.risedata.rpc.Task.ScheduleTask;
 import net.risedata.rpc.consumer.config.ConsumerApplication;
 import net.risedata.rpc.consumer.config.LoadingConfig;
@@ -17,8 +17,8 @@ import net.risedata.rpc.consumer.listener.impl.LinkedConnectionListener;
 import net.risedata.rpc.consumer.task.ManagerAndIpAndPortTask;
 import net.risedata.rpc.utils.IdUtils;
 
-import java.util.List;
-import java.util.concurrent.RejectedExecutionException;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 
 /**
  * @description: ip
@@ -36,7 +36,7 @@ public class HostAndPortConnectionManager implements ConnectionManager {
     private boolean isStop;
 
     public HostAndPortConnectionManager() {
-        this.id = (int) IdUtils.getId();
+        this.id = (int)IdUtils.getId();
         this.pool = new DefaultConnectionPool();
     }
 
@@ -95,15 +95,14 @@ public class HostAndPortConnectionManager implements ConnectionManager {
         }
     }
 
-
     @Override
     public Connection getConnection() {
-        return (Connection) pool.getConnection();
+        return (Connection)pool.getConnection();
     }
 
     @Override
     public ChannelFuture connection(String url) {
-        //特殊的识别
+        // 特殊的识别
         try {
             String[] split = url.split(":");
             return connectionToHost(split[1], Integer.valueOf(split[2]));
@@ -150,7 +149,7 @@ public class HostAndPortConnectionManager implements ConnectionManager {
             });
         } catch (InterruptedException e) {
             return null;
-        } catch (RejectedExecutionException e){
+        } catch (RejectedExecutionException e) {
             return null;
         }
     }

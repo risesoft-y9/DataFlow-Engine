@@ -16,5 +16,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface Exclude {
-}
+public @interface Exclude {}

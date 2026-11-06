@@ -1,8 +1,12 @@
 package net.risedata.rpc.annotation;
 
-import org.springframework.stereotype.Indexed;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.lang.annotation.*;
+import org.springframework.stereotype.Indexed;
 
 /**
  * 设置扫描的包路径

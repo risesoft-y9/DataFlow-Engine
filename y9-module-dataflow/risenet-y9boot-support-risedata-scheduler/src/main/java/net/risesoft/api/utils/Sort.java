@@ -24,11 +24,7 @@ public class Sort implements Comparable<Sort> {
 
     @Override
     public String toString() {
-        return "sort{" +
-                "count=" + count +
-                ", name='" + name + '\'' +
-                '}';
+        return "sort{" + "count=" + count + ", name='" + name + '\'' + '}';
     }
-
 
 }

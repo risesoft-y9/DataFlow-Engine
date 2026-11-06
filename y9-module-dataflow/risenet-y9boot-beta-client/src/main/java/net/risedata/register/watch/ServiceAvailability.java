@@ -10,6 +10,7 @@ package net.risedata.register.watch;
 public interface ServiceAvailability {
     /**
      * 是否可用
+     * 
      * @return true=可用,false不可用
      */
     boolean isAvailability();

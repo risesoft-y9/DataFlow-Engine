@@ -1,5 +1,13 @@
 package net.risesoft.api.job.actions.start;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import net.risesoft.api.job.JobContext;
 import net.risesoft.api.job.TaskExecutorService;
 import net.risesoft.api.job.actions.JobAction;
@@ -8,14 +16,6 @@ import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.api.utils.LResult;
 import net.risesoft.api.utils.ResultUtils;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @Description : 启动子任务操作器
@@ -27,33 +27,33 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Component
 public class StartJobChildrenAction implements JobAction {
 
-	@Autowired
-	JobService jobService;
+    @Autowired
+    JobService jobService;
 
-	@Override
-	public LResult action(Job job, JobLog jobLog, TaskExecutorService taskExecutor, JobContext jobContext) {
+    @Override
+    public LResult action(Job job, JobLog jobLog, TaskExecutorService taskExecutor, JobContext jobContext) {
 
-		String[] childJobs = job.getChildJobs().split(",");
-		Job tempJob = null;
-		taskExecutor.appendLog(jobLog.getId(), "执行子任务:" + Arrays.toString(childJobs));
-		jobContext.setChildrenJob(true);
-		ArrayList<LResult> results = new ArrayList<>();
-		AtomicBoolean isEndJobChild = new AtomicBoolean(true);
-		for (int i = 0; i < childJobs.length; i++) {
-			tempJob = jobService.findByJobId(Integer.parseInt(childJobs[i]));
-			if (tempJob != null) {
-				if (!StringUtils.isEmpty(tempJob.getChildJobs())) {
-					isEndJobChild.set(false);
-				}
-				results.add(taskExecutor.toAction(StartJobAction.class, tempJob, jobLog, jobContext));
-			}
-		}
+        String[] childJobs = job.getChildJobs().split(",");
+        Job tempJob = null;
+        taskExecutor.appendLog(jobLog.getId(), "执行子任务:" + Arrays.toString(childJobs));
+        jobContext.setChildrenJob(true);
+        ArrayList<LResult> results = new ArrayList<>();
+        AtomicBoolean isEndJobChild = new AtomicBoolean(true);
+        for (int i = 0; i < childJobs.length; i++) {
+            tempJob = jobService.findByJobId(Integer.parseInt(childJobs[i]));
+            if (tempJob != null) {
+                if (!StringUtils.isEmpty(tempJob.getChildJobs())) {
+                    isEndJobChild.set(false);
+                }
+                results.add(taskExecutor.toAction(StartJobAction.class, tempJob, jobLog, jobContext));
+            }
+        }
 
-		return ResultUtils.batchResult(results.toArray(new LResult[results.size()])).onEnd(res -> {
-			if (isEndJobChild.get()) {
-				jobContext.setChildrenJob(false);
-			}
+        return ResultUtils.batchResult(results.toArray(new LResult[results.size()])).onEnd(res -> {
+            if (isEndJobChild.get()) {
+                jobContext.setChildrenJob(false);
+            }
 
-		});
-	}
+        });
+    }
 }

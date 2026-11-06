@@ -5,11 +5,9 @@ import net.risedata.jdbc.repository.model.ClassBuild;
 import net.risedata.jdbc.repository.model.ReturnType;
 
 public interface SearchReturnHandle {
-	
-	
-	
-	boolean isHandle(ReturnType type);
 
-	String parse(ReturnType type,ClassBuild properties,ArgsBuilder argsBuilder);
+    boolean isHandle(ReturnType type);
+
+    String parse(ReturnType type, ClassBuild properties, ArgsBuilder argsBuilder);
 
 }

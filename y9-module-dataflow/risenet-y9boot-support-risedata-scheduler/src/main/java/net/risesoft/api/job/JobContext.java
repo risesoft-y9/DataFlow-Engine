@@ -1,8 +1,8 @@
 package net.risesoft.api.job;
 
-import net.risesoft.api.exceptions.JobException;
-
 import java.util.Map;
+
+import net.risesoft.api.exceptions.JobException;
 
 /**
  * @Description : 任务调度上下文用于上下文之间传递参数
@@ -13,36 +13,36 @@ import java.util.Map;
  */
 public class JobContext {
 
-	private Map<String, Object> args;
+    private Map<String, Object> args;
 
-	boolean isChildrenJob;
+    boolean isChildrenJob;
 
-	public JobContext(Map<String, Object> args) {
-		this.args = args;
-	}
+    public JobContext(Map<String, Object> args) {
+        this.args = args;
+    }
 
-	public JobContext put(String key, Object value) {
-		args.put(key, value);
-		return this;
-	}
+    public JobContext put(String key, Object value) {
+        args.put(key, value);
+        return this;
+    }
 
-	public Object getRequiredValue(String key) {
-		Object obj = getArgs().get(key);
-		if (obj == null) {
-			throw new JobException("key:" + key + " 不存在");
-		}
-		return obj;
-	}
+    public Object getRequiredValue(String key) {
+        Object obj = getArgs().get(key);
+        if (obj == null) {
+            throw new JobException("key:" + key + " 不存在");
+        }
+        return obj;
+    }
 
-	public Map<String, Object> getArgs() {
-		return args;
-	}
+    public Map<String, Object> getArgs() {
+        return args;
+    }
 
-	public boolean isChildrenJob() {
-		return isChildrenJob;
-	}
+    public boolean isChildrenJob() {
+        return isChildrenJob;
+    }
 
-	public void setChildrenJob(boolean childrenJob) {
-		isChildrenJob = childrenJob;
-	}
+    public void setChildrenJob(boolean childrenJob) {
+        isChildrenJob = childrenJob;
+    }
 }

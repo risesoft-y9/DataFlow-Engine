@@ -12,31 +12,31 @@ import net.risedata.jdbc.repository.proxy.RepositoryCreateFactory;
 
 public class ListSearchReturnHandle implements SearchReturnHandle {
 
-	@Override
-	public boolean isHandle(ReturnType type) {
-		return type.getReturnType() == List.class;
-	}
+    @Override
+    public boolean isHandle(ReturnType type) {
+        return type.getReturnType() == List.class;
+    }
 
-	@Override
-	public String parse(ReturnType type, ClassBuild properties, ArgsBuilder argsBuilder) {
-		if (type.isClass()) {
-			BeanConfig bc = BeanConfigFactory.getInstance(type.getGenericityClass());
-			if (bc == null) {
-				if (type.getGenericityClass() == Map.class) {
-					return "return " + RepositoryCreateFactory.JDBC_TEMPLATE + ".queryForListMap(_sql" + argsBuilder.to()
-							+ ");";
-				}
-				return "return " + RepositoryCreateFactory.JDBC_TEMPLATE + ".queryForSimpleList(_sql, "
-						+ type.getGenericityClass().getName() + ".class" + argsBuilder.to() + ");";
-			} else {
-				return "return " + RepositoryCreateFactory.JDBC_TEMPLATE + ".queryForList(_sql, "
-						+ type.getGenericityClass().getName() + ".class " + argsBuilder.to() + ");";
-			}
-		} else {
-			argsBuilder.delete(type.getIndex());
-			return "return " + RepositoryCreateFactory.JDBC_TEMPLATE + ".queryForList(_sql,(java.lang.Class)$args["
-					+ type.getIndex() + "]" + argsBuilder.to() + ");";
-		}
-	}
+    @Override
+    public String parse(ReturnType type, ClassBuild properties, ArgsBuilder argsBuilder) {
+        if (type.isClass()) {
+            BeanConfig bc = BeanConfigFactory.getInstance(type.getGenericityClass());
+            if (bc == null) {
+                if (type.getGenericityClass() == Map.class) {
+                    return "return " + RepositoryCreateFactory.JDBC_TEMPLATE + ".queryForListMap(_sql"
+                        + argsBuilder.to() + ");";
+                }
+                return "return " + RepositoryCreateFactory.JDBC_TEMPLATE + ".queryForSimpleList(_sql, "
+                    + type.getGenericityClass().getName() + ".class" + argsBuilder.to() + ");";
+            } else {
+                return "return " + RepositoryCreateFactory.JDBC_TEMPLATE + ".queryForList(_sql, "
+                    + type.getGenericityClass().getName() + ".class " + argsBuilder.to() + ");";
+            }
+        } else {
+            argsBuilder.delete(type.getIndex());
+            return "return " + RepositoryCreateFactory.JDBC_TEMPLATE + ".queryForList(_sql,(java.lang.Class)$args["
+                + type.getIndex() + "]" + argsBuilder.to() + ");";
+        }
+    }
 
 }

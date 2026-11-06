@@ -1,13 +1,15 @@
 package net.risedata.register.discover;
 
-import net.risedata.register.service.IServiceInstance;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import net.risedata.register.service.IServiceInstance;
 
 /**
  * @Description : 管理服务
@@ -18,17 +20,15 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DiscoveryManager {
 
-
     private static final Map<String, List<ServiceInstance>> SERVICES = new ConcurrentHashMap<>();
     public static final Logger LOG = LoggerFactory.getLogger(DiscoveryManager.class);
-
 
     private static List<String> instanceNames = new ArrayList<>();
 
     /**
      * 注册一个实例进入到管理中心
      *
-     * @param name     实例名
+     * @param name 实例名
      * @param instance 实例数据
      */
     public synchronized static boolean register(String name, IServiceInstance instance) {
@@ -40,11 +40,15 @@ public class DiscoveryManager {
             instances = new ArrayList<>();
             SERVICES.put(name, instances);
         }
-        //更新时间做比较
+        // 更新时间做比较
         for (ServiceInstance serviceInstance : instances) {
             if (serviceInstance.getInstanceId().equals(instance.getInstanceId())) {
-                if (!((IServiceInstanceImpl) serviceInstance).getIServiceInstance().toString().equals(instance.toString()) && ((IServiceInstanceImpl) serviceInstance).getIServiceInstance().getUpdateTime() < instance.getUpdateTime()) {
-                    ((IServiceInstanceImpl) serviceInstance).setIServiceInstance(instance);
+                if (!((IServiceInstanceImpl)serviceInstance).getIServiceInstance()
+                    .toString()
+                    .equals(instance.toString())
+                    && ((IServiceInstanceImpl)serviceInstance).getIServiceInstance().getUpdateTime() < instance
+                        .getUpdateTime()) {
+                    ((IServiceInstanceImpl)serviceInstance).setIServiceInstance(instance);
                 }
                 return false;
             }
@@ -126,7 +130,7 @@ public class DiscoveryManager {
                             instanceNames.remove(name);
                             SERVICES.remove(name);
                         }
-                       return true;
+                        return true;
                     }
                 }
             }
@@ -137,7 +141,7 @@ public class DiscoveryManager {
     /**
      * 更新当前所有的服务
      *
-     * @param name              服务名
+     * @param name 服务名
      * @param iServiceInstances 实例
      */
     public synchronized static void update(String name, List<IServiceInstance> iServiceInstances) {
@@ -151,6 +155,5 @@ public class DiscoveryManager {
         }
         SERVICES.put(name, instances);
     }
-
 
 }

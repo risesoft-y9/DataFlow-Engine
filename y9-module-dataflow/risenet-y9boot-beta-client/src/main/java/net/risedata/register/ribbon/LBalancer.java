@@ -1,9 +1,8 @@
 package net.risedata.register.ribbon;
 
+import java.util.List;
 
 import org.springframework.cloud.client.ServiceInstance;
-
-import java.util.List;
 
 /**
  * @Description : 负载均衡算法器
@@ -15,6 +14,7 @@ import java.util.List;
 public interface LBalancer {
     /**
      * 选择一个实例
+     * 
      * @param services
      * @return
      */

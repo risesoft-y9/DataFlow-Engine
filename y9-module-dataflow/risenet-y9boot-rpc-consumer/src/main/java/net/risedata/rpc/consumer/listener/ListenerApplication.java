@@ -1,11 +1,11 @@
 package net.risedata.rpc.consumer.listener;
 
-import javassist.NotFoundException;
-import net.risedata.rpc.consumer.annotation.Listener;
-import net.risedata.rpc.consumer.annotation.Listeners;
-import net.risedata.rpc.consumer.exceptions.ListenerException;
-import net.risedata.rpc.utils.LParameter;
-import net.risedata.rpc.utils.MethodUtils;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
@@ -13,8 +13,13 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ClassUtils;
 
-import java.lang.reflect.Method;
-import java.util.*;
+import net.risedata.rpc.consumer.annotation.Listener;
+import net.risedata.rpc.consumer.annotation.Listeners;
+import net.risedata.rpc.consumer.exceptions.ListenerException;
+import net.risedata.rpc.utils.LParameter;
+import net.risedata.rpc.utils.MethodUtils;
+
+import javassist.NotFoundException;
 
 /**
  * 只需要获取监听的配置 method信息以及实例
@@ -27,7 +32,6 @@ import java.util.*;
  */
 public class ListenerApplication implements ApplicationListener<ContextRefreshedEvent> {
 
-
     public static final Map<String, List<ListenerModel>> LISTENER_MODELS = new HashMap<>();
     private boolean isInit = false;
     public static final List<ListenerBack> LISTENER_BACKS = new ArrayList<>();
@@ -35,15 +39,16 @@ public class ListenerApplication implements ApplicationListener<ContextRefreshed
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
-        if (event.getApplicationContext().getParent() == null || event.getApplicationContext().getParent().getParent() == null) {
+        if (event.getApplicationContext().getParent() == null
+            || event.getApplicationContext().getParent().getParent() == null) {
             if (isInit) {
                 return;
             }
-            isInit=true;
+            isInit = true;
             ApplicationContext application = event.getApplicationContext();
             String[] ListenerBeanNames = application.getBeanNamesForAnnotation(Listeners.class);
-            Map<String, ListenerBack>  listenerBackMap =   application.getBeansOfType(ListenerBack.class);
-            listenerBackMap.forEach((key,value)->{
+            Map<String, ListenerBack> listenerBackMap = application.getBeansOfType(ListenerBack.class);
+            listenerBackMap.forEach((key, value) -> {
                 LISTENER_BACKS.add(value);
             });
             Object o;
@@ -78,13 +83,12 @@ public class ListenerApplication implements ApplicationListener<ContextRefreshed
                         listeners.add(listenerModel);
                     }
 
-
                 }
             }
         }
     }
 
-    public static void close(){
+    public static void close() {
 
         LISTENER_MODELS.clear();
     }

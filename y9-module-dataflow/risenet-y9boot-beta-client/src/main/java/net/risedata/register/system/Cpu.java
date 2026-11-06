@@ -1,6 +1,5 @@
 package net.risedata.register.system;
 
-
 import cn.hutool.core.util.NumberUtil;
 
 /**
@@ -37,76 +36,57 @@ public class Cpu {
      */
     private double free;
 
-    public int getCpuNum()
-    {
+    public int getCpuNum() {
         return cpuNum;
     }
 
-    public void setCpuNum(int cpuNum)
-    {
+    public void setCpuNum(int cpuNum) {
         this.cpuNum = cpuNum;
     }
 
-    public double getTotal()
-    {
+    public double getTotal() {
         return (NumberUtil.round(NumberUtil.mul(total, 100), 2)).doubleValue();
     }
 
-    public void setTotal(double total)
-    {
+    public void setTotal(double total) {
         this.total = total;
     }
 
-    public double getSys()
-    {
+    public double getSys() {
         return (NumberUtil.round(NumberUtil.mul(sys / total, 100), 2)).doubleValue();
     }
 
-    public void setSys(double sys)
-    {
+    public void setSys(double sys) {
         this.sys = sys;
     }
 
-    public double getUsed()
-    {
+    public double getUsed() {
         return (NumberUtil.round(NumberUtil.mul(used / total, 100), 2).doubleValue());
     }
 
-    public void setUsed(double used)
-    {
+    public void setUsed(double used) {
         this.used = used;
     }
 
-    public double getWait()
-    {
+    public double getWait() {
         return (NumberUtil.round(NumberUtil.mul(wait / total, 100), 2)).doubleValue();
     }
 
-    public void setWait(double wait)
-    {
+    public void setWait(double wait) {
         this.wait = wait;
     }
 
-    public double getFree()
-    {
+    public double getFree() {
         return (NumberUtil.round(NumberUtil.mul(free / total, 100), 2)).doubleValue();
     }
 
-    public void setFree(double free)
-    {
+    public void setFree(double free) {
         this.free = free;
     }
 
-
     @Override
     public String toString() {
-        return "Cpu{" +
-                "cpuNum=" + cpuNum +
-                ", total=" + total +
-                ", sys=" + sys +
-                ", used=" + used +
-                ", wait=" + wait +
-                ", free=" + free +
-                '}';
+        return "Cpu{" + "cpuNum=" + cpuNum + ", total=" + total + ", sys=" + sys + ", used=" + used + ", wait=" + wait
+            + ", free=" + free + '}';
     }
 }

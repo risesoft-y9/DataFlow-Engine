@@ -1,10 +1,5 @@
 package net.risedata.rpc.utils;
 
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
-
 public class IdUtils {
     /**
      * 返回当前线程id 只适合同步操作
@@ -26,7 +21,7 @@ public class IdUtils {
         return id++;
     }
 
-    public static void refresh(){
+    public static void refresh() {
         id = 0;
     }
 

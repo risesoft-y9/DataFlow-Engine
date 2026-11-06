@@ -17,36 +17,36 @@ import net.risesoft.y9.Y9Context;
 @EnableAsync
 public class RiseAdminConfig {
 
-	@Bean
-	public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
-		MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-		List<MediaType> supportedMediaTypes = new ArrayList<MediaType>();
-		supportedMediaTypes.add(MediaType.parseMediaType("text/html;charset=UTF-8"));
-		// supportedMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);
-		converter.setSupportedMediaTypes(supportedMediaTypes);
-		return converter;
-	}
-	
-//	@SuppressWarnings({ "rawtypes", "unchecked" })
-//	@Bean
-//	public FilterRegistrationBean checkUserLoginFilter() {
-//		FilterRegistrationBean filterBean = new FilterRegistrationBean();
-//		filterBean.setFilter(new CheckUserLoginFilter());
-//		filterBean.setAsyncSupported(false);
-//		filterBean.setOrder(50);
-//		filterBean.addUrlPatterns("/api/*");
-//		return filterBean;
-//	}
-	
-	@Bean
-	@DependsOn("y9Context")
-	public EncryptConverter encryptConverter() {
-		return new EncryptConverter();
-	}
+    @Bean
+    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        List<MediaType> supportedMediaTypes = new ArrayList<MediaType>();
+        supportedMediaTypes.add(MediaType.parseMediaType("text/html;charset=UTF-8"));
+        // supportedMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);
+        converter.setSupportedMediaTypes(supportedMediaTypes);
+        return converter;
+    }
 
-	@Bean
-	public Y9Context y9Context() {
-		return new Y9Context();
-	}
-	
+    // @SuppressWarnings({ "rawtypes", "unchecked" })
+    // @Bean
+    // public FilterRegistrationBean checkUserLoginFilter() {
+    // FilterRegistrationBean filterBean = new FilterRegistrationBean();
+    // filterBean.setFilter(new CheckUserLoginFilter());
+    // filterBean.setAsyncSupported(false);
+    // filterBean.setOrder(50);
+    // filterBean.addUrlPatterns("/api/*");
+    // return filterBean;
+    // }
+
+    @Bean
+    @DependsOn("y9Context")
+    public EncryptConverter encryptConverter() {
+        return new EncryptConverter();
+    }
+
+    @Bean
+    public Y9Context y9Context() {
+        return new Y9Context();
+    }
+
 }

@@ -30,175 +30,175 @@ import reactor.core.publisher.Mono;
 @RestController()
 @RequestMapping("/api/rest/system/service")
 public class RegisterController extends BaseController {
-	
-	@Autowired
-	private IServiceService iServiceService;
 
-	/**
-	 * 修改状态
-	 * 
-	 * @param serviceId
-	 * @param id
-	 * @param status
-	 * @return
-	 */
-	@RequestMapping("/updateStatus/{id}/{status}")
-	public Y9Result<String> updateStatus(@PathVariable String id, @PathVariable int status) {
-		if(iServiceService.setStatus(id, status)) {
-			return Y9Result.successMsg("保存成功");
-		}
-		return Y9Result.failure("保存失败");
-	}
+    @Autowired
+    private IServiceService iServiceService;
 
-	/**
-	 * 重启
-	 * 
-	 * @param serviceId
-	 * @param id
-	 * @return
-	 */
-	@PostMapping("/reStart/{id}")
-	public Object reStart(@PathVariable String id) {
-		ClientConnection connection = ClientListener.getConnection(id);
-		if (connection != null) {
-			iServiceService.setStatus(id, IServiceInstance.AWAIT_STOP);
-			JSONArray json = connection.pushListener(ListenerConfigs.RE_START, new HashMap<>(), 10000).getResult()
-					.getValue();
-			System.out.println("重启返回值" + json);
-			if (json == null || json.size() == 0) {
-				return -1;
-			}
-			return json.getInteger(0);
-		}
-		return -1;
-	}
+    /**
+     * 修改状态
+     * 
+     * @param serviceId
+     * @param id
+     * @param status
+     * @return
+     */
+    @RequestMapping("/updateStatus/{id}/{status}")
+    public Y9Result<String> updateStatus(@PathVariable String id, @PathVariable int status) {
+        if (iServiceService.setStatus(id, status)) {
+            return Y9Result.successMsg("保存成功");
+        }
+        return Y9Result.failure("保存失败");
+    }
 
-	/**
-	 * 传入 instanceids 对指定的服务器执行事件请求 webflux
-	 *
-	 * @param instanceIds ids集合
-	 * @param operation   操作
-	 * @param argsJson    参数
-	 * @return
-	 */
-	@PostMapping("/sendOp")
-	public Mono<Object> sendOp(@RequestParam(required = true) String[] instanceIds,
-			@RequestParam(required = true) String operation, @RequestParam(required = true) String argsJson) {
+    /**
+     * 重启
+     * 
+     * @param serviceId
+     * @param id
+     * @return
+     */
+    @PostMapping("/reStart/{id}")
+    public Object reStart(@PathVariable String id) {
+        ClientConnection connection = ClientListener.getConnection(id);
+        if (connection != null) {
+            iServiceService.setStatus(id, IServiceInstance.AWAIT_STOP);
+            JSONArray json =
+                connection.pushListener(ListenerConfigs.RE_START, new HashMap<>(), 10000).getResult().getValue();
+            System.out.println("重启返回值" + json);
+            if (json == null || json.size() == 0) {
+                return -1;
+            }
+            return json.getInteger(0);
+        }
+        return -1;
+    }
 
-		return Mono.create((succ) -> {
-			ClientConnection clinetConnection;
-			Map<String, Object> args = JSONObject.parseObject(argsJson);
-			Map<String, Object> res = new HashMap<>();
-			AtomicInteger count = new AtomicInteger(instanceIds.length);
-			try {
-				for (String instanceId : instanceIds) {
-					clinetConnection = ClientListener.getConnection(instanceId);
-					if (clinetConnection == null) {
-						res.put(instanceId, -1);
-						if (count.decrementAndGet() == 0) {
-							res.put("status", 200);
-							succ.success(res);
-						}
-					} else {
-						clinetConnection.pushListener(operation, args, 10000).onSuccess((result) -> {
-							if (result.getValue() != null) {
-								res.put(instanceId, result.getValue().get(0));
-							} else {
-								res.put(instanceId, -1);
-							}
-							if (count.decrementAndGet() == 0) {
-								res.put("status", 200);
-								succ.success(res);
-							}
-						}).onError((request, e) -> {
+    /**
+     * 传入 instanceids 对指定的服务器执行事件请求 webflux
+     *
+     * @param instanceIds ids集合
+     * @param operation 操作
+     * @param argsJson 参数
+     * @return
+     */
+    @PostMapping("/sendOp")
+    public Mono<Object> sendOp(@RequestParam(required = true) String[] instanceIds,
+        @RequestParam(required = true) String operation, @RequestParam(required = true) String argsJson) {
 
-							e.printStackTrace();
-							res.put(instanceId, "error:" + e.getMessage());
-							if (count.decrementAndGet() == 0) {
-								res.put("status", 200);
-								succ.success(res);
-							}
-						});
-					}
-				}
-			} catch (Exception e) {
-				res.put("status", 500);
-				res.put("error", e.getMessage());
-				succ.success(res);
-			}
-		});
-	}
+        return Mono.create((succ) -> {
+            ClientConnection clinetConnection;
+            Map<String, Object> args = JSONObject.parseObject(argsJson);
+            Map<String, Object> res = new HashMap<>();
+            AtomicInteger count = new AtomicInteger(instanceIds.length);
+            try {
+                for (String instanceId : instanceIds) {
+                    clinetConnection = ClientListener.getConnection(instanceId);
+                    if (clinetConnection == null) {
+                        res.put(instanceId, -1);
+                        if (count.decrementAndGet() == 0) {
+                            res.put("status", 200);
+                            succ.success(res);
+                        }
+                    } else {
+                        clinetConnection.pushListener(operation, args, 10000).onSuccess((result) -> {
+                            if (result.getValue() != null) {
+                                res.put(instanceId, result.getValue().get(0));
+                            } else {
+                                res.put(instanceId, -1);
+                            }
+                            if (count.decrementAndGet() == 0) {
+                                res.put("status", 200);
+                                succ.success(res);
+                            }
+                        }).onError((request, e) -> {
 
-	/**
-	 * 获取监控
-	 * 
-	 * @return
-	 */
-	@RequestMapping("/getWatchs")
-	public Map<String, CheckStatusTask> getWatchs() {
-		return WatchManager.getWatchTask();
-	}
+                            e.printStackTrace();
+                            res.put(instanceId, "error:" + e.getMessage());
+                            if (count.decrementAndGet() == 0) {
+                                res.put("status", 200);
+                                succ.success(res);
+                            }
+                        });
+                    }
+                }
+            } catch (Exception e) {
+                res.put("status", 500);
+                res.put("error", e.getMessage());
+                succ.success(res);
+            }
+        });
+    }
 
-	/**
-	 * 根据id删除
-	 * 
-	 * @param id
-	 * @return
-	 */
-	@RequestMapping("remove")
-	public Y9Result<String> removeServer(String id) {
-		if(iServiceService.delById(id)) {
-			return Y9Result.successMsg("删除成功");
-		}
-		return Y9Result.failure("删除失败");
-	}
+    /**
+     * 获取监控
+     * 
+     * @return
+     */
+    @RequestMapping("/getWatchs")
+    public Map<String, CheckStatusTask> getWatchs() {
+        return WatchManager.getWatchTask();
+    }
 
-	// 发送事件执行操作
-	@RequestMapping("/execute/{operation}/{id}")
-	public Object execute(@PathVariable String operation, @PathVariable String id) {
-		ClientListener.pushListener(operation, new HashMap<>(), null, id, null);
-		return true;
-	}
+    /**
+     * 根据id删除
+     * 
+     * @param id
+     * @return
+     */
+    @RequestMapping("remove")
+    public Y9Result<String> removeServer(String id) {
+        if (iServiceService.delById(id)) {
+            return Y9Result.successMsg("删除成功");
+        }
+        return Y9Result.failure("删除失败");
+    }
 
-	/**
-	 * 获取所有服务
-	 * 
-	 * @param environment
-	 * @return
-	 */
-	@RequestMapping("/getServicesAll")
-	public Y9Result<List<IServiceInstanceModel>> getServicesAll(
-			@RequestParam(required = false, defaultValue = "Public") String environment, Integer status) {
-		return Y9Result.success(iServiceService.findAll(status, environment));
-	}
+    // 发送事件执行操作
+    @RequestMapping("/execute/{operation}/{id}")
+    public Object execute(@PathVariable String operation, @PathVariable String id) {
+        ClientListener.pushListener(operation, new HashMap<>(), null, id, null);
+        return true;
+    }
 
-	/**
-	 * 根据实例id获取所有可用的实例
-	 * 
-	 * @param name
-	 * @return
-	 */
-	@RequestMapping("/getServiceByName")
-	public Y9Result<List<IServiceInstanceModel>> getServiceByName(@RequestParam String name, 
-			@RequestParam(required = false, defaultValue = "Public") String environment) {
-		name = name.toUpperCase();
-		return Y9Result.success(iServiceService.getService(name, environment));
-	}
+    /**
+     * 获取所有服务
+     * 
+     * @param environment
+     * @return
+     */
+    @RequestMapping("/getServicesAll")
+    public Y9Result<List<IServiceInstanceModel>>
+        getServicesAll(@RequestParam(required = false, defaultValue = "Public") String environment, Integer status) {
+        return Y9Result.success(iServiceService.findAll(status, environment));
+    }
 
-	/**
-	 * 检查服务
-	 *
-	 * @param serviceInstance
-	 * @param secure
-	 * @return
-	 */
-	@PostMapping("/check")
-	public Y9Result<String> check(String id) {
-		IServiceInstanceModel model = iServiceService.findById(id);
-		if(CheckStatusTask.check(model)) {
-			return Y9Result.successMsg("节点正常");
-		}
-		return Y9Result.failure("节点异常");
-	}
+    /**
+     * 根据实例id获取所有可用的实例
+     * 
+     * @param name
+     * @return
+     */
+    @RequestMapping("/getServiceByName")
+    public Y9Result<List<IServiceInstanceModel>> getServiceByName(@RequestParam String name,
+        @RequestParam(required = false, defaultValue = "Public") String environment) {
+        name = name.toUpperCase();
+        return Y9Result.success(iServiceService.getService(name, environment));
+    }
+
+    /**
+     * 检查服务
+     *
+     * @param serviceInstance
+     * @param secure
+     * @return
+     */
+    @PostMapping("/check")
+    public Y9Result<String> check(String id) {
+        IServiceInstanceModel model = iServiceService.findById(id);
+        if (CheckStatusTask.check(model)) {
+            return Y9Result.successMsg("节点正常");
+        }
+        return Y9Result.failure("节点异常");
+    }
 
 }

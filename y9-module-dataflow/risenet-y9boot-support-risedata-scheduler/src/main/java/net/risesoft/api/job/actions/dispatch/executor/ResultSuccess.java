@@ -10,11 +10,10 @@ package net.risesoft.api.job.actions.dispatch.executor;
 public interface ResultSuccess {
     /**
      * 成功
+     * 
      * @param value
      * @return
      */
     void onSuccess(Object value);
-
-
 
 }

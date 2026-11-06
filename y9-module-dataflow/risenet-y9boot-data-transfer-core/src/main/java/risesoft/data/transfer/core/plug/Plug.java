@@ -11,11 +11,11 @@ import risesoft.data.transfer.core.handle.Handle;
  * @author lb
  */
 public interface Plug extends Handle {
-	/**
-	 * 是否注册
-	 * 
-	 * @param jobContext
-	 * @return
-	 */
-	boolean register(JobContext jobContext);
+    /**
+     * 是否注册
+     * 
+     * @param jobContext
+     * @return
+     */
+    boolean register(JobContext jobContext);
 }

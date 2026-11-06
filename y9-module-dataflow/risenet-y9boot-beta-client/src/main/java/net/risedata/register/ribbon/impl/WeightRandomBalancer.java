@@ -11,7 +11,7 @@ import java.util.Random;
  */
 public class WeightRandomBalancer extends AbstractWeightBalancer {
 
-	private static final Random random = new Random();
+    private static final Random random = new Random();
 
     int getIndex(int maxIndex) {
         return random.nextInt(maxIndex);

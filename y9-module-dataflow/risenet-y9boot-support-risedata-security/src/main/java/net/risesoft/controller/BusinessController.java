@@ -23,59 +23,65 @@ import net.risesoft.y9public.entity.DataBusinessEntity;
 @RequiredArgsConstructor
 public class BusinessController {
 
-	private final DataBusinessService dataBusinessService;
-	
-	/**
-	 * 分页获取业务分类
-	 * @param name
-	 * @param parentId
-	 * @param page
-	 * @param size
-	 * @return
-	 */
-	@GetMapping("/getAll")
-	public Y9Page<DataBusinessEntity> getAll(String name, String parentId, Integer page, Integer size) {
-		Page<DataBusinessEntity> pageList = dataBusinessService.findByNamePage(name, parentId, page, size);
-        return Y9Page.success(page, pageList.getTotalPages(), pageList.getTotalElements(), pageList.getContent(), "获取数据成功");
+    private final DataBusinessService dataBusinessService;
+
+    /**
+     * 分页获取业务分类
+     * 
+     * @param name
+     * @param parentId
+     * @param page
+     * @param size
+     * @return
+     */
+    @GetMapping("/getAll")
+    public Y9Page<DataBusinessEntity> getAll(String name, String parentId, Integer page, Integer size) {
+        Page<DataBusinessEntity> pageList = dataBusinessService.findByNamePage(name, parentId, page, size);
+        return Y9Page.success(page, pageList.getTotalPages(), pageList.getTotalElements(), pageList.getContent(),
+            "获取数据成功");
     }
-	
-	/**
-	 * 获取业务分类列表
-	 * @return
-	 */
-	@GetMapping("/findAll")
-	public Y9Result<List<DataBusinessEntity>> findAll() {
+
+    /**
+     * 获取业务分类列表
+     * 
+     * @return
+     */
+    @GetMapping("/findAll")
+    public Y9Result<List<DataBusinessEntity>> findAll() {
         return Y9Result.success(dataBusinessService.findAll(), "获取数据成功");
     }
-	
-	/**
-	 * 保存业务分类信息
-	 * @param entity
-	 * @return
-	 */
-	@PostMapping(value = "/saveData")
-	public Y9Result<String> saveData(DataBusinessDTO businessDTO) {
-		return dataBusinessService.saveData(businessDTO);
-	}
-	
-	/**
-	 * 根据id获取业务分类信息
-	 * @param id
-	 * @return
-	 */
-	@GetMapping(value = "/getDataById")
-	public Y9Result<DataBusinessEntity> getDataById(@RequestParam String id) {
-		return Y9Result.success(dataBusinessService.getById(id), "获取成功");
-	}
-	
-	/**
-	 * 删除业务分类数据
-	 * @param id
-	 * @return
-	 */
-	@PostMapping(value = "/deleteData")
-	public Y9Result<String> deleteData(@RequestParam String id) {
-		return dataBusinessService.deleteData(id);
-	}
-	
+
+    /**
+     * 保存业务分类信息
+     * 
+     * @param entity
+     * @return
+     */
+    @PostMapping(value = "/saveData")
+    public Y9Result<String> saveData(DataBusinessDTO businessDTO) {
+        return dataBusinessService.saveData(businessDTO);
+    }
+
+    /**
+     * 根据id获取业务分类信息
+     * 
+     * @param id
+     * @return
+     */
+    @GetMapping(value = "/getDataById")
+    public Y9Result<DataBusinessEntity> getDataById(@RequestParam String id) {
+        return Y9Result.success(dataBusinessService.getById(id), "获取成功");
+    }
+
+    /**
+     * 删除业务分类数据
+     * 
+     * @param id
+     * @return
+     */
+    @PostMapping(value = "/deleteData")
+    public Y9Result<String> deleteData(@RequestParam String id) {
+        return dataBusinessService.deleteData(id);
+    }
+
 }

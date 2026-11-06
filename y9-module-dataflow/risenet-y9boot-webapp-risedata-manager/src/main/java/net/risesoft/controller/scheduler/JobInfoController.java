@@ -20,27 +20,27 @@ import net.risesoft.pojo.Y9Result;
 @RequestMapping("/api/rest/job/info")
 public class JobInfoController extends BaseController {
 
-	@Autowired
-	JobInfoService jobInfoService;
+    @Autowired
+    JobInfoService jobInfoService;
 
-	/**
-	 * 根据id 获取任务信息
-	 *
-	 * @return
-	 */
-	@GetMapping("getCount")
-	public Y9Result<Object> getCount(String environment) {
-		return Y9Result.success(jobInfoService.getCount(environment));
-	}
+    /**
+     * 根据id 获取任务信息
+     *
+     * @return
+     */
+    @GetMapping("getCount")
+    public Y9Result<Object> getCount(String environment) {
+        return Y9Result.success(jobInfoService.getCount(environment));
+    }
 
-	/**
-	 * search
-	 *
-	 * @return
-	 */
-	@GetMapping("search")
-	public Y9Result<Object> search(String startTime, String endTime, String environment) {
-		return Y9Result.success(jobInfoService.getInfo(environment, startTime, endTime));
-	}
+    /**
+     * search
+     *
+     * @return
+     */
+    @GetMapping("search")
+    public Y9Result<Object> search(String startTime, String endTime, String environment) {
+        return Y9Result.success(jobInfoService.getInfo(environment, startTime, endTime));
+    }
 
 }

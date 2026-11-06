@@ -12,64 +12,65 @@ import net.risesoft.security.model.DataUser;
  * @Version 1.0
  */
 public interface TokenService {
-	/**
-	 * 根据 user 创建token
-	 *
-	 * @param userModel
-	 * @return
-	 */
-	String createToken(DataUser userModel);
+    /**
+     * 根据 user 创建token
+     *
+     * @param userModel
+     * @return
+     */
+    String createToken(DataUser userModel);
 
-	/**
-	 * 根据token 获取用户
-	 *
-	 * @param token tokenid
-	 * @return
-	 */
-	DataUser getUserByToken(String token);
+    /**
+     * 根据token 获取用户
+     *
+     * @param token tokenid
+     * @return
+     */
+    DataUser getUserByToken(String token);
 
-	/**
-	 * 续订
-	 *
-	 * @param token token
-	 * @param time  最新时间
-	 * @return
-	 */
-	boolean renew(String token, long time);
+    /**
+     * 续订
+     *
+     * @param token token
+     * @param time 最新时间
+     * @return
+     */
+    boolean renew(String token, long time);
 
-	/**
-	 * @param token token
-	 * @param time  过期时间
-	 * @return
-	 */
-	boolean deleteToken(String token, long time);
+    /**
+     * @param token token
+     * @param time 过期时间
+     * @return
+     */
+    boolean deleteToken(String token, long time);
 
-	/**
-	 * 拿到最新的过期时间
-	 * 
-	 * @return
-	 */
-	long getFailureTime();
+    /**
+     * 拿到最新的过期时间
+     * 
+     * @return
+     */
+    long getFailureTime();
 
-	/**
-	 * 删除一个token
-	 * 
-	 * @param token
-	 * @return
-	 */
-	boolean removeToken(String token);
+    /**
+     * 删除一个token
+     * 
+     * @param token
+     * @return
+     */
+    boolean removeToken(String token);
 
-	/**
-	 * 获取失效的token
-	 * 
-	 * @return
-	 */
-	List<String> getFailureToken();
-	
-	/**
-	 * 用外部登录方式
-	 * @param loginName
-	 * @return
-	 */
-	DataUser login(String loginName);
+    /**
+     * 获取失效的token
+     * 
+     * @return
+     */
+    List<String> getFailureToken();
+
+    /**
+     * 用外部登录方式
+     * 
+     * @param loginName
+     * @return
+     */
+    DataUser login(String loginName);
 }

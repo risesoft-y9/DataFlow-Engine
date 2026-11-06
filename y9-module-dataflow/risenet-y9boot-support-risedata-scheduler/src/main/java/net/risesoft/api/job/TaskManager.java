@@ -1,5 +1,16 @@
 package net.risesoft.api.job;
 
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
 import net.risedata.register.service.IServiceInstanceFactory;
 import net.risedata.rpc.consumer.annotation.Listener;
 import net.risedata.rpc.consumer.annotation.Listeners;
@@ -10,13 +21,6 @@ import net.risesoft.api.persistence.job.JobLogService;
 import net.risesoft.api.persistence.job.JobService;
 import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Description : 任务管理器
@@ -53,17 +57,16 @@ public class TaskManager {
         return jobLogService.isBlock(job.getId(), job.getTimeOut(), logId);
     }
 
-
     /**
      * 添加到待执行的任务管理器
      *
-     * @param job    任务
+     * @param job 任务
      * @param jobLog 任务日志
      */
     public synchronized void pushTask(Job job, JobLog jobLog) {
 
         jobLogService.updateStatus(jobLog.getId(), JobLog.AWAIT, jobLog.getStatus());
-        if (!isBlock(job, jobLog.getId())) {//当没有阻塞的时候
+        if (!isBlock(job, jobLog.getId())) {// 当没有阻塞的时候
             pollJob(job, job.getId());
         }
 
@@ -74,10 +77,13 @@ public class TaskManager {
      */
     @Scheduled(fixedDelayString = "${beta.job.refreshTime:30000}", initialDelayString = "${beta.job.refreshTime:30000}")
     public void onRefresh() {
-        //获取需要监控的任务
-        List<Job> jobs = jobService.findWatch(iServiceInstanceFactory.getIsntance().getInstanceId(), iServiceInstanceFactory.getIsntance().getEnvironment(), iServiceInstanceFactory.getIsntance().getServiceId());
+        // 获取需要监控的任务
+        List<Job> jobs = jobService.findWatch(iServiceInstanceFactory.getIsntance().getInstanceId(),
+            iServiceInstanceFactory.getIsntance().getEnvironment(),
+            iServiceInstanceFactory.getIsntance().getServiceId());
         for (Job job : jobs) {
-            if (jobService.updateWatch(job.getId(), iServiceInstanceFactory.getIsntance().getInstanceId(), job.getDispatchServer())) {
+            if (jobService.updateWatch(job.getId(), iServiceInstanceFactory.getIsntance().getInstanceId(),
+                job.getDispatchServer())) {
                 addTask(job);
             }
         }
@@ -88,13 +94,12 @@ public class TaskManager {
     /**
      * 清理30天前的数据
      */
-    //@Scheduled(cron = "0 0 0 * * ?")
+    // @Scheduled(cron = "0 0 0 * * ?")
     public void clearLog() {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MONDAY, -1);
         jobLogService.clearLog(calendar.getTime());
     }
-
 
     @Autowired
     private JobChangeService jobChangeService;
@@ -133,7 +138,7 @@ public class TaskManager {
             refreshChangeJob();
             jobService.updateNoWatch(ids);
         }
-        List<Job> misss = jobService.findMiss(iServiceInstanceFactory.getIsntance().getInstanceId(),ids,JOB_TASK);
+        List<Job> misss = jobService.findMiss(iServiceInstanceFactory.getIsntance().getInstanceId(), ids, JOB_TASK);
         for (Job job : misss) {
             addTask(job);
         }
@@ -188,7 +193,7 @@ public class TaskManager {
         try {
             scheduledRegister.addTriggerTask(jobTask, jobTask);
         } catch (Exception e) {
-            //任务定时报错修改状态并且抛出异常
+            // 任务定时报错修改状态并且抛出异常
             e.printStackTrace();
             Application.logger.error("任务添加失败已停止任务任务信息: " + job);
             jobService.setStatus(job.getId(), 0);
@@ -213,11 +218,9 @@ public class TaskManager {
             }
         }
 
-
     }
 
     public static final String ON_JOB_CHANGE = "ON_JOB_CHANGE";
-
 
     /**
      * 发送改变事件
@@ -228,8 +231,8 @@ public class TaskManager {
         HashMap<String, Object> map = new HashMap<>();
         map.put("id", id);
         onChangeJob(id);
-        ClientListener.pushListener(ON_JOB_CHANGE, map,
-                iServiceInstanceFactory.getIsntance().getServiceId(), null, null);
+        ClientListener.pushListener(ON_JOB_CHANGE, map, iServiceInstanceFactory.getIsntance().getServiceId(), null,
+            null);
     }
 
     /**

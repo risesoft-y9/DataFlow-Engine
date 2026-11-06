@@ -11,22 +11,22 @@ import risesoft.data.transfer.core.statistics.State;
  * @date 2024年12月31日
  * @author lb
  */
-public class JobSuccessEndExecutorSql extends JobEndExecutorSql implements Plug{
+public class JobSuccessEndExecutorSql extends JobEndExecutorSql implements Plug {
 
-	public JobSuccessEndExecutorSql(ExecutorConfig config, JobContext jobContext) {
-		super(config, jobContext);
-	}
+    public JobSuccessEndExecutorSql(ExecutorConfig config, JobContext jobContext) {
+        super(config, jobContext);
+    }
 
-	@Override
-	public void onJobEnd(JobContext jobContext) {
-		if (jobContext.getCommunication().getState()==State.SUCCEEDED) {
-			super.onJobEnd(jobContext);
-		}
-	}
+    @Override
+    public void onJobEnd(JobContext jobContext) {
+        if (jobContext.getCommunication().getState() == State.SUCCEEDED) {
+            super.onJobEnd(jobContext);
+        }
+    }
 
-	@Override
-	public boolean register(JobContext jobContext) {
-		return true;
-	}
+    @Override
+    public boolean register(JobContext jobContext) {
+        return true;
+    }
 
 }

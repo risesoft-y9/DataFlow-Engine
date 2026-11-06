@@ -1,6 +1,6 @@
 package net.risesoft.api.persistence.model.log;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,7 +9,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Comment;
 
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * @Description : 匹配分析
@@ -55,7 +55,6 @@ public class MatchAnalyseModel implements Serializable {
     @Comment(value = "类型")
     @Column(name = "MATCH_TYPE", length = 40)
     private String type;
-
 
     public String getId() {
         return id;

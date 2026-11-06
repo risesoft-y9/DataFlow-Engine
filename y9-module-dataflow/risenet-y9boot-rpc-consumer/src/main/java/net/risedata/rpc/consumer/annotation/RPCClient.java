@@ -1,10 +1,14 @@
 package net.risedata.rpc.consumer.annotation;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 import org.springframework.stereotype.Indexed;
 
 import net.risedata.rpc.consumer.listener.ExceptionListener;
-
-import java.lang.annotation.*;
 
 /**
  * @description: 客户端api注解
@@ -17,9 +21,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 public @interface RPCClient {
     /**
-     * 配置提供此服务的服务端ip 端口
-     * 注意: 可以是纯ip 端口的 则为 rpc:127.0.0.1:8888
-     * 可以是SpringCloud整合的则为 cloud:service-name
+     * 配置提供此服务的服务端ip 端口 注意: 可以是纯ip 端口的 则为 rpc:127.0.0.1:8888 可以是SpringCloud整合的则为 cloud:service-name
      *
      * @return 连接的url
      */
@@ -33,24 +35,19 @@ public @interface RPCClient {
     String name() default "";
 
     /**
-     * 超时时间 当 为 负数的时候则 不会使用此超时时间
-     * 如果不需要超时时间 则设置为 0
+     * 超时时间 当 为 负数的时候则 不会使用此超时时间 如果不需要超时时间 则设置为 0
      */
     int timeOut() default -1;
 
     /**
-     * 出现异常 所调用的 异常处理类
-     * 注意: 在没有增加超时熔断的时候
-     * 超时也会调用 这个异常如果不想处理超时的异常可以进行判断
+     * 出现异常 所调用的 异常处理类 注意: 在没有增加超时熔断的时候 超时也会调用 这个异常如果不想处理超时的异常可以进行判断
      *
      * @return 异常的类
      */
     Class<? extends ExceptionListener> exceptionHandle() default ExceptionListener.class;
 
     /**
-     * 降级机制 必须是实现了此api 的接口的类当然也可以是接口
-     * 接口必须在spring 中有实现类
-     * 如果是类  请不要在类的头上增加 spring 的扫描注解
+     * 降级机制 必须是实现了此api 的接口的类当然也可以是接口 接口必须在spring 中有实现类 如果是类 请不要在类的头上增加 spring 的扫描注解
      *
      * @return 熔断类
      */
@@ -62,7 +59,5 @@ public @interface RPCClient {
      * @return 连接管理器名字
      */
     String managerName() default "";
-
-
 
 }

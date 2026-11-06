@@ -1,15 +1,18 @@
 package net.risesoft.api.job.creator.impl;
 
-import cn.hutool.core.util.ArrayUtil;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
 import com.alibaba.fastjson.JSONArray;
+
 import net.risesoft.api.exceptions.JobException;
 import net.risesoft.api.job.JobContext;
 import net.risesoft.api.job.actions.dispatch.method.DispatchActionManager;
 import net.risesoft.api.job.creator.CreatorMethod;
-import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import cn.hutool.core.util.ArrayUtil;
 
 /**
  * @Description : 对于args #{args:true/false} 当为true的时候为分割
@@ -28,10 +31,10 @@ public class DispatchArgsCreator implements CreatorMethod {
             Object value = context.getArgs().get(DispatchActionManager.DISPATCH_ARGS);
             if (value instanceof JSONArray) {
 
-                int index = (Integer) context.getRequiredValue("index");
-                JSONArray arrays = ((JSONArray) value);
+                int index = (Integer)context.getRequiredValue("index");
+                JSONArray arrays = ((JSONArray)value);
                 List<Object> res = new ArrayList<>();
-                int maxSize = (Integer) context.getArgs().get(DispatchActionManager.INSTANCE_SIZE);
+                int maxSize = (Integer)context.getArgs().get(DispatchActionManager.INSTANCE_SIZE);
 
                 while (arrays.size() > index) {
                     res.add(arrays.get(index));

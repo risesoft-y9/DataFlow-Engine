@@ -1,14 +1,14 @@
 package net.risesoft.api.job;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
+
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
 
 /**
  * @Description : 定时任务注册管理器
@@ -28,12 +28,13 @@ public class ScheduledRegister implements DisposableBean {
 
     /**
      * 添加一个任务
+     * 
      * @param task 任务
      * @param trigger 执行时间器
      */
     public void addTriggerTask(Runnable task, Trigger trigger) {
         ScheduledFuture<?> future = taskScheduler.schedule(task, trigger);
-        futureMap.put(task,future);
+        futureMap.put(task, future);
 
     }
 
@@ -51,8 +52,6 @@ public class ScheduledRegister implements DisposableBean {
         }
         return false;
     }
-
-
 
     @Override
     public void destroy() throws Exception {

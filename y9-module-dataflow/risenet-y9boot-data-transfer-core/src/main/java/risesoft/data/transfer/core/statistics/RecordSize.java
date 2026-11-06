@@ -1,16 +1,16 @@
 package risesoft.data.transfer.core.statistics;
 
 public class RecordSize {
-	int record;
+    int record;
 
-	long size;
+    long size;
 
-	public int getRecord() {
-		return record;
-	}
+    public int getRecord() {
+        return record;
+    }
 
-	public long getSize() {
-		return size;
-	}
+    public long getSize() {
+        return size;
+    }
 
 }

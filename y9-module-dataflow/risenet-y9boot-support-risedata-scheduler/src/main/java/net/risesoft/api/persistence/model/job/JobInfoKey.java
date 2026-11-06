@@ -1,14 +1,15 @@
 package net.risesoft.api.persistence.model.job;
 
-import javax.persistence.*;
-
-import org.hibernate.annotations.Comment;
-
 import java.io.Serializable;
 import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+
+import org.hibernate.annotations.Comment;
+
 /**
- * @Description :  日志信息
+ * @Description : 日志信息
  * @ClassName JobInfo
  * @Author lb
  * @Date 2022/9/14 11:47
@@ -23,7 +24,6 @@ public class JobInfoKey implements Serializable {
     @Comment(value = "时间")
     @Column(name = "INFO_DATE", length = 100)
     private String date;
-
 
     /**
      * 所属环境
@@ -51,11 +51,12 @@ public class JobInfoKey implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        JobInfoKey that = (JobInfoKey) o;
-        return Objects.equals(date, that.date) &&
-                Objects.equals(environment, that.environment);
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        JobInfoKey that = (JobInfoKey)o;
+        return Objects.equals(date, that.date) && Objects.equals(environment, that.environment);
     }
 
     @Override

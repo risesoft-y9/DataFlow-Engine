@@ -1,11 +1,11 @@
 package net.risedata.register.rpc;
 
+import java.util.List;
+
 import net.risedata.register.service.IServiceInstance;
 import net.risedata.rpc.consumer.annotation.API;
 import net.risedata.rpc.consumer.annotation.RPCClient;
 import net.risedata.rpc.consumer.result.SyncResult;
-
-import java.util.List;
 
 /**
  * @Description : 服务注册调用Rpc的api
@@ -19,7 +19,6 @@ public interface RegisterAPI {
 
     public static final String MANAGER_NAME = "register_rpc_manager";
 
-
     /**
      * 拿到当前的所有服务信息
      *
@@ -28,7 +27,6 @@ public interface RegisterAPI {
     @API
     Object getServiceName();
 
-
     /**
      * 根据名字获取实例
      *
@@ -36,7 +34,6 @@ public interface RegisterAPI {
      */
     @API
     List<IServiceInstance> getServiceByName(String name);
-
 
     /**
      * 获取所有实例
@@ -58,13 +55,12 @@ public interface RegisterAPI {
     /**
      * 删除一个服务
      *
-     * @param name       服务名
+     * @param name 服务名
      * @param instanceId 实例id
      * @return
      */
     @API
     boolean remove(String name, String instanceId);
-
 
     /**
      * 刷新时间

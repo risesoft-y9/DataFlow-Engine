@@ -7,9 +7,9 @@ package net.risesoft.api.exceptions;
  * @Date 2022/8/4 17:07
  * @Version 1.0
  */
-public class RegisterException extends  RuntimeException {
+public class RegisterException extends RuntimeException {
 
-    public RegisterException(String msg){
+    public RegisterException(String msg) {
         super(msg);
     }
 }

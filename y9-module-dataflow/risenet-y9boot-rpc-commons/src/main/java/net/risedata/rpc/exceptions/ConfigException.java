@@ -6,5 +6,4 @@ public class ConfigException extends RuntimeException {
         super(msg);
     }
 
-
 }

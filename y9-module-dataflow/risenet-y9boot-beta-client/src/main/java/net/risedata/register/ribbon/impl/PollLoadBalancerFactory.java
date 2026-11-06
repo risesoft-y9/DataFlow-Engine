@@ -7,8 +7,7 @@ import net.risedata.register.ribbon.LBalancer;
  */
 public class PollLoadBalancerFactory extends AbstractLoadBalancerFactory {
 
-    public PollLoadBalancerFactory() {
-    }
+    public PollLoadBalancerFactory() {}
 
     @Override
     LBalancer createInstance(String name) {

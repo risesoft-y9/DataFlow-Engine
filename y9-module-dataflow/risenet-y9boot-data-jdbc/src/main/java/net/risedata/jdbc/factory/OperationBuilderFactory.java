@@ -10,16 +10,15 @@ import net.risedata.jdbc.operation.Operation;
  */
 public class OperationBuilderFactory {
 
-	
-	public static OperationBuilder getInstance() {
-		return new OperationBuilder();
-	}
-	
-	public static OperationBuilder builder(String key,Operation value) {
-		return new OperationBuilder().builder(key, value);
-	}
-	
-	public static OperationBuilder builder(String key,Operation value,String key2,Operation value2) {
-		return new OperationBuilder().builder(key, value).builder(key2, value2);
-	}
+    public static OperationBuilder getInstance() {
+        return new OperationBuilder();
+    }
+
+    public static OperationBuilder builder(String key, Operation value) {
+        return new OperationBuilder().builder(key, value);
+    }
+
+    public static OperationBuilder builder(String key, Operation value, String key2, Operation value2) {
+        return new OperationBuilder().builder(key, value).builder(key2, value2);
+    }
 }

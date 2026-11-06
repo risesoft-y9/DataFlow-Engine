@@ -1,8 +1,8 @@
 package risesoft.data.transfer.core.exception;
 
-
 /**
  * 管理异常
+ * 
  * @typeName CommonErrorCode
  * @date 2023年12月4日
  * @author lb
@@ -30,16 +30,15 @@ public enum CommonErrorCode implements ErrorCode {
 
     @Override
     public String toString() {
-        return String.format("Code:[%s], Describe:[%s]", this.code,
-                this.describe);
+        return String.format("Code:[%s], Describe:[%s]", this.code, this.describe);
     }
 
-	public String getCode() {
-		return this.code;
-	}
+    public String getCode() {
+        return this.code;
+    }
 
-	public String getDescription() {
-		return this.describe;
-	}
+    public String getDescription() {
+        return this.describe;
+    }
 
 }

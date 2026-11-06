@@ -1,21 +1,19 @@
 package net.risesoft.api.job.creator.impl;
 
+import java.util.Map;
 
-import cn.hutool.http.HttpUtil;
+import org.springframework.stereotype.Component;
+
 import com.alibaba.fastjson.JSON;
 
-import net.risedata.jdbc.commons.utils.DateUtils;
 import net.risesoft.api.exceptions.JobException;
 import net.risesoft.api.job.JobContext;
 import net.risesoft.api.job.creator.CreatorMethod;
 
-import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.Map;
+import cn.hutool.http.HttpUtil;
 
 /**
- * @Description :http 请求 args[0]  采取的方法为post 请求args[1] 为 参数
+ * @Description :http 请求 args[0] 采取的方法为post 请求args[1] 为 参数
  * @ClassName HttpCreator
  * @Author lb
  * @Date 2022/10/17 9:20
@@ -23,7 +21,6 @@ import java.util.Map;
  */
 @Component("http")
 public class HttpCreator implements CreatorMethod {
-
 
     @Override
     public String create(JobContext context, String[] args) {
@@ -37,6 +34,5 @@ public class HttpCreator implements CreatorMethod {
         }
         return HttpUtil.post(url, body, 60000);
     }
-
 
 }

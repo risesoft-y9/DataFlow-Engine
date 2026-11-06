@@ -1,11 +1,11 @@
 package net.risedata.register.rpc;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import net.risedata.register.container.ContainerManager;
 import net.risedata.register.model.Const;
 import net.risedata.rpc.consumer.annotation.Listener;
 import net.risedata.rpc.consumer.annotation.Listeners;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @Description : 监控一些系统操作

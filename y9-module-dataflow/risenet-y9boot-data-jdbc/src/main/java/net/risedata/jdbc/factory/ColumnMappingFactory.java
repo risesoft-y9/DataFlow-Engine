@@ -13,13 +13,13 @@ import net.risedata.jdbc.mapping.ColumnMapping;
  *
  */
 public class ColumnMappingFactory {
-	public static ColumnMapping getInstance(BeanConfig bc,Field field) {
-		ColMapping colMapping = field.getAnnotation(ColMapping.class);
-		if (colMapping != null) {
-           Class<? extends ColumnMapping> mappingClass = colMapping.value();
-           ColumnMapping columnMapping =  InstanceFactoryManager.getInstance(mappingClass);
-           return columnMapping.create(bc, field, colMapping.args());
-		}
-		return null;
-	}
+    public static ColumnMapping getInstance(BeanConfig bc, Field field) {
+        ColMapping colMapping = field.getAnnotation(ColMapping.class);
+        if (colMapping != null) {
+            Class<? extends ColumnMapping> mappingClass = colMapping.value();
+            ColumnMapping columnMapping = InstanceFactoryManager.getInstance(mappingClass);
+            return columnMapping.create(bc, field, colMapping.args());
+        }
+        return null;
+    }
 }

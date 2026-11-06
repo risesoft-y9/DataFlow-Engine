@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @Version 1.0
  */
 public class IServiceInstanceFactory {
-	
+
     @Autowired
     RegisterDiscoveryProperties properties;
 
@@ -39,7 +39,8 @@ public class IServiceInstanceFactory {
                     iServiceInstance.setEnvironment(environment == null ? "Public" : environment);
                     iServiceInstance.setExpiresTime(properties.getHeartBeatTimeout());
                     iServiceInstance.setWeight(properties.getWeight());
-                    iServiceInstance.setInstanceId(iServiceInstance.getServiceId() + ":" + iServiceInstance.getHost() + ":" + iServiceInstance.getPort());
+                    iServiceInstance.setInstanceId(iServiceInstance.getServiceId() + ":" + iServiceInstance.getHost()
+                        + ":" + iServiceInstance.getPort());
                 }
             }
         }

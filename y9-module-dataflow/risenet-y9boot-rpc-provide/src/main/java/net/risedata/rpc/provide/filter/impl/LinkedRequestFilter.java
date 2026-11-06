@@ -1,14 +1,13 @@
 package net.risedata.rpc.provide.filter.impl;
 
-import net.risedata.rpc.model.Request;
+import java.util.List;
+
 import net.risedata.rpc.model.Response;
 import net.risedata.rpc.provide.context.RPCRequestContext;
 import net.risedata.rpc.provide.context.Send;
 import net.risedata.rpc.provide.filter.Filter;
 import net.risedata.rpc.provide.filter.FilterContext;
 import net.risedata.rpc.provide.filter.FilterNode;
-
-import java.util.List;
 
 /**
  * @Description : 用来连接 requestFilter里面的过滤器
@@ -18,8 +17,6 @@ import java.util.List;
  * @Version 1.0
  */
 public class LinkedRequestFilter extends DefaultFilterNode implements Filter {
-
-
 
     public LinkedRequestFilter(List<FilterNode> filters) {
         super(filters, null);
@@ -35,16 +32,13 @@ public class LinkedRequestFilter extends DefaultFilterNode implements Filter {
         }
     }
 
-
-
-
-
     @Override
-    public void doAfter(Response response, RPCRequestContext context, FilterContext filterContext, Send send) throws Exception{
+    public void doAfter(Response response, RPCRequestContext context, FilterContext filterContext, Send send)
+        throws Exception {
         if (context.getFilterApplication() != null) {
-            context.getFilterApplication().doAfter(response,context,send);
+            context.getFilterApplication().doAfter(response, context, send);
         } else {
-            filterContext.doAfter(response,context,send);
+            filterContext.doAfter(response, context, send);
         }
     }
 
@@ -52,6 +46,5 @@ public class LinkedRequestFilter extends DefaultFilterNode implements Filter {
     public int getOrder() {
         return 0;
     }
-
 
 }

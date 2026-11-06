@@ -13,17 +13,17 @@ import net.risesoft.api.persistence.model.job.JobInfo;
  */
 public interface JobInfoService {
 
-    //拿到总调度次数
+    // 拿到总调度次数
     Long getCount(String environment);
 
     /**
      * 获取info
+     * 
      * @param startTime
      * @param endTime
      * @return
      */
-    List<JobInfo> getInfo(String environment,String startTime,String endTime);
-
+    List<JobInfo> getInfo(String environment, String startTime, String endTime);
 
     void addSuccess(String environment);
 

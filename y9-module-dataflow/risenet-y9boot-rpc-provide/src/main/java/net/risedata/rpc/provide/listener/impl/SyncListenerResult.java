@@ -1,17 +1,21 @@
 package net.risedata.rpc.provide.listener.impl;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import net.risedata.rpc.provide.exceptions.JsonException;
 import net.risedata.rpc.provide.exceptions.ListenerException;
-import net.risedata.rpc.provide.listener.*;
+import net.risedata.rpc.provide.listener.ListenerError;
+import net.risedata.rpc.provide.listener.Result;
+import net.risedata.rpc.provide.listener.Success;
+import net.risedata.rpc.provide.listener.SyncParseResult;
+import net.risedata.rpc.provide.listener.SyncResult;
 import net.risedata.rpc.provide.model.ListenerRequest;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @description: 默认操作的异步操作实现类
@@ -45,7 +49,7 @@ public class SyncListenerResult implements SyncParseResult, Result {
         this.request = request;
     }
 
-    //类型处理以及result 处理
+    // 类型处理以及result 处理
     @Override
     public void success(String res) {
         this.res = res;
@@ -56,12 +60,11 @@ public class SyncListenerResult implements SyncParseResult, Result {
 
     @Override
     public void error(Throwable e) {
-        this.exception = (RuntimeException) e;
+        this.exception = (RuntimeException)e;
         if (this.eror != null) {
             this.eror.error(request, e);
         }
     }
-
 
     @Override
     public Result getResult() {
@@ -77,7 +80,7 @@ public class SyncListenerResult implements SyncParseResult, Result {
                 thread.notify();
             }
         }).onError((error, e) -> {
-            exception = (RuntimeException) e;
+            exception = (RuntimeException)e;
             synchronized (thread) {
                 thread.notify();
             }
@@ -115,21 +118,20 @@ public class SyncListenerResult implements SyncParseResult, Result {
     public SyncResult onError(ListenerError error) {
         this.eror = error;
         if (exception != null) {
-            error((Throwable) exception);
+            error((Throwable)exception);
         }
         return this;
     }
 
     @Override
     public JSONArray getValue() {
-       try {
-           return JSON.parseArray(res);
-       }catch (Exception e){
-           throw  new JsonException(e.getMessage()+" res="+res);
-       }
+        try {
+            return JSON.parseArray(res);
+        } catch (Exception e) {
+            throw new JsonException(e.getMessage() + " res=" + res);
+        }
 
     }
-
 
     public Object toMap() {
         if (JSON.isValidArray(res)) {
@@ -155,16 +157,14 @@ public class SyncListenerResult implements SyncParseResult, Result {
             return map;
         }
 
-
     }
-
 
     private Object getObject(Object v) {
         if (v == null) {
             return null;
         }
         if (isJson(v.getClass())) {
-            Map<String, Object> data = ((JSONObject) v).getInnerMap();
+            Map<String, Object> data = ((JSONObject)v).getInnerMap();
             data.forEach((k, v2) -> {
                 Object v3 = getObject(v2);
                 if (v3 != null && v3 != v2) {
@@ -174,7 +174,7 @@ public class SyncListenerResult implements SyncParseResult, Result {
             return data;
         }
         if (isJsonArray(v.getClass())) {
-            List<Object> list = Arrays.asList(((JSONArray) v).toArray());
+            List<Object> list = Arrays.asList(((JSONArray)v).toArray());
             Object temp = null;
             Object temp2 = null;
             for (int i = 0; i < list.size(); i++) {
@@ -196,7 +196,6 @@ public class SyncListenerResult implements SyncParseResult, Result {
         }
         return v;
     }
-
 
     private boolean isJson(Class<?> type) {
         return JSONObject.class == type;

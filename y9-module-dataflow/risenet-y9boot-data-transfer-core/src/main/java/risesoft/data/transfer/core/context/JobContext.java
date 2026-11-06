@@ -12,7 +12,6 @@ import risesoft.data.transfer.core.factory.FactoryManager;
 import risesoft.data.transfer.core.handle.DoHandle;
 import risesoft.data.transfer.core.handle.HandleManager;
 import risesoft.data.transfer.core.job.Job;
-import risesoft.data.transfer.core.job.JobEngine;
 import risesoft.data.transfer.core.listener.JobListener;
 import risesoft.data.transfer.core.log.Logger;
 import risesoft.data.transfer.core.log.LoggerFactory;
@@ -28,333 +27,330 @@ import risesoft.data.transfer.core.util.Configuration;
  * @author lb
  */
 public class JobContext {
-	/**
-	 * 统计信息
-	 */
-	private Communication communication;
-	/**
-	 * 任务id
-	 */
-	private String jobId;
+    /**
+     * 统计信息
+     */
+    private Communication communication;
+    /**
+     * 任务id
+     */
+    private String jobId;
 
-	/**
-	 * 需要执行的handle
-	 */
-	private HandleManager handles;
-	/**
-	 * 输入流
-	 */
-	private StreamContext streamContext;
-	/**
-	 * 存放着当前实例
-	 */
-	private Map<Class<?>, Object> instanceMap;
+    /**
+     * 需要执行的handle
+     */
+    private HandleManager handles;
+    /**
+     * 输入流
+     */
+    private StreamContext streamContext;
+    /**
+     * 存放着当前实例
+     */
+    private Map<Class<?>, Object> instanceMap;
 
-	/**
-	 * 全局核心交换机
-	 */
-	private Exchange coreExchange;
-	/**
-	 * 任务集合
-	 */
-	private List<Job> jobs;
+    /**
+     * 全局核心交换机
+     */
+    private Exchange coreExchange;
+    /**
+     * 任务集合
+     */
+    private List<Job> jobs;
 
-	/**
-	 * 当前执行的任务
-	 */
-	private int concurrentJob = 0;
+    /**
+     * 当前执行的任务
+     */
+    private int concurrentJob = 0;
 
-	/**
-	 * 输入执行器
-	 */
-	private ExecutorTaskQueue inExecutorTaskQueue;
-	/**
-	 * 输入通道配置
-	 */
-	private Configuration inChannelConfiguration;
+    /**
+     * 输入执行器
+     */
+    private ExecutorTaskQueue inExecutorTaskQueue;
+    /**
+     * 输入通道配置
+     */
+    private Configuration inChannelConfiguration;
 
-	/**
-	 * 输出执行器
-	 */
-	private ExecutorTaskQueue outExecutorTaskQueue;
-	/**
-	 * 任务监听
-	 */
-	private JobListener jobListener;
-	/**
-	 * 是否结束
-	 */
-	private boolean isEnd;
-	/**
-	 * 日志接口
-	 */
-	private LoggerFactory loggerFactory;
-	/**
-	 * 默认日志
-	 */
-	private Logger logger;
-	/**
-	 * 任务名
-	 */
-	private String name;
+    /**
+     * 输出执行器
+     */
+    private ExecutorTaskQueue outExecutorTaskQueue;
+    /**
+     * 任务监听
+     */
+    private JobListener jobListener;
+    /**
+     * 是否结束
+     */
+    private boolean isEnd;
+    /**
+     * 日志接口
+     */
+    private LoggerFactory loggerFactory;
+    /**
+     * 默认日志
+     */
+    private Logger logger;
+    /**
+     * 任务名
+     */
+    private String name;
 
-	private Map<String, Object> contextMap;
-	/**
-	 * 全局配置文件
-	 */
-	private Configuration configuration;
+    private Map<String, Object> contextMap;
+    /**
+     * 全局配置文件
+     */
+    private Configuration configuration;
 
-	public JobContext(Communication communication, String jobId, JobListener jobListener,
-			Configuration configuration) {
-		super();
-		this.communication = communication;
-		this.jobId = jobId;
-		
-		this.streamContext = new StreamContext();
-		this.instanceMap = new HashMap<Class<?>, Object>();
-		this.contextMap = new HashMap<String, Object>();
-		this.jobListener = jobListener;
-		this.communication = communication;
-		this.configuration=configuration;
-		this.handles =  new HandleManager(this);
-		putInstance(this);
-		putInstance(handles);
-		putInstance(communication);
-	
-	}
+    public JobContext(Communication communication, String jobId, JobListener jobListener, Configuration configuration) {
+        super();
+        this.communication = communication;
+        this.jobId = jobId;
 
-	/**
-	 * 获取上下文对象，这个对象可以用于缓存等操作
-	 * 
-	 * @return
-	 */
-	public Map<String, Object> getContext() {
-		return contextMap;
-	}
+        this.streamContext = new StreamContext();
+        this.instanceMap = new HashMap<Class<?>, Object>();
+        this.contextMap = new HashMap<String, Object>();
+        this.jobListener = jobListener;
+        this.communication = communication;
+        this.configuration = configuration;
+        this.handles = new HandleManager(this);
+        putInstance(this);
+        putInstance(handles);
+        putInstance(communication);
 
-	/**
-	 * 获取任务名
-	 * 
-	 * @return
-	 */
-	public String getName() {
-		return name;
-	}
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    /**
+     * 获取上下文对象，这个对象可以用于缓存等操作
+     * 
+     * @return
+     */
+    public Map<String, Object> getContext() {
+        return contextMap;
+    }
 
-	/**
-	 * 获取本次任务的日志工厂
-	 * 
-	 * @return
-	 */
-	public LoggerFactory getLoggerFactory() {
-		return loggerFactory;
-	}
+    /**
+     * 获取任务名
+     * 
+     * @return
+     */
+    public String getName() {
+        return name;
+    }
 
-	/**
-	 * 获取上下文日志
-	 * 
-	 * @return
-	 */
-	public Logger getLogger() {
-		return this.logger;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setLoggerFactory(LoggerFactory loggerFactory) {
-		this.loggerFactory = loggerFactory;
-		this.logger = loggerFactory.getLogger(JobContext.class);
-		this.instanceMap.put(LoggerFactory.class, loggerFactory);
-		this.instanceMap.put(Logger.class, logger);
-	}
+    /**
+     * 获取本次任务的日志工厂
+     * 
+     * @return
+     */
+    public LoggerFactory getLoggerFactory() {
+        return loggerFactory;
+    }
 
-	public synchronized boolean isEnd() {
-		return isEnd;
-	}
+    /**
+     * 获取上下文日志
+     * 
+     * @return
+     */
+    public Logger getLogger() {
+        return this.logger;
+    }
 
-	public synchronized void setEnd(boolean isEnd) {
-		this.isEnd = isEnd;
-	}
+    public void setLoggerFactory(LoggerFactory loggerFactory) {
+        this.loggerFactory = loggerFactory;
+        this.logger = loggerFactory.getLogger(JobContext.class);
+        this.instanceMap.put(LoggerFactory.class, loggerFactory);
+        this.instanceMap.put(Logger.class, logger);
+    }
 
-	public JobListener getJobListener() {
-		return jobListener;
-	}
+    public synchronized boolean isEnd() {
+        return isEnd;
+    }
 
-	public void setJobListener(JobListener jobListener) {
-		this.jobListener = jobListener;
-	}
+    public synchronized void setEnd(boolean isEnd) {
+        this.isEnd = isEnd;
+    }
 
-	public JobContext setCoreExchange(Exchange exchange) {
-		this.coreExchange = exchange;
-		return this;
-	}
+    public JobListener getJobListener() {
+        return jobListener;
+    }
 
-	public Exchange getCoreExchange() {
-		return coreExchange;
-	}
+    public void setJobListener(JobListener jobListener) {
+        this.jobListener = jobListener;
+    }
 
-	public void putInstance(Class<?> key, Object instance) {
-		this.instanceMap.put(key, instance);
-	}
+    public JobContext setCoreExchange(Exchange exchange) {
+        this.coreExchange = exchange;
+        return this;
+    }
 
-	public Map<Class<?>, Object> getInstanceMap() {
-		return this.instanceMap;
-	}
+    public Exchange getCoreExchange() {
+        return coreExchange;
+    }
 
-	public Configuration getConfiguration() {
-		return configuration;
-	}
+    public void putInstance(Class<?> key, Object instance) {
+        this.instanceMap.put(key, instance);
+    }
 
+    public Map<Class<?>, Object> getInstanceMap() {
+        return this.instanceMap;
+    }
 
+    public Configuration getConfiguration() {
+        return configuration;
+    }
 
-	/**
-	 * 已实例的类追加实例
-	 * 
-	 * @param instance
-	 */
-	public void putInstance(Object instance) {
-		this.instanceMap.put(instance.getClass(), instance);
-	}
+    /**
+     * 已实例的类追加实例
+     * 
+     * @param instance
+     */
+    public void putInstance(Object instance) {
+        this.instanceMap.put(instance.getClass(), instance);
+    }
 
-	/**
-	 * 获取实例
-	 * 
-	 * @param key 需要的类型
-	 * @return
-	 */
-	public <T> T getInstance(Class<T> key) {
-		return key.cast(this.instanceMap.get(key));
-	}
+    /**
+     * 获取实例
+     * 
+     * @param key 需要的类型
+     * @return
+     */
+    public <T> T getInstance(Class<T> key) {
+        return key.cast(this.instanceMap.get(key));
+    }
 
-	public StreamContext getStreamContext() {
-		return streamContext;
-	}
+    public StreamContext getStreamContext() {
+        return streamContext;
+    }
 
-	public Communication getCommunication() {
-		return communication;
-	}
+    public Communication getCommunication() {
+        return communication;
+    }
 
-	public void setCommunication(Communication communication) {
-		this.communication = communication;
-	}
+    public void setCommunication(Communication communication) {
+        this.communication = communication;
+    }
 
-	public String getJobId() {
-		return jobId;
-	}
+    public String getJobId() {
+        return jobId;
+    }
 
-	public HandleManager getHandles() {
-		return handles;
-	}
+    public HandleManager getHandles() {
+        return handles;
+    }
 
-	public void setJobs(List<Job> jobs) {
-		this.jobs = jobs;
-	}
+    public void setJobs(List<Job> jobs) {
+        this.jobs = jobs;
+    }
 
-	/**
-	 * 获取下一个任务
-	 * 
-	 * @return
-	 */
-	public Job nextJob() {
-		return jobs.get(this.concurrentJob++);
-	}
+    /**
+     * 获取下一个任务
+     * 
+     * @return
+     */
+    public Job nextJob() {
+        return jobs.get(this.concurrentJob++);
+    }
 
-	/**
-	 * 是否存在任务
-	 * 
-	 * @return
-	 */
-	public boolean hasJob() {
-		return jobs.size() > this.concurrentJob;
-	}
+    /**
+     * 是否存在任务
+     * 
+     * @return
+     */
+    public boolean hasJob() {
+        return jobs.size() > this.concurrentJob;
+    }
 
-	/**
-	 * 获取当前任务
-	 * 
-	 * @return
-	 */
-	public Job getConcurrentJob() {
-		return this.jobs.get(this.concurrentJob);
-	}
+    /**
+     * 获取当前任务
+     * 
+     * @return
+     */
+    public Job getConcurrentJob() {
+        return this.jobs.get(this.concurrentJob);
+    }
 
-	public ExecutorTaskQueue getInExecutorTaskQueue() {
-		return inExecutorTaskQueue;
-	}
+    public ExecutorTaskQueue getInExecutorTaskQueue() {
+        return inExecutorTaskQueue;
+    }
 
-	public JobContext setInExecutorTaskQueue(ExecutorTaskQueue inExecutorTaskQueue) {
-		this.inExecutorTaskQueue = inExecutorTaskQueue;
-		return this;
-	}
+    public JobContext setInExecutorTaskQueue(ExecutorTaskQueue inExecutorTaskQueue) {
+        this.inExecutorTaskQueue = inExecutorTaskQueue;
+        return this;
+    }
 
-	public ExecutorTaskQueue getOutExecutorTaskQueue() {
-		return outExecutorTaskQueue;
-	}
+    public ExecutorTaskQueue getOutExecutorTaskQueue() {
+        return outExecutorTaskQueue;
+    }
 
-	public JobContext setOutExecutorTaskQueue(ExecutorTaskQueue outExecutorTaskQueue) {
-		this.outExecutorTaskQueue = outExecutorTaskQueue;
-		return this;
-	}
+    public JobContext setOutExecutorTaskQueue(ExecutorTaskQueue outExecutorTaskQueue) {
+        this.outExecutorTaskQueue = outExecutorTaskQueue;
+        return this;
+    }
 
-	public <T> void doHandle(Class<T> handleType, DoHandle<T> doHandle) {
-		this.handles.doHandle(handleType, doHandle);
+    public <T> void doHandle(Class<T> handleType, DoHandle<T> doHandle) {
+        this.handles.doHandle(handleType, doHandle);
 
-	}
+    }
 
-	public JobContext setInChannelConfiguration(Configuration inChannelConfiguration) {
-		this.inChannelConfiguration = inChannelConfiguration;
-		return this;
-	}
+    public JobContext setInChannelConfiguration(Configuration inChannelConfiguration) {
+        this.inChannelConfiguration = inChannelConfiguration;
+        return this;
+    }
 
-	/**
-	 * 停止任务
-	 * 
-	 * @param e 传递停止的异常信息
-	 * @return
-	 */
-	public synchronized boolean stop(Throwable e) {
-		if (this.communication.isFinished()) {
-			return false;
-		}
-		if (this.communication.getState() == State.WAITING) {
-			running();
-		}
-		this.communication.setState(State.KILLED);
-		this.communication.setThrowable(e, true);
-		return Engine.onJobFlush(this);
+    /**
+     * 停止任务
+     * 
+     * @param e 传递停止的异常信息
+     * @return
+     */
+    public synchronized boolean stop(Throwable e) {
+        if (this.communication.isFinished()) {
+            return false;
+        }
+        if (this.communication.getState() == State.WAITING) {
+            running();
+        }
+        this.communication.setState(State.KILLED);
+        this.communication.setThrowable(e, true);
+        return Engine.onJobFlush(this);
 
-	}
+    }
 
-	/**
-	 * 暂停当前任务 true: 暂停成功 false: 任务已结束暂停失败
-	 * 
-	 * @param message 暂停描述信息会记录到日志中
-	 * @return
-	 */
-	public synchronized boolean await(String message) {
-		if (this.communication.isFinished()) {
-			return false;
-		}
-		this.communication.setState(State.WAITING);
-		logger.info(this, "任务暂停,暂停信息:" + message);
-		return true;
-	}
+    /**
+     * 暂停当前任务 true: 暂停成功 false: 任务已结束暂停失败
+     * 
+     * @param message 暂停描述信息会记录到日志中
+     * @return
+     */
+    public synchronized boolean await(String message) {
+        if (this.communication.isFinished()) {
+            return false;
+        }
+        this.communication.setState(State.WAITING);
+        logger.info(this, "任务暂停,暂停信息:" + message);
+        return true;
+    }
 
-	/**
-	 * 任务继续如果任务没有暂停则会返回false
-	 * 
-	 * @return
-	 */
-	public synchronized boolean running() {
-		return this.communication.runing();
-	}
+    /**
+     * 任务继续如果任务没有暂停则会返回false
+     * 
+     * @return
+     */
+    public synchronized boolean running() {
+        return this.communication.runing();
+    }
 
-	public InChannel getInChannel() {
-		InChannel inChannel = FactoryManager.getInstanceOfConfiguration(inChannelConfiguration, InChannel.class,
-				instanceMap);
-		inChannel.setOutPutStream(coreExchange);
-		return inChannel;
-	}
+    public InChannel getInChannel() {
+        InChannel inChannel =
+            FactoryManager.getInstanceOfConfiguration(inChannelConfiguration, InChannel.class, instanceMap);
+        inChannel.setOutPutStream(coreExchange);
+        return inChannel;
+    }
 
 }

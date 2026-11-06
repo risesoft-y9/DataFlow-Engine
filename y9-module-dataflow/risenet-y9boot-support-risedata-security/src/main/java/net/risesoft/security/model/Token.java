@@ -1,6 +1,6 @@
 package net.risesoft.security.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,7 +9,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Comment;
 
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * @Description : 令牌 保存令牌对应的用户 以及令牌产生时间
@@ -19,34 +19,34 @@ import java.io.Serializable;
  * @Version 1.0
  */
 @Entity
-@JsonIgnoreProperties(value = { "hibernateLazyInitializer" })
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer"})
 @Table(name = "Y9_DATASERVICE_TOKEN")
 public class Token implements Serializable {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
-	/**
+    /**
      * 令牌
      */
     @Id
     @Comment(value = "令牌id")
-    @Column(name = "TOKEN",length = 38)
+    @Column(name = "TOKEN", length = 38)
     private String token;
 
     /**
      * 所对应的userId
      */
     @Comment(value = "用户id")
-    @Column(name = "USER_ID",length = 38)
+    @Column(name = "USER_ID", length = 38)
     private String userId;
 
     /**
      * 令牌时间
      */
     @Comment(value = "令牌时间")
-    @Column(name = "TOKEN_TIME",length = 38)
+    @Column(name = "TOKEN_TIME", length = 38)
     private Long tokenTime;
 
     public String getToken() {
@@ -75,10 +75,6 @@ public class Token implements Serializable {
 
     @Override
     public String toString() {
-        return "Token{" +
-                "token='" + token + '\'' +
-                ", userId='" + userId + '\'' +
-                ", tokenTime=" + tokenTime +
-                '}';
+        return "Token{" + "token='" + token + '\'' + ", userId='" + userId + '\'' + ", tokenTime=" + tokenTime + '}';
     }
 }

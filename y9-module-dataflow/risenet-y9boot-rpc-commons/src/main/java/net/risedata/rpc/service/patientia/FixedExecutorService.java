@@ -1,7 +1,5 @@
 package net.risedata.rpc.service.patientia;
 
-
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -20,10 +18,9 @@ public class FixedExecutorService implements RPCExecutorService {
     private ThreadPoolExecutor executorService;
 
     public FixedExecutorService(int size) {
-        executorService = new ThreadPoolExecutor(size, size, 0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>());
+        executorService =
+            new ThreadPoolExecutor(size, size, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
     }
-
 
     @Override
     public void executor(Runnable task) {
@@ -60,6 +57,5 @@ public class FixedExecutorService implements RPCExecutorService {
     public int getPoolSize() {
         return executorService.getPoolSize();
     }
-
 
 }

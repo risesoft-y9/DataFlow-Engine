@@ -10,6 +10,7 @@ package net.risesoft.security;
 public interface GetEnvironment {
     /**
      * 检查环境
+     * 
      * @return
      */
     String getEnvironment();

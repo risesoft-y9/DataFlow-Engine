@@ -20,7 +20,8 @@ public class FilterAdapter implements Filter {
     }
 
     @Override
-    public void doAfter(Response response, RPCRequestContext context, FilterContext filterContext, Send send) throws Exception {
+    public void doAfter(Response response, RPCRequestContext context, FilterContext filterContext, Send send)
+        throws Exception {
 
     }
 
@@ -28,6 +29,5 @@ public class FilterAdapter implements Filter {
     public int getOrder() {
         return 0;
     }
-
 
 }

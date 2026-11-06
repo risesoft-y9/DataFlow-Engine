@@ -7,14 +7,14 @@ import lombok.NoArgsConstructor;
 @Data
 public class DataSourceTypeDTO {
 
-	private String id;
+    private String id;
 
-	private String name;
-	
-	private String driver;
-	
-	private String imgData;
-	
-	private Integer type;
+    private String name;
+
+    private String driver;
+
+    private String imgData;
+
+    private Integer type;
 
 }

@@ -12,19 +12,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("beta.discovery.watch")
 public class WatchProperties {
 
-
     /**
      * 是否监控
      */
     private boolean watch = false;
     /**
-     * 当配置了这个参数后联系请求次数达到这个次数则自动上线
-     * 如果是0则不会自动上线
+     * 当配置了这个参数后联系请求次数达到这个次数则自动上线 如果是0则不会自动上线
      */
     private Integer success = 3;
     /**
-     * 设置失败次数默认值为3
-     * 当其他参数成立的时候也会被判断失败
+     * 设置失败次数默认值为3 当其他参数成立的时候也会被判断失败
      */
     private Integer fail = 3;
     /**
@@ -96,7 +93,6 @@ public class WatchProperties {
         this.time = time;
     }
 
-
     public Integer getTimeOut() {
         return timeOut;
     }
@@ -115,15 +111,8 @@ public class WatchProperties {
 
     @Override
     public String toString() {
-        return "WatchProperties{" +
-                "watch=" + watch +
-                ", success=" + success +
-                ", fail=" + fail +
-                ", time=" + time +
-                ", timeOut=" + timeOut +
-                ", baseContext='" + baseContext + '\'' +
-                ", successRet='" + successRet + '\'' +
-                ", watchUrl='" + watchUrl + '\'' +
-                '}';
+        return "WatchProperties{" + "watch=" + watch + ", success=" + success + ", fail=" + fail + ", time=" + time
+            + ", timeOut=" + timeOut + ", baseContext='" + baseContext + '\'' + ", successRet='" + successRet + '\''
+            + ", watchUrl='" + watchUrl + '\'' + '}';
     }
 }

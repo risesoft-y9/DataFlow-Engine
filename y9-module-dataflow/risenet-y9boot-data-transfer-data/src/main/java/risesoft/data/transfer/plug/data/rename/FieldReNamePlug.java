@@ -16,21 +16,21 @@ import risesoft.data.transfer.core.record.ColumnDisposeHandlePlug;
  */
 public class FieldReNamePlug implements Plug {
 
-	public FieldReNamePlug(@ConfigParameter(description = "重命名字段映射", required = true) Map<String, String> renameMap,
-			JobContext jobContext) {
-		renameMap.forEach((k, v) -> {
-			ColumnDisposeHandlePlug.registerListener(k, (c, r, i) -> {
-				c.setName(v);
-				return c;
-			}, jobContext);
+    public FieldReNamePlug(
+        @ConfigParameter(description = "重命名字段映射", required = true) Map<String, String> renameMap,
+        JobContext jobContext) {
+        renameMap.forEach((k, v) -> {
+            ColumnDisposeHandlePlug.registerListener(k, (c, r, i) -> {
+                c.setName(v);
+                return c;
+            }, jobContext);
 
-		});
-	}
+        });
+    }
 
-
-	@Override
-	public boolean register(JobContext jobContext) {
-		return true;
-	}
+    @Override
+    public boolean register(JobContext jobContext) {
+        return true;
+    }
 
 }

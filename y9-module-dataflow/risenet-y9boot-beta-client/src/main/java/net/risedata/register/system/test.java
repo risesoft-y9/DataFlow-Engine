@@ -19,12 +19,12 @@ public class test {
         server.refreshMem();
         server.refreshDisks();
         java.lang.System.out.println(java.lang.System.currentTimeMillis() - time);
-        java.lang.System.out.println("cpu"+server.getCpu());
+        java.lang.System.out.println("cpu" + server.getCpu());
         java.lang.System.out.println();
-        java.lang.System.out.println("内存"+server.getMem());
+        java.lang.System.out.println("内存" + server.getMem());
         java.lang.System.out.println();
-        java.lang.System.out.println("桌面"+server.getDisks());
-        java.lang.System.out.println(java.lang.System.currentTimeMillis()-time);
+        java.lang.System.out.println("桌面" + server.getDisks());
+        java.lang.System.out.println(java.lang.System.currentTimeMillis() - time);
 
     }
 }

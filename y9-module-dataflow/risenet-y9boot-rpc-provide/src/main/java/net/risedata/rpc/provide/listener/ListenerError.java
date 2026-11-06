@@ -13,7 +13,7 @@ public interface ListenerError {
      * 失败后调用的方法
      *
      * @param res 返回值
-     * @param e   异常
+     * @param e 异常
      */
     void error(ListenerRequest res, Throwable e);
 }

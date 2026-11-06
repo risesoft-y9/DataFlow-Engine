@@ -1,7 +1,8 @@
 package net.risedata.rpc.consumer.utils;
 
-import io.netty.channel.SimpleChannelInboundHandler;
 import net.risedata.rpc.model.Msg;
+
+import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
  * @description: 自动id生成 递增
@@ -16,10 +17,8 @@ public abstract class AutoIdConnection extends SimpleChannelInboundHandler<Msg> 
     protected synchronized long getId() {
         if (id > MAX) {
             id = 0;
-        }
-        ;
+        } ;
         return id++;
     }
-
 
 }

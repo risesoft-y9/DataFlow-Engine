@@ -4,14 +4,17 @@ import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import net.risedata.jdbc.search.LPageable;
 import net.risesoft.pojo.Y9Result;
-import net.risesoft.security.model.RoleUserLink;
 import net.risesoft.security.dto.DataUserDTO;
 import net.risesoft.security.dto.RoleUserLinkDTO;
 import net.risesoft.security.model.DataUser;
+import net.risesoft.security.model.RoleUserLink;
 import net.risesoft.security.service.RoleLinkService;
 import net.risesoft.security.service.UserService;
 
@@ -25,31 +28,31 @@ import net.risesoft.security.service.UserService;
 @RestController()
 @RequestMapping("/api/rest/role/link")
 public class RoleLinkController {
-	
-	@Autowired
-	private RoleLinkService roleLinkService;
-	
-	@Autowired
-	private UserService userService;
-	
-	@Autowired
-	private ModelMapper modelMapper;
 
-	@RequestMapping("/searchUsers")
-	public Y9Result<Object> searchUsers(String roleId, DataUserDTO userDTO, LPageable page, Boolean isNot) {
-		DataUser dataUser = modelMapper.map(userDTO, DataUser.class);
-		return Y9Result.success(userService.searchForPageRole(dataUser, page, roleId, isNot));
-	}
+    @Autowired
+    private RoleLinkService roleLinkService;
 
-	@PostMapping("/bind")
-	public Y9Result<Object> bind(@RequestBody @Valid RoleUserLinkDTO userLinkDTO) {
-		RoleUserLink roleUserLink = modelMapper.map(userLinkDTO, RoleUserLink.class);
-		return Y9Result.success(roleLinkService.save(roleUserLink));
-	}
+    @Autowired
+    private UserService userService;
 
-	@PostMapping("/unBind")
-	public Y9Result<Object> unBind(@RequestBody @Valid RoleUserLinkDTO userLinkDTO) {
-		RoleUserLink roleUserLink = modelMapper.map(userLinkDTO, RoleUserLink.class);
-		return Y9Result.success(roleLinkService.delete(roleUserLink));
-	}
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @RequestMapping("/searchUsers")
+    public Y9Result<Object> searchUsers(String roleId, DataUserDTO userDTO, LPageable page, Boolean isNot) {
+        DataUser dataUser = modelMapper.map(userDTO, DataUser.class);
+        return Y9Result.success(userService.searchForPageRole(dataUser, page, roleId, isNot));
+    }
+
+    @PostMapping("/bind")
+    public Y9Result<Object> bind(@RequestBody @Valid RoleUserLinkDTO userLinkDTO) {
+        RoleUserLink roleUserLink = modelMapper.map(userLinkDTO, RoleUserLink.class);
+        return Y9Result.success(roleLinkService.save(roleUserLink));
+    }
+
+    @PostMapping("/unBind")
+    public Y9Result<Object> unBind(@RequestBody @Valid RoleUserLinkDTO userLinkDTO) {
+        RoleUserLink roleUserLink = modelMapper.map(userLinkDTO, RoleUserLink.class);
+        return Y9Result.success(roleLinkService.delete(roleUserLink));
+    }
 }

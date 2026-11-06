@@ -7,8 +7,6 @@ import net.risedata.register.ribbon.LBalancer;
  */
 public class WeightPollLoadBalancerFactory extends AbstractLoadBalancerFactory {
 
-
-
     @Override
     LBalancer createInstance(String name) {
         return new WeightPollBalancer();

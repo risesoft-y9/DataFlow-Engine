@@ -11,11 +11,11 @@ public interface MessageServiceExecutor {
 
     /**
      * 发送消息服务
+     * 
      * @param recipients 收消息人
      * @param title 标题
      * @param message 短信
      */
-    void sendMessage(String[] recipients,String title,String message,Object source);
-
+    void sendMessage(String[] recipients, String title, String message, Object source);
 
 }

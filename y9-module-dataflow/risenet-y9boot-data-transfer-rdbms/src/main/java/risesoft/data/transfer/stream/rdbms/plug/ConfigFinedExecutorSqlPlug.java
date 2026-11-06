@@ -17,44 +17,45 @@ import risesoft.data.transfer.core.util.ConfigurationConst;
  */
 public class ConfigFinedExecutorSqlPlug extends ExecutorSql {
 
-	@ConfigBean
-	static class ExecutorConfig extends LogConfig {
+    @ConfigBean
+    static class ExecutorConfig extends LogConfig {
 
-		@ConfigField(required = true, description = "sql")
-		private String sql;
+        @ConfigField(required = true, description = "sql")
+        private String sql;
 
-		@ConfigField(required = false, value = "0", description = "目标源索引")
-		private Integer index;
+        @ConfigField(required = false, value = "0", description = "目标源索引")
+        private Integer index;
 
-		@ConfigField(required = false, value = "output", description = "目标源", options = { "output", "input" })
-		private String source;
+        @ConfigField(required = false, value = "output", description = "目标源", options = {"output", "input"})
+        private String source;
 
-		public String getSql() {
-			return sql;
-		}
+        public String getSql() {
+            return sql;
+        }
 
-		public ExecutorConfig() {
-			super();
-		}
-		
-		
-	}
+        public ExecutorConfig() {
+            super();
+        }
 
-	protected ExecutorConfig config;
+    }
 
-	public ConfigFinedExecutorSqlPlug(ExecutorConfig config, JobContext jobContext) {
-		super();
-		Configuration configuration = jobContext.getConfiguration();
-		configuration = configuration.getListConfiguration(ConfigurationConst.JOBS).get(config.index)
-				.getConfiguration(config.source).getConfiguration("args");
-		this.jdbcPassword = configuration.getString("password");
-		this.jdbcUrl = configuration.getString("jdbcUrl");
-		this.jdbcUserName = configuration.getString("userName");
-		this.config = config;
-		this.sql=config.sql;
-		if (config.getLog().isDebug()) {
-			config.getLog().debug(this, "find configuration:" + configuration);
-		}
-	}
+    protected ExecutorConfig config;
+
+    public ConfigFinedExecutorSqlPlug(ExecutorConfig config, JobContext jobContext) {
+        super();
+        Configuration configuration = jobContext.getConfiguration();
+        configuration = configuration.getListConfiguration(ConfigurationConst.JOBS)
+            .get(config.index)
+            .getConfiguration(config.source)
+            .getConfiguration("args");
+        this.jdbcPassword = configuration.getString("password");
+        this.jdbcUrl = configuration.getString("jdbcUrl");
+        this.jdbcUserName = configuration.getString("userName");
+        this.config = config;
+        this.sql = config.sql;
+        if (config.getLog().isDebug()) {
+            config.getLog().debug(this, "find configuration:" + configuration);
+        }
+    }
 
 }

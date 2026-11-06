@@ -1,11 +1,7 @@
 package net.risesoft.api.persistence.job;
 
-
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-
-import net.risesoft.api.persistence.model.job.Job;
 
 /**
  * @Description : 任务改变表
@@ -17,6 +13,7 @@ import net.risesoft.api.persistence.model.job.Job;
 public interface JobChangeService {
     /**
      * 插入一条改变数据
+     * 
      * @param jobId
      */
     void insertChange(Integer jobId);
@@ -27,6 +24,7 @@ public interface JobChangeService {
 
     /**
      * 批量删除
+     * 
      * @param ids
      */
     void onDelete(Collection<Integer> ids);

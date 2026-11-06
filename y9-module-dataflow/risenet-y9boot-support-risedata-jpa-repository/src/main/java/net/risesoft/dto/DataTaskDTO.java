@@ -7,20 +7,20 @@ import lombok.NoArgsConstructor;
 @Data
 public class DataTaskDTO {
 
-	private String id;
+    private String id;
 
-	private String name;
-	
-	private String description;
-	
-	private String businessId;
-	
-	private String userId;
-	
-	private String userName;
-	
-	private String tenantId;
-	
-	private Integer taskType;
+    private String name;
+
+    private String description;
+
+    private String businessId;
+
+    private String userId;
+
+    private String userName;
+
+    private String tenantId;
+
+    private Integer taskType;
 
 }

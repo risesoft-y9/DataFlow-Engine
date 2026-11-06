@@ -1,9 +1,10 @@
 package net.risedata.rpc.provide.handle.impl;
 
+import java.util.List;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import net.risedata.rpc.model.Request;
 import net.risedata.rpc.provide.config.ApplicationConfig;
 import net.risedata.rpc.provide.context.RPCRequestContext;
 import net.risedata.rpc.provide.defined.MethodDefined;
@@ -14,13 +15,10 @@ import net.risedata.rpc.provide.handle.ArgsMatchedHandle;
 import net.risedata.rpc.provide.handle.TypeConvertHandle;
 import net.risedata.rpc.utils.LParameter;
 
-import java.util.List;
-
 /**
  * map形式的参数填充器
  */
 public class MapArgsMatchHandle implements ArgsMatchedHandle {
-
 
     @Override
     public boolean isHandle(JSONArray args, List<ParameterDefined> defineds, MethodDefined methodDefined) {
@@ -28,7 +26,8 @@ public class MapArgsMatchHandle implements ArgsMatchedHandle {
     }
 
     @Override
-    public void handle(Object[] arg, JSONArray args, List<ParameterDefined> defined, MethodDefined methodDefined, RPCRequestContext request) {
+    public void handle(Object[] arg, JSONArray args, List<ParameterDefined> defined, MethodDefined methodDefined,
+        RPCRequestContext request) {
         ParameterDefined parameterDefined;
         boolean isTypeConvert = methodDefined.getClassDefined().isTypeConvert();
 
@@ -40,9 +39,12 @@ public class MapArgsMatchHandle implements ArgsMatchedHandle {
             for (int i = 0; i < defined.size(); i++) {
                 parameterDefined = defined.get(i);
                 if (isTypeConvert) {
-                    arg[i] = getValue(object, parameterDefined.getName(), parameterDefined.getType(), methodDefined.getClassDefined().getTypeConvertHandles(),parameterDefined.getParameter(), request);
+                    arg[i] = getValue(object, parameterDefined.getName(), parameterDefined.getType(),
+                        methodDefined.getClassDefined().getTypeConvertHandles(), parameterDefined.getParameter(),
+                        request);
                 } else {
-                    arg[i] = ApplicationConfig.DEFAULT_TYPE_CONVERT_HANDLE.handleMap(object, parameterDefined.getName(), parameterDefined.getType(),parameterDefined.getParameter(), request);
+                    arg[i] = ApplicationConfig.DEFAULT_TYPE_CONVERT_HANDLE.handleMap(object, parameterDefined.getName(),
+                        parameterDefined.getType(), parameterDefined.getParameter(), request);
                 }
                 if (!parameterDefined.pass(arg[i])) {
                     throw new ArgsException(parameterDefined.noPassMsg(i, arg[i], parameterDefined));
@@ -55,12 +57,14 @@ public class MapArgsMatchHandle implements ArgsMatchedHandle {
 
     }
 
-    private Object getValue(JSONObject jsonObject, String name, Class<?> returnType, List<TypeConvertHandle> typeConvertHandles, LParameter parameterDefined, RPCRequestContext request) {
+    private Object getValue(JSONObject jsonObject, String name, Class<?> returnType,
+        List<TypeConvertHandle> typeConvertHandles, LParameter parameterDefined, RPCRequestContext request) {
         for (TypeConvertHandle typeConvertHandle : typeConvertHandles) {
             if (typeConvertHandle.isHandle(returnType)) {
-                return typeConvertHandle.handleMap(jsonObject, name, returnType,parameterDefined, request);
+                return typeConvertHandle.handleMap(jsonObject, name, returnType, parameterDefined, request);
             }
         }
-        return ApplicationConfig.DEFAULT_TYPE_CONVERT_HANDLE.handleMap(jsonObject, name, returnType,parameterDefined, request);
+        return ApplicationConfig.DEFAULT_TYPE_CONVERT_HANDLE.handleMap(jsonObject, name, returnType, parameterDefined,
+            request);
     }
 }

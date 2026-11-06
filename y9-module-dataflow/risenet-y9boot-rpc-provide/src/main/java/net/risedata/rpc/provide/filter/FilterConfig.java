@@ -7,7 +7,7 @@ package net.risedata.rpc.provide.filter;
  * @Date 2021/11/24 9:49
  * @Version 1.0
  */
-public class FilterConfig implements Comparable<FilterConfig>{
+public class FilterConfig implements Comparable<FilterConfig> {
     /**
      * 那些符合匹配**为全部
      */
@@ -24,8 +24,9 @@ public class FilterConfig implements Comparable<FilterConfig>{
         this.noMatcher = noMatcher;
         this.filter = filter;
     }
-    public FilterConfig( Filter filter) {
-       this("**","**",filter);
+
+    public FilterConfig(Filter filter) {
+        this("**", "**", filter);
 
     }
 
@@ -55,15 +56,12 @@ public class FilterConfig implements Comparable<FilterConfig>{
 
     @Override
     public int compareTo(FilterConfig o) {
-        return o.filter.getOrder()-filter.getOrder();
+        return o.filter.getOrder() - filter.getOrder();
     }
 
     @Override
     public String toString() {
-        return "FilterConfig{" +
-                "matcher='" + matcher + '\'' +
-                ", noMatcher='" + noMatcher + '\'' +
-                ", filter=" + filter +
-                '}';
+        return "FilterConfig{" + "matcher='" + matcher + '\'' + ", noMatcher='" + noMatcher + '\'' + ", filter="
+            + filter + '}';
     }
 }

@@ -11,22 +11,22 @@ import risesoft.data.transfer.core.stream.out.RecordOutuptStream;
  * @author lb
  */
 public interface Exchange extends RecordOutuptStream {
-	/**
-	 * 设置这个交换机的输出通道
-	 * 
-	 * @param channel
-	 */
-	void setOutChannel(OutChannel channel);
+    /**
+     * 设置这个交换机的输出通道
+     * 
+     * @param channel
+     */
+    void setOutChannel(OutChannel channel);
 
-	/**
-	 * 获取输出通道
-	 * 
-	 * @return
-	 */
-	OutChannel getOutChannel();
+    /**
+     * 获取输出通道
+     * 
+     * @return
+     */
+    OutChannel getOutChannel();
 
-	/**
-	 * 关闭
-	 */
-	void shutdown();
+    /**
+     * 关闭
+     */
+    void shutdown();
 }

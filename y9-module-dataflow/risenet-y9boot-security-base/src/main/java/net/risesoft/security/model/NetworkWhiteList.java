@@ -1,13 +1,6 @@
 package net.risesoft.security.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import net.risedata.jdbc.annotations.operation.Operate;
-import net.risedata.jdbc.annotations.order.Desc;
-import net.risedata.jdbc.operation.Operates;
-import net.risesoft.security.GetEnvironment;
-import net.risesoft.security.LikeOperation;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,10 +10,17 @@ import javax.validation.constraints.NotBlank;
 
 import org.hibernate.annotations.Comment;
 
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import net.risedata.jdbc.annotations.operation.Operate;
+import net.risedata.jdbc.annotations.order.Desc;
+import net.risedata.jdbc.operation.Operates;
+import net.risesoft.security.GetEnvironment;
+import net.risesoft.security.LikeOperation;
 
 /**
- * @Description : 网络请求白名单 ,包括配置文件访问权限  注册服务权限
+ * @Description : 网络请求白名单 ,包括配置文件访问权限 注册服务权限
  * @ClassName NetworkWhiteList
  * @Author lb
  * @Date 2022/8/5 9:54
@@ -77,7 +77,7 @@ public class NetworkWhiteList implements GetEnvironment {
      */
     @Desc
     @Comment(value = "创建时间")
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "CREATE_DATE", length = 100)
     private Date createDate;
 

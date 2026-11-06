@@ -1,4 +1,5 @@
 package net.risesoft.api.job.actions.dispatch.executor;
+
 import org.springframework.cloud.client.ServiceInstance;
 
 /**
@@ -10,5 +11,5 @@ import org.springframework.cloud.client.ServiceInstance;
  */
 public interface DoBalance {
 
-    ServiceInstance doBalance(int errorCount,ServiceInstance serviceInstance);
+    ServiceInstance doBalance(int errorCount, ServiceInstance serviceInstance);
 }

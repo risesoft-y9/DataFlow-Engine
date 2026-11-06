@@ -1,14 +1,13 @@
 package net.risedata.rpc.factory;
 
-import com.alibaba.fastjson.JSONObject;
-
-import net.risedata.rpc.exceptions.ProxyException;
-import net.risedata.rpc.factory.model.ReturnType;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONObject;
+
+import net.risedata.rpc.exceptions.ProxyException;
+import net.risedata.rpc.factory.model.ReturnType;
 
 /**
  * 构建方法返回值的工厂
@@ -29,10 +28,10 @@ public class ReturnTypeFactory {
             if (!genericityName.equals("java.lang.Object")) {
                 int index = findT(genericityName, m);
                 if (index != -1) {
-                    return new ReturnType(returnType, null, false, index,false);
+                    return new ReturnType(returnType, null, false, index, false);
                 }
-            }else{
-                return new ReturnType(JSONObject.class,null,false,0,true);
+            } else {
+                return new ReturnType(JSONObject.class, null, false, 0, true);
             }
             throw new ProxyException("An undefined type " + genericityName);
 
@@ -55,7 +54,7 @@ public class ReturnTypeFactory {
                         throw new ProxyException("class not found " + e.getMessage());
                     }
                 }
-                return new ReturnType(returnType, null, false, index,true);
+                return new ReturnType(returnType, null, false, index, true);
             }
         } else {
             return new ReturnType(returnType, Map.class);

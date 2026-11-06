@@ -22,39 +22,39 @@ import org.apache.commons.lang3.StringUtils;
 @Inherited
 public @interface ConfigParameter {
 
-	/**
-	 * 默认值
-	 * 
-	 * @return
-	 */
-	String value() default StringUtils.EMPTY;
+    /**
+     * 默认值
+     * 
+     * @return
+     */
+    String value() default StringUtils.EMPTY;
 
-	/**
-	 * 获取的路径
-	 * 
-	 * @return
-	 */
-	String path() default StringUtils.EMPTY;
+    /**
+     * 获取的路径
+     * 
+     * @return
+     */
+    String path() default StringUtils.EMPTY;
 
-	/**
-	 * 是否为必须
-	 * 
-	 * @return
-	 */
-	boolean required() default false;
+    /**
+     * 是否为必须
+     * 
+     * @return
+     */
+    boolean required() default false;
 
-	/**
-	 * 描述
-	 * 
-	 * @return
-	 */
-	String description() default StringUtils.EMPTY;
+    /**
+     * 描述
+     * 
+     * @return
+     */
+    String description() default StringUtils.EMPTY;
 
-	/**
-	 * 可选值
-	 * 
-	 * @return
-	 */
-	String[] options() default {};
+    /**
+     * 可选值
+     * 
+     * @return
+     */
+    String[] options() default {};
 
 }

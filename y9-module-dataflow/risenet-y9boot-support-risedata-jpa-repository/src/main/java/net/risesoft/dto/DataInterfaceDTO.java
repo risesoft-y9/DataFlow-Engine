@@ -7,24 +7,24 @@ import lombok.NoArgsConstructor;
 @Data
 public class DataInterfaceDTO {
 
-	private String id;
+    private String id;
 
-	private String interfaceName;
-	
-	private String interfaceUrl;
-	
-	private String requestType;
-	
-	private String contentType;
-	
-	private Integer dataType;
-	
-	private Integer pattern;
-	
-	private String tenantId;
-	
-	private String userId;
-	
-	private String userName;
+    private String interfaceName;
+
+    private String interfaceUrl;
+
+    private String requestType;
+
+    private String contentType;
+
+    private Integer dataType;
+
+    private Integer pattern;
+
+    private String tenantId;
+
+    private String userId;
+
+    private String userName;
 
 }

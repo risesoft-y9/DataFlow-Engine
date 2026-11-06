@@ -7,30 +7,30 @@ import lombok.NoArgsConstructor;
 @Data
 public class DataTableFieldDTO {
 
-	private String id;
+    private String id;
 
-	private String name;
-	
-	private String cname;
-	
-	private String tableId;
-	
-	private Integer typeNum;
-	
-	private String fieldType;
-	
-	private String fieldLength;
-	
-	private String fieldNull;
-	
-	private String fieldPk;
-	
-	private Integer displayOrder;
-	
-	private Boolean isState;
-	
-	private Integer updateVersion;
-	
-	private String oldName;
+    private String name;
+
+    private String cname;
+
+    private String tableId;
+
+    private Integer typeNum;
+
+    private String fieldType;
+
+    private String fieldLength;
+
+    private String fieldNull;
+
+    private String fieldPk;
+
+    private Integer displayOrder;
+
+    private Boolean isState;
+
+    private Integer updateVersion;
+
+    private String oldName;
 
 }

@@ -21,46 +21,48 @@ import net.risesoft.y9public.repository.DataTaskRepository;
 @Component
 @RPCServer(name = "config", enableRequest = true)
 public class ConfigApi {
-	
-	@Autowired
-	ConfigService configService;
-	
-	@Autowired
-	private DataTaskRepository dataTaskRepository;
-	
-	@Autowired
-	private DataSingleTaskConfigRepository dataSingleTaskConfigRepository;
-	
-	/**
-	 * 根据jobId 返回配置
-	 * 
-	 * @param jobId
-	 * @return
-	 */
-	@API
-	public Config getConfig(String jobId) {
-		return configService.findOneNoSecurity(jobId);
-	}
-	
-	/**
-	 * 根据任务id获取任务类型
-	 * @param id
-	 * @return
-	 */
-	@API
-	public Integer taskType(String id) {
-		return dataTaskRepository.findById(id).orElse(null).getTaskType();
-	}
-	
-	/**
-	 * 获取单任务的配置
-	 * @param id
-	 * @return
-	 */
-	@API
-	public Config getSingleConfig(String id) {
-		String json = dataSingleTaskConfigRepository.findById(id).orElse(null).getConfigData();
-		return Y9JsonUtil.readValue(json, Config.class);
-	}
+
+    @Autowired
+    ConfigService configService;
+
+    @Autowired
+    private DataTaskRepository dataTaskRepository;
+
+    @Autowired
+    private DataSingleTaskConfigRepository dataSingleTaskConfigRepository;
+
+    /**
+     * 根据jobId 返回配置
+     * 
+     * @param jobId
+     * @return
+     */
+    @API
+    public Config getConfig(String jobId) {
+        return configService.findOneNoSecurity(jobId);
+    }
+
+    /**
+     * 根据任务id获取任务类型
+     * 
+     * @param id
+     * @return
+     */
+    @API
+    public Integer taskType(String id) {
+        return dataTaskRepository.findById(id).orElse(null).getTaskType();
+    }
+
+    /**
+     * 获取单任务的配置
+     * 
+     * @param id
+     * @return
+     */
+    @API
+    public Config getSingleConfig(String id) {
+        String json = dataSingleTaskConfigRepository.findById(id).orElse(null).getConfigData();
+        return Y9JsonUtil.readValue(json, Config.class);
+    }
 
 }

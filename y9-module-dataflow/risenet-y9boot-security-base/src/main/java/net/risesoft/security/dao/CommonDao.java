@@ -13,8 +13,8 @@ import net.risedata.jdbc.repository.Repository;
  * @author lb
  */
 public interface CommonDao extends Repository {
-	
-	@Search("select name from #{?1} where id in (?2)")
-	List<String> findNameByIds(Class<?> entiryClass, List<String> ids);
+
+    @Search("select name from #{?1} where id in (?2)")
+    List<String> findNameByIds(Class<?> entiryClass, List<String> ids);
 
 }

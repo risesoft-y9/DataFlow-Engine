@@ -1,9 +1,8 @@
 package net.risedata.rpc.consumer.exceptions;
 
-
 import net.risedata.rpc.model.Request;
 
-public class CarryRequestedException extends RuntimeException{
+public class CarryRequestedException extends RuntimeException {
 
     private Request request;
 

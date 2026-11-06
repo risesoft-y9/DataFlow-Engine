@@ -6,6 +6,6 @@ package net.risedata.jdbc.executor.log;
  * @author libo 2021年2月18日
  */
 public interface PrintExecutor {
-	void print(String msg, Object[] objects);
+    void print(String msg, Object[] objects);
 
 }

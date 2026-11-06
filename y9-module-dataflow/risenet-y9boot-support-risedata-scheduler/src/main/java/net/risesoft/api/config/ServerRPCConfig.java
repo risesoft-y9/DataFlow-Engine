@@ -13,5 +13,4 @@ import net.risedata.rpc.annotation.RPCScan;
  */
 @Component
 @RPCScan("net.risesoft.api.consumer")
-public class ServerRPCConfig {
-}
+public class ServerRPCConfig {}

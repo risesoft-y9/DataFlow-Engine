@@ -1,12 +1,13 @@
 package net.risedata.rpc.coder;
 
+import java.util.List;
+
+import net.risedata.rpc.model.Msg;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
-import net.risedata.rpc.model.Msg;
-
-import java.util.List;
 
 /**
  * 将接收到的消息进行解码
@@ -32,6 +33,5 @@ public class MsgDecoder extends ReplayingDecoder<Msg> {
         out.add(new Msg(content.length, content));
 
     }
-
 
 }

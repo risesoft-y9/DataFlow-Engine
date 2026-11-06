@@ -10,26 +10,26 @@ import java.util.List;
  * @author lb
  */
 public interface Ack {
-	/**
-	 * 确定
-	 * 
-	 * @param record
-	 */
-	void confirm(Record record);
+    /**
+     * 确定
+     * 
+     * @param record
+     */
+    void confirm(Record record);
 
-	/**
-	 * 确定
-	 * 
-	 * @param record
-	 */
-	void confirm(List<Record> record);
+    /**
+     * 确定
+     * 
+     * @param record
+     */
+    void confirm(List<Record> record);
 
-	/**
-	 * 取消
-	 * 
-	 * @param record
-	 * @param e
-	 * @param errorMag
-	 */
-	void cancel(Record record, Throwable e, String errorMag);
+    /**
+     * 取消
+     * 
+     * @param record
+     * @param e
+     * @param errorMag
+     */
+    void cancel(Record record, Throwable e, String errorMag);
 }

@@ -8,6 +8,6 @@ package risesoft.data.transfer.core.plug;
  * @date 2025年8月18日
  * @author lb
  */
-public interface RootPlug extends Plug{
+public interface RootPlug extends Plug {
 
 }

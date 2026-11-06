@@ -7,16 +7,16 @@ import lombok.NoArgsConstructor;
 @Data
 public class DataMappingDTO {
 
-	private String id;
+    private String id;
 
-	private String className;
-	
-	private String description;
-	
-	private String funcType;
-	
-	private String typeName;
-	
-	private Integer onlyOne;
+    private String className;
+
+    private String description;
+
+    private String funcType;
+
+    private String typeName;
+
+    private Integer onlyOne;
 
 }

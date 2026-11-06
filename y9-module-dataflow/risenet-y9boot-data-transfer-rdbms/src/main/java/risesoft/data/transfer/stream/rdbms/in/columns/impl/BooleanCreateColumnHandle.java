@@ -17,24 +17,24 @@ import risesoft.data.transfer.stream.rdbms.in.columns.CreateColumnHandle;
  */
 public class BooleanCreateColumnHandle implements CreateColumnHandle {
 
-	@Override
-	public boolean isHandle(int type) {
-		switch (type) {
-	      case Types.BOOLEAN:
-          case Types.BIT:
-			return true;
-		default:
-			return false;
-		}
+    @Override
+    public boolean isHandle(int type) {
+        switch (type) {
+            case Types.BOOLEAN:
+            case Types.BIT:
+                return true;
+            default:
+                return false;
+        }
 
-	}
+    }
 
-	@Override
-	public Column getColumn(ResultSet rs, ResultSetMetaData metaData, int index, String mandatoryEncoding)
-			throws Exception {
+    @Override
+    public Column getColumn(ResultSet rs, ResultSetMetaData metaData, int index, String mandatoryEncoding)
+        throws Exception {
 
-		return new BoolColumn(rs.getBoolean(index),metaData.getColumnLabel(index));
+        return new BoolColumn(rs.getBoolean(index), metaData.getColumnLabel(index));
 
-	}
+    }
 
 }

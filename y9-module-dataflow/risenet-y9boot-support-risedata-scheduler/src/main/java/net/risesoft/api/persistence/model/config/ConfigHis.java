@@ -1,5 +1,14 @@
 package net.risesoft.api.persistence.model.config;
 
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.Table;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -8,10 +17,6 @@ import net.risedata.jdbc.annotations.order.Desc;
 import net.risedata.jdbc.operation.Operates;
 import net.risesoft.security.GetEnvironment;
 import net.risesoft.security.LikeOperation;
-
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @Description : 配置文件历史版本
@@ -61,7 +66,7 @@ public class ConfigHis implements Serializable, GetEnvironment {
      * 最后的修改时间
      */
     @Desc
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone ="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "UPDATETIME", length = 100)
     private Date updateTime;
     /**
@@ -99,17 +104,9 @@ public class ConfigHis implements Serializable, GetEnvironment {
 
     @Override
     public String toString() {
-        return "ConfigHis{" +
-                "id='" + id + '\'' +
-                ", configId='" + configId + '\'' +
-                ", name='" + name + '\'' +
-                ", type='" + type + '\'' +
-                ", group='" + group + '\'' +
-                ", environment='" + environment + '\'' +
-                ", updateTime=" + updateTime +
-                ", opName='" + opName + '\'' +
-                ", opType='" + opType + '\'' +
-                '}';
+        return "ConfigHis{" + "id='" + id + '\'' + ", configId='" + configId + '\'' + ", name='" + name + '\''
+            + ", type='" + type + '\'' + ", group='" + group + '\'' + ", environment='" + environment + '\''
+            + ", updateTime=" + updateTime + ", opName='" + opName + '\'' + ", opType='" + opType + '\'' + '}';
     }
 
     public String getOpType() {
@@ -135,7 +132,6 @@ public class ConfigHis implements Serializable, GetEnvironment {
     public void setId(String id) {
         this.id = id;
     }
-
 
     public Date getUpdateTime() {
         return updateTime;

@@ -1,6 +1,22 @@
 package net.risesoft.api.job;
 
-import cn.hutool.core.date.DateUtil;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
+
 import net.risedata.register.service.IServiceInstanceFactory;
 import net.risesoft.api.exceptions.JobException;
 import net.risesoft.api.job.actions.JobAction;
@@ -12,18 +28,7 @@ import net.risesoft.api.persistence.model.job.Job;
 import net.risesoft.api.persistence.model.job.JobLog;
 import net.risesoft.api.utils.LResult;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import cn.hutool.core.date.DateUtil;
 
 /**
  * @Description : 任务执行器
@@ -68,7 +73,6 @@ public class TaskExecutorService implements ApplicationContextAware, DisposableB
      */
     private Map<Integer, List<String>> jobLogMap = new ConcurrentHashMap<>();
 
-
     private synchronized void addLog(Integer jobId, String logId) {
         List<String> logs = jobLogMap.get(jobId);
         if (logs == null) {
@@ -96,7 +100,7 @@ public class TaskExecutorService implements ApplicationContextAware, DisposableB
     public static final String SERVER_KEY = "$server";
 
     public String startJob(Job job) {
-        return startJob(job,null);
+        return startJob(job, null);
     }
 
     /**
@@ -105,7 +109,7 @@ public class TaskExecutorService implements ApplicationContextAware, DisposableB
      * @param job 任务
      */
     public String startJob(Job job, String server) {
-        //构建任务日志
+        // 构建任务日志
         JobLog jobLog = new JobLog();
         jobLog.setStatus(0);
         jobLog.setEnvironment(job.getEnvironment());
@@ -126,11 +130,10 @@ public class TaskExecutorService implements ApplicationContextAware, DisposableB
             jobLog.setStatus(2);
             jobLogService.updateStatus(jobLog.getId(), 2);
             removeLog(job.getId(), jobLog.getId());
-            jobLogService.appendLog(jobLog.getId(), "执行任务失败异常信息:\n" + getExceptionStack(e).substring(0,250));
+            jobLogService.appendLog(jobLog.getId(), "执行任务失败异常信息:\n" + getExceptionStack(e).substring(0, 250));
         }
         return jobLog.getId();
     }
-
 
     public void startJob(Job job, JobLog jobLog, JobContext jobContext) {
         if (jobContext == null) {
@@ -162,29 +165,31 @@ public class TaskExecutorService implements ApplicationContextAware, DisposableB
      *
      * @param jobLog 日志
      * @param status 状态
-     * @param msg    消息
+     * @param msg 消息
      */
     public void endJob(Job job, JobLog jobLog, Integer status, String msg, String result, JobContext jobContext) {
         if (jobContext.isChildrenJob()) {
-            appendLog(jobLog.getId(), new StringBuilder("任务<<").append(job.getId()+job.getName()+"("+job.getDescription()+")").append(">>执行结束\n执行状态:"
-                    +(status==1?"成功":"失败")  + "\n消息:" + msg + "\n返回值:" + result).toString());
-            if (status==2){
-                closeJob(job,jobLog,status,msg,result,jobContext);
+            appendLog(jobLog.getId(),
+                new StringBuilder("任务<<").append(job.getId() + job.getName() + "(" + job.getDescription() + ")")
+                    .append(">>执行结束\n执行状态:" + (status == 1 ? "成功" : "失败") + "\n消息:" + msg + "\n返回值:" + result)
+                    .toString());
+            if (status == 2) {
+                closeJob(job, jobLog, status, msg, result, jobContext);
             }
         } else {
-            closeJob(job,jobLog,status,msg,result,jobContext);
+            closeJob(job, jobLog, status, msg, result, jobContext);
         }
 
     }
-    
-    private  void closeJob(Job job, JobLog jobLog, Integer status, String msg, String result, JobContext jobContext) {
+
+    private void closeJob(Job job, JobLog jobLog, Integer status, String msg, String result, JobContext jobContext) {
         jobLogService.endJob(jobLog.getId(), status, msg, result, job.getEnvironment());
         taskManager.endJob(job, jobLog.getJobId());
         removeLog(job.getId(), jobLog.getId());
         if (status == JobLog.ERROR) {
             messageService.onJobError(job);
         }
-        messageService.onJobEnd(job,jobLog);
+        messageService.onJobEnd(job, jobLog);
     }
 
     /**
@@ -192,7 +197,7 @@ public class TaskExecutorService implements ApplicationContextAware, DisposableB
      *
      * @param jobLog 日志
      * @param status 状态
-     * @param msg    消息
+     * @param msg 消息
      */
     public void endJob(Job job, JobLog jobLog, Integer status, String msg, JobContext jobContext) {
         endJob(job, jobLog, status, msg, msg, jobContext);
@@ -202,7 +207,7 @@ public class TaskExecutorService implements ApplicationContextAware, DisposableB
      * 结束任务
      *
      * @param jobLog 日志
-     * @param msg    消息
+     * @param msg 消息
      */
     public void successJob(Job job, JobLog jobLog, String msg, String result, JobContext jobContext) {
         if (!StringUtils.isEmpty(job.getChildJobs())) {
@@ -210,8 +215,8 @@ public class TaskExecutorService implements ApplicationContextAware, DisposableB
                 toAction(StartJobChildrenAction.class, job, jobLog, jobContext).onEnd((success) -> {
                     endJob(job, jobLog, JobLog.SUCCESS, msg, result, jobContext);
                 });
-            }catch ( Exception e){
-                endJob(job, jobLog, JobLog.ERROR, "子任务执行失败系统异常:"+e.getMessage(), result, jobContext);
+            } catch (Exception e) {
+                endJob(job, jobLog, JobLog.ERROR, "子任务执行失败系统异常:" + e.getMessage(), result, jobContext);
 
             }
 
@@ -235,7 +240,6 @@ public class TaskExecutorService implements ApplicationContextAware, DisposableB
         }
         return actionClass.cast(jobAction);
     }
-
 
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         for (JobAction action : actions) {

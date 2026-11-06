@@ -11,15 +11,15 @@ import risesoft.data.transfer.core.handle.HandleContext;
  */
 public interface LogHandleReference {
 
-	boolean isDebug();
+    boolean isDebug();
 
-	boolean isInfo();
+    boolean isInfo();
 
-	boolean isError();
-   
-	HandleContext<LogDebugHandle> getLogDebugHandle();
+    boolean isError();
 
-	HandleContext<LogInfoHandle> getLogInfoHandle();
+    HandleContext<LogDebugHandle> getLogDebugHandle();
 
-	HandleContext<LogErrorHandle> getLogErrorHandle();
+    HandleContext<LogInfoHandle> getLogInfoHandle();
+
+    HandleContext<LogErrorHandle> getLogErrorHandle();
 }

@@ -6,15 +6,15 @@ import net.risedata.jdbc.repository.parse.handles.method.MethodNameBuilder;
 
 public class OrInstructionHandle implements WhereInstructionHandle {
 
-	@Override
-	public String handleInstruction() {
-		return "Or";
-	}
+    @Override
+    public String handleInstruction() {
+        return "Or";
+    }
 
-	@Override
-	public void handle(MethodNameBuilder builder, ClassBuild classBuild) {
+    @Override
+    public void handle(MethodNameBuilder builder, ClassBuild classBuild) {
 
-		throw new ProxyException("Or不能单独执行");
-	}
+        throw new ProxyException("Or不能单独执行");
+    }
 
 }

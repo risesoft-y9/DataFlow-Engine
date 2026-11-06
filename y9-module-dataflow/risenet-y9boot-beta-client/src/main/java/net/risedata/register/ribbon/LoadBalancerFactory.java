@@ -9,11 +9,11 @@ package net.risedata.register.ribbon;
  */
 public interface LoadBalancerFactory {
 
-
     /**
      * 根据实例名获取一个负载均衡实例
+     * 
      * @param name 实例名
      * @return 实例
      */
-      LBalancer selectorBalancer(String name) ;
+    LBalancer selectorBalancer(String name);
 }

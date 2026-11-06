@@ -15,27 +15,27 @@ import risesoft.data.transfer.core.util.Configuration;
  */
 public class DefaultCreateInstanceFactory implements InstanceFactory {
 
-	@Override
-	public <T> T getInstance(String name, Class<T> cla, Map<Class<?>, Object> instanceMap) throws Exception {
-		Class<?> class1 = Thread.currentThread().getContextClassLoader().loadClass(name);
-		// TODO 可以在此处去修改 class对象
-		@SuppressWarnings("rawtypes")
-		Constructor constructor = class1.getConstructors()[0];
-		if (!cla.isAssignableFrom(class1)) {
-			throw new ClassCastException("不能将:" + class1 + "转为:" + cla);
-		}
-		Class<?>[] instanceClasses = constructor.getParameterTypes();
-		if (instanceClasses.length == 0) {
-			return cla.cast(constructor.newInstance());
-		}
-		Object[] instanceObjects = new Object[instanceClasses.length];
-		Configuration configuration = (Configuration) instanceMap.get(Configuration.class);
-		for (int i = 0; i < instanceClasses.length; i++) {
-			ConfigParameter configField = constructor.getParameters()[i].getAnnotation(ConfigParameter.class);
-			instanceObjects[i] = BeanFactory.getOjbect(instanceClasses[i], configField, configuration, instanceMap,
-					constructor.getParameters()[i].getName());
-		}
-		return cla.cast(constructor.newInstance(instanceObjects));
-	}
+    @Override
+    public <T> T getInstance(String name, Class<T> cla, Map<Class<?>, Object> instanceMap) throws Exception {
+        Class<?> class1 = Thread.currentThread().getContextClassLoader().loadClass(name);
+        // TODO 可以在此处去修改 class对象
+        @SuppressWarnings("rawtypes")
+        Constructor constructor = class1.getConstructors()[0];
+        if (!cla.isAssignableFrom(class1)) {
+            throw new ClassCastException("不能将:" + class1 + "转为:" + cla);
+        }
+        Class<?>[] instanceClasses = constructor.getParameterTypes();
+        if (instanceClasses.length == 0) {
+            return cla.cast(constructor.newInstance());
+        }
+        Object[] instanceObjects = new Object[instanceClasses.length];
+        Configuration configuration = (Configuration)instanceMap.get(Configuration.class);
+        for (int i = 0; i < instanceClasses.length; i++) {
+            ConfigParameter configField = constructor.getParameters()[i].getAnnotation(ConfigParameter.class);
+            instanceObjects[i] = BeanFactory.getOjbect(instanceClasses[i], configField, configuration, instanceMap,
+                constructor.getParameters()[i].getName());
+        }
+        return cla.cast(constructor.newInstance(instanceObjects));
+    }
 
 }

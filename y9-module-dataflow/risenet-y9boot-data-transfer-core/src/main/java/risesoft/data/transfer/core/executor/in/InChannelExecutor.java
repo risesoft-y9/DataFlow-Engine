@@ -15,25 +15,25 @@ import risesoft.data.transfer.core.util.CloseUtils;
  */
 public class InChannelExecutor implements Executor {
 
-	private DataInputStream dataInputStream;
+    private DataInputStream dataInputStream;
 
-	private InChannel inChannel;
+    private InChannel inChannel;
 
-	public InChannelExecutor(DataInputStream dataInputStream, InChannel inChannel) {
-		super();
-		this.dataInputStream = dataInputStream;
-		this.inChannel = inChannel;
-	}
+    public InChannelExecutor(DataInputStream dataInputStream, InChannel inChannel) {
+        super();
+        this.dataInputStream = dataInputStream;
+        this.inChannel = inChannel;
+    }
 
-	@Override
-	public void run(Object data) {
-		dataInputStream.read((Data) data, inChannel);
-	}
+    @Override
+    public void run(Object data) {
+        dataInputStream.read((Data)data, inChannel);
+    }
 
-	@Override
-	public void close() throws Exception {
-		CloseUtils.close(dataInputStream);
-		CloseUtils.close(inChannel);
-	}
+    @Override
+    public void close() throws Exception {
+        CloseUtils.close(dataInputStream);
+        CloseUtils.close(inChannel);
+    }
 
 }

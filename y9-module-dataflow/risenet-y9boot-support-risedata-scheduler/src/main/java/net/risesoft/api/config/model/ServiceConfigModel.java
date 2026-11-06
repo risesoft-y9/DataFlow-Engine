@@ -14,7 +14,6 @@ public class ServiceConfigModel {
     @Value("${beta.discovery.service:${spring.application.name:}}")
     String myService;
 
-
     public String getMyService() {
         return myService;
     }

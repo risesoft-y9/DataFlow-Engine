@@ -11,13 +11,13 @@ import risesoft.data.transfer.core.util.strings.handles.StringCastValueHandle;
  */
 public class StringToLongHandle implements StringCastValueHandle<Long> {
 
-	public Class<?>[] getTypes() {
-		return new Class<?>[] { long.class, Long.class };
-	}
+    public Class<?>[] getTypes() {
+        return new Class<?>[] {long.class, Long.class};
+    }
 
-	@Override
-	public Long getValue(String value) {
-		return Long.valueOf(value);
-	}
+    @Override
+    public Long getValue(String value) {
+        return Long.valueOf(value);
+    }
 
 }

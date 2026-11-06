@@ -11,13 +11,13 @@ import risesoft.data.transfer.core.util.strings.handles.StringCastValueHandle;
  */
 public class StringToStringHandle implements StringCastValueHandle<String> {
 
-	public Class<?>[] getTypes() {
-		return new Class<?>[] { String.class };
-	}
+    public Class<?>[] getTypes() {
+        return new Class<?>[] {String.class};
+    }
 
-	@Override
-	public String getValue(String value) {
-		return value;
-	}
+    @Override
+    public String getValue(String value) {
+        return value;
+    }
 
 }
