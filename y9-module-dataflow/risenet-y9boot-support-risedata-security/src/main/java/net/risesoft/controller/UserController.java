@@ -47,7 +47,7 @@ public class UserController {
      * 创建新用户
      *
      * @param userName 用户名
-     * @param password 密码 base64加密过来
+     * @param password 密码，经 Base64 编码后传入
      * @param account 账号
      * @return
      */
